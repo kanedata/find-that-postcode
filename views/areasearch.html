@@ -1,44 +1,47 @@
-<!DOCTYPE html>
-<html>
-  <head>
-		<link href="/static/bulma.css" rel="stylesheet" type="text/css" />
-    <title>Area types</title>
-  </head>
-  <body>
-    <div class="container">
-      <h1 class="title is-1">Search: {{q}}</h1>
-      <form>
-        <input type="text" value="{{q}}" name="q" />
-        <input type="submit" value="search" />
-      </form>
-      <div class="columns">
-        <div class="column">
-          % if result_count <= size:
-          <h2 class="title">Showing all {{ "{:,.0f}".format(result_count) }} results</h2>
-          % else:
-          <h2 class="title">Showing from {{ "{:,.0f}".format(from_ + 1) }} to {{ "{:,.0f}".format(min([from_ + size, result_count])) }} of {{ "{:,.0f}".format(result_count) }} results</h2>
-          % end
+% setdefault("q", "")
+% rebase("base.html", title='Search areas - %s' % (q,))
+<form>
+  <div class="field has-addons">
+    <p class="control is-expanded">
+      <input class="input is-large" type="text" placeholder="Area to search for" value="{{q}}" name="q" />
+    </p>
+    <p class="control">
+      <input type="submit" class="button is-primary is-large" value="search" />
+    </p>
+  </div>
+</form>
+</div>
+</section>
+<section class="section">
+  <div class="container">
+% if defined("results"):
+<div class="columns">
+  <div class="column">
+    % if result_count <= size:
+    <h2 class="title">Showing all {{ "{:,.0f}".format(result_count) }} results</h2>
+    % else:
+    <h2 class="title">Showing from {{ "{:,.0f}".format(from_ + 1) }} to {{ "{:,.0f}".format(min([from_ + size, result_count])) }} of {{ "{:,.0f}".format(result_count) }} results</h2>
+    % end
 
-          <table class="table">
-            <tbody>
-            % for i in results:
-              <tr>
-                <td>
-                  <a href="/area/{{ i["id"] }}.html">{{ i["name"] }}</a>
-                </td>
-                <td>
-                  % for a in area_types:
-                    % if a[0]==i["type"]:
-                    <span class="tag">{{ a[1] }}</span>
-                    % end
-                  % end
-                </td>
-              </tr>
+    <table class="table">
+      <tbody>
+      % for i in results:
+        <tr>
+          <td>
+            <a href="/area/{{ i["id"] }}.html">{{ i["name"] }}</a>
+          </td>
+          <td>
+            % for a in area_types:
+              % if a[0]==i["type"]:
+              <span class="tag">{{ a[1] }}</span>
+              % end
             % end
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </body>
-</html>
+          </td>
+        </tr>
+      % end
+      </tbody>
+    </table>
+    % include('pagination.html', pagination=pagination)
+  </div>
+</div>
+% end

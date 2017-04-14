@@ -5,48 +5,30 @@ import argparse
 from datetime import datetime
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
-
-INDEX_NAME = "postcode"
-
-NAME_FILES = [
-    {"file": "Documents/2011 Census Output Area Classification Names and Codes UK.txt", "type_field": "oac11", "code_field": "OAC11", "name_field": "Subgroup", "welsh_name_field": None },
-    {"file": "Documents/BUASD_names and codes UK as at 12_13.txt", "type_field": "buasd11", "code_field": "BUASD13CD", "name_field": "BUASD13NM", "welsh_name_field": None },
-    {"file": "Documents/BUA_names and codes UK as at 12_13.txt", "type_field": "bua11", "code_field": "BUA13CD", "name_field": "BUA13NM", "welsh_name_field": None },
-    {"file": "Documents/CCG names and codes UK as at 07_15.txt", "type_field": "ccg", "code_field": "CCG15CD", "name_field": "CCG15NM", "welsh_name_field": "CCG15NMW" },
-    {"file": "Documents/Country names and codes UK as at 08_12.txt", "type_field": "ctry", "code_field": "CTRY12CD", "name_field": "CTRY12NM", "welsh_name_field": "CTRY12NMW" },
-    {"file": "Documents/County names and codes UK as at 12_10.txt", "type_field": "cty", "code_field": "CTY10CD", "name_field": "CTY10NM", "welsh_name_field": None },
-    {"file": "Documents/EER names and codes UK as at 12_10.txt", "type_field": "eer", "code_field": "EER10CD", "name_field": "EER10NM", "welsh_name_field": None },
-    {"file": "Documents/HLTHAU names and codes UK as at 12_16.txt", "type_field": "hlthau", "code_field": "HLTHAUCD", "name_field": "HLTHAUNM", "welsh_name_field": "HLTHAUNMW" },
-    {"file": "Documents/LAU2 names and codes UK as at 12_16 (NUTS).txt", "type_field": "nuts", "code_field": "LAU216CD", "name_field": "LAU216NM", "welsh_name_field": None },
-    {"file": "Documents/LA_UA names and codes UK as at 12_16.txt", "type_field": "laua", "code_field": "LAD16CD", "name_field": "LAD16NM", "welsh_name_field": None },
-    {"file": "Documents/LEP names and codes EN as at 12_13.txt", "type_field": "lep", "code_field": "LEP13CD1", "name_field": "LEP13NM1", "welsh_name_field": None },
-    {"file": "Documents/LSOA (2011) names and codes UK as at 12_12.txt", "type_field": "lsoa11", "code_field": "LSOA11CD", "name_field": "LSOA11NM", "welsh_name_field": None },
-    {"file": "Documents/MSOA (2011) names and codes UK as at 12_12.txt", "type_field": "msoa11", "code_field": "MSOA11CD", "name_field": "MSOA11NM", "welsh_name_field": None },
-    {"file": "Documents/National Park names and codes GB as at 08_16.txt", "type_field": "park", "code_field": "NPARK16CD", "name_field": "NPARK16NM", "welsh_name_field": None },
-    {"file": "Documents/Pan SHA names and codes EN as at 12_10 (HRO).txt", "type_field": "hro", "code_field": "PSHA10CD", "name_field": "PSHA10NM", "welsh_name_field": None },
-    {"file": "Documents/PCT names and codes UK as at 12_16.txt", "type_field": "pct", "code_field": "PCTCD", "name_field": "PCTNM", "welsh_name_field": "PCTNMW" },
-    {"file": "Documents/PFA names and codes GB as at 12_15.txt", "type_field": "pfa", "code_field": "PFA15CD", "name_field": "PFA15NM", "welsh_name_field": None },
-    {"file": "Documents/Region names and codes EN as at 12_10 (GOR).txt", "type_field": "gor", "code_field": "GOR10CD", "name_field": "GOR10NM", "welsh_name_field": "GOR10NMW" },
-    {"file": "Documents/Rural Urban (2011) Indicator names and codes GB as at 12_16.txt", "type_field": "ru11ind", "code_field": "RU11IND", "name_field": "RU11NM", "welsh_name_field": None },
-    {"file": "Documents/TECLEC names and codes UK as at 12_16.txt", "type_field": "teclec", "code_field": "TECLECCD", "name_field": "TECLECNM", "welsh_name_field": None },
-    {"file": "Documents/TTWA names and codes UK as at 12_11 v5.txt", "type_field": "ttwa", "code_field": "TTWA11CD", "name_field": "TTWA11NM", "welsh_name_field": None },
-    {"file": "Documents/Westminster Parliamentary Constituency names and codes UK as at 12_14.txt", "type_field": "pcon", "code_field": "PCON14CD", "name_field": "PCON14NM", "welsh_name_field": None },
-    {"file": "Documents/Ward names and codes UK as at 12_16.txt", "type_field": "ward", "code_field": "WD16CD", "name_field": "WD16NM", "welsh_name_field": None },
-    #{"file": "Documents/LAU216_LAU116_NUTS315_NUTS215_NUTS115_UK_LU.txt", "type_field": "", "name_field": "", "welsh_name_field": None },
-]
+from metadata import NAME_FILES
 
 def main():
     parser = argparse.ArgumentParser(description='Import postcodes into elasticsearch.')
+
+    # Postcode details
     parser.add_argument('nspl', type=str,
                         default='data/NSPL.zip',
                         help='ZIP file for National Statistics Postcode Lookup')
     parser.add_argument('--skip-postcodes', dest='do_postcodes', action='store_false', help="Skip import of the postcode data")
     parser.add_argument('--skip-codes', dest='do_codes', action='store_false', help="Skip import of the names and codes data")
+
+    # elasticsearch options
+    parser.add_argument('--es-host', default="localhost", help='host for the elasticsearch instance')
+    parser.add_argument('--es-port', default=9200, help='port for the elasticsearch instance')
+    parser.add_argument('--es-url-prefix', default='', help='Elasticsearch url prefix')
+    parser.add_argument('--es-use-ssl', action='store_true', help='Use ssl to connect to elasticsearch')
+    parser.add_argument('--es-index', default='postcode', help='index used to store postcode data')
+
     args = parser.parse_args()
 
     postcodes = []
 
-    es = Elasticsearch()
+    es = Elasticsearch(host=args.es_host, port=args.es_port, url_prefix=args.es_url_prefix, use_ssl=args.es_use_ssl)
 
     with zipfile.ZipFile(args.nspl) as pczip:
         for f in pczip.filelist:
@@ -57,7 +39,7 @@ def main():
                     pccsv  = io.TextIOWrapper(pccsv)
                     reader = csv.DictReader(pccsv)
                     for i in reader:
-                        i["_index"] = INDEX_NAME
+                        i["_index"] = args.es_index
                         i["_type"] = "postcode"
                         i["_op_type"] = "index"
                         i["_id"] = i["pcds"]
@@ -92,13 +74,13 @@ def main():
                             print("[postcodes] Processed %s postcodes" % pcount)
                             print("[elasticsearch] %s postcodes to save" % len(postcodes))
                             results = bulk(es, postcodes)
-                            print("[elasticsearch] saved %s postcodes to %s index" % (results[0], INDEX_NAME))
+                            print("[elasticsearch] saved %s postcodes to %s index" % (results[0], args.es_index))
                             print("[elasticsearch] %s errors reported" % len(results[1]) )
                             postcodes = []
                     print("[postcodes] Processed %s postcodes" % pcount)
                     print("[elasticsearch] %s postcodes to save" % len(postcodes))
                     results = bulk(es, postcodes)
-                    print("[elasticsearch] saved %s postcodes to %s index" % (results[0], INDEX_NAME))
+                    print("[elasticsearch] saved %s postcodes to %s index" % (results[0], args.es_index))
                     print("[elasticsearch] %s errors reported" % len(results[1]) )
                     postcodes = []
 
@@ -117,7 +99,7 @@ def main():
                     reader = csv.DictReader(nccsv, delimiter='\t')
                     for i in reader:
                         i["_id"] = i[codes["code_field"]]
-                        i["_index"] = INDEX_NAME
+                        i["_index"] = args.es_index
                         i["_type"] = "code"
                         i["_op_type"] = "index"
                         i["type"] = codes["type_field"]
@@ -133,7 +115,7 @@ def main():
                         names_and_codes.append(i)
                     print("[elasticsearch] %s codes to save" % len(names_and_codes))
                     results = bulk(es, names_and_codes)
-                    print("[elasticsearch] saved %s codes to %s index" % (results[0], INDEX_NAME))
+                    print("[elasticsearch] saved %s codes to %s index" % (results[0], args.es_index))
                     print("[elasticsearch] %s errors reported" % len(results[1]) )
 
 

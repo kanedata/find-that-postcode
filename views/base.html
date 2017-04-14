@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+		<link href="/static/bulma.css" rel="stylesheet" type="text/css" />
+    % if 'leaflet' in get('includes', []):
+    <link rel="stylesheet" href="/static/leaflet/leaflet.css" />
+    <script src="/static/leaflet/leaflet.js"></script>
+    <script type="text/javascript" src="http://maps.stamen.com/js/tile.stamen.js?v1.3.0"></script>
+    % end
+    <title>{{ title or 'No title' }}</title>
+  </head>
+  <body>
+    <section class="hero is-dark">
+      <div class="hero-body">
+        <div class="container">
+          <h1 class="title">
+            {{ get("heading") or title }}
+          </h1>
+          <h2 class="subtitle">
+            {{ !get("subtitle", "") }}
+          </h2>
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="container">
+        {{!base}}
+      </div>
+    </section>
+    <footer class="footer">
+      <div class="container">
+        <div class="content has-text-centered">
+          <p>
+            <strong>es-postcodes</strong> by <a href="">David Kane</a>.
+          </p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

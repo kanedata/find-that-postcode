@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+		<link href="/static/bulma.css" rel="stylesheet" type="text/css" />
+    <title>{{ area_type[1] }}</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="title is-1">{{ area_type[1] }}</h1>
+      <div class="columns">
+        <div class="column">
+          % if area_type[2]!=area_type[1]:
+          <h2 class="title is-4">Full name</h2>
+          <p>{{ area_type[2] }}</p>
+          % end
+          <h2 class="title is-4">Code</h2>
+          <p>{{ area_type[0] }}</p>
+          <h2 class="title is-4">Description</h2>
+          <p>{{ area_type[3] }}</p>
+        </div>
+        <div class="column">
+          <h3 class="title">Areas</h3>
+          % if count_areas <= size:
+          <p class="subtitle">Showing all {{ "{:,.0f}".format(count_areas) }}</p>
+          % else:
+          <p class="subtitle">Showing from {{ "{:,.0f}".format(from_ + 1) }} to {{ "{:,.0f}".format(min([from_ + size, count_areas])) }} of {{ "{:,.0f}".format(count_areas) }}</p>
+          % end
+          <table class="table">
+            <tbody>
+            % for i in result:
+              <tr>
+                <td><a href="/area/{{ i["_id"] }}.html">{{ i["_source"]["name"] }}</a></td>
+                <td><a href="/area/{{ i["_id"] }}.html">{{ i["_id"] }}</a></td>
+              </tr>
+            % end
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

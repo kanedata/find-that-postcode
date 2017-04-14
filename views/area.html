@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+		<link href="/static/bulma.css" rel="stylesheet" type="text/css" />
+    <title>{{ area_type[1] }} - {{ area }}</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="title is-1">{{ result["name"] }}</h1>
+      <h2 class="subtitle">
+        <a href="/areatype/{{ area_type[0] }}.html">{{ area_type[1] }}</a> - {{ area }}
+        % if result["name_welsh"]!=result["name"]:
+        ({{result["name_welsh"]}})
+        % end
+      </h2>
+      <div class="columns">
+        <div class="column">
+          <div class="card">
+            <header class="card-header">
+              <p class="card-header-title">Technical details</p>
+            </header>
+            <div class="card-content">
+              <div class="content">
+                <table class="table">
+                  % for i in [i for i in result if i not in ["examples", "name", "type", "name_welsh", "type_name", "sort_order"]]:
+                  <tr>
+                    <td>{{i}}</td>
+                    <td>{{result[i]}}</td>
+                  </tr>
+                  % end
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="column">
+          <h3 class="title">Example postcodes</h3>
+          % for i in result["examples"]:
+          <div class="card">
+            <header class="card-header">
+              <p class="card-header-title"><a href="/postcode/{{ i["postcode"] }}.html">{{ i["postcode"] }}</a></p>
+            </header>
+            <div class="card-image">
+              <figure class="image is-2by1">
+                <img src="https://maps.googleapis.com/maps/api/staticmap?center={{ i["location"]["lat"] }},{{ i["location"]["lon"] }}&zoom=13&size=640x320&maptype=roadmap&markers=color:red%7C{{ i["location"]["lat"] }},{{ i["location"]["lon"] }}&key={{ gmaps_api_key }}" />
+              </figure>
+            </div>
+          </div>
+          <br>
+          % end
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

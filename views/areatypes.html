@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+		<link href="/static/bulma.css" rel="stylesheet" type="text/css" />
+    <title>Area types</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="title is-1">Area types</h1>
+      <div class="columns">
+      % for i in key_area_types:
+        <div class="column">
+          <h2 class="title">{{ i[0] }} areas</h2>
+          <ul>
+            % for area in i[1]:
+              % for area_type in area_types:
+                % if area_type[0] == area:
+                <li>
+                  <a href="/areatype/{{ area_type[0] }}.html">{{ area_type[1] }}</a>
+                  % if area in area_counts:
+                  ({{ "{:,.0f}".format(area_counts[area]) }})
+                  % end
+                </li>
+                % end
+              % end
+            % end
+          </ul>
+        </div>
+      % end
+      </div>
+    </div>
+  </body>
+</html>

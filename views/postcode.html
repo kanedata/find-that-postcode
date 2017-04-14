@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+  <head>
+		<link href="/static/bulma.css" rel="stylesheet" type="text/css" />
+    <title>{{ postcode }}</title>
+  </head>
+  <body>
+    <div class="container">
+      % if point:
+      <h1 class="title is-1">Point {{ point["lat"] }}, {{ point["lon"] }}</h1>
+      <h2 class="subtitle is-5">Closest postcode to point {{ point["lat"] }}, {{ point["lon"] }} is <a href="/postcode/{{postcode}}.html">{{ postcode }}</a>.<br>Centre of {{ postcode }} is {{ "{:,.1f}".format(point["distance"]) }} meters away.</h2>
+      % else:
+      <h1 class="title is-1">Postcode {{ postcode }}</h1>
+        % if result["doterm"]:
+        <h2 class="subtitle is-2">No longer used since {{ result["doterm"].strftime("%B %Y") }}</h2>
+        % end
+      % end
+      <div class="columns">
+        <div class="column">
+          <div class="columns">
+            % if result["location"]:
+            <div class="column">
+              <div class="card">
+                <header class="card-header">
+                  <p class="card-header-title">Latitude and Longitude</p>
+                </header>
+                <div class="card-content">
+                  <div class="content">
+                    <a href="https://tools.wmflabs.org/geohack/geohack.php?params={{ result["location"]["lat"] }};{{ result["location"]["lon"] }}">{{ result["location"]["lat"] }}, {{ result["location"]["lon"] }}</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            % end
+            <div class="column">
+              <div class="card">
+                <header class="card-header">
+                  <p class="card-header-title">OS Easting/Northing</p>
+                </header>
+                <div class="card-content">
+                  <div class="content">
+                    {{ result["oseast1m"] }}, {{ result["osnrth1m"] }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- static map -->
+          % if result["location"]:
+          <figure class="image is-square">
+            <img src="https://maps.googleapis.com/maps/api/staticmap?center={{ result["location"]["lat"] }},{{ result["location"]["lon"] }}&zoom=13&size=600x600&maptype=roadmap&markers=color:red%7C{{ result["location"]["lat"] }},{{ result["location"]["lon"] }}&key={{ gmaps_api_key }}" />
+          </figure>
+          % end
+          <br>
+          <div class="card">
+            <header class="card-header">
+              <p class="card-header-title">Technical details</p>
+            </header>
+            <div class="card-content">
+              <div class="content">
+                <table class="table">
+                  <tbody>
+                    <tr><td>7 character version of postcode</td><td><pre>{{ result["pcd"] }}</pre></td></tr>
+                    <tr><td>8 character version of postcode</td><td><pre>{{ result["pcd2"] }}</pre></td></tr>
+                    <tr><td>Date introduced</td><td>{{ result["dointr"].strftime("%B %Y") }}</td></tr>
+                    % if result["doterm"]:
+                    <tr><td>Date terminated</td><td>{{ result["doterm"].strftime("%B %Y") }}</td></tr>
+                    % end
+                    <tr><td>Postcode user type</td><td>{{result["usertype"] }} ({{ other_codes["usertype"][result["usertype"]] }})</td></tr>
+                    <tr><td>Grid reference positional quality indicator</td><td>{{result["osgrdind"]}} ({{ other_codes["osgrdind"][result["osgrdind"]] }})</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="column">
+          % for i in key_area_types:
+          <h2 class="title">{{ i[0] }} areas</h2>
+          <table class="table">
+            <tbody>
+            % for area in i[1]:
+              % for area_type in area_types:
+                % if area_type[0] == area and not result[area]["id"].endswith("99999999"):
+                <tr>
+                    <td><span title="{{ area_type[0] }}">{{ area_type[1] }}</span></td>
+                    <td>
+                      % if result[area]["name"]=="":
+                      <a href="/area/{{ result[area]["id"] }}.html">{{ result[area]["id"] }}</a>
+                      % else:
+                      <a href="/area/{{ result[area]["id"] }}.html">{{ result[area]["name"] }}</a> <span class="tag is-pulled-right">{{ result[area]["id"] }}</span>
+                      % end
+                    </td>
+                  </tr>
+                % end
+              % end
+            % end
+            </tbody>
+          </table>
+          % end
+          <h2 class="title">Area classifications</h2>
+          <table class="table">
+            <tbody>
+              <tr>
+                <td><span title="oac11">Output area classification</span></td>
+                <td>
+                    {{ result["oac11"]["Supergroup"] }} &gt; <span class="tag is-pulled-right">{{ result["oac11"]["id"][0] }}</span><br>
+                    {{ result["oac11"]["Group"] }} &gt; <span class="tag is-pulled-right">{{ result["oac11"]["id"][0:2] }}</span><br> 
+                    {{ result["oac11"]["Subgroup"] }} <span class="tag is-pulled-right">{{ result["oac11"]["id"] }}</span>
+                </td>
+              </tr>
+              % if result["ru11ind"]:
+              <tr>
+                <td><span title="ru11ind">Rural/urban classification</span></td>
+                <td>{{ result["ru11ind"]["name"] }}  <span class="tag is-pulled-right">{{ result["ru11ind"]["id"] }}</span></td>
+              </tr>
+              % end
+              % if result["imd"] and other_codes["imd"][result["ctry"]["id"]]:
+              <tr>
+                <td><span title="imd">Index of multiple deprivation</span></td>
+                <td>
+                  <p><strong>{{ "{:,.0f}".format(result["imd"]) }}</strong> out of {{ "{:,.0f}".format(other_codes["imd"][result["ctry"]["id"]]) }} lower super output areas in {{ result["ctry"]["name"]}} (where 1 is the most deprived LSOA).</p>
+                  <p><strong>{{ "{:.0%}".format( float(result["imd"]) / float(other_codes["imd"][result["ctry"]["id"]]) ) }}</strong> of LSOAs in {{ result["ctry"]["name"]}} are more deprived than this one.</p>
+                </td>
+              </tr>
+              % end
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -183,7 +183,7 @@ def get_postcode_object(postcode):
     for i in ["dointr", "doterm"]:
         if postcode["_source"][i]:
             postcode["_source"][i] = postcode["_source"][i].strftime("%Y%m")
-            
+
     return {
         "type": "postcodes",
         "id": postcode["_id"],
@@ -333,7 +333,10 @@ def area(areacode, filetype="json"):
         elif filetype=="json":
             return {
                 "data": get_area_object(result),
-                "links": {"self": get_area_link( areacode )}
+                "links": {
+                    "self": get_area_link( areacode ),
+                    "geojson": get_area_link( areacode, filetype="geojson" ) # @TODO need to check whether boundary data actually exists before applying this
+                }
             }
         elif filetype=="geojson":
             if "boundary" not in result["_source"]:

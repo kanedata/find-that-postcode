@@ -1,10 +1,12 @@
 from __future__ import print_function
-import bottle
-from elasticsearch import Elasticsearch
 from datetime import datetime
 import argparse
-from metadata import AREA_TYPES, KEY_AREA_TYPES, OTHER_CODES
 import math
+
+import bottle
+from elasticsearch import Elasticsearch
+
+from metadata import AREA_TYPES, KEY_AREA_TYPES, OTHER_CODES
 
 def parse_postcode(postcode):
     """

@@ -3,8 +3,10 @@ import zipfile
 import io
 import argparse
 from datetime import datetime
+
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
+
 from metadata import NAME_FILES
 
 def main():

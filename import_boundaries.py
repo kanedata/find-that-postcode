@@ -63,6 +63,7 @@ def main():
 
 
         if not os.path.isfile(boundary_file ):
+            print("[%s] Downloading file: [%s]" % (code, boundary_file))
             urllib.request.urlretrieve(boundary_file, "data/%s_boundary.geojson" % code)
             boundary_file = "data/%s_boundary.geojson" % code
 
@@ -85,6 +86,7 @@ def main():
                         print("[ERROR][%s] Feature %s Code field not found" % (code, k,))
 
             else:
+                print("[%s] Opened file: [%s]" % (code, boundary_file))
                 bulk_boundaries = []
                 for k, i in enumerate(boundaries["features"]):
                     bulk_boundaries.append({
@@ -100,9 +102,10 @@ def main():
                             }
                         })
                 print("[elasticsearch] %s boundaries to save" % len(bulk_boundaries))
-                results = bulk(es, bulk_boundaries)
+                results = bulk(es, bulk_boundaries, raise_on_error=False)
                 print("[elasticsearch] saved %s boundaries to %s index" % (results[0], args.es_index))
                 print("[elasticsearch] %s errors reported" % len(results[1]) )
+                # @TODO Log errors somewhere...
 
 
 if __name__ == '__main__':

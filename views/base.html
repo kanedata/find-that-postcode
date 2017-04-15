@@ -2,6 +2,9 @@
 <html>
   <head>
 		<link href="/static/bulma.css" rel="stylesheet" type="text/css" />
+    % if 'jquery' in get('includes', []):
+    <script src="/static/jquery-3.2.1.min.js"></script>
+    % end
     % if 'leaflet' in get('includes', []):
     <link rel="stylesheet" href="/static/leaflet/leaflet.css" />
     <script src="/static/leaflet/leaflet.js"></script>

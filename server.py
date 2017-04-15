@@ -68,6 +68,16 @@ def get_pagination(url, current_page, page_size, total_results, range=5):
 
     return pagination
 
+GEOJSON_TYPES = {
+    "point": "Point", # A single geographic coordinate.
+    "linestring": "LineString", # An arbitrary line given two or more points.
+    "polygon": "Polygon", # A closed polygon whose first and last point must match, thus requiring n + 1 vertices to create an n-sided polygon and a minimum of 4 vertices.
+    "multipoint": "MultiPoint", # An array of unconnected, but likely related points.
+    "multilinestring": "MultiLineString", # An array of separate linestrings.
+    "multipolygon": "MultiPolygon", # An array of separate polygons.
+    "geometrycollection": "GeometryCollection", # A GeoJSON shape similar to the multi* shapes except that multiple types can coexist (e.g., a Point and a LineString).
+}
+
 def main():
 
     parser = argparse.ArgumentParser(description='Run a reconciliation service based on a CSV file')
@@ -91,7 +101,7 @@ def main():
     def process_postcode_result(postcode):
         for i in postcode:
             if postcode[i]:
-                code = es.get(index=args.es_index, doc_type='code', id=postcode[i], ignore=[404])#, _source_include=["name"])
+                code = es.get(index=args.es_index, doc_type='code', id=postcode[i], ignore=[404], _source_exclude=["boundary"])#, _source_include=["name"])
                 if i in ["osgrdind", "usertype"]:
                     pass
                 elif code["found"]:
@@ -157,7 +167,7 @@ def main():
         areaname = bottle.request.query.q
         # @TODO order most important areas to top
         if areaname:
-            result = es.search(index=args.es_index, doc_type='code', q=areaname, from_=from_, size=size)
+            result = es.search(index=args.es_index, doc_type='code', q=areaname, from_=from_, size=size, _source_exclude=["boundary"])
             areas = [{"id": a["_id"], "name": a["_source"]["name"], "type": a["_source"]["type"]} for a in result["hits"]["hits"]]
             if filetype=="html":
                 return bottle.template('areasearch.html',
@@ -182,9 +192,12 @@ def main():
     @bottle.route('/area/<areacode>')
     @bottle.route('/area/<areacode>.<filetype>')
     def area(areacode, filetype="json"):
-        result = es.get(index=args.es_index, doc_type='code', id=areacode, ignore=[404])
+        _source_exclude = ["boundary"]
+        if filetype=="geojson":
+            _source_exclude = []
+
+        result = es.get(index=args.es_index, doc_type='code', id=areacode, ignore=[404], _source_exclude=_source_exclude)
         if result["found"]:
-            # @TODO needs to be random order
             query = {
                 "query": {
                     "function_score": {
@@ -198,8 +211,9 @@ def main():
 
                 }
             }
-            example = es.search(index=args.es_index, doc_type='postcode', body=query, size=5)
-            result["_source"]["examples"] = [{"postcode": e["_id"], "location": e["_source"]["location"]} for e in example["hits"]["hits"]]
+            if filetype!="geojson":
+                example = es.search(index=args.es_index, doc_type='postcode', body=query, size=5)
+                result["_source"]["examples"] = [{"postcode": e["_id"], "location": e["_source"]["location"]} for e in example["hits"]["hits"]]
             area_type=[a for a in AREA_TYPES if a[0]==result["_source"]["type"]][0]
             result["_source"]["type_name"] = area_type[1]
 
@@ -214,6 +228,22 @@ def main():
                     )
             elif filetype=="json":
                 return result["_source"]
+            elif filetype=="geojson":
+                if "boundary" not in result["_source"]:
+                    bottle.abort(404, "boundary not found")
+                return {
+                    "type": "FeatureCollection",
+                    "features": [
+                        {
+                            "type": "Feature",
+                            "geometry": {
+                                "type": GEOJSON_TYPES[result["_source"]["boundary"]["type"]],
+                                "coordinates": result["_source"]["boundary"]["coordinates"]
+                            },
+                            "properties": {k:v for k,v in result["_source"].items() if k!="boundary"}
+                        }
+                    ]
+                }
 
     @bottle.route('/areatype')
     @bottle.route('/areatype.<filetype>')
@@ -230,7 +260,7 @@ def main():
         		}
         	}
         }
-        result = es.search(index=args.es_index, doc_type='code', body=query)
+        result = es.search(index=args.es_index, doc_type='code', body=query, _source_exclude=["boundary"])
         area_counts = {i["key"]:i["doc_count"] for i in result["aggregations"]["group_by_type"]["buckets"]}
 
 
@@ -263,7 +293,7 @@ def main():
                 {"sort_order.keyword": "asc" } # @TODO sort by _id? ??
             ]
         }
-        result = es.search(index=args.es_index, doc_type='code', body=query, from_=from_, size=size)
+        result = es.search(index=args.es_index, doc_type='code', body=query, from_=from_, size=size, _source_exclude=["boundary"])
         if filetype=="html":
             return bottle.template('areatype.html',
                 result=result["hits"]["hits"],

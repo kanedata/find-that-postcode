@@ -3,7 +3,23 @@ from elasticsearch import Elasticsearch
 
 
 INDEXES = [
-    {"name": "postcode", "mapping": ("postcode", {"properties": {"location": {"type": "geo_point"}}}) }
+    {
+        "name": "postcode",
+        "mapping": [
+            ("postcode", {
+                    "properties": {
+                        "boundary": {"type": "geo_shape"}
+                    }
+                }
+            ),
+            ("code", {
+                    "properties": {
+                        "boundary": {"type": "geo_shape"}
+                    }
+                }
+            ),
+        ]
+    }
 ]
 
 def main():
@@ -24,8 +40,9 @@ def main():
         res = es.indices.create(index =  i["name"]  )
 
         if "mapping" in i:
-            res = es.indices.put_mapping(i["mapping"][0], i["mapping"][1], index= i["name"]   )
-            print("[elasticsearch] set mapping on %s index" % ( i["name"]  ))
+            for mapping in i["mapping"]:
+                res = es.indices.put_mapping(mapping[0], mapping[1], index= i["name"]   )
+                print("[elasticsearch] set mapping on %s index, %s type" % ( i["name"], mapping[0]  ))
 
 if __name__ == '__main__':
     main()

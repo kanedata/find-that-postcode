@@ -1,6 +1,6 @@
 % title = '%s - %s' % (area_type[1], area)
 % subtitle = '<a href="/areatype/%s.html">%s</a> - %s' % (area_type[0], area_type[1], area)
-% rebase("base.html", title=title, subtitle=subtitle, heading=result["name"], includes=['leaflet'])
+% rebase("base.html", title=title, subtitle=subtitle, heading=result["name"], includes=['leaflet','jquery'])
 <h2 class="subtitle">
   % if result["name_welsh"]!=result["name"]:
   ({{result["name_welsh"]}})
@@ -53,5 +53,13 @@
   marker.bindPopup("<a href=\"/postcode/{{i["postcode"]}}.html\">{{i["postcode"]}}</a>", {autoClose: false}).openPopup();
   % end
   markers.addTo(mymap);
-  mymap.fitBounds(markers.getBounds());
+  var bounds = markers.getBounds()
+  mymap.fitBounds(bounds);
+  //console.log(markers.getBounds());
+  $.getJSON('/area/{{area}}.geojson', function(boundary){
+    boundary_json = L.geoJSON(boundary).addTo(mymap);
+    console.log(boundary_json.getBounds());
+    bounds = boundary_json.getBounds()
+    mymap.fitBounds(bounds);
+  });
 </script>

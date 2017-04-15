@@ -183,16 +183,11 @@ def get_postcode_object(postcode):
     for i in ["dointr", "doterm"]:
         if postcode["_source"][i]:
             postcode["_source"][i] = postcode["_source"][i].strftime("%Y%m")
-    attributes = {}
-    for i in postcode["_source"]:
-        if not isinstance(postcode["_source"][i], dict):
-            attributes[i] = postcode["_source"][i]
-        elif "id" not in postcode["_source"][i]:
-            attributes[i] = postcode["_source"][i]
+            
     return {
         "type": "postcodes",
         "id": postcode["_id"],
-        "attributes": attributes,
+        "attributes": postcode["_source"],
         "relationships": {
             "areas": {
                 "data": [{

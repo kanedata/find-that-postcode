@@ -108,13 +108,13 @@ def process_postcode_result(postcode, es, es_index):
 
     return postcode
 
-@app.route('/postcode/redirect')
+@app.route('/postcodes/redirect')
 def postcode_redirect():
     postcode = bottle.request.query.postcode
-    return bottle.redirect('/postcode/%s.html' % postcode)
+    return bottle.redirect('/postcodes/%s.html' % postcode)
 
-@app.route('/postcode/<postcode>')
-@app.route('/postcode/<postcode>.<filetype>')
+@app.route('/postcodes/<postcode>')
+@app.route('/postcodes/<postcode>.<filetype>')
 def postcode(postcode, filetype="json"):
     """ View details about a particular postcode
     """
@@ -135,12 +135,18 @@ def postcode(postcode, filetype="json"):
                 other_codes=OTHER_CODES
                 )
         elif filetype=="json":
-            return result["_source"]
+            return {
+                "data": {
+                    "type": "postcode",
+                    "id": result["_id"],
+                    "attributes": result["_source"]
+                }
+            }
 
 
 
-@app.route('/area/search')
-@app.route('/area/search.<filetype>')
+@app.route('/areas/search')
+@app.route('/areas/search.<filetype>')
 def areaname(filetype="json"):
     p = bottle.request.query.p or '1'
     p = int(p)
@@ -155,7 +161,7 @@ def areaname(filetype="json"):
         if filetype=="html":
             return bottle.template('areasearch.html',
             page=p, size=size, from_=from_,
-            pagination=get_pagination( '/area/search.html?q=%s&p=%%s' % areaname, p, size, result["hits"]["total"] ),
+            pagination=get_pagination( '/areas/search.html?q=%s&p=%%s' % areaname, p, size, result["hits"]["total"] ),
             q=areaname,
             results=areas,
             result_count=result["hits"]["total"],
@@ -172,8 +178,8 @@ def areaname(filetype="json"):
         elif filetype=="json":
             return {"result": []}
 
-@app.route('/area/<areacode>')
-@app.route('/area/<areacode>.<filetype>')
+@app.route('/areas/<areacode>')
+@app.route('/areas/<areacode>.<filetype>')
 def area(areacode, filetype="json"):
     _source_exclude = ["boundary"]
     if filetype=="geojson":
@@ -228,8 +234,8 @@ def area(areacode, filetype="json"):
                 ]
             }
 
-@app.route('/areatype')
-@app.route('/areatype.<filetype>')
+@app.route('/areatypes')
+@app.route('/areatypes.<filetype>')
 def areatypes(filetype="json"):
 
     query = {
@@ -257,8 +263,8 @@ def areatypes(filetype="json"):
     else:
         return {"result": AREA_TYPES}
 
-@app.route('/areatype/<areatype>')
-@app.route('/areatype/<areatype>.<filetype>')
+@app.route('/areatypes/<areatype>')
+@app.route('/areatypes/<areatype>.<filetype>')
 def areatype(areatype, filetype="json"):
     p = bottle.request.query.p or '1'
     p = int(p)
@@ -282,7 +288,7 @@ def areatype(areatype, filetype="json"):
             result=result["hits"]["hits"],
             count_areas = result["hits"]["total"],
             page=p, size=size, from_=from_,
-            pagination=get_pagination( '/areatype/%s.html?p=%%s' % areatype, p, size, result["hits"]["total"] ),
+            pagination=get_pagination( '/areatypes/%s.html?p=%%s' % areatype, p, size, result["hits"]["total"] ),
             area_type=[a for a in AREA_TYPES if a[0]==areatype][0],
             area_types=AREA_TYPES,
             key_area_types=KEY_AREA_TYPES,
@@ -291,8 +297,8 @@ def areatype(areatype, filetype="json"):
     elif filetype=="json":
         return {"result": result["hits"]["hits"]}
 
-@app.route('/point/<lat:float>,<lon:float>')
-@app.route('/point/<lat:float>,<lon:float>.<filetype>')
+@app.route('/points/<lat:float>,<lon:float>')
+@app.route('/points/<lat:float>,<lon:float>.<filetype>')
 def get_point(lat, lon, filetype="json"):
     query = {
     	"query": {

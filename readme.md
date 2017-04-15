@@ -77,13 +77,13 @@ By default the server is available at <http://localhost:8080/>.
 
 The server has a number of possible uses:
 
-- `/postcode/SW1A+1AA.html` gives information about a particular postcode.
-- `/area/E09000033.html` gives information about an area, including example postcodes.
-- `/area/search.html?q=Winchester` finds any areas containing a search query.
-- `/areatype/laua.html` gives information about a type of area, including lists of
+- `/postcodes/SW1A+1AA.html` gives information about a particular postcode.
+- `/areas/E09000033.html` gives information about an area, including example postcodes.
+- `/areas/search.html?q=Winchester` finds any areas containing a search query.
+- `/areatypes/laua.html` gives information about a type of area, including lists of
 example codes.
-- `/areatype.html` lists all the possible area types.
-- `/point/53.490911,-2.095804.html` gives details of the postcode closest to the
+- `/areatypes.html` lists all the possible area types.
+- `/points/53.490911,-2.095804.html` gives details of the postcode closest to the
   latitude, longitude point. If it's more than 10km from the nearest postcode it's
   assumed to be outside the UK.
 

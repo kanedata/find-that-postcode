@@ -7,7 +7,7 @@
       % for area in i[1]:
         % for area_type in area_types:
           % if area_type[0] == area:
-          <a href="/areatype/{{ area_type[0] }}.html" class="panel-block">{{ area_type[1] }} &nbsp;
+          <a href="/areatypes/{{ area_type[0] }}.html" class="panel-block">{{ area_type[1] }} &nbsp;
             % if area in area_counts:
             <small> [{{ "{:,.0f}".format(area_counts[area]) }}]</small>
             % end

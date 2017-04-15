@@ -1,6 +1,6 @@
 % if point:
   % title = 'Point %s, %s' % (point["lat"], point["lon"])
-  % subtitle = 'Closest postcode to point {0}, {1} is <a href="/postcode/{2}.html">{2}</a>.<br>Centre of {2} is {3:,.1f} meters away.'.format(point["lat"], point["lon"], postcode, point["distance"])
+  % subtitle = 'Closest postcode to point {0}, {1} is <a href="/postcodes/{2}.html">{2}</a>.<br>Centre of {2} is {3:,.1f} meters away.'.format(point["lat"], point["lon"], postcode, point["distance"])
 % else:
   % title = 'Postcode %s' % (postcode,)
   % subtitle = ""
@@ -82,9 +82,9 @@
               <td><span title="{{ area_type[0] }}">{{ area_type[1] }}</span></td>
               <td>
                 % if result[area]["name"]=="":
-                <a href="/area/{{ result[area]["id"] }}.html">{{ result[area]["id"] }}</a>
+                <a href="/areas/{{ result[area]["id"] }}.html">{{ result[area]["id"] }}</a>
                 % else:
-                <a href="/area/{{ result[area]["id"] }}.html">{{ result[area]["name"] }}</a> <span class="tag is-pulled-right">{{ result[area]["id"] }}</span>
+                <a href="/areas/{{ result[area]["id"] }}.html">{{ result[area]["name"] }}</a> <span class="tag is-pulled-right">{{ result[area]["id"] }}</span>
                 % end
               </td>
             </tr>

@@ -8,10 +8,12 @@
 </h2>
 <div class="columns">
   <div class="column">
+    % if result["examples"][0]["location"].get("lat") and result["examples"][0]["location"].get("lon"):
     <figure>
       <div id="postcode-map" style="height:500px;"></div>
     </figure>
     <br>
+    % end
     <div class="card">
       <header class="card-header">
         <p class="card-header-title">Technical details</p>
@@ -42,14 +44,14 @@
     % end
   </div>
 </div>
-
+% if result["examples"][0]["location"].get("lat") and result["examples"][0]["location"].get("lon"):
 <script type="text/javascript">
-  var postcode_location = [{{ result["examples"][0]["location"]["lat"] }},{{ result["examples"][0]["location"]["lon"] }}];
+  var postcode_location = [{{ result["examples"][0]["location"].get("lat") }},{{ result["examples"][0]["location"].get("lon") }}];
   var mymap = L.map('postcode-map').setView(postcode_location, 9);
   var layer = new L.StamenTileLayer("toner").addTo(mymap);
   var markers = L.featureGroup();
   % for i in result["examples"]:
-  var marker = L.marker([{{ i["location"]["lat"] }},{{ i["location"]["lon"] }}]).addTo(markers);
+  var marker = L.marker([{{ i["location"].get("lat") }},{{ i["location"].get("lon") }}]).addTo(markers);
   marker.bindPopup("<a href=\"/postcode/{{i["postcode"]}}.html\">{{i["postcode"]}}</a>", {autoClose: false}).openPopup();
   % end
   markers.addTo(mymap);
@@ -63,3 +65,4 @@
     mymap.fitBounds(bounds);
   });
 </script>
+% end

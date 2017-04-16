@@ -8,140 +8,23 @@ import bottle
 from elasticsearch import Elasticsearch
 
 from metadata import AREA_TYPES, KEY_AREA_TYPES, OTHER_CODES
+from controllers import postcodes, areatypes
 
 app = bottle.default_app()
 
-def parse_postcode(postcode):
-    """
-    standardises a postcode into the correct format
-    """
-
-    if postcode is None:
-        return None
-
-    # check for blank/empty
-    postcode = postcode.strip()
-    if postcode=='':
-        return None
-
-    # check for nonstandard codes
-    if len(postcode.replace(" ", ""))>7:
-        return postcode
-
-    first_part = postcode[:-3].strip()
-    last_part = postcode[-3:].strip()
-
-    # check for incorrect characters
-    first_part = list(first_part)
-    last_part = list(last_part)
-    if last_part[0]=="O":
-        last_part[0] = "0"
-
-    return "%s %s" % ("".join(first_part), "".join(last_part) )
-
-def get_pagination(current_page, page_size, total_results, range=5):
-    pagination = {
-        "next": None,
-        "prev": None,
-        #"page_range": None,
-        "first": None,
-        "last": None
-    }
-
-    max_page = math.ceil(float(total_results) / float(page_size))
-
-    # next page link
-    if current_page < max_page:
-        pagination["next"] = (current_page + 1, page_size)
-
-    # previous page link
-    if current_page > 1:
-        pagination["prev"] = (current_page - 1, page_size)
-
-    # start_page link
-    if (current_page - 1) > 1:
-        pagination["first"] = (1, page_size)
-
-    # end page link
-    if (current_page + 1) < max_page:
-        pagination["last"] = (max_page, page_size)
-
-    # page ranges
-    # @TODO calculate page ranges
-
-    return pagination
-
-GEOJSON_TYPES = {
-    "point": "Point", # A single geographic coordinate.
-    "linestring": "LineString", # An arbitrary line given two or more points.
-    "polygon": "Polygon", # A closed polygon whose first and last point must match, thus requiring n + 1 vertices to create an n-sided polygon and a minimum of 4 vertices.
-    "multipoint": "MultiPoint", # An array of unconnected, but likely related points.
-    "multilinestring": "MultiLineString", # An array of separate linestrings.
-    "multipolygon": "MultiPolygon", # An array of separate polygons.
-    "geometrycollection": "GeometryCollection", # A GeoJSON shape similar to the multi* shapes except that multiple types can coexist (e.g., a Point and a LineString).
-}
-
-
-def process_postcode_result(postcode, es, es_index):
-    for i in postcode:
-        if postcode[i]:
-            code = es.get(index=es_index, doc_type='code', id=postcode[i], ignore=[404], _source_exclude=["boundary"])#, _source_include=["name"])
-            if i in ["osgrdind", "usertype"]:
-                pass
-            elif code["found"]:
-                code["_source"]["id"] = code["_id"]
-                postcode[i] = code["_source"]
-                if code["_id"].endswith("99999999"):
-                    postcode[i]["name"] = ""
-            elif i in ["wz11", "oa11"]:
-                postcode[i] = {
-                    "id": postcode[i],
-                    "name": "",
-                    "type": i,
-                    "typename":  get_area_type(i)[2]
-                }
-
-    # sort out leps @TODO do this properly
-    postcode["lep"] = postcode["lep1"]
-
-    # turn dates into dates
-    postcode["dointr"] = datetime.strptime(postcode["dointr"], "%Y-%m-%dT%H:%M:%S")
-    if postcode["doterm"]:
-        postcode["doterm"] = datetime.strptime(postcode["doterm"], "%Y-%m-%dT%H:%M:%S")
-
-    return postcode
-
+# @TODO delete
 def set_url_filetype(filetype=None):
     if filetype:
         return "." + filetype
     return ""
 
+# @TODO delete
 def get_area_type(areatype):
     possible_types = [a for a in AREA_TYPES if a[0]==areatype]
     if len(possible_types)==1:
         return possible_types[0]
     return []
 
-def get_area_object(area):
-    return {
-        "type": "areas",
-        "id": area["_id"],
-        "attributes": {
-            "name": area["_source"]["name"],
-            "name_welsh": area["_source"].get("name_welsh"),
-            "type": area["_source"]["type"],
-            "typename": get_area_type(area["_source"]["type"])[2]
-        },
-        "relationships": {
-            "links": {
-                "self": get_area_link(area["_id"]),
-                "related": get_areatype_link(area["_source"]["type"])
-            }
-        }
-    }
-
-def get_area_link(areaid, filetype=None):
-    return "/areas/{}{}".format(areaid, set_url_filetype(filetype))
 
 def get_area_search_link(q, p=1, size=100, filetype=None):
     query_vars = {"q": q}
@@ -150,23 +33,6 @@ def get_area_search_link(q, p=1, size=100, filetype=None):
     if size!=100:
         query_vars["size"] = size
     return "/areas/search{}?{}".format(set_url_filetype(filetype), urlencode(query_vars))
-
-def get_areatype_object(areatype, count_areas= None):
-    return {
-        "type": "areatypes",
-        "id": areatype[0],
-        "attributes": {
-            "name": areatype[1],
-            "name_full": areatype[2],
-            "description": areatype[3],
-            "count": count_areas
-        },
-        "relationships": {
-            "links": {
-                "self": get_areatype_link(areatype[0])
-            }
-        }
-    }
 
 def get_areatype_link(areatypeid, p=1, size=100, filetype=None):
     query_vars = {}
@@ -178,39 +44,6 @@ def get_areatype_link(areatypeid, p=1, size=100, filetype=None):
         return "/areatypes/{}{}?{}".format(areatypeid, set_url_filetype(filetype), urlencode(query_vars))
     else:
         return "/areatypes/{}{}".format(areatypeid, set_url_filetype(filetype))
-
-def get_postcode_object(postcode):
-    for i in ["dointr", "doterm"]:
-        if postcode["_source"][i]:
-            postcode["_source"][i] = postcode["_source"][i].strftime("%Y%m")
-
-    return {
-        "type": "postcodes",
-        "id": postcode["_id"],
-        "attributes": postcode["_source"],
-        "relationships": {
-            "areas": {
-                "data": [{
-                    "type": "areas",
-                    "id": postcode["_source"][a[0]]["id"]
-                } for a in AREA_TYPES if a[0] in postcode["_source"]],
-                "links": {
-                    "self": "/postcodes/{}/relationships/areas".format(postcode["_id"]),
-                    "related": "/postcodes/{}/areas".format(postcode["_id"])
-                }
-            }
-        }
-    }
-
-def get_postcode_included(postcode):
-    areas = [postcode["_source"][a[0]] for a in AREA_TYPES if a[0] in postcode["_source"]]
-    return [get_area_object({
-        "_id": a["id"],
-        "_source": a
-    }) for a in areas]
-
-def get_postcode_link(postcode, filetype=None):
-    return "/postcodes/{}{}".format(postcode, set_url_filetype(filetype))
 
 def get_point_link(lat, lon, filetype=None):
     return "/points/{},{}{}".format(lat, lon, set_url_filetype(filetype))
@@ -225,30 +58,9 @@ def postcode_redirect():
 def postcode(postcode, filetype="json"):
     """ View details about a particular postcode
     """
-    postcode = postcode.replace("+", "")
-    postcode = parse_postcode(postcode)
-    result = app.config.get("es").get(index=app.config.get("es_index", "postcode"), doc_type='postcode', id=postcode, ignore=[404])
-    if result["found"]:
-        result["_source"] = process_postcode_result(result["_source"], app.config.get("es"), app.config.get("es_index", "postcode"))
-
-        if filetype=="html":
-
-            return bottle.template('postcode.html',
-                result=result["_source"],
-                postcode=result["_id"],
-                point=None,
-                area_types=AREA_TYPES,
-                key_area_types=KEY_AREA_TYPES,
-                other_codes=OTHER_CODES
-                )
-        elif filetype=="json":
-            return {
-                "included": get_postcode_included(result),
-                "data": get_postcode_object(result),
-                "links": {"self": get_postcode_link(result["_id"])}
-            }
-
-
+    pc = postcodes.Postcode(app.config.get("es"), app.config.get("es_index", "postcode"))
+    pc.get(postcode)
+    return pc.return_result(filetype)
 
 @app.route('/areas/search')
 @app.route('/areas/search.<filetype>')
@@ -357,7 +169,7 @@ def area(areacode, filetype="json"):
 
 @app.route('/areatypes')
 @app.route('/areatypes.<filetype>')
-def areatypes(filetype="json"):
+def areatypes_all(filetype="json"):
 
     query = {
     	"size": 0,
@@ -388,56 +200,9 @@ def areatypes(filetype="json"):
 @app.route('/areatypes/<areatype>')
 @app.route('/areatypes/<areatype>.<filetype>')
 def areatype(areatype, filetype="json"):
-    p = bottle.request.query.page or '1'
-    p = int(p)
-    size = bottle.request.query.size or '100'
-    size = int(size)
-    from_ = (p-1) * size
-    query = {
-        "query": {
-            "match": {
-                "type": areatype
-            }
-        },
-        "sort": [
-            {"sort_order.keyword": "asc" } # @TODO sort by _id? ??
-        ]
-    }
-    result = app.config.get("es").search(index=app.config.get("es_index", "postcode"), doc_type='code', body=query, from_=from_, size=size, _source_exclude=["boundary"])
-    area_type = get_area_type(areatype)
-    pagination = {k:(get_areatype_link(areatype, v[0], v[1]) if v else None) for k,v in get_pagination( p, size, result["hits"]["total"] ).items()}
-    if filetype=="html":
-        return bottle.template('areatype.html',
-            result=result["hits"]["hits"],
-            count_areas = result["hits"]["total"],
-            page=p, size=size, from_=from_,
-            pagination=pagination,
-            area_type=area_type,
-            area_types=AREA_TYPES,
-            key_area_types=KEY_AREA_TYPES,
-            other_codes=OTHER_CODES
-            )
-    elif filetype=="json":
-        areatype_json = get_areatype_object(area_type, count_areas=result["hits"]["total"])
-        areatype_json["relationships"] = {
-            "areas": {
-                "data": [{
-                    "type": "areas",
-                    "id": a["_id"]
-                } for a in result["hits"]["hits"]],
-                "links": {
-                    "self": "/areatypes/{}/relationships/areas".format(area_type[0]),
-                    "related": "/areatypes/{}/areas".format(area_type[0])
-                }
-            }
-        }
-        links = pagination
-        links["self"] = get_areatype_link(areatype, p, size)
-        return {
-            "data": areatype_json,
-            "links": links,
-            "included": [get_area_object(a) for a in result["hits"]["hits"]]
-        }
+    at = areatypes.Areatype( app.config.get("es"), app.config.get("es_index", "postcode"))
+    at.get( areatype, int(bottle.request.query.page or '1'), int(bottle.request.query.size or '100') )
+    return at.return_result(filetype)
 
 @app.route('/points/<lat:float>,<lon:float>')
 @app.route('/points/<lat:float>,<lon:float>.<filetype>')
@@ -516,8 +281,6 @@ def get_point(lat, lon, filetype="json"):
 
 @app.route('/static/<filename:path>')
 def send_static(filename):
-    """ if we need static files
-    """
     return bottle.static_file(filename, root='./static')
 
 def main():

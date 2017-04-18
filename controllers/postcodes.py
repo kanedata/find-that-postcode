@@ -80,27 +80,3 @@ class Postcode(Controller):
                 json[1]["attributes"][i] = json[1]["attributes"][i].strftime("%Y%m")
 
         return json
-
-    def return_result(self, filetype):
-        json = self.toJSON()
-        if not self.found:
-            return bottle.abort(404)
-
-        if filetype=="html":
-            return bottle.template(self.template_name(),
-                result=self.data,
-                postcode=self.id,
-                point=None,
-                area_types=AREA_TYPES,
-                key_area_types=KEY_AREA_TYPES,
-                other_codes=OTHER_CODES
-                )
-        elif filetype=="json":
-            return {
-                "data": json[1],
-                "included": json[2],
-                "links": {
-                    "self": self.url(),
-                    "html": self.url("html")
-                }
-            }

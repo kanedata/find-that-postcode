@@ -55,32 +55,6 @@ class Areatype(Controller):
             self.attributes["full_name"] = typedata[2]
             self.attributes["description"] = typedata[3]
 
-    def return_result(self, filetype):
-        json = self.toJSON()
-        if not self.found:
-            return bottle.abort(404)
-
-        if filetype=="html":
-            return bottle.template(self.template_name(),
-                result=self.areas,
-                count_areas = self.attributes["count_areas"],
-                page=self.p, size=self.size, from_=self.get_from(),
-                pagination=self.pagination,
-                area_type=[self.id, self.name, self.full_name, self.description],
-                area_types=AREA_TYPES,
-                key_area_types=KEY_AREA_TYPES,
-                other_codes=OTHER_CODES
-                )
-        elif filetype=="json":
-            return {
-                "data": json[1],
-                "included": json[2],
-                "links": {
-                    "self": self.url(),
-                    "html": self.url("html")
-                }
-            }
-
 class Areatypes(Controller):
 
     es_type = 'code'

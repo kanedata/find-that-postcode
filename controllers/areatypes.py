@@ -2,73 +2,72 @@ import bottle
 
 from metadata import AREA_TYPES, KEY_AREA_TYPES, OTHER_CODES
 
-from .controller import Controller
-from .areas import get_area_link
-from .areas import get_area_object
+from .controller import *
+import controllers.areas
 
 class Areatype(Controller):
 
     es_type = 'code'
     url_slug = 'areatypes'
-    template = 'areatype.html'
 
-    def __init__(self, es, es_index):
-        super().__init__(es, es_index)
+    def __init__(self, config):
+        self.areatypes = {i[0]:i for i in AREA_TYPES}
+        super().__init__(config)
 
-    def get(self, areatype, p, size):
-        self.set_pages(p, size)
-        query = {
-            "query": {
-                "match": {
-                    "type": areatype
-                }
-            },
-            "sort": [
-                {"sort_order.keyword": "asc" } # @TODO sort by _id? ??
-            ]
-        }
-        result = self.es.search(index=self.es_index, doc_type=self.es_type, body=query, from_=self.get_from(), size=self.size, _source_exclude=["boundary"])
-        if result["hits"]["total"]>0:
-            self.found = True
-            self.id = areatype
-            self.areas = result["hits"]["hits"]
-            self.count_areas = result["hits"]["total"]
-            self.set_pagination(self.count_areas)
-            typedata = self.get_area_type(areatype)
-            if typedata:
-                self.name = typedata[1]
-                self.full_name = typedata[2]
-                self.description = typedata[3]
-            else:
-                self.name = areatype
-                self.full_name = areatype
-                self.description = ''
-
-    def jsonapi(self):
-        return {
-            "type": "areatypes",
-            "id": self.id,
-            "attributes": {
-                "name": self.name,
-                "name_full": self.full_name,
-                "description": self.description,
-                "count": self.count_areas
-            },
-            "relationships": {
-                "links": {
-                    "self": self.url()
-                }
+    def get_by_id(self, areatype, p=1, size=None):
+        self.set_from_data(areatype)
+        self.areas = []
+        if self.config.get("es") and not self.config.get("stop_recursion"):
+            self.relationships["areas"] = []
+            #size = self.default_size if size is None else size
+            #self.set_pages(p, size)
+            #from_ = self.get_from()
+            size = 100
+            from_ = 0
+            query = {
+                "query": {
+                    "match": {
+                        "type": self.id
+                    }
+                },
+                "sort": [
+                    {"sort_order.keyword": "asc" } # @TODO sort by _id? ??
+                ]
             }
+            result = self.config.get("es").search(index=self.config.get("es_index"), doc_type=self.es_type, body=query, from_=from_, size=size, _source_exclude=["boundary"])
+            if result["hits"]["total"]>0:
+                self.config["stop_recursion"] = True
+                self.relationships["areas"] = [controllers.areas.Area(self.config).set_from_data(a) for a in result["hits"]["hits"]]
+                self.attributes["count_areas"] = result["hits"]["total"]
+                #self.set_pagination(self.attributes["count_areas"])
+            else: self.found = False
+        return self
+
+    def set_from_data(self, areatype):
+        self.found = True
+        self.id = areatype
+        self.attributes = {
+            "id": areatype,
+            "count_areas": None,
+            "name": areatype,
+            "full_name": areatype,
+            "description": ""
         }
+        typedata = self.areatypes.get(areatype)
+        if typedata:
+            self.attributes["name"] = typedata[1]
+            self.attributes["full_name"] = typedata[2]
+            self.attributes["description"] = typedata[3]
 
     def return_result(self, filetype):
+        json = self.toJSON()
         if not self.found:
             return bottle.abort(404)
 
         if filetype=="html":
             return bottle.template(self.template_name(),
                 result=self.areas,
-                count_areas = self.count_areas,
+                count_areas = self.attributes["count_areas"],
                 page=self.p, size=self.size, from_=self.get_from(),
                 pagination=self.pagination,
                 area_type=[self.id, self.name, self.full_name, self.description],
@@ -77,23 +76,60 @@ class Areatype(Controller):
                 other_codes=OTHER_CODES
                 )
         elif filetype=="json":
-            areatype_json = self.jsonapi()
-            areatype_json["relationships"] = {
-                "areas": {
-                    "data": [{
-                        "type": "areas",
-                        "id": a["_id"]
-                    } for a in self.areas],
-                    "links": {
-                        "self": self.relationship_url('areas', False),
-                        "related": self.relationship_url('areas', True)
-                    }
+            return {
+                "data": json[1],
+                "included": json[2],
+                "links": {
+                    "self": self.url(),
+                    "html": self.url("html")
                 }
             }
-            links = self.pagination
-            links["self"] = self.url()
-            return {
-                "data": areatype_json,
-                "links": links,
-                "included": [self.get_area_object(a) for a in self.areas]
-            }
+
+class Areatypes(Controller):
+
+    es_type = 'code'
+    url_slug = 'areatypes'
+    template = 'areatypes.html'
+
+    def __init__(self, config, data=None):
+        self.areatypes = {i[0]:i for i in AREA_TYPES}
+        super().__init__(config, data)
+
+    def get(self):
+        query = {
+        	"size": 0,
+        	"aggs": {
+        		"group_by_type": {
+        			"terms": {
+        				"field": "type.keyword",
+        				"size": 100
+        			}
+        		}
+        	}
+        }
+        result = self.config.get("es").search(index=self.config.get("es_index", "postcode"), doc_type=self.es_type, body=query, _source_exclude=["boundary"])
+        self.area_counts = {i["key"]:i["doc_count"] for i in result["aggregations"]["group_by_type"]["buckets"]}
+        self.attributes = []
+        for a in self.areatypes:
+            areatype = Areatype(self.config, a)
+            if a in self.area_counts:
+                areatype.attributes["count_areas"] = self.area_counts[a]
+            self.attributes.append(areatype)
+
+    def toJSON(self):
+        return {
+            "data": [a.toJSON() for a in self.attributes],
+            "links": {"self": "/areatypes"}
+        }
+
+    def return_result(self, filetype):
+
+        if filetype=="html":
+            return bottle.template('areatypes.html',
+                area_counts=self.area_counts,
+                area_types=AREA_TYPES,
+                key_area_types=KEY_AREA_TYPES,
+                other_codes=OTHER_CODES
+                )
+        else:
+            return self.toJSON()

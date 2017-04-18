@@ -1,46 +1,91 @@
 from metadata import AREA_TYPES
 
-def get_area_object(area):
-    return {
-        "type": "areas",
-        "id": area["_id"],
-        "attributes": {
-            "name": area["_source"]["name"],
-            "name_welsh": area["_source"].get("name_welsh"),
-            "type": area["_source"]["type"],
-            "typename": get_area_type(area["_source"]["type"])[2]
-        },
-        "relationships": {
-            "links": {
-                "self": get_area_link(area["_id"]),
-                "related": get_areatype_link(area["_source"]["type"])
+from .controller import *
+import controllers.postcodes
+import controllers.areatypes
+
+class Area(Controller):
+
+    es_type = 'code'
+    url_slug = 'areas'
+    template = 'area.html'
+
+    def __init__(self, config):
+        super().__init__(config)
+        self.boundary = None
+
+    def get_by_id(self, id, boundary=False, examples_count=5):
+        id = self.parse_id(id)
+        _source_exclude = [] if boundary else ["boundary"]
+        result = self.config.get("es").get(index=self.config.get("es_index"), doc_type=self.es_type, id=id, ignore=[404], _source_exclude=_source_exclude)
+        if result["found"]:
+            self.relationships["areatype"] = {}
+            self.set_from_data(result)
+            if examples_count>0:
+                self.relationships["example_postcodes"] = self.get_example_postcodes(examples_count)
+            self.boundary = result["_source"].get("boundary")
+
+    def process_attributes(self, area):
+        self.relationships["areatype"] = controllers.areatypes.Areatype(self.config).get_by_id(area["type"])
+        del area["type"]
+        if "boundary" in area:
+            del area["boundary"]
+        return area
+
+    def get_example_postcodes(self, examples_count=5):
+        query = {
+            "query": {
+                "function_score": {
+                    "query": {
+                        "query_string": {
+                            "query": self.id
+                        }
+                    },
+                    "random_score": {}
+                }
+
             }
         }
-    }
+        example = self.config.get("es").search(index=self.config.get("es_index"), doc_type='postcode', body=query, size=examples_count)
+        return [controllers.postcodes.Postcode(self.config).set_from_data(e) for e in example["hits"]["hits"]]
 
-def get_area_type(areatype):
-    possible_types = [a for a in AREA_TYPES if a[0]==areatype]
-    if len(possible_types)==1:
-        return possible_types[0]
-    return []
+    def return_result(self, filetype):
+        json = self.toJSON()
+        if not self.found:
+            return bottle.abort(404)
 
-
-def get_area_link(areaid, filetype=None):
-    return "/areas/{}{}".format(areaid, set_url_filetype(filetype))
-
-
-def set_url_filetype(filetype=None):
-    if filetype:
-        return "." + filetype
-    return ""
-
-def get_areatype_link(areatypeid, p=1, size=100, filetype=None):
-    query_vars = {}
-    if p > 1:
-        query_vars["page"] = p
-    if size!=100:
-        query_vars["size"] = size
-    if len(query_vars)>0:
-        return "/areatypes/{}{}?{}".format(areatypeid, set_url_filetype(filetype), urlencode(query_vars))
-    else:
-        return "/areatypes/{}{}".format(areatypeid, set_url_filetype(filetype))
+        if filetype=="html":
+            return bottle.template(self.template_name(),
+                result=self.attributes,
+                area=self.id,
+                area_type=self.attributes.get("type"),
+                area_types=AREA_TYPES,
+                key_area_types=KEY_AREA_TYPES,
+                other_codes=OTHER_CODES
+                )
+        elif filetype=="json":
+            return {
+                "data": json[1],
+                "included": json[2],
+                "links": {
+                    "self": self.url(),
+                    "html": self.url("html"),
+                    "geojson": self.url(filetype="geojson" ) # @TODO need to check whether boundary data actually exists before applying this
+                }
+            }
+        elif filetype=="geojson":
+            if not self.boundary:
+                bottle.abort(404, "boundary not found")
+            return {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": GEOJSON_TYPES[self.boundary["type"]],
+                            "coordinates": self.boundary["coordinates"]
+                        },
+                        "properties": self.attributes
+                    }
+                ]
+            }

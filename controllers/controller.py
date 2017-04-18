@@ -1,6 +1,7 @@
 from metadata import AREA_TYPES
 import math
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlunparse
+import bottle
 
 GEOJSON_TYPES = {
     "point": "Point", # A single geographic coordinate.
@@ -15,41 +16,55 @@ GEOJSON_TYPES = {
 class Controller:
 
     template = None
-    default_size = 100
 
-    def __init__(self, es, es_index):
-        self.es_index = es_index
-        self.es = es
+    def __init__(self, config={}):
+        # main configuration
+        self.config = config
+        self.urlparts = bottle.request.urlparts if bottle else None
         self.found = False
-        self.data = {}
+        self.errors = []
+        self.attributes = {}
+        self.relationships = {}
         self.id = None
-        self.use_pagination = False
-        self.p = None
-        self.size = self.default_size
-        self.pagination = {
-            "next": None,
-            "prev": None,
-            "first": None,
-            "last": None
-        }
-        self.areatypes = {i[0]:i for i in AREA_TYPES}
+        self.pagination = False
 
-    def get_area_type(self, areatype):
-        return self.areatypes.get(areatype, [])
+    def set_from_data(self, data=None):
+        if data:
+            self.found = True
+            self.attributes = self.process_attributes(data["_source"])
+            self.id = data["_id"]
+        return self
+
+    def process_attributes(self, data):
+        return data
+
+    def parse_id(self, id):
+        return id
 
     def url(self, filetype=None, query_vars={}):
-        return "/{}/{}{}{}".format(self.url_slug, self.id, self.set_url_filetype(filetype), self.get_query_string(query_vars))
+        path = [self.url_slug, self.id.replace(" ", "+") + self.set_url_filetype(filetype)]
+        return urlunparse([
+            self.urlparts.scheme if self.urlparts else "",
+            self.urlparts.netloc if self.urlparts else "",
+            "/".join(path),
+            "",
+            self.get_query_string(query_vars),
+            ""
+        ])
 
     def relationship_url(self, relationship, related=True, filetype=None, query_vars={}):
         if related:
-            return "/{}/{}/{}{}{}".format(self.url_slug, self.id, relationship, self.set_url_filetype(filetype), self.get_query_string(query_vars))
+            path = [self.url_slug, self.id.replace(" ", "+"), relationship + self.set_url_filetype(filetype)]
         else:
-            return "/{}/{}/relationships/{}{}{}".format(self.url_slug, self.id, relationship, self.set_url_filetype(filetype), self.get_query_string(query_vars))
-
-    def template_name(self):
-        if self.template:
-            return self.template
-        return '{}.html'.format(self.es_type)
+            path = [self.url_slug, self.id.replace(" ", "+"), "relationships", relationship + self.set_url_filetype(filetype)]
+        return urlunparse([
+            self.urlparts.scheme if self.urlparts else "",
+            self.urlparts.netloc if self.urlparts else "",
+            "/".join(path),
+            "",
+            self.get_query_string(query_vars),
+            ""
+        ])
 
     def set_url_filetype(self, filetype=None):
         if filetype:
@@ -57,22 +72,87 @@ class Controller:
         return ""
 
     def get_query_string(self, query_vars={}):
-        query_vars = self.page_query_vars(query_vars)
-        return ('?' + urlencode(query_vars)) if len(query_vars)>0 else ''
+        #query_vars = self.page_query_vars(query_vars)
+        return urlencode(query_vars)
+
+    # role = top|identifier|embedded
+    def toJSON(self, role="top"):
+        json = {}
+        included = []
+        status = 404
+
+        # check if anything has been found
+        if not self.found:
+            json["errors"] = [
+                {
+                    "status": str(status),
+                    "title": "resource not found",
+                    "detail": "resource could not be found"
+                }
+            ]
+            return (status, json, included)
+
+        status = 200
+        json["type"] = self.url_slug
+        json["id"] = self.id
+        if role=="identifer":
+            return (status, json, included)
+
+        json["attributes"] = self.attributes
+        json["links"] = {
+            "self": self.url(),
+            "html": self.url("html")
+        }
+
+        # add relationship information
+        if len(self.relationships)>0:
+            json["relationships"] = {}
+
+        for i in self.relationships:
+            json["relationships"][i] = {
+                "links": {
+                    "self": self.relationship_url(i, False),
+                    "related": self.relationship_url(i, True)
+                },
+                "data": None
+            }
+            if isinstance(self.relationships[i], list):
+                json["relationships"][i]["data"] = [j.toJSON("identifer")[1] for j in self.relationships[i]]
+                if role!="embedded":
+                    included += [j.toJSON("embedded")[1] for j in self.relationships[i]]
+            else:
+                json["relationships"][i]["data"] = self.relationships[i].toJSON("identifer")[1]
+                if role!="embedded":
+                    included.append(self.relationships[i].toJSON("embedded")[1])
+
+        return (status, json, included)
+
+class Pagination():
+
+    default_size = 100
+
+    def __init__():
+        self.page = None
+        self.size = self.default_size
+        self.pagination = {
+            "next": None,
+            "prev": None,
+            "first": None,
+            "last": None
+        }
 
     def page_query_vars(self, query_vars={}):
-        if self.p and self.p > 1 and "page" not in query_vars:
+        if self.page and self.page > 1 and "page" not in query_vars:
             query_vars["page"] = self.p
         if self.size and self.size and self.size!=self.default_size and "size" not in query_vars:
             query_vars["size"] = self.size
         return query_vars
 
-
     def get_from(self):
-        return (self.p-1) * self.size
+        return (self.page-1) * self.size
 
-    def set_pages(self, p, size):
-        self.p = p
+    def set_pages(self, page, size):
+        self.page = page
         self.size = size
 
     def set_pagination(self, total_results, filetype="json", url_args={}, range=5):
@@ -83,23 +163,23 @@ class Controller:
             url_args["size"] = self.size
 
         # next page link
-        if self.p < self.max_page:
-            url_args["p"] = self.p + 1
+        if self.page < self.max_page:
+            url_args["page"] = self.page + 1
             self.pagination["next"] = self.url(filetype, url_args)
 
         # previous page link
-        if self.p > 1:
-            url_args["p"] = self.p - 1
+        if self.page > 1:
+            url_args["page"] = self.page - 1
             self.pagination["prev"] = self.url(filetype, url_args)
 
         # start_page link
-        if (self.p - 1) > 1:
-            url_args["p"] = 1
+        if (self.page - 1) > 1:
+            url_args["page"] = 1
             self.pagination["first"] = self.url(filetype, url_args)
 
         # end page link
-        if (self.p + 1) < self.max_page:
-            url_args["p"] = self.max_page
+        if (self.page + 1) < self.max_page:
+            url_args["page"] = self.max_page
             self.pagination["last"] = self.url(filetype, url_args)
 
         # page ranges

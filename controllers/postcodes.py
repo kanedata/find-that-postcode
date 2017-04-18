@@ -1,92 +1,47 @@
 from datetime import datetime
 import bottle
+import re
 
 from metadata import AREA_TYPES, KEY_AREA_TYPES, OTHER_CODES
 
-from .controller import Controller
-from .areatypes import Areatype
-from .areas import get_area_object
+from .controller import *
+import controllers.areas
 
 class Postcode(Controller):
 
     es_type = 'postcode'
     url_slug = 'postcodes'
     date_fields = ["dointr", "doterm"]
-    template = 'postcode.html'
+    not_area_fields = ["osgrdind", "usertype"]
 
-    def __init__(self, es, es_index):
-        super().__init__(es, es_index)
+    def __init__(self, config):
+        super().__init__(config)
 
-    def get(self, postcode):
-        postcode = postcode.replace("+", "")
-        postcode = self.parse_postcode(postcode)
-        result = self.es.get(index=self.es_index, doc_type=self.es_type, id=postcode, ignore=[404])
-        if result["found"]:
-            self.found = True
-            self.data = self.process_result(result["_source"])
-            self.id = result["_id"]
+    def get_by_id(self, id):
+        id = self.parse_id(id)
+        if id:
+            result = self.config.get("es").get(index=self.config.get("es_index"), doc_type=self.es_type, id=id, ignore=[404])
+            if result["found"]:
+                self.set_from_data(result)
 
-    def jsonapi(self):
-        for i in self.date_fields:
-            if self.data[i]:
-                self.data[i] = self.data[i].strftime("%Y%m")
-
-        return {
-            "type": "postcodes",
-            "id": self.id,
-            "attributes": self.data,
-            "relationships": {
-                "areas": {
-                    "data": [{
-                        "type": "areas",
-                        "id": self.data[a[0]]["id"]
-                    } for a in AREA_TYPES if a[0] in self.data],
-                    "links": {
-                        "self": self.relationship_url("areas", False),
-                        "related": self.relationship_url("areas", True)
-                    }
-                }
-            }
-        }
-
-    def jsonapi_included(self):
-        areas = [self.data[a[0]] for a in AREA_TYPES if a[0] in self.data]
-        return [self.get_area_object({
-            "_id": a["id"],
-            "_source": a
-        }) for a in areas]
-
-    def process_result(self, postcode):
-        for i in postcode:
-            if postcode[i]:
-                code = self.es.get(index=self.es_index, doc_type='code', id=postcode[i], ignore=[404], _source_exclude=["boundary"])
-                if i in ["osgrdind", "usertype"]:
-                    pass
-                elif code["found"]:
-                    code["_source"]["id"] = code["_id"]
-                    postcode[i] = code["_source"]
-                    if code["_id"].endswith("99999999"):
-                        postcode[i]["name"] = ""
-                elif i in ["wz11", "oa11"]:
-                    postcode[i] = {
-                        "id": postcode[i],
-                        "name": postcode[i],
-                        "type": i,
-                        "typename": self.get_area_type(i)[2]
-                    }
-
-        # sort out leps @TODO do this properly
-        postcode["lep"] = postcode["lep1"]
+    def process_attributes(self, postcode, get_areas=True):
+        self.relationships["areas"] = []
+        for i in list(postcode.keys()):
+            if postcode[i] and i not in self.not_area_fields:
+                area  = controllers.areas.Area(self.config)
+                area.get_by_id(postcode[i], examples_count=0)
+                if area.found:
+                    del postcode[i]
+                    self.relationships["areas"].append(area)
 
         # turn dates into dates
         for i in self.date_fields:
-            if postcode[i]:
+            if postcode[i] and not isinstance(postcode[i], datetime):
                 postcode[i] = datetime.strptime(postcode[i], "%Y-%m-%dT%H:%M:%S")
 
         return postcode
 
-
-    def parse_postcode(self, postcode):
+    def parse_id(self, postcode):
         """
         standardises a postcode into the correct format
         """
@@ -95,12 +50,16 @@ class Postcode(Controller):
             return None
 
         # check for blank/empty
-        postcode = postcode.strip()
+        # put in all caps
+        postcode = postcode.strip().upper()
         if postcode=='':
             return None
 
+        # replace any non alphanumeric characters
+        postcode = re.sub('[^0-9a-zA-Z]+', '', postcode)
+
         # check for nonstandard codes
-        if len(postcode.replace(" ", ""))>7:
+        if len(postcode)>7:
             return postcode
 
         first_part = postcode[:-3].strip()
@@ -114,7 +73,16 @@ class Postcode(Controller):
 
         return "%s %s" % ("".join(first_part), "".join(last_part) )
 
+    def toJSON(self, role="top"):
+        json = super().toJSON(role)
+        for i in self.date_fields:
+            if json[1].get("attributes", {}).get(i) and isinstance(json[1]["attributes"][i], datetime):
+                json[1]["attributes"][i] = json[1]["attributes"][i].strftime("%Y%m")
+
+        return json
+
     def return_result(self, filetype):
+        json = self.toJSON()
         if not self.found:
             return bottle.abort(404)
 
@@ -129,7 +97,10 @@ class Postcode(Controller):
                 )
         elif filetype=="json":
             return {
-                "data": self.jsonapi(),
-                "included": self.jsonapi_included(),
-                "links": {"self": self.url()}
+                "data": json[1],
+                "included": json[2],
+                "links": {
+                    "self": self.url(),
+                    "html": self.url("html")
+                }
             }

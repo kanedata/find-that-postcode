@@ -44,37 +44,17 @@ class Point(Controller):
             self.relationships["nearest_postcode"] = controllers.postcodes.Postcode(self.config).set_from_data(postcode)
             self.attributes["distance_from_postcode"] = postcode["sort"][0]
 
-    def return_result(self, filetype):
-        json = self.toJSON()
-        if not self.found:
-            return bottle.abort(404)
+    def topJSON(self):
 
         # check if postcode is too far away
         if self.attributes.get("distance_from_postcode") > self.max_distance:
-            return {
+            return (400, {
                 "errors": [{
                     "status": "400",
                     "code": "point_outside_uk",
-                    "title": "Nearest postcode ({}) is more than 10km away ({:,.1f}km). Are you sure this point is in the UK?".format( self.postcode.id, (self.attributes.get("distance_from_postcode") / 1000) )
+                    "title": "Nearest postcode is more than 10km away",
+                    "detail": "Nearest postcode ({}) is more than 10km away ({:,.1f}km). Are you sure this point is in the UK?".format( self.postcode.id, (self.attributes.get("distance_from_postcode") / 1000) )
                 }]
-            }
+            })
 
-        if filetype=="html":
-
-            return bottle.template('postcode.html',
-                result=self.postcode.attributes,
-                postcode=self.postcode.id,
-                point={"lat": self.attributes.get("lat"), "lon": self.attributes.get("lon"), "distance": self.attributes.get("distance_from_postcode")},
-                area_types=AREA_TYPES,
-                key_area_types=KEY_AREA_TYPES,
-                other_codes=OTHER_CODES
-                )
-        elif filetype=="json":
-            return {
-                "data": json[1],
-                "included": json[2],
-                "links": {
-                    "self": self.url(),
-                    "html": self.url("html")
-                }
-            }
+        return super().topJSON()

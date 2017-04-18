@@ -26,7 +26,7 @@ class Controller:
         self.attributes = {}
         self.relationships = {}
         self.id = None
-        self.pagination = False
+        self.pagination = None
 
     def set_from_data(self, data=None):
         if data:
@@ -127,13 +127,36 @@ class Controller:
 
         return (status, json, included)
 
+    def topJSON(self):
+        json = self.toJSON()
+        if not self.found:
+            return (404, {
+                "errors": [
+                    {
+                        "status": "404",
+                        "code": "not_found",
+                        "title": "Code not found"
+                    }
+                ]
+            })
+
+        return (200, {
+                "data": json[1],
+                "included": json[2],
+                "links": {
+                    "self": self.url(),
+                    "html": self.url("html")
+                }
+            })
+
 class Pagination():
 
     default_size = 100
 
-    def __init__():
-        self.page = None
-        self.size = self.default_size
+    def __init__(self):
+        self.page = int(bottle.request.query.page or 1)
+        self.size = int(bottle.request.query.size or self.default_size)
+        self.from_ = self.get_from()
         self.pagination = {
             "next": None,
             "prev": None,
@@ -155,7 +178,7 @@ class Pagination():
         self.page = page
         self.size = size
 
-    def set_pagination(self, total_results, filetype="json", url_args={}, range=5):
+    def set_pagination(self, total_results, url_args={}, range=5):
         self.total = total_results
         self.max_page = math.ceil(float(total_results) / float(self.size))
 
@@ -165,22 +188,22 @@ class Pagination():
         # next page link
         if self.page < self.max_page:
             url_args["page"] = self.page + 1
-            self.pagination["next"] = self.url(filetype, url_args)
+            self.pagination["next"] = url_args
 
         # previous page link
         if self.page > 1:
             url_args["page"] = self.page - 1
-            self.pagination["prev"] = self.url(filetype, url_args)
+            self.pagination["prev"] = url_args
 
         # start_page link
         if (self.page - 1) > 1:
             url_args["page"] = 1
-            self.pagination["first"] = self.url(filetype, url_args)
+            self.pagination["first"] = url_args
 
         # end page link
         if (self.page + 1) < self.max_page:
             url_args["page"] = self.max_page
-            self.pagination["last"] = self.url(filetype, url_args)
+            self.pagination["last"] = url_args
 
         # page ranges
         # @TODO calculate page ranges

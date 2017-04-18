@@ -19,11 +19,7 @@ class Areatype(Controller):
         self.areas = []
         if self.config.get("es") and not self.config.get("stop_recursion"):
             self.relationships["areas"] = []
-            #size = self.default_size if size is None else size
-            #self.set_pages(p, size)
-            #from_ = self.get_from()
-            size = 100
-            from_ = 0
+            self.pagination = Pagination()
             query = {
                 "query": {
                     "match": {
@@ -34,12 +30,12 @@ class Areatype(Controller):
                     {"sort_order.keyword": "asc" } # @TODO sort by _id? ??
                 ]
             }
-            result = self.config.get("es").search(index=self.config.get("es_index"), doc_type=self.es_type, body=query, from_=from_, size=size, _source_exclude=["boundary"])
+            result = self.config.get("es").search(index=self.config.get("es_index"), doc_type=self.es_type, body=query, from_=self.pagination.from_, size=self.pagination.size, _source_exclude=["boundary"])
             if result["hits"]["total"]>0:
                 self.config["stop_recursion"] = True
                 self.relationships["areas"] = [controllers.areas.Area(self.config).set_from_data(a) for a in result["hits"]["hits"]]
                 self.attributes["count_areas"] = result["hits"]["total"]
-                #self.set_pagination(self.attributes["count_areas"])
+                self.pagination.set_pagination(self.attributes["count_areas"])
             else: self.found = False
         return self
 

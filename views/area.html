@@ -1,14 +1,16 @@
-% title = '%s - %s' % (area_type[1], area)
-% subtitle = '<a href="/areatypes/%s.html">%s</a> - %s' % (area_type[0], area_type[1], area)
-% rebase("base.html", title=title, subtitle=subtitle, heading=result["name"], includes=['leaflet','jquery'])
+% areatype = included[("areatypes", result["data"]["relationships"]["areatype"]["data"]["id"])]
+% title = '%s - %s' % (areatype["attributes"]["name"], result["data"]["id"])
+% subtitle = '<a href="/areatypes/%s.html">%s</a> - %s' % (areatype["id"], areatype["attributes"]["name"], result["data"]["attributes"]["name"])
+% rebase("base.html", title=title, subtitle=subtitle, heading=result["data"]["attributes"]["name"], includes=['leaflet','jquery'])
 <h2 class="subtitle">
-  % if result["name_welsh"]!=result["name"]:
-  ({{result["name_welsh"]}})
+  % if result["data"]["attributes"]["name_welsh"]!=result["data"]["attributes"]["name"]:
+  ({{ result["data"]["attributes"]["name_welsh"] }})
   % end
 </h2>
 <div class="columns">
   <div class="column">
-    % if result["examples"][0]["location"].get("lat") and result["examples"][0]["location"].get("lon"):
+    % example_postcode = included[("postcodes", result["data"]["relationships"]["example_postcodes"]["data"][0]["id"])]
+    % if example_postcode["attributes"]["location"]["lat"] and example_postcode["attributes"]["location"]["lon"]:
     <figure>
       <div id="postcode-map" style="height:500px;"></div>
     </figure>
@@ -21,10 +23,10 @@
       <div class="card-content">
         <div class="content">
           <table class="table">
-            % for i in [i for i in result if i not in ["examples", "name", "type", "name_welsh", "type_name", "sort_order"]]:
+            % for i in [i for i in result["data"]["attributes"] if i not in ["examples", "name", "type", "name_welsh", "type_name", "sort_order"]]:
             <tr>
               <td>{{i}}</td>
-              <td>{{result[i]}}</td>
+              <td>{{result["data"]["attributes"][i]}}</td>
             </tr>
             % end
           </table>
@@ -34,31 +36,32 @@
   </div>
   <div class="column">
     <h3 class="title">Example postcodes</h3>
-    % for i in result["examples"]:
+    % for i in result["data"]["relationships"]["example_postcodes"]["data"]:
     <div class="card">
       <div class="card-content">
-        <p class="content"><a href="/postcodes/{{ i["postcode"] }}.html">{{ i["postcode"] }}</a></p>
+        <p class="content"><a href="/postcodes/{{ i["id"] }}.html">{{ i["id"] }}</a></p>
       </div>
     </div>
     <br>
     % end
   </div>
 </div>
-% if result["examples"][0]["location"].get("lat") and result["examples"][0]["location"].get("lon"):
+% if example_postcode["attributes"]["location"]["lat"] and example_postcode["attributes"]["location"]["lon"]:
 <script type="text/javascript">
-  var postcode_location = [{{ result["examples"][0]["location"].get("lat") }},{{ result["examples"][0]["location"].get("lon") }}];
+  var postcode_location = [{{ example_postcode["attributes"]["location"].get("lat") }},{{ example_postcode["attributes"]["location"].get("lon") }}];
   var mymap = L.map('postcode-map').setView(postcode_location, 9);
   var layer = new L.StamenTileLayer("toner").addTo(mymap);
   var markers = L.featureGroup();
-  % for i in result["examples"]:
-  var marker = L.marker([{{ i["location"].get("lat") }},{{ i["location"].get("lon") }}]).addTo(markers);
-  marker.bindPopup("<a href=\"/postcodes/{{i["postcode"]}}.html\">{{i["postcode"]}}</a>", {autoClose: false}).openPopup();
+  % for i in result["data"]["relationships"]["example_postcodes"]["data"]:
+  % postcode = included[("postcodes", i["id"])]
+  var marker = L.marker([{{ postcode["attributes"]["location"].get("lat") }},{{ postcode["attributes"]["location"].get("lon") }}]).addTo(markers);
+  marker.bindPopup("<a href=\"/postcodes/{{ postcode["id"] }}.html\">{{ postcode["id"] }}</a>", {autoClose: false}).openPopup();
   % end
   markers.addTo(mymap);
   var bounds = markers.getBounds()
   mymap.fitBounds(bounds);
   //console.log(markers.getBounds());
-  $.getJSON('/areas/{{area}}.geojson', function(boundary){
+  $.getJSON('/areas/{{result["data"]["id"]}}.geojson', function(boundary){
     boundary_json = L.geoJSON(boundary).addTo(mymap);
     console.log(boundary_json.getBounds());
     bounds = boundary_json.getBounds()

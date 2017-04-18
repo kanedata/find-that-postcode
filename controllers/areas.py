@@ -20,10 +20,10 @@ class Area(Controller):
         result = self.config.get("es").get(index=self.config.get("es_index"), doc_type=self.es_type, id=id, ignore=[404], _source_exclude=_source_exclude)
         if result["found"]:
             self.relationships["areatype"] = {}
+            self.boundary = result["_source"].get("boundary")
             self.set_from_data(result)
             if examples_count>0:
                 self.relationships["example_postcodes"] = self.get_example_postcodes(examples_count)
-            self.boundary = result["_source"].get("boundary")
 
     def process_attributes(self, area):
         self.relationships["areatype"] = controllers.areatypes.Areatype(self.config).get_by_id(area["type"])
@@ -49,43 +49,26 @@ class Area(Controller):
         example = self.config.get("es").search(index=self.config.get("es_index"), doc_type='postcode', body=query, size=examples_count)
         return [controllers.postcodes.Postcode(self.config).set_from_data(e) for e in example["hits"]["hits"]]
 
-    def return_result(self, filetype):
-        json = self.toJSON()
-        if not self.found:
-            return bottle.abort(404)
+    def topJSON(self):
+        json = super().topJSON()
+        if self.found:
+            # @TODO need to check whether boundary data actually exists before applying this
+            json[1]["links"]["geojson"] = self.url(filetype="geojson" )
+        return json
 
-        if filetype=="html":
-            return bottle.template(self.template_name(),
-                result=self.attributes,
-                area=self.id,
-                area_type=self.attributes.get("type"),
-                area_types=AREA_TYPES,
-                key_area_types=KEY_AREA_TYPES,
-                other_codes=OTHER_CODES
-                )
-        elif filetype=="json":
-            return {
-                "data": json[1],
-                "included": json[2],
-                "links": {
-                    "self": self.url(),
-                    "html": self.url("html"),
-                    "geojson": self.url(filetype="geojson" ) # @TODO need to check whether boundary data actually exists before applying this
+    def geoJSON(self):
+        if not self.boundary:
+            bottle.abort(404, "boundary not found")
+        return {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": GEOJSON_TYPES[self.boundary["type"]],
+                        "coordinates": self.boundary["coordinates"]
+                    },
+                    "properties": self.attributes
                 }
-            }
-        elif filetype=="geojson":
-            if not self.boundary:
-                bottle.abort(404, "boundary not found")
-            return {
-                "type": "FeatureCollection",
-                "features": [
-                    {
-                        "type": "Feature",
-                        "geometry": {
-                            "type": GEOJSON_TYPES[self.boundary["type"]],
-                            "coordinates": self.boundary["coordinates"]
-                        },
-                        "properties": self.attributes
-                    }
-                ]
-            }
+            ]
+        }

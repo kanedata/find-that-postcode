@@ -25,6 +25,28 @@ def get_area_search_link(q, p=1, size=100, filetype=None):
         query_vars["size"] = size
     return "/areas/search{}?{}".format(set_url_filetype(filetype), urlencode(query_vars))
 
+def return_result(result, status=200, filetype="json", template=None):
+    if filetype=="html" and not template:
+        bottle.abort(500, "No template provided")
+
+    if status!=200:
+        if filetype=="json":
+            raise bottle.HTTPError(status = status, body = result)
+        elif filetype=="html":
+            return bottle.abort(status, result)
+
+    if filetype=="json":
+        return result
+    elif filetype=="html":
+        return bottle.template(template,
+            result=result,
+            included={(i["type"], i["id"]):i for i in result["included"]},
+            area_types=AREA_TYPES,
+            key_area_types=KEY_AREA_TYPES,
+            other_codes=OTHER_CODES
+        )
+
+
 @app.route('/postcodes/redirect')
 def postcode_redirect():
     postcode = bottle.request.query.postcode
@@ -37,7 +59,8 @@ def postcode(postcode, filetype="json"):
     """
     pc = Postcode(app.config)
     pc.get_by_id(postcode)
-    return pc.return_result(filetype)
+    (status, result) = pc.topJSON()
+    return return_result(result, status, filetype, "postcode.html")
 
 @app.route('/areas/search')
 @app.route('/areas/search.<filetype>')
@@ -86,33 +109,36 @@ def areaname(filetype="json"):
 @app.route('/areas/<areacode>.<filetype>')
 def area(areacode, filetype="json"):
     a = Area(app.config)
+    a.get_by_id(areacode.strip(), boundary=filetype=="geojson")
     if filetype=="geojson":
-        a.get_by_id(areacode.strip(), boundary=True)
-    else:
-        a.get_by_id(areacode.strip())
-    return a.return_result(filetype)
+        return a.geoJSON()
+    (status, result) = a.topJSON()
+    return return_result(result, status, filetype, "area.html")
 
 @app.route('/areatypes')
 @app.route('/areatypes.<filetype>')
 def areatypes_all(filetype="json"):
     ats = Areatypes( app.config )
     ats.get()
-    return ats.return_result(filetype)
+    (status, result) = ats.topJSON()
+    return return_result(result, status, filetype, "areatypes.html")
 
 @app.route('/areatypes/<areatype>')
 @app.route('/areatypes/<areatype>.<filetype>')
 def areatype(areatype, filetype="json"):
     app.config["stop_recursion"] = False
     at = Areatype( app.config )
-    at.get_by_id( areatype, int(bottle.request.query.page or '1'), int(bottle.request.query.size or '100') )
-    return at.return_result(filetype)
+    at.get_by_id( areatype )
+    (status, result) = at.topJSON()
+    return return_result(result, status, filetype, "areatype.html")
 
 @app.route('/points/<lat:float>,<lon:float>')
 @app.route('/points/<lat:float>,<lon:float>.<filetype:re:(html|json)>')
 def get_point(lat, lon, filetype="json"):
     po = Point( app.config )
     po.get_by_id( lat, lon )
-    return po.return_result(filetype)
+    (status, result) = po.topJSON()
+    return return_result(result, status, filetype, "postcode.html")
 
 @app.route('/static/<filename:path>')
 def send_static(filename):

@@ -1,11 +1,11 @@
 <nav class="pagination is-centered">
-  % if pagination["previous"]:
-  <a class="pagination-previous" href="{{pagination["prev"]}}">Previous</a>
+  % if pagination.get("prev"):
+  <a class="pagination-previous" href="{{pagination.get("prev")}}">Previous</a>
   % else:
   <a class="pagination-previous" disabled>Previous</a>
   % end
-  % if pagination["next"]:
-  <a class="pagination-next" href="{{pagination["next"]}}">Next</a>
+  % if pagination.get("next"):
+  <a class="pagination-next" href="{{pagination.get("next")}}">Next</a>
   % else:
   <a class="pagination-next" disabled>Next</a>
   % end

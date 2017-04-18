@@ -74,25 +74,24 @@
   </div>
   <div class="column">
     % areas = {included[("areas", i["id"])]["relationships"]["areatype"]["data"]["id"]:included[("areas", i["id"])] for i in postcode["relationships"]["areas"]["data"] if ("areas", i["id"]) in included}
+    % areatypes = {included[i]["id"]:included[i] for i in included if i[0]=="areatypes"}
     <!--<pre>{{areas}}</pre>-->
     % for i in key_area_types:
     <h2 class="title">{{ i[0] }} areas</h2>
     <table class="table">
       <tbody>
       % for area in i[1]:
-        % for area_type in area_types:
-          % if area in areas and area_type[0] == area and not areas[area]["id"].endswith("999999"):
-          <tr>
-              <td><span title="{{ area_type[0] }}">{{ area_type[1] }}</span></td>
-              <td>
-                % if areas[area]["attributes"]["name"]=="":
-                <a href="{{ areas[area]["links"]["html"] }}">{{ areas[area]["id"] }}</a>
-                % else:
-                <a href="{{ areas[area]["links"]["html"] }}">{{ areas[area]["attributes"]["name"] }}</a> <span class="tag is-pulled-right">{{ areas[area]["id"] }}</span>
-                % end
-              </td>
-            </tr>
-          % end
+        % if area in areas and area in areatypes and not areas[area]["id"].endswith("999999"):
+        <tr>
+            <td><span title="{{ areatypes[area]["id"] }}">{{ areatypes[area]["attributes"]["name"] }}</span></td>
+            <td>
+              % if areas[area]["attributes"]["name"]=="":
+              <a href="{{ areas[area]["links"]["html"] }}">{{ areas[area]["id"] }}</a>
+              % else:
+              <a href="{{ areas[area]["links"]["html"] }}">{{ areas[area]["attributes"]["name"] }}</a> <span class="tag is-pulled-right">{{ areas[area]["id"] }}</span>
+              % end
+            </td>
+          </tr>
         % end
       % end
       </tbody>

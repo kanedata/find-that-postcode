@@ -40,16 +40,19 @@ def return_result(result, status=200, filetype="json", template=None):
     elif filetype=="html":
         return bottle.template(template,
             result=result,
-            included={(i["type"], i["id"]):i for i in result["included"]},
-            area_types=AREA_TYPES,
+            included={(i["type"], i["id"]):i for i in result.get("included",[])},
             key_area_types=KEY_AREA_TYPES,
             other_codes=OTHER_CODES
         )
 
 @app.route('/')
+@app.route('/index.html')
 def index():
+    ats = Areatypes( app.config )
+    ats.get()
+    (status, result) = ats.topJSON()
     return bottle.template('index.html',
-        area_types=AREA_TYPES,
+        result=result,
         key_area_types=KEY_AREA_TYPES
     )
 

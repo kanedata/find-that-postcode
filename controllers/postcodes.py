@@ -79,4 +79,10 @@ class Postcode(Controller):
             if json[1].get("attributes", {}).get(i) and isinstance(json[1]["attributes"][i], datetime):
                 json[1]["attributes"][i] = json[1]["attributes"][i].strftime("%Y%m")
 
+
+        ats = controllers.areatypes.Areatypes( self.config )
+        ats.get()
+        for a in ats.attributes:
+            json[2].append(a.toJSON()[1])
+
         return json

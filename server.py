@@ -46,6 +46,12 @@ def return_result(result, status=200, filetype="json", template=None):
             other_codes=OTHER_CODES
         )
 
+@app.route('/')
+def index():
+    return bottle.template('index.html',
+        area_types=AREA_TYPES,
+        key_area_types=KEY_AREA_TYPES
+    )
 
 @app.route('/postcodes/redirect')
 def postcode_redirect():
@@ -132,6 +138,12 @@ def areatype(areatype, filetype="json"):
     (status, result) = at.topJSON()
     return return_result(result, status, filetype, "areatype.html")
 
+@app.route('/points/redirect')
+def points_redirect():
+    lat = float(bottle.request.query.lat)
+    lon = float(bottle.request.query.lon)
+    return bottle.redirect('/points/{:,.5f},{:,.5f}.html'.format(lat, lon))
+
 @app.route('/points/<lat:float>,<lon:float>')
 @app.route('/points/<lat:float>,<lon:float>.<filetype:re:(html|json)>')
 def get_point(lat, lon, filetype="json"):
@@ -164,6 +176,8 @@ def main():
 
     app.config["es"] = Elasticsearch(host=args.es_host, port=args.es_port, url_prefix=args.es_url_prefix, use_ssl=args.es_use_ssl)
     app.config["es_index"] = args.es_index
+
+    bottle.debug(args.debug)
 
     bottle.run(app, host=args.host, port=args.port, reloader=args.debug)
 

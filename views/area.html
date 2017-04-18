@@ -1,6 +1,6 @@
 % areatype = included[("areatypes", result["data"]["relationships"]["areatype"]["data"]["id"])]
 % title = '%s - %s' % (areatype["attributes"]["name"], result["data"]["id"])
-% subtitle = '<a href="/areatypes/%s.html">%s</a> - %s' % (areatype["id"], areatype["attributes"]["name"], result["data"]["attributes"]["name"])
+% subtitle = '<a href="/areatypes/%s.html">%s</a> - %s' % (areatype["id"], areatype["attributes"]["name"], result["data"]["id"])
 % rebase("base.html", title=title, subtitle=subtitle, heading=result["data"]["attributes"]["name"], includes=['leaflet','jquery'])
 <h2 class="subtitle">
   % if result["data"]["attributes"]["name_welsh"]!=result["data"]["attributes"]["name"]:

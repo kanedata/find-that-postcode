@@ -1,4 +1,7 @@
-% rebase("base.html", title='Area types')
+% if get("rebase_", True)==True:
+%   rebase("base.html", title='Area types')
+% end
+% setdefault("area_counts", {})
 <div class="columns">
 % for i in key_area_types:
   <div class="column">

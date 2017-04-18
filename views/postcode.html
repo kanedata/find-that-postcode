@@ -1,7 +1,7 @@
 % if result["data"]["type"]=="points":
   % postcode = included[("postcodes", result["data"]["relationships"]["nearest_postcode"]["data"]["id"])]
-  % title = 'Point %s, %s' % (result["data"]["attributes"]["lat"], result["data"]["attributes"]["lon"])
-  % subtitle = 'Closest postcode to point {0}, {1} is <a href="{2}">{2}</a>.<br>Centre of {2} is {3:,.1f} meters away.'.format(result["data"]["attributes"]["lat"], result["data"]["attributes"]["lon"], postcode["links"]["html"], result["data"]["attributes"]["distance_from_postcode"])
+  % title = 'Point {:,.5f}, {:,.5f}'.format(result["data"]["attributes"]["lat"], result["data"]["attributes"]["lon"])
+  % subtitle = 'Closest postcode to point {0:,.5f}, {1:,.5f} is <a href="{2}">{3}</a>.<br>Centre of {3} is {4:,.1f} meters away.'.format(result["data"]["attributes"]["lat"], result["data"]["attributes"]["lon"], postcode["links"]["html"], postcode["id"], result["data"]["attributes"]["distance_from_postcode"])
 % else:
   % postcode = result["data"]
   % title = 'Postcode %s' % (postcode["id"],)

@@ -14,3 +14,12 @@ def test_point_json():
     assert point_json.get("data",{}).get("relationships",{}).get("nearest_postcode",{}).get("data",{}).get("id") == "W5 4NH"
 
     assert point_json.get("data",{}).get("attributes",{}).get("distance_from_postcode") == 68.9707515287199
+
+def test_point_json_distance():
+    pass
+
+def test_point_html():
+    pass
+
+def test_point_html_distance():
+    pass

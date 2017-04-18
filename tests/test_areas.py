@@ -22,3 +22,21 @@ def test_area_json():
 def test_missing_area_json():
     with pytest.raises(bottle.HTTPError):
         server.area("1234567")
+
+def test_area_html():
+    pass
+
+def test_area_missing_html():
+    pass
+
+def test_area_geojson():
+    pass
+
+def test_area_search():
+    pass
+
+def test_area_search_nonsense():
+    pass
+
+def test_area_search_blank():
+    pass

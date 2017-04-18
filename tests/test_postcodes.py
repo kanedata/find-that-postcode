@@ -22,3 +22,9 @@ def test_postcode_json():
 def test_missing_postcode_json():
     with pytest.raises(bottle.HTTPError):
         postcode_json = server.postcode("1234567")
+
+def test_postcode_html():
+    pass
+
+def test_postcode_missing_html():
+    pass

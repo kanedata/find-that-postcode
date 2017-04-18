@@ -59,13 +59,12 @@ class Areatypes(Controller):
 
     es_type = 'code'
     url_slug = 'areatypes'
-    template = 'areatypes.html'
 
-    def __init__(self, config, data=None):
-        self.areatypes = {i[0]:i for i in AREA_TYPES}
-        super().__init__(config, data)
+    def __init__(self, config):
+        super().__init__(config)
 
     def get(self):
+        self.areatypes = {i[0]:i for i in AREA_TYPES}
         query = {
         	"size": 0,
         	"aggs": {
@@ -81,25 +80,14 @@ class Areatypes(Controller):
         self.area_counts = {i["key"]:i["doc_count"] for i in result["aggregations"]["group_by_type"]["buckets"]}
         self.attributes = []
         for a in self.areatypes:
-            areatype = Areatype(self.config, a)
+            areatype = Areatype(self.config)
+            areatype.set_from_data(a)
             if a in self.area_counts:
                 areatype.attributes["count_areas"] = self.area_counts[a]
             self.attributes.append(areatype)
 
-    def toJSON(self):
-        return {
-            "data": [a.toJSON() for a in self.attributes],
+    def topJSON(self):
+        return (200, {
+            "data": [a.toJSON()[1] for a in self.attributes],
             "links": {"self": "/areatypes"}
-        }
-
-    def return_result(self, filetype):
-
-        if filetype=="html":
-            return bottle.template('areatypes.html',
-                area_counts=self.area_counts,
-                area_types=AREA_TYPES,
-                key_area_types=KEY_AREA_TYPES,
-                other_codes=OTHER_CODES
-                )
-        else:
-            return self.toJSON()
+        })

@@ -69,18 +69,50 @@
         <p>The <code>.json</code> at the end of the url is optional, requests will return json by default unless <code>.html</code> is added.</p>
         <p><a href="https://en.wikipedia.org/wiki/ONS_coding_system#Current_GSS_coding_system">ONS GSS codes</a> are used for area IDs.</p>
       </div>
-    </div>
-    <div class="column is-three-quarters">
       <div class="content is-medium">
         <h3 class="title is-4">Example requests</h3>
         <table>
-          <tr><td>Get data on a postcode</td><td><code>/postcodes/AB12+3CD.json</code></td><td><a href="/postcodes/SW1A+1AA">Example</a></td></tr>
-          <tr><td>Get data about a postcode close<br>to a latitude, longitude point</td><td><code>/points/51.501009,-0.141588.json</code></td><td><a href="/points/51.501009,-0.141588">Example</a></td></tr>
-          <tr><td>Get data about an area<br><small>Includes 5 random postcodes from the area</small></td><td><code>/areas/E01000001.json</code></td><td><a href="/areas/E14000639">Example</a></td></tr>
-          <tr><td>Get an area's boundaries as geojson<br><small>NB not available for all areas</small></td><td><code>/areas/E01000001.geojson</code></td><td><a href="/areas/E14000639.geojson">Example</a></td></tr>
-          <tr><td>Search for areas containing a string</td><td><code>/areas/search.json?q=search+term</code></td><td><a href="/areas/search.json?q=Westmister">Example</a></td></tr>
-          <tr><td>Get information about a type of area<br><small>(local authority, parliamentary constituency, etc)</small></td><td><code>/areatypes/pcon.json</code></td><td><a href="/areas/E14000639">Example</a></td></tr>
-          <tr><td>Get information about all types of area</td><td><code>/areatypes.json</code></td><td><a href="/areatypes">Area types</a></td></tr>
+          <tr>
+            <td>Get data on a postcode</td>
+            <td><code>/postcodes/AB12+3CD.json</code></td>
+            <td><a href="/postcodes/SW1A+1AA">Example</a></td>
+            <td><a href="/postcodes/SW1A+1AA.html">Example HTML</a></td>
+          </tr>
+          <tr>
+            <td>Get data about a postcode nearest<br>to a latitude, longitude point</td>
+            <td><code>/points/51.501009,-0.141588.json</code></td>
+            <td><a href="/points/51.501009,-0.141588">Example</a></td>
+            <td><a href="/points/51.501009,-0.141588.html">Example HTML</a></td>
+          </tr>
+          <tr>
+            <td>Get data about an area<br><small>Includes 5 random postcodes from the area</small></td>
+            <td><code>/areas/E01000001.json</code></td>
+            <td><a href="/areas/E14000639">Example</a></td>
+            <td><a href="/areas/E14000639.html">Example HTML</a></td>
+          </tr>
+          <tr>
+            <td>Get an area's boundaries as geojson<br><small>NB not available for all areas</small></td>
+            <td><code>/areas/E01000001.geojson</code></td>
+            <td colspan="2"><a href="/areas/E14000639.geojson">Example</a></td>
+          </tr>
+          <tr>
+            <td>Search for areas containing a string</td>
+            <td><code>/areas/search.json?q=search+term</code></td>
+            <td><a href="/areas/search.json?q=Westmister">Example</a></td>
+            <td><a href="/areas/search.html?q=Westmister">Example HTML</a></td>
+          </tr>
+          <tr>
+            <td>Get information about a type of area<br><small>(local authority, parliamentary constituency, etc)</small></td>
+            <td><code>/areatypes/pcon.json</code></td>
+            <td><a href="/areas/E14000639">Example</a></td>
+            <td><a href="/areas/E14000639.html">Example HTML</a></td>
+          </tr>
+          <tr>
+            <td>Get information about all types of area</td>
+            <td><code>/areatypes.json</code></td>
+            <td><a href="/areatypes">Area types</a></td>
+            <td><a href="/areatypes.html">HTML</a></td>
+          </tr>
         </table>
       </div>
     </div>

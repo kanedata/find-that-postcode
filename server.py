@@ -79,13 +79,17 @@ def areaname(filetype="json"):
     (status, result) = areas.topJSON()
     return return_result(result, status, filetype, "areasearch.html")
 
+@app.route('/areas/<areacode>.geojson')
+def area_geojson(areacode):
+    a = Area(app.config)
+    a.get_by_id(areacode.strip(), boundary=True)
+    return a.geoJSON()
+
 @app.route('/areas/<areacode>')
 @app.route('/areas/<areacode>.<filetype>')
 def area(areacode, filetype="json"):
     a = Area(app.config)
-    a.get_by_id(areacode.strip(), boundary=filetype=="geojson")
-    if filetype=="geojson":
-        return a.geoJSON()
+    a.get_by_id(areacode.strip())
     (status, result) = a.topJSON()
     return return_result(result, status, filetype, "area.html")
 

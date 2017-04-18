@@ -87,9 +87,9 @@ class Areas(Controller):
         self.pagination = Pagination()
         if q:
             self.meta["q"] = q
-            result = self.config.get("es").search(index=self.config.get("es_index", "postcode"), doc_type=self.es_type, q=q, from_=self.pagination.from_, size=self.pagination.size, _source_exclude=["boundary"])
-            self.data = [Area(self.config).set_from_data(a) for a in result["hits"]["hits"]]
-            self.meta["result_count"] = result["hits"]["total"]
+            result = self.config.get("es").search(index=self.config.get("es_index", "postcode"), doc_type=self.es_type, q=q, from_=self.pagination.from_, size=self.pagination.size, _source_exclude=["boundary"], ignore=[400])
+            self.data = [Area(self.config).set_from_data(a) for a in result.get("hits",{}).get("hits",[])]
+            self.meta["result_count"] = result.get("hits",{}).get("total",0)
 
     def topJSON(self):
         # get all areatypes first

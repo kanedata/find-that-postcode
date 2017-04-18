@@ -1,5 +1,4 @@
-% setdefault("q", "")
-% rebase("base.html", title='Search areas - %s' % (q,))
+% rebase("base.html", heading='Search areas', title='Search areas - %s' % (get("result",{}).get("meta",{}).get("q",""),))
 <form>
   <div class="field has-addons">
     <p class="control is-expanded">
@@ -19,9 +18,9 @@
       <div class="column">
       % if len(result.get("data",[]))>0:
         % if result["meta"]["result_count"] <= result["meta"]["size"]:
-        <h2 class="title">Showing all {{ "{:,.0f}".format(result["meta"]["result_count"]) }} results</h2>
+        <h2 class="title">Showing all {{ "{:,.0f}".format(result["meta"]["result_count"]) }} results for "{{ get("result",{}).get("meta",{}).get("q","") }}"</h2>
         % else:
-        <h2 class="title">Showing from {{ "{:,.0f}".format(result["meta"]["from"] + 1) }} to {{ "{:,.0f}".format(min([result["meta"]["from"] + result["meta"]["size"], result["meta"]["result_count"]])) }} of {{ "{:,.0f}".format(result["meta"]["result_count"]) }} results</h2>
+        <h2 class="title">Showing from {{ "{:,.0f}".format(result["meta"]["from"] + 1) }} to {{ "{:,.0f}".format(min([result["meta"]["from"] + result["meta"]["size"], result["meta"]["result_count"]])) }} of {{ "{:,.0f}".format(result["meta"]["result_count"]) }} results for "{{ get("result",{}).get("meta",{}).get("q","") }}"</h2>
         % end
         <table class="table">
           <tbody>

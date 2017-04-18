@@ -207,3 +207,12 @@ class Pagination():
 
         # page ranges
         # @TODO calculate page ranges
+
+    def get_meta(self, meta):
+        meta["from"] = self.get_from()
+        meta["page"] = self.page
+        meta["size"] = self.size
+        return meta
+
+    def get_links(self, links):
+        return links

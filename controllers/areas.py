@@ -72,3 +72,36 @@ class Area(Controller):
                 }
             ]
         }
+
+class Areas(Controller):
+
+    es_type = 'code'
+    url_slug = 'areas'
+
+    def __init__(self, config):
+        super().__init__(config)
+        self.data = []
+        self.meta = {}
+
+    def search(self, q):
+        self.pagination = Pagination()
+        if q:
+            self.meta["q"] = q
+            result = self.config.get("es").search(index=self.config.get("es_index", "postcode"), doc_type=self.es_type, q=q, from_=self.pagination.from_, size=self.pagination.size, _source_exclude=["boundary"])
+            self.data = [Area(self.config).set_from_data(a) for a in result["hits"]["hits"]]
+            self.meta["result_count"] = result["hits"]["total"]
+
+    def topJSON(self):
+        # get all areatypes first
+        ats = controllers.areatypes.Areatypes( self.config )
+        ats.get()
+        included = []
+        for a in ats.attributes:
+            included.append(a.toJSON()[1])
+
+        return (200, {
+            "data": [a.toJSON()[1] for a in self.data],
+            "meta": self.pagination.get_meta(self.meta),
+            "links": self.pagination.get_links({}),
+            "included": included
+        })

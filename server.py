@@ -74,45 +74,10 @@ def postcode(postcode, filetype="json"):
 @app.route('/areas/search')
 @app.route('/areas/search.<filetype>')
 def areaname(filetype="json"):
-    p = bottle.request.query.page or '1'
-    p = int(p)
-    size = bottle.request.query.size or '100'
-    size = int(size)
-    from_ = (p-1) * size
-    areaname = bottle.request.query.q
-    # @TODO order most important areas to top
-    if areaname:
-        result = app.config.get("es").search(index=app.config.get("es_index", "postcode"), doc_type='code', q=areaname, from_=from_, size=size, _source_exclude=["boundary"])
-        areas = [{"id": a["_id"], "name": a["_source"]["name"], "type": a["_source"]["type"]} for a in result["hits"]["hits"]]
-        pagination = {k:(get_area_search_link( areaname, v[0], v[1] ) if v else None) for k,v in get_pagination( p, size, result["hits"]["total"] ).items()}
-        if filetype=="html":
-            return bottle.template('areasearch.html',
-                page=p, size=size, from_=from_,
-                pagination=pagination,
-                q=areaname,
-                results=areas,
-                result_count=result["hits"]["total"],
-                area_types=AREA_TYPES,
-                key_area_types=KEY_AREA_TYPES,
-                other_codes=OTHER_CODES
-            )
-        elif filetype=="json":
-            links = pagination
-            links["self"] = get_area_search_link( areaname, p, size )
-            return {
-                "data": [get_area_object(a) for a in result["hits"]["hits"]],
-                "links": links,
-                "meta": {
-                    "total-results": result["hits"]["total"],
-                    "query": areaname
-                }
-            }
-    else:
-        if filetype=="html":
-            return bottle.template('areasearch.html'
-            )
-        elif filetype=="json":
-            return {"result": []}
+    areas = Areas(app.config)
+    areas.search(bottle.request.query.q)
+    (status, result) = areas.topJSON()
+    return return_result(result, status, filetype, "areasearch.html")
 
 @app.route('/areas/<areacode>')
 @app.route('/areas/<areacode>.<filetype>')

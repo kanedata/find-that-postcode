@@ -57,4 +57,7 @@ class Point(Controller):
                 }]
             })
 
-        return super().topJSON()
+        json = super().topJSON()
+        postcode_json = self.relationships["nearest_postcode"].toJSON()
+        json[1]["included"] += postcode_json[2]
+        return json

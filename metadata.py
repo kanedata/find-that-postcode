@@ -1,4 +1,3 @@
-
 AREA_TYPES = [
     ("oa11", "Output area", "2011 Census Output Area (OA)/ Small Area (SA)", "The 2011 Census OAs in GB and SAs in Northern Ireland were based on 2001 Census OAs, and they form the building bricks for defining higher level geographies. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no grid reference."),
     ("cty", "County", "County", "The current county to which the postcode has been assigned. Pseudo codes are included for English UAs, Wales, Scotland, Northern Ireland, Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."),
@@ -28,7 +27,7 @@ AREA_TYPES = [
 ]
 
 KEY_AREA_TYPES = [
-    ("Key", ["ctry", "region", "cty", "laua", "ward", "oa11", "pcon"]),
+    ("Key", ["ctry", "region", "cty", "laua", "ward", "oa11", "pcon", "gor"]),
     ("Secondary", ["ttwa", "pfa", "lep", "msoa11", "lsoa11", "park"]),
     ("Health", ["ccg", "hlthau", "hro", "pct"]),
     ("Other", ["eer", "bua11", "buasd11", "wz11", "teclec", "nuts"]),

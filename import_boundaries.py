@@ -116,6 +116,7 @@ def main():
 
             else:
                 print("[%s] Opened file: [%s]" % (code, boundary_file))
+                print("[%s] %s features to import" % (code, len(boundaries["features"])))
                 bulk_boundaries = []
                 errors = []
                 boundaries_updated = 0

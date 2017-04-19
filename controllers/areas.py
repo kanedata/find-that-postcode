@@ -87,7 +87,26 @@ class Areas(Controller):
         self.pagination = Pagination()
         if q:
             self.meta["q"] = q
-            result = self.config.get("es").search(index=self.config.get("es_index", "postcode"), doc_type=self.es_type, q=q, from_=self.pagination.from_, size=self.pagination.size, _source_exclude=["boundary"], ignore=[400])
+            query = {
+                "query": {
+                    "function_score": {
+                      "query": {
+                      	"query_string": {
+                    		"query": q
+                    	}
+                      },
+                      "boost": "5",
+                      "functions": [
+                          {"weight": 3, "filter": { "terms": { "type": ["ctry", "region", "cty", "laua","gor"] } } },
+                          {"weight": 2, "filter": { "terms": { "type": ["ttwa", "pfa", "lep", "park", "pcon"] } } },
+                          {"weight": 1.5, "filter": { "terms": { "type": ["ccg", "hlthau", "hro", "pct"] } } },
+                          {"weight": 1, "filter": { "terms": { "type": ["eer", "bua11", "buasd11", "teclec"] } } },
+                          {"weight": 0.4, "filter": { "terms": { "type": ["msoa11", "lsoa11", "wz11", "oa11", "nuts", "ward"] } } }
+                      ]
+                    }
+                }
+            }
+            result = self.config.get("es").search(index=self.config.get("es_index", "postcode"), doc_type=self.es_type, body=query, from_=self.pagination.from_, size=self.pagination.size, _source_exclude=["boundary"], ignore=[400])
             self.data = [Area(self.config).set_from_data(a) for a in result.get("hits",{}).get("hits",[])]
             self.meta["result_count"] = result.get("hits",{}).get("total",0)
 

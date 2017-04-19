@@ -7,7 +7,7 @@
   % title = 'Postcode %s' % (postcode["id"],)
   % subtitle = ""
     % if postcode["attributes"]["doterm"]:
-    % subtitle = 'No longer used since %s' % postcode["attributes"]["doterm"].strftime("%B %Y")
+    % subtitle = 'No longer used since %s' % postcode["attributes"]["doterm"]
     % end
 % end
 % rebase("base.html", title=title, subtitle=subtitle, includes=['leaflet'])

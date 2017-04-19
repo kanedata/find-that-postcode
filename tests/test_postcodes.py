@@ -28,3 +28,6 @@ def test_postcode_html():
 
 def test_postcode_missing_html():
     pass
+
+def test_postcode_redirect():
+    pass

@@ -59,7 +59,7 @@ def index():
 @app.route('/postcodes/redirect')
 def postcode_redirect():
     postcode = bottle.request.query.postcode
-    return bottle.redirect(get_postcode_link(postcode,"html"))
+    return bottle.redirect('/postcodes/{}.html'.format(postcode))
 
 @app.route('/postcodes/<postcode>')
 @app.route('/postcodes/<postcode>.<filetype>')

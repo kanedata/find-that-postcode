@@ -53,7 +53,8 @@ class Area(Controller):
         json = super().topJSON()
         if self.found:
             # @TODO need to check whether boundary data actually exists before applying this
-            json[1]["links"]["geojson"] = self.url(filetype="geojson" )
+            if json[1]["data"]["attributes"].get("has_boundary"):
+                json[1]["links"]["geojson"] = self.url(filetype="geojson" )
         return json
 
     def geoJSON(self):

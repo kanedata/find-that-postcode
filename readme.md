@@ -56,6 +56,53 @@ file downloaded above.
 This will then run the import process. It takes a while to run as there are over
 2.5 million postcodes. The data will be around 1.3 GB in size on the disk.
 
+### 6. Import boundaries (optional)
+
+Boundary files can be found on the [ONS Geoportal](http://geoportal.statistics.gov.uk/datasets?q=Latest_Boundaries&sort_by=name&sort_order=asc).
+Generally the "Generalised Clipped" versions should be used to minimise the file
+size. Open each boundary file link and find the "API" link on the right hand
+side, and copy the `GeoJSON` link, or download the file.
+
+These files are the latest available at April 2017:
+
+- Countries: <http://geoportal.statistics.gov.uk/datasets/37bcb9c9e788497ea4f80543fd14c0a7_2.geojson>
+- Westminster Parliamentary Constituencies: <http://geoportal.statistics.gov.uk/datasets/deeb99fdf09949bc8ed4dc95c80da279_2.geojson>
+- Counties and unitary authorities: <http://geoportal.statistics.gov.uk/datasets/687f346f5023410ba86615655ff33ca9_2.geojson>
+- Local Authority Districts: <http://geoportal.statistics.gov.uk/datasets/686603e943f948acaa13fb5d2b0f1275_2.geojson>
+- Regions: <http://geoportal.statistics.gov.uk/datasets/f99b145881724e15a04a8a113544dfc5_2.geojson>
+- CCGs: <http://geoportal.statistics.gov.uk/datasets/ac17d33d37b94e48abd8ccbcde640dde_2.geojson>
+- European electoral regions: <http://geoportal.statistics.gov.uk/datasets/44667328cf45481ba91aef2f646b5fc0_2.geojson>
+- Local Enterprise Partnerships: <http://geoportal.statistics.gov.uk/datasets/532e3bb99acf44549ebb882c15646059_2.geojson>
+- NHS Commissioning Regions: <http://geoportal.statistics.gov.uk/datasets/b804b37c78004e788becf75f712f6a38_2.geojson>
+- NHS England Regions: <http://geoportal.statistics.gov.uk/datasets/6e93e6b47edd49ab827a1831d8eb0f57_2.geojson>
+- National Parks: <http://geoportal.statistics.gov.uk/datasets/df607d4ffa124cdca8317e3e63d45d78_2.geojson>
+- Police Force areas: <http://geoportal.statistics.gov.uk/datasets/3e5a096a8c7c456fb6d3164a3f44b005_2.geojson>
+- Strategic Clinical Networks: <http://geoportal.statistics.gov.uk/datasets/7ddabffc9b46444bbf548732642f1ea2_2.geojson>
+- Travel to Work Areas: <http://geoportal.statistics.gov.uk/datasets/d3062ec5f03b49a7be631d71586cac8c_2.geojson>
+
+These files are large:
+
+- Parishes: <http://geoportal.statistics.gov.uk/datasets/f13dad37854b4a1f869bf178489ff99a_2.geojson>
+- Wards: <http://geoportal.statistics.gov.uk/datasets/afcc88affe5f450e9c03970b237a7999_2.geojson>
+- LSOAs: <http://geoportal.statistics.gov.uk/datasets/da831f80764346889837c72508f046fa_2.geojson>
+- MSOAs: <http://geoportal.statistics.gov.uk/datasets/826dc85fb600440889480f4d9dbb1a24_2.geojson>
+- Workplace Zones: <http://geoportal.statistics.gov.uk/datasets/a399c2a5922a4beaa080de63c0a218a3_2.geojson>
+- Built-up Areas: <http://geoportal.statistics.gov.uk/datasets/278ff7af4efb4a599f70156e6e19cc9f_0.geojson>
+- Built-up Area Sub-divisions: <http://geoportal.statistics.gov.uk/datasets/1f021bb824ee4820b353b4b58fab6df5_0.geojson>
+
+
+Import the boundary files by running:
+
+```bash
+python import_boundaries.py "http://geoportal.statistics.gov.uk/datasets/ac17d33d37b94e48abd8ccbcde640dde_2.geojson"
+```
+
+### Run tests
+
+```bash
+python -m pytest
+```
+
 Using the data
 --------------
 
@@ -178,6 +225,4 @@ curl "http://localhost:9200/postcode/code/E14000639?pretty"
 Todo / future features
 ----------------------
 
-- Configure host and port for elasticsearch index (and allow http url connections).
-- Add area boundaries as geo-shapes in elasticsearch
 - Find areas containing a point

@@ -23,7 +23,7 @@
       <div class="card-content">
         <div class="content">
           <table class="table">
-            % for i in [i for i in result["data"]["attributes"] if i not in ["examples", "name", "type", "name_welsh", "type_name", "sort_order"]]:
+            % for i in [i for i in result["data"]["attributes"] if i not in ["examples", "name", "type", "name_welsh", "type_name", "sort_order", "has_boundary"]]:
             <tr>
               <td>{{i}}</td>
               <td>{{result["data"]["attributes"][i]}}</td>
@@ -35,6 +35,11 @@
     </div>
   </div>
   <div class="column">
+    % if "geojson" in result["links"]:
+    <div class="clearfix">
+      <a href="{{result["links"]["geojson"]}}" class="is-pulled-right">Boundary (geoJSON)</a>
+    </div>
+    % end
     <h3 class="title">Example postcodes</h3>
     % for i in result["data"]["relationships"]["example_postcodes"]["data"]:
     <div class="card">

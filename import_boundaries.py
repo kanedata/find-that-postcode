@@ -15,6 +15,8 @@ def parse_boundary_file(boundary_file):
     reader = csv.reader([boundary_file], delimiter=':', quotechar="'")
     boundary_file = next(reader)
 
+
+
     if len(boundary_file)==2:
         code = boundary_file[0]
         code_field = None
@@ -34,7 +36,7 @@ def parse_boundary_file(boundary_file):
         else:
             raise ValueError("Could not determine code field")
 
-    return (code, code_field, filename)
+    return (filename, code_field)
 
 def main():
     parser = argparse.ArgumentParser(description='Import area boundaries into elasticsearch.')
@@ -42,7 +44,7 @@ def main():
     # Postcode details
     parser.add_argument('boundary_files', type=str, nargs='+',
                         default='data/NSPL.zip',
-                        help='Entry for each boundary file to import. In format `code:url` or `code:url:code_field`. `url` can be a local path or a remote URL. URL should be in quotes (\' not double-quotes) if it contains a colon :.')
+                        help='URL or file path for each boundary file to import. Multiple URLs should be separated by a space')
     parser.add_argument('--examine', action='store_true', help="Give info about the shape of the file, don't execute the import")
 
     # elasticsearch options
@@ -59,16 +61,43 @@ def main():
     es = Elasticsearch(host=args.es_host, port=args.es_port, url_prefix=args.es_url_prefix, use_ssl=args.es_use_ssl)
 
     for boundary_file in args.boundary_files:
-        (code, code_field, boundary_file) = parse_boundary_file(boundary_file)
+        #(code, code_field, boundary_file) = parse_boundary_file(boundary_file)
+        boundary_filename = "data/%s" % boundary_file.split('/')[-1]
 
 
         if not os.path.isfile(boundary_file ):
-            print("[%s] Downloading file: [%s]" % (code, boundary_file))
-            urllib.request.urlretrieve(boundary_file, "data/%s_boundary.geojson" % code)
-            boundary_file = "data/%s_boundary.geojson" % code
+            if not os.path.isfile(boundary_filename):
+                print("[%s] Downloading file" % (boundary_file))
+                urllib.request.urlretrieve(boundary_file, boundary_filename)
+            boundary_file = boundary_filename
 
         with open(boundary_file) as a:
             boundaries = json.load(a)
+            errors = []
+
+            if len(boundaries.get("features",[]))>0:
+                test_boundary = boundaries.get("features",[])[0]
+                code_fields = []
+                for k in test_boundary.get("properties", {}):
+                    if k.endswith("cd"):
+                        code_fields.append(k)
+                if len(code_fields)==1:
+                    code_field = code_fields[0]
+                elif len(code_fields)==0:
+                    errors.append("[ERROR][%s] No code field found in file" % (boundary_file,))
+                else:
+                    errors.append("[ERROR][%s] Too many code fields found in file" % (boundary_file,))
+            else:
+                errors.append("[ERROR][%s] Features not found in file" % (boundary_file,))
+
+            if len(errors)>0:
+                if args.examine:
+                    for e in errors:
+                        print(e)
+                else:
+                    raise ValueError("; ".join(errors))
+
+            code = code_field.replace("cd", "")
 
             if args.examine:
                 print("[%s] Opened file: [%s]" % (code, boundary_file))
@@ -88,8 +117,10 @@ def main():
             else:
                 print("[%s] Opened file: [%s]" % (code, boundary_file))
                 bulk_boundaries = []
+                errors = []
+                boundaries_updated = 0
                 for k, i in enumerate(boundaries["features"]):
-                    bulk_boundaries.append({
+                    boundary = {
                             "_index": args.es_index,
                             "_type": "code",
                             "_op_type": "update",
@@ -98,13 +129,21 @@ def main():
                                 "boundary": {
                                     "type": i["geometry"]["type"].lower(),
                                     "coordinates": i["geometry"]["coordinates"]
-                                }
+                                },
+                                "has_boundary": True
                             }
-                        })
-                print("[elasticsearch] %s boundaries to save" % len(bulk_boundaries))
-                results = bulk(es, bulk_boundaries, raise_on_error=False)
-                print("[elasticsearch] saved %s boundaries to %s index" % (results[0], args.es_index))
-                print("[elasticsearch] %s errors reported" % len(results[1]) )
+                        }
+                    bulk_boundaries.append(boundary)
+                    results = es.update(index=args.es_index, doc_type="code", id=boundary["_id"], body={"doc": boundary["doc"]}, ignore=[404,400])
+                    if results.get("error"):
+                        e = "[%s] %s" % ( boundary["_id"], results.get("error",{}).get("reason", "Operation failed"))
+                        errors.append(e)
+                        print(e)
+                    else:
+                        boundaries_updated += 1
+                        #print("[%s] Saved boundary" % boundary["_id"])
+                print("[elasticsearch] %s boundaries saved" % boundaries_updated )
+                print("[elasticsearch] %s errors reported" % len(errors) )
                 # @TODO Log errors somewhere...
 
 

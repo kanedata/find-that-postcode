@@ -8,7 +8,13 @@ INDEXES = [
         "mapping": [
             ("postcode", {
                     "properties": {
-                        "boundary": {"type": "geo_shape"}
+                        "location": {"type": "geo_point"}
+                    }
+                }
+            ),
+            ("placename", {
+                    "properties": {
+                        "location": {"type": "geo_point"}
                     }
                 }
             ),

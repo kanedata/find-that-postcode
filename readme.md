@@ -3,7 +3,7 @@ Elasticsearch Postcodes
 
 This project creates an elasticsearch index based on the UK postcode file, and
 runs a webserver on top of it for making queries. It's like a more lightweight
-version of [MapIt](https://mapit.mysociety.org.uk/).
+and less sophisticated version of [MapIt](https://mapit.mysociety.org.uk/).
 
 Setup
 -----
@@ -95,6 +95,19 @@ Import the boundary files by running:
 
 ```bash
 python import_boundaries.py "http://geoportal.statistics.gov.uk/datasets/ac17d33d37b94e48abd8ccbcde640dde_2.geojson"
+```
+
+### 7. Import placenames (optional)
+
+A further related dataset is placenames. The [ONS has a list of these](http://geoportal.statistics.gov.uk/datasets/a6c138d17ac54532b0ca8ee693922f10_0)
+which can be imported using the `import_placenames.py` script. An entry for each
+placename is added to the `postcode/placenames` elasticsearch index/type.
+
+To use, first download the [placenames CSV file from ONS](http://geoportal.statistics.gov.uk/datasets/a6c138d17ac54532b0ca8ee693922f10_0),
+and then run:
+
+```bash
+python import_placenames.py "path/to/file.csv"
 ```
 
 ### Run tests

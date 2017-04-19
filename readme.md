@@ -90,12 +90,14 @@ These files are large:
 - Built-up Areas: <http://geoportal.statistics.gov.uk/datasets/278ff7af4efb4a599f70156e6e19cc9f_0.geojson>
 - Built-up Area Sub-divisions: <http://geoportal.statistics.gov.uk/datasets/1f021bb824ee4820b353b4b58fab6df5_0.geojson>
 
-
 Import the boundary files by running:
 
 ```bash
 python import_boundaries.py "http://geoportal.statistics.gov.uk/datasets/ac17d33d37b94e48abd8ccbcde640dde_2.geojson"
 ```
+
+These imports will also take a while, and add significantly to the size of the
+elasticsearch index. It may increase in size to over 5GB.
 
 ### 7. Import placenames (optional)
 

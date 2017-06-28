@@ -17,16 +17,6 @@ from controllers.controller import *
 app = bottle.default_app()
 
 
-# @TODO delete
-def get_area_search_link(q, p=1, size=100, filetype=None):
-    query_vars = {"q": q}
-    if p > 1:
-        query_vars["page"] = p
-    if size != 100:
-        query_vars["size"] = size
-    return "/areas/search{}?{}".format(set_url_filetype(filetype), urlencode(query_vars))
-
-
 def return_result(result, status=200, filetype="json", template=None):
     if filetype == "html" and not template:
         bottle.abort(500, "No template provided")

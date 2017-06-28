@@ -60,7 +60,7 @@ class Postcode(Controller):
                     return a.id
 
     def parse_id(self, postcode):
-        return parse_postcode(postcode)
+        return self.parse_postcode(postcode)
 
     @staticmethod
     def parse_postcode(postcode):

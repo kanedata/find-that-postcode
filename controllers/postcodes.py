@@ -42,7 +42,28 @@ class Postcode(Controller):
 
         return postcode
 
+    def get_attribute(self, attr):
+        """
+        Get an attribute or area by the field name
+
+        Adding "_name" to end of the code will return the name rather than code
+        """
+        if attr in self.attributes:
+            return self.attributes.get(attr)
+
+        for a in self.relationships["areas"]:
+            if attr.endswith("_name"):
+                if a.relationships["areatype"].id == attr[:-5]:
+                    return a.attributes.get("name")
+            else:
+                if a.relationships["areatype"].id == attr:
+                    return a.id
+
     def parse_id(self, postcode):
+        return parse_postcode(postcode)
+
+    @staticmethod
+    def parse_postcode(postcode):
         """
         standardises a postcode into the correct format
         """

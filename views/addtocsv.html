@@ -1,0 +1,95 @@
+% rebase("base.html", title='Add fields to CSV' )
+<form action="" method="post" enctype="multipart/form-data">
+  <div class="columns">
+    <div class="column">
+      <div class="content">
+        <p>Add geographical data to a CSV file by looking it up from a postcode column</p>
+        <p>The file should be separated by commas (<code>,</code> - not semicolons or tabs)
+        and the first row should contain the column names.</p>
+      </div>
+      <div class="field">
+        <label class="label">CSV file</label>
+        <p class="control">
+          <input class="" type="file" name="csvfile">
+        </p>
+      </div>
+      <div class="field">
+        <label class="label">Name of column containing postcodes</label>
+        <p class="control">
+          <input class="input" type="text" name="column_name" value="postcode">
+        </p>
+      </div>
+      <div class="field">
+        <p class="control">
+          <input class="button is-primary" type="submit" value="Upload" />
+        </p>
+      </div>
+    </div>
+    <div class="column">
+      <div class="field">
+        <label class="label">Fields to add</label>
+        <p class="control">
+          <table class="table">
+            <tbody>
+              <tr>
+                <th>Basic fields</th>
+                <th>Code</th>
+                <th>Name</th>
+              </tr>
+              % for b in basic_fields:
+              <tr>
+                <td>{{b[1]}}</td>
+                <td><input type="checkbox" name="fields" value="{{b[0]}}"
+                  % if b[0] in default_fields:
+                  checked="checked"
+                  % end
+                  ></td>
+                <td>
+                  % if b[2]:
+                  <input type="checkbox" name="fields" value="{{b[0]}}_name"
+                    % if "%s_name" % b[0] in default_fields:
+                    checked="checked"
+                    % end
+                  >
+                  % end
+                </td>
+              </tr>
+              % end
+            % for i in key_area_types:
+              <tr>
+                <th>{{ i[0] }} areas</th>
+                <th></th>
+                <th></th>
+              </tr>
+              % for area in i[1]:
+                % for area_type in result["data"]:
+                  % if area_type["id"] == area:
+              <tr>
+                <td>
+                  {{ area_type["attributes"]["name"] }}
+                  % if area_type["attributes"].get("count_areas"):
+                  <small> [{{ "{:,.0f}".format(area_type["attributes"]["count_areas"]) }}]</small>
+                  % end
+                </td>
+                <td><input type="checkbox" name="fields" value="{{area}}"
+                  % if area in default_fields:
+                  checked="checked"
+                  % end
+                  ></td>
+                <td><input type="checkbox" name="fields" value="{{area}}_name"
+                  % if "%s_name" % area in default_fields:
+                  checked="checked"
+                  % end
+                  ></td>
+              </tr>
+                  % end
+                % end
+              % end
+            % end
+            </tbody>
+          </table>
+        </p>
+      </div>
+    </div>
+  </div>
+</form>

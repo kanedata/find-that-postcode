@@ -58,6 +58,17 @@ OTHER_CODES = {
 }
 
 
+DEFAULT_UPLOAD_FIELDS = ["latlng", "laua", "laua_name", "gor", "gor_name"]
+BASIC_UPLOAD_FIELDS = [
+    ("latlng", "Latitude / Longitude", False),
+    ("estnrth", "OS Easting / Northing", False),
+    ("pcds", "Standardised postcode", False),
+    ("imd", "Index of multiple deprivation rank", False),
+    ("oac11", "2011 Output Area Classification (OAC)", True),
+    ("ru11ind", "2011 Census rural-urban classification", True),
+]
+
+
 NAME_FILES = [
     {"file": "Documents/2011 Census Output Area Classification Names and Codes UK.txt", "type_field": "oac11", "code_field": "OAC11", "name_field": "Subgroup", "welsh_name_field": None},
     {"file": "Documents/BUASD_names and codes UK as at 12_13.txt", "type_field": "buasd11", "code_field": "BUASD13CD", "name_field": "BUASD13NM", "welsh_name_field": None},

@@ -10,7 +10,7 @@ POSTCODE_FIELDS = ["postcode", "postal_code", "post_code", "post code"]
 
 
 def process_csv(csvfile, outfile, config,
-                postcode_field=["postcode", "postal_code", "post_code", "post code"],
+                postcode_field="postcode",
                 fields=["lat", "long", "cty"]):
 
     # @TODO add option for different CSV dialects and for no headers
@@ -25,7 +25,6 @@ def process_csv(csvfile, outfile, config,
         "W99999999": ""
     }
     for key, row in enumerate(reader):
-        print("Row %s" % key)
         for i in fields:
             row[i] = None
         postcode = Postcode.parse_postcode(row.get(postcode_field))

@@ -3,16 +3,21 @@ from datetime import datetime
 import argparse
 import math
 from urllib.parse import urlencode
+import os
+import sys
+import codecs
+import tempfile
 
 import bottle
 from elasticsearch import Elasticsearch
 
-from metadata import AREA_TYPES, KEY_AREA_TYPES, OTHER_CODES
+from metadata import *
 from controllers.postcodes import *
 from controllers.areatypes import *
 from controllers.areas import *
 from controllers.points import *
 from controllers.controller import *
+from process_csv import process_csv
 
 app = bottle.default_app()
 
@@ -130,6 +135,51 @@ def get_point(lat, lon, filetype="json"):
 @app.route('/static/<filename:path>')
 def send_static(filename):
     return bottle.static_file(filename, root='./static')
+
+
+@app.route('/addtocsv', method='POST')
+def add_to_csv():
+    upload = bottle.request.files.get('csvfile')
+    column_name = bottle.request.forms.get("column_name", "postcode")
+    fields = bottle.request.forms.getall("fields")
+    print(fields)
+    if len(fields) == 0:
+        fields = DEFAULT_UPLOAD_FIELDS
+
+    if "latlng" in fields:
+        fields.append("lat")
+        fields.append("long")
+        fields.remove("latlng")
+
+    if "estnrth" in fields:
+        fields.append("oseast1m")
+        fields.append("osnrth1m")
+        fields.remove("estnrth")
+
+    name, ext = os.path.splitext(upload.filename)
+    if ext not in ('.csv'):
+        return 'File extension not allowed.'
+
+    with tempfile.SpooledTemporaryFile(mode='w+', newline='') as output:
+        process_csv(codecs.iterdecode(upload.file, 'utf-8'), output, app.config, column_name, fields)
+        output.seek(0)
+        bottle.response.headers['Content-Type'] = 'text/csv'
+        bottle.response.headers['Content-Disposition'] = 'attachment; filename={}'.format(upload.raw_filename)
+        return output.read()
+
+
+@app.route('/addtocsv', method='GET')
+def add_to_csv():
+    ats = Areatypes(app.config)
+    ats.get()
+    (status, result) = ats.topJSON()
+
+    return bottle.template('addtocsv.html',
+                           result=result,
+                           key_area_types=KEY_AREA_TYPES,
+                           basic_fields=BASIC_UPLOAD_FIELDS,
+                           default_fields=DEFAULT_UPLOAD_FIELDS
+                           )
 
 
 def main():

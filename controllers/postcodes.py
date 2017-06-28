@@ -7,6 +7,7 @@ from metadata import AREA_TYPES, KEY_AREA_TYPES, OTHER_CODES
 from .controller import *
 import controllers.areas
 
+
 class Postcode(Controller):
 
     es_type = 'postcode'
@@ -28,7 +29,7 @@ class Postcode(Controller):
         self.relationships["areas"] = []
         for i in list(postcode.keys()):
             if postcode[i] and i not in self.not_area_fields:
-                area  = controllers.areas.Area(self.config)
+                area = controllers.areas.Area(self.config)
                 area.get_by_id(postcode[i], examples_count=0)
                 if area.found:
                     del postcode[i]
@@ -52,14 +53,14 @@ class Postcode(Controller):
         # check for blank/empty
         # put in all caps
         postcode = postcode.strip().upper()
-        if postcode=='':
+        if postcode == '':
             return None
 
         # replace any non alphanumeric characters
         postcode = re.sub('[^0-9a-zA-Z]+', '', postcode)
 
         # check for nonstandard codes
-        if len(postcode)>7:
+        if len(postcode) > 7:
             return postcode
 
         first_part = postcode[:-3].strip()
@@ -68,10 +69,10 @@ class Postcode(Controller):
         # check for incorrect characters
         first_part = list(first_part)
         last_part = list(last_part)
-        if last_part[0]=="O":
+        if last_part[0] == "O":
             last_part[0] = "0"
 
-        return "%s %s" % ("".join(first_part), "".join(last_part) )
+        return "%s %s" % ("".join(first_part), "".join(last_part))
 
     def toJSON(self, role="top"):
         json = super().toJSON(role)
@@ -79,8 +80,7 @@ class Postcode(Controller):
             if json[1].get("attributes", {}).get(i) and isinstance(json[1]["attributes"][i], datetime):
                 json[1]["attributes"][i] = json[1]["attributes"][i].strftime("%Y%m")
 
-
-        ats = controllers.areatypes.Areatypes( self.config )
+        ats = controllers.areatypes.Areatypes(self.config)
         ats.get()
         for a in ats.attributes:
             json[2].append(a.toJSON()[1])

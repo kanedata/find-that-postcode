@@ -4,6 +4,7 @@ import bottle
 from .controller import *
 import controllers.postcodes
 
+
 class Point(Controller):
 
     es_type = 'postcode'
@@ -16,30 +17,30 @@ class Point(Controller):
 
     def get_by_id(self, lat, lon):
         self.set_from_data({
-            "_id": "{},{}".format(lat,lon),
+            "_id": "{},{}".format(lat, lon),
             "_source": {
                 "lat": lat,
                 "lon": lon
             }
         })
         query = {
-        	"query": {
-        		"match_all": {}
-        	},
-        	"sort": [
-        		{
-        			"_geo_distance": {
-        				"location": {
-        					"lat": lat,
-        					"lon": lon
-        				},
-        				"unit": "m"
-        			}
-        		}
-        	]
+            "query": {
+                "match_all": {}
+            },
+            "sort": [
+                {
+                    "_geo_distance": {
+                        "location": {
+                            "lat": lat,
+                            "lon": lon
+                        },
+                        "unit": "m"
+                    }
+                }
+            ]
         }
         result = self.config.get("es").search(index=self.config.get("es_index", "postcode"), doc_type='postcode', body=query, size=1)
-        if result["hits"]["total"]>0:
+        if result["hits"]["total"] > 0:
             postcode = result["hits"]["hits"][0]
             self.relationships["nearest_postcode"] = controllers.postcodes.Postcode(self.config).set_from_data(postcode)
             self.attributes["distance_from_postcode"] = postcode["sort"][0]
@@ -53,7 +54,7 @@ class Point(Controller):
                     "status": "400",
                     "code": "point_outside_uk",
                     "title": "Nearest postcode is more than 10km away",
-                    "detail": "Nearest postcode ({}) is more than 10km away ({:,.1f}km). Are you sure this point is in the UK?".format( self.postcode.id, (self.attributes.get("distance_from_postcode") / 1000) )
+                    "detail": "Nearest postcode ({}) is more than 10km away ({:,.1f}km). Are you sure this point is in the UK?".format(self.postcode.id, (self.attributes.get("distance_from_postcode") / 1000))
                 }]
             })
 

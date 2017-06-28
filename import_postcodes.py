@@ -9,6 +9,7 @@ from elasticsearch.helpers import bulk
 
 from metadata import NAME_FILES
 
+
 def main():
     parser = argparse.ArgumentParser(description='Import postcodes into elasticsearch.')
 
@@ -35,10 +36,10 @@ def main():
     with zipfile.ZipFile(args.nspl) as pczip:
         for f in pczip.filelist:
             if f.filename.endswith(".csv") and f.filename.startswith("Data/multi_csv/NSPL_") and args.do_postcodes:
-                print ("[postcodes] Opening %s" % f.filename)
+                print("[postcodes] Opening %s" % f.filename)
                 pcount = 0
                 with pczip.open(f, 'rU') as pccsv:
-                    pccsv  = io.TextIOWrapper(pccsv)
+                    pccsv = io.TextIOWrapper(pccsv)
                     reader = csv.DictReader(pccsv)
                     for i in reader:
                         i["_index"] = args.es_index
@@ -48,7 +49,7 @@ def main():
 
                         # null any blank fields
                         for k in i:
-                            if i[k]=="":
+                            if i[k] == "":
                                 i[k] = None
 
                         # date fields
@@ -60,7 +61,7 @@ def main():
                         for j in ["lat", "long"]:
                             if i[j]:
                                 i[j] = float(i[j])
-                                if i[j]==99.999999:
+                                if i[j] == 99.999999:
                                     i[j] = None
                         if i["lat"] and i["long"]:
                             i["location"] = {"lat": i["lat"], "lon": i["long"]}
@@ -77,25 +78,25 @@ def main():
                             print("[elasticsearch] %s postcodes to save" % len(postcodes))
                             results = bulk(es, postcodes)
                             print("[elasticsearch] saved %s postcodes to %s index" % (results[0], args.es_index))
-                            print("[elasticsearch] %s errors reported" % len(results[1]) )
+                            print("[elasticsearch] %s errors reported" % len(results[1]))
                             postcodes = []
                     print("[postcodes] Processed %s postcodes" % pcount)
                     print("[elasticsearch] %s postcodes to save" % len(postcodes))
                     results = bulk(es, postcodes)
                     print("[elasticsearch] saved %s postcodes to %s index" % (results[0], args.es_index))
-                    print("[elasticsearch] %s errors reported" % len(results[1]) )
+                    print("[elasticsearch] %s errors reported" % len(results[1]))
                     postcodes = []
 
             # add names and codes
             if f.filename in [i["file"] for i in NAME_FILES] and args.do_codes:
-                codes = [i for i in NAME_FILES if i["file"]==f.filename][0]
+                codes = [i for i in NAME_FILES if i["file"] == f.filename][0]
                 names_and_codes = []
                 print("[codes] adding codes for '%s' field" % codes["type_field"])
                 with pczip.open(codes["file"], 'rU') as nccsv:
-                    nccsv  = io.TextIOWrapper(nccsv)
+                    nccsv = io.TextIOWrapper(nccsv)
 
                     # double tab delimiter in country codes causing issues
-                    if codes["type_field"]=="ctry":
+                    if codes["type_field"] == "ctry":
                         nccsv = (row.replace('\t\t', '\t') for row in nccsv)
 
                     reader = csv.DictReader(nccsv, delimiter='\t')
@@ -118,7 +119,7 @@ def main():
                     print("[elasticsearch] %s codes to save" % len(names_and_codes))
                     results = bulk(es, names_and_codes)
                     print("[elasticsearch] saved %s codes to %s index" % (results[0], args.es_index))
-                    print("[elasticsearch] %s errors reported" % len(results[1]) )
+                    print("[elasticsearch] %s errors reported" % len(results[1]))
 
 
 if __name__ == '__main__':

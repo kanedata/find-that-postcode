@@ -4,6 +4,7 @@ from .controller import *
 import controllers.postcodes
 import controllers.areatypes
 
+
 class Area(Controller):
 
     es_type = 'code'
@@ -22,7 +23,7 @@ class Area(Controller):
             self.relationships["areatype"] = {}
             self.boundary = result["_source"].get("boundary")
             self.set_from_data(result)
-            if examples_count>0:
+            if examples_count > 0:
                 self.relationships["example_postcodes"] = self.get_example_postcodes(examples_count)
 
     def process_attributes(self, area):
@@ -54,7 +55,7 @@ class Area(Controller):
         if self.found:
             # @TODO need to check whether boundary data actually exists before applying this
             if json[1]["data"]["attributes"].get("has_boundary"):
-                json[1]["links"]["geojson"] = self.url(filetype="geojson" )
+                json[1]["links"]["geojson"] = self.url(filetype="geojson")
         return json
 
     def geoJSON(self):
@@ -74,6 +75,7 @@ class Area(Controller):
             ]
         }
 
+
 class Areas(Controller):
 
     es_type = 'code'
@@ -91,29 +93,29 @@ class Areas(Controller):
             query = {
                 "query": {
                     "function_score": {
-                      "query": {
-                      	"query_string": {
-                    		"query": q
-                    	}
-                      },
-                      "boost": "5",
-                      "functions": [
-                          {"weight": 3, "filter": { "terms": { "type": ["ctry", "region", "cty", "laua","gor"] } } },
-                          {"weight": 2, "filter": { "terms": { "type": ["ttwa", "pfa", "lep", "park", "pcon"] } } },
-                          {"weight": 1.5, "filter": { "terms": { "type": ["ccg", "hlthau", "hro", "pct"] } } },
-                          {"weight": 1, "filter": { "terms": { "type": ["eer", "bua11", "buasd11", "teclec"] } } },
-                          {"weight": 0.4, "filter": { "terms": { "type": ["msoa11", "lsoa11", "wz11", "oa11", "nuts", "ward"] } } }
-                      ]
+                        "query": {
+                            "query_string": {
+                                "query": q
+                            }
+                        },
+                        "boost": "5",
+                        "functions": [
+                            {"weight": 3, "filter": {"terms": {"type": ["ctry", "region", "cty", "laua", "gor"]}}},
+                            {"weight": 2, "filter": {"terms": {"type": ["ttwa", "pfa", "lep", "park", "pcon"]}}},
+                            {"weight": 1.5, "filter": {"terms": {"type": ["ccg", "hlthau", "hro", "pct"]}}},
+                            {"weight": 1, "filter": {"terms": {"type": ["eer", "bua11", "buasd11", "teclec"]}}},
+                            {"weight": 0.4, "filter": {"terms": {"type": ["msoa11", "lsoa11", "wz11", "oa11", "nuts", "ward"]}}}
+                        ]
                     }
                 }
             }
             result = self.config.get("es").search(index=self.config.get("es_index", "postcode"), doc_type=self.es_type, body=query, from_=self.pagination.from_, size=self.pagination.size, _source_exclude=["boundary"], ignore=[400])
-            self.data = [Area(self.config).set_from_data(a) for a in result.get("hits",{}).get("hits",[])]
-            self.meta["result_count"] = result.get("hits",{}).get("total",0)
+            self.data = [Area(self.config).set_from_data(a) for a in result.get("hits", {}).get("hits", [])]
+            self.meta["result_count"] = result.get("hits", {}).get("total", 0)
 
     def topJSON(self):
         # get all areatypes first
-        ats = controllers.areatypes.Areatypes( self.config )
+        ats = controllers.areatypes.Areatypes(self.config)
         ats.get()
         included = []
         for a in ats.attributes:

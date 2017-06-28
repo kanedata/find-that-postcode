@@ -25,6 +25,7 @@ AREA_LOOKUP = [
     ("pfa15cd", "pfa", "pfa15nm"),
 ]
 
+
 def main():
     parser = argparse.ArgumentParser(description='Import area boundaries into elasticsearch.')
 
@@ -46,7 +47,7 @@ def main():
     es = Elasticsearch(host=args.es_host, port=args.es_port, url_prefix=args.es_url_prefix, use_ssl=args.es_use_ssl)
 
     placename_file = args.placename_file
-    if not os.path.isfile( args.placename_file ):
+    if not os.path.isfile(args.placename_file):
         print("[placenames] Downloading file: [%s]" % (placename_file))
         urllib.request.urlretrieve(placename_file, "data/placenames.csv")
         placename_file = "data/placenames.csv"
@@ -62,7 +63,7 @@ def main():
             i["_id"] = i["place15cd"]
 
             for k in i:
-                if i[k]=="":
+                if i[k] == "":
                     i[k] = None
 
             # population count
@@ -73,7 +74,7 @@ def main():
             for j in ["lat", "long"]:
                 if i[j]:
                     i[j] = float(i[j])
-                    if i[j]==99.999999 or i[j]==0:
+                    if i[j] == 99.999999 or i[j] == 0:
                         i[j] = None
             if i["lat"] and i["long"]:
                 i["location"] = {"lat": i["lat"], "lon": i["long"]}
@@ -96,13 +97,13 @@ def main():
                 print("[elasticsearch] %s placenames to save" % len(placenames))
                 results = bulk(es, placenames)
                 print("[elasticsearch] saved %s placenames to %s index" % (results[0], args.es_index))
-                print("[elasticsearch] %s errors reported" % len(results[1]) )
+                print("[elasticsearch] %s errors reported" % len(results[1]))
                 placenames = []
         print("[placenames] Processed %s placenames" % pcount)
         print("[elasticsearch] %s placenames to save" % len(placenames))
         results = bulk(es, placenames)
         print("[elasticsearch] saved %s placenames to %s index" % (results[0], args.es_index))
-        print("[elasticsearch] %s errors reported" % len(results[1]) )
+        print("[elasticsearch] %s errors reported" % len(results[1]))
         placenames = []
 
 

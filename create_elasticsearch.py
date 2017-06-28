@@ -7,26 +7,27 @@ INDEXES = [
         "name": "postcode",
         "mapping": [
             ("postcode", {
-                    "properties": {
-                        "location": {"type": "geo_point"}
-                    }
+                "properties": {
+                    "location": {"type": "geo_point"}
                 }
+            }
             ),
             ("placename", {
-                    "properties": {
-                        "location": {"type": "geo_point"}
-                    }
+                "properties": {
+                    "location": {"type": "geo_point"}
                 }
+            }
             ),
             ("code", {
-                    "properties": {
-                        "boundary": {"type": "geo_shape"}
-                    }
+                "properties": {
+                    "boundary": {"type": "geo_shape"}
                 }
+            }
             ),
         ]
     }
 ]
+
 
 def main():
 
@@ -38,17 +39,17 @@ def main():
     es = Elasticsearch()
 
     for i in INDEXES:
-        if es.indices.exists( i["name"]  ) and args.reset:
-            print("[elasticsearch] deleting '%s' index..." % ( i["name"]  ))
-            res = es.indices.delete(index =  i["name"]  )
+        if es.indices.exists(i["name"]) and args.reset:
+            print("[elasticsearch] deleting '%s' index..." % (i["name"]))
+            res = es.indices.delete(index=i["name"])
             print("[elasticsearch] response: '%s'" % (res))
-        print("[elasticsearch] creating '%s' index..." % ( i["name"]  ))
-        res = es.indices.create(index =  i["name"]  )
+        print("[elasticsearch] creating '%s' index..." % (i["name"]))
+        res = es.indices.create(index=i["name"])
 
         if "mapping" in i:
             for mapping in i["mapping"]:
-                res = es.indices.put_mapping(mapping[0], mapping[1], index= i["name"]   )
-                print("[elasticsearch] set mapping on %s index, %s type" % ( i["name"], mapping[0]  ))
+                res = es.indices.put_mapping(mapping[0], mapping[1], index=i["name"])
+                print("[elasticsearch] set mapping on %s index, %s type" % (i["name"], mapping[0]))
 
 if __name__ == '__main__':
     main()

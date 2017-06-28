@@ -4,14 +4,15 @@ from urllib.parse import urlencode, urlunparse
 import bottle
 
 GEOJSON_TYPES = {
-    "point": "Point", # A single geographic coordinate.
-    "linestring": "LineString", # An arbitrary line given two or more points.
-    "polygon": "Polygon", # A closed polygon whose first and last point must match, thus requiring n + 1 vertices to create an n-sided polygon and a minimum of 4 vertices.
-    "multipoint": "MultiPoint", # An array of unconnected, but likely related points.
-    "multilinestring": "MultiLineString", # An array of separate linestrings.
-    "multipolygon": "MultiPolygon", # An array of separate polygons.
-    "geometrycollection": "GeometryCollection", # A GeoJSON shape similar to the multi* shapes except that multiple types can coexist (e.g., a Point and a LineString).
+    "point": "Point",  # A single geographic coordinate.
+    "linestring": "LineString",  # An arbitrary line given two or more points.
+    "polygon": "Polygon",  # A closed polygon whose first and last point must match, thus requiring n + 1 vertices to create an n-sided polygon and a minimum of 4 vertices.
+    "multipoint": "MultiPoint",  # An array of unconnected, but likely related points.
+    "multilinestring": "MultiLineString",  # An array of separate linestrings.
+    "multipolygon": "MultiPolygon",  # An array of separate polygons.
+    "geometrycollection": "GeometryCollection",  # A GeoJSON shape similar to the multi* shapes except that multiple types can coexist (e.g., a Point and a LineString).
 }
+
 
 class Controller:
 
@@ -72,7 +73,7 @@ class Controller:
         return ""
 
     def get_query_string(self, query_vars={}):
-        #query_vars = self.page_query_vars(query_vars)
+        # query_vars = self.page_query_vars(query_vars)
         return urlencode(query_vars)
 
     # role = top|identifier|embedded
@@ -95,7 +96,7 @@ class Controller:
         status = 200
         json["type"] = self.url_slug
         json["id"] = self.id
-        if role=="identifer":
+        if role == "identifer":
             return (status, json, included)
 
         json["attributes"] = self.attributes
@@ -105,7 +106,7 @@ class Controller:
         }
 
         # add relationship information
-        if len(self.relationships)>0:
+        if len(self.relationships) > 0:
             json["relationships"] = {}
 
         for i in self.relationships:
@@ -118,11 +119,11 @@ class Controller:
             }
             if isinstance(self.relationships[i], list):
                 json["relationships"][i]["data"] = [j.toJSON("identifer")[1] for j in self.relationships[i]]
-                if role!="embedded":
+                if role != "embedded":
                     included += [j.toJSON("embedded")[1] for j in self.relationships[i]]
             else:
                 json["relationships"][i]["data"] = self.relationships[i].toJSON("identifer")[1]
-                if role!="embedded":
+                if role != "embedded":
                     included.append(self.relationships[i].toJSON("embedded")[1])
 
         return (status, json, included)
@@ -147,7 +148,8 @@ class Controller:
                     "self": self.url(),
                     "html": self.url("html")
                 }
-            })
+                })
+
 
 class Pagination():
 
@@ -167,12 +169,12 @@ class Pagination():
     def page_query_vars(self, query_vars={}):
         if self.page and self.page > 1 and "page" not in query_vars:
             query_vars["page"] = self.p
-        if self.size and self.size and self.size!=self.default_size and "size" not in query_vars:
+        if self.size and self.size and self.size != self.default_size and "size" not in query_vars:
             query_vars["size"] = self.size
         return query_vars
 
     def get_from(self):
-        return (self.page-1) * self.size
+        return (self.page - 1) * self.size
 
     def set_pages(self, page, size):
         self.page = page

@@ -1,6 +1,7 @@
 bottle==0.12.13
 colorama==0.3.7
 elasticsearch==5.3.0
+gunicorn==19.7.1
 py==1.4.33
 pytest==3.0.7
 urllib3==1.20

@@ -113,6 +113,7 @@ def area_csv():
     writer.writeheader()
     for row in a.get_all(area_types):
         writer.writerow(row)
+    bottle.response.content_type = 'text/csv'
     return si.getvalue()
 
 

@@ -7,6 +7,8 @@ import os
 import sys
 import codecs
 import tempfile
+import csv
+import io
 
 import bottle
 from elasticsearch import Elasticsearch
@@ -27,12 +29,12 @@ def return_result(result, status=200, filetype="json", template=None):
         bottle.abort(500, "No template provided")
 
     if status != 200:
-        if filetype == "json":
+        if filetype in ("json", "geojson"):
             raise bottle.HTTPError(status=status, body=result)
         elif filetype == "html":
             return bottle.abort(status, result)
 
-    if filetype == "json":
+    if filetype in ("json", "geojson"):
         return result
     elif filetype == "html":
         return bottle.template(template,
@@ -85,7 +87,8 @@ def areaname(filetype="json"):
 def area_geojson(areacode):
     a = Area(app.config)
     a.get_by_id(areacode.strip(), boundary=True)
-    return a.geoJSON()
+    (status, result) = a.geoJSON()
+    return return_result(result, status, "geojson")
 
 
 @app.route('/areas/<areacode>')
@@ -95,6 +98,22 @@ def area(areacode, filetype="json"):
     a.get_by_id(areacode.strip())
     (status, result) = a.topJSON()
     return return_result(result, status, filetype, "area.html")
+    
+@app.route('/areas/names.csv')
+def area_csv():
+    # can add a comma-separated list of area types
+    # eg ?types=lsoa11,laua
+    area_types = bottle.request.query.get("types", None)
+    if area_types:
+        area_types = [a.strip().lower() for a in area_types.split(",")]
+
+    a = Areas(app.config)
+    si = io.StringIO()
+    writer = csv.DictWriter(si, fieldnames=["code", "name", "type"])
+    writer.writeheader()
+    for row in a.get_all(area_types):
+        writer.writerow(row)
+    return si.getvalue()
 
 
 @app.route('/areatypes')

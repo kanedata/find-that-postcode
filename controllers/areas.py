@@ -1,9 +1,10 @@
 from metadata import AREA_TYPES
 
-from .controller import *
+from .controller import Controller, Pagination, GEOJSON_TYPES
 import controllers.postcodes
 import controllers.areatypes
 
+from elasticsearch.helpers import scan
 
 class Area(Controller):
 
@@ -60,8 +61,8 @@ class Area(Controller):
 
     def geoJSON(self):
         if not self.boundary:
-            bottle.abort(404, "boundary not found")
-        return {
+            return (404, "boundary not found")
+        return (200, {
             "type": "FeatureCollection",
             "features": [
                 {
@@ -73,7 +74,7 @@ class Area(Controller):
                     "properties": self.attributes
                 }
             ]
-        }
+        })
 
 
 class Areas(Controller):
@@ -109,9 +110,44 @@ class Areas(Controller):
                     }
                 }
             }
-            result = self.config.get("es").search(index=self.config.get("es_index", "postcode"), doc_type=self.es_type, body=query, from_=self.pagination.from_, size=self.pagination.size, _source_exclude=["boundary"], ignore=[400])
+            result = self.config.get("es").search(
+                index=self.config.get("es_index", "postcode"), 
+                doc_type=self.es_type, 
+                body=query, 
+                from_=self.pagination.from_, 
+                size=self.pagination.size, 
+                _source_exclude=["boundary"], 
+                ignore=[400]
+            )
             self.data = [Area(self.config).set_from_data(a) for a in result.get("hits", {}).get("hits", [])]
             self.meta["result_count"] = result.get("hits", {}).get("total", 0)
+
+    def get_all(self, area_types=None):
+        q = None
+        if area_types:
+            q = {
+                "query": {
+                    "terms": {
+                        "type": area_types
+                    }
+                }
+            }
+        result = scan(
+            self.config.get("es"),
+            query=q,
+            index=self.config.get("es_index", "postcode"), 
+            doc_type=self.es_type, 
+            _source_include=["type", "name"], 
+            size=10000,
+            ignore=[400]
+        )
+        for r in result:
+            yield {
+                "code": r["_id"], 
+                "name": r["_source"]["name"],
+                "type": r["_source"]["type"]
+            }
+
 
     def topJSON(self):
         # get all areatypes first

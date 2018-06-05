@@ -1,10 +1,9 @@
+"""This module runs a bottle server for a postcode directory
+
+"""
 from __future__ import print_function
-from datetime import datetime
 import argparse
-import math
-from urllib.parse import urlencode
 import os
-import sys
 import codecs
 import tempfile
 import csv
@@ -98,7 +97,7 @@ def area(areacode, filetype="json"):
     a.get_by_id(areacode.strip())
     (status, result) = a.topJSON()
     return return_result(result, status, filetype, "area.html")
-    
+
 @app.route('/areas/names.csv')
 def area_csv():
     # can add a comma-separated list of area types
@@ -176,7 +175,7 @@ def add_to_csv():
         fields.append("osnrth1m")
         fields.remove("estnrth")
 
-    name, ext = os.path.splitext(upload.filename)
+    _, ext = os.path.splitext(upload.filename)
     if ext not in ('.csv'):
         return 'File extension not allowed.'
 

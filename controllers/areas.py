@@ -1,10 +1,9 @@
-from metadata import AREA_TYPES
+from elasticsearch.helpers import scan
 
 from .controller import Controller, Pagination, GEOJSON_TYPES
 import controllers.postcodes
 import controllers.areatypes
 
-from elasticsearch.helpers import scan
 
 class Area(Controller):
 

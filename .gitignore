@@ -7,3 +7,6 @@ __pycache__/
 env/
 scratchpad/
 .cache/
+
+*.lnk
+.vscode/

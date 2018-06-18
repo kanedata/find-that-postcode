@@ -20,6 +20,10 @@ from controllers.points import *
 from controllers.controller import *
 from process_csv import process_csv
 
+# set MEMFILE_MAX to allow bigger uploads
+# 5 MB
+bottle.BaseRequest.MEMFILE_MAX = 1024 * 1024 * 5
+
 app = bottle.default_app()
 
 
@@ -202,7 +206,7 @@ def add_to_csv():
         process_csv(codecs.iterdecode(upload.file, 'utf-8'), output, app.config, column_name, fields)
         output.seek(0)
         bottle.response.headers['Content-Type'] = 'text/csv'
-        bottle.response.headers['Content-Disposition'] = 'attachment; filename={}'.format(upload.raw_filename)
+        bottle.response.headers['Content-Disposition'] = 'attachment; filename="{}"'.format(upload.raw_filename)
         return output.read()
 
 

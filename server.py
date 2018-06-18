@@ -32,8 +32,7 @@ potential_env_vars = [
 for e_v in potential_env_vars:
     if os.environ.get(e_v):
         app.config["es"] = Elasticsearch(os.environ.get(e_v))
-        app.config["es_index"] = 'charitysearch'
-        app.config["es_type"] = 'charity'
+        app.config["es_index"] = 'postcode'
         break
 
 if os.environ.get("GA_TRACKING_ID"):

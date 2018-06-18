@@ -298,5 +298,5 @@ dokku run es-postcodes python import_boundaries.py --dir='/data' http://geoporta
 dokku run es-postcodes python import_boundaries.py --dir='/data' http://geoportal.statistics.gov.uk/datasets/826dc85fb600440889480f4d9dbb1a24_2.geojson
 dokku run es-postcodes python import_boundaries.py --dir='/data' http://geoportal.statistics.gov.uk/datasets/a399c2a5922a4beaa080de63c0a218a3_2.geojson
 dokku run es-postcodes python import_boundaries.py --dir='/data' http://geoportal.statistics.gov.uk/datasets/278ff7af4efb4a599f70156e6e19cc9f_0.geojson
-dokku run es-postcodes python import_boundaries.py --dir='/data' sydneyhttp://geoportal.statistics.gov.uk/datasets/1f021bb824ee4820b353b4b58fab6df5_0.geojson
+dokku run es-postcodes python import_boundaries.py --dir='/data' http://geoportal.statistics.gov.uk/datasets/1f021bb824ee4820b353b4b58fab6df5_0.geojson
 ```

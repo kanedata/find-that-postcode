@@ -97,6 +97,7 @@ def main():
                     errors.append("[ERROR][%s] No code field found in file" % (boundary_file,))
                 else:
                     errors.append("[ERROR][%s] Too many code fields found in file" % (boundary_file,))
+                    errors.append("[ERROR][%s] Code fields: %s" % (boundary_file,"; ".join(code_fields)))
             else:
                 errors.append("[ERROR][%s] Features not found in file" % (boundary_file,))
 

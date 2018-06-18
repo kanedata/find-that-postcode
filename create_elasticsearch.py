@@ -1,5 +1,6 @@
 import argparse
 from elasticsearch import Elasticsearch
+import os
 
 
 INDEXES = [
@@ -34,9 +35,35 @@ def main():
     parser = argparse.ArgumentParser(description='Setup elasticsearch indexes.')
     parser.add_argument('--reset', action='store_true',
                         help='If set, any existing indexes will be deleted and recreated.')
+
+    # elasticsearch options
+    parser.add_argument('--es-host', default="localhost",
+                        help='host for the elasticsearch instance')
+    parser.add_argument('--es-port', default=9200,
+                        help='port for the elasticsearch instance')
+    parser.add_argument('--es-url-prefix', default='',
+                        help='Elasticsearch url prefix')
+    parser.add_argument('--es-use-ssl', action='store_true',
+                        help='Use ssl to connect to elasticsearch')
+    parser.add_argument('--es-index', default='postcode',
+                        help='index used to store postcode data')
+
     args = parser.parse_args()
 
-    es = Elasticsearch()
+    es = Elasticsearch(host=args.es_host, port=args.es_port,
+                       url_prefix=args.es_url_prefix, use_ssl=args.es_use_ssl)
+
+    potential_env_vars = [
+        "ELASTICSEARCH_URL",
+        "ES_URL",
+        "BONSAI_URL"
+    ]
+    for e_v in potential_env_vars:
+        if os.environ.get(e_v):
+            es = Elasticsearch(os.environ.get(e_v))
+            break
+
+    INDEXES[0]["name"] = args.es_index
 
     for i in INDEXES:
         if es.indices.exists(i["name"]) and args.reset:

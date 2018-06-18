@@ -59,6 +59,16 @@ def main():
 
     es = Elasticsearch(host=args.es_host, port=args.es_port, url_prefix=args.es_url_prefix, use_ssl=args.es_use_ssl)
 
+    potential_env_vars = [
+        "ELASTICSEARCH_URL",
+        "ES_URL",
+        "BONSAI_URL"
+    ]
+    for e_v in potential_env_vars:
+        if os.environ.get(e_v):
+            es = Elasticsearch(os.environ.get(e_v))
+            break
+
     for boundary_file in args.boundary_files:
         # (code, code_field, boundary_file) = parse_boundary_file(boundary_file)
         boundary_filename = "data/%s" % boundary_file.split('/')[-1]

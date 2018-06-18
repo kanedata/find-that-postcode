@@ -2,6 +2,7 @@ import csv
 import zipfile
 import io
 import argparse
+import os
 from datetime import datetime
 
 from elasticsearch import Elasticsearch
@@ -33,12 +34,22 @@ def main():
 
     es = Elasticsearch(host=args.es_host, port=args.es_port, url_prefix=args.es_url_prefix, use_ssl=args.es_use_ssl)
 
+    potential_env_vars = [
+        "ELASTICSEARCH_URL",
+        "ES_URL",
+        "BONSAI_URL"
+    ]
+    for e_v in potential_env_vars:
+        if os.environ.get(e_v):
+            es = Elasticsearch(os.environ.get(e_v))
+            break
+
     with zipfile.ZipFile(args.nspl) as pczip:
         for f in pczip.filelist:
             if f.filename.endswith(".csv") and f.filename.startswith("Data/multi_csv/NSPL_") and args.do_postcodes:
                 print("[postcodes] Opening %s" % f.filename)
                 pcount = 0
-                with pczip.open(f, 'rU') as pccsv:
+                with pczip.open(f, 'r') as pccsv:
                     pccsv = io.TextIOWrapper(pccsv)
                     reader = csv.DictReader(pccsv)
                     for i in reader:

@@ -1,6 +1,7 @@
 import csv
 import urllib.request
 import argparse
+import os
 from datetime import datetime
 import os
 import json
@@ -45,6 +46,16 @@ def main():
     placenames = []
 
     es = Elasticsearch(host=args.es_host, port=args.es_port, url_prefix=args.es_url_prefix, use_ssl=args.es_use_ssl)
+
+    potential_env_vars = [
+        "ELASTICSEARCH_URL",
+        "ES_URL",
+        "BONSAI_URL"
+    ]
+    for e_v in potential_env_vars:
+        if os.environ.get(e_v):
+            es = Elasticsearch(os.environ.get(e_v))
+            break
 
     placename_file = args.placename_file
     if not os.path.isfile(args.placename_file):

@@ -253,6 +253,10 @@ dokku apps:create es-postcodes
 # add permanent data storage
 dokku storage:mount es-postcodes /var/lib/dokku/data/storage/es-postcodes:/data
 
+# enable domain
+dokku domains:enable es-postcodes
+dokku domains:add es-postcodes postcodes.findthatcharity.uk
+
 # elasticsearch
 sudo dokku plugin:install https://github.com/dokku/dokku-elasticsearch.git elasticsearch
 export ELASTICSEARCH_IMAGE="elasticsearch"
@@ -281,8 +285,11 @@ git push dokku master
 On Dokku server run:
 
 ```bash
+# fetch the data files
+wget -O /var/lib/dokku/data/storage/es-postcodes/nspl.zip https://ons.maps.arcgis.com/sharing/rest/content/items/fd4d376782994b1ca2316a2fd0649315/data
+
 # setup and run import
-dokku run es-postcodes python data_import/create_elasticsearch.py
-dokku run es-postcodes python data_import/fetch_data.py --folder '/data'
+dokku run es-postcodes python create_elasticsearch.py
+dokku run es-postcodes python import_postcodes.py '/data/nspl.zip'
 dokku run es-postcodes python data_import/import_data.py --folder '/data'
 ```

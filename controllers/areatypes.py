@@ -27,9 +27,9 @@ class Areatype(Controller):
                         "type": self.id
                     }
                 },
-                "sort": [
-                    {"sort_order.keyword": "asc"}  # @TODO sort by _id? ??
-                ]
+                # "sort": [
+                #     {"sort_order.keyword": "asc"}  # @TODO sort by _id? ??
+                # ]
             }
             result = self.config.get("es").search(index=self.config.get("es_index"), doc_type=self.es_type, body=query, from_=self.pagination.from_, size=self.pagination.size, _source_exclude=["boundary"])
             if result["hits"]["total"] > 0:

@@ -103,7 +103,7 @@ def main():
                 codes = [i for i in NAME_FILES if i["file"] == f.filename][0]
                 names_and_codes = []
                 print("[codes] adding codes for '%s' field" % codes["type_field"])
-                with pczip.open(codes["file"], 'rU') as nccsv:
+                with pczip.open(codes["file"], 'r') as nccsv:
                     nccsv = io.TextIOWrapper(nccsv)
 
                     # double tab delimiter in country codes causing issues

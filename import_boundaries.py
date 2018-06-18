@@ -46,6 +46,8 @@ def main():
                         help='URL or file path for each boundary file to import. Multiple URLs should be separated by a space')
     parser.add_argument('--examine', action='store_true', help="Give info about the shape of the file, don't execute the import")
 
+    parser.add_argument('--dir', default='data', help='destination directory to store the files')
+
     # elasticsearch options
     parser.add_argument('--es-host', default="localhost", help='host for the elasticsearch instance')
     parser.add_argument('--es-port', default=9200, help='port for the elasticsearch instance')
@@ -71,7 +73,7 @@ def main():
 
     for boundary_file in args.boundary_files:
         # (code, code_field, boundary_file) = parse_boundary_file(boundary_file)
-        boundary_filename = "data/%s" % boundary_file.split('/')[-1]
+        boundary_filename = os.path.join(args.dir, boundary_file.split('/')[-1])
 
         if not os.path.isfile(boundary_file):
             if not os.path.isfile(boundary_filename):

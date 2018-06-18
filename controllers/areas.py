@@ -100,7 +100,7 @@ class Areas(Controller):
                         },
                         "boost": "5",
                         "functions": [
-                            {"weight": 3, "filter": {"terms": {"type": ["ctry", "region", "cty", "laua", "gor"]}}},
+                            {"weight": 3, "filter": {"terms": {"type": ["ctry", "region", "cty", "laua", "rgn"]}}},
                             {"weight": 2, "filter": {"terms": {"type": ["ttwa", "pfa", "lep", "park", "pcon"]}}},
                             {"weight": 1.5, "filter": {"terms": {"type": ["ccg", "hlthau", "hro", "pct"]}}},
                             {"weight": 1, "filter": {"terms": {"type": ["eer", "bua11", "buasd11", "teclec"]}}},

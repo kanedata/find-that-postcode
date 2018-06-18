@@ -44,6 +44,8 @@ def main():
             es = Elasticsearch(os.environ.get(e_v))
             break
 
+    code_files = [i["file"] for i in NAME_FILES]
+
     with zipfile.ZipFile(args.nspl) as pczip:
         for f in pczip.filelist:
             if f.filename.endswith(".csv") and f.filename.startswith("Data/multi_csv/NSPL_") and args.do_postcodes:
@@ -99,38 +101,42 @@ def main():
                     postcodes = []
 
             # add names and codes
-            if f.filename in [i["file"] for i in NAME_FILES] and args.do_codes:
-                codes = [i for i in NAME_FILES if i["file"] == f.filename][0]
-                names_and_codes = []
-                print("[codes] adding codes for '%s' field" % codes["type_field"])
-                with pczip.open(codes["file"], 'r') as nccsv:
-                    nccsv = io.TextIOWrapper(nccsv)
+            if not args.do_codes:
+                continue 
 
-                    # double tab delimiter in country codes causing issues
-                    if codes["type_field"] == "ctry":
-                        nccsv = (row.replace('\t\t', '\t') for row in nccsv)
+            for j in code_files:
+                if f.filename.startswith(j) and f.filename.endswith('.csv'):
+                    codes = [i for i in NAME_FILES if i["file"] == j][0]
+                    names_and_codes = []
+                    print("[codes] adding codes for '%s' field" % codes["type_field"])
+                    with pczip.open(codes["file"], 'r') as nccsv:
+                        nccsv = io.TextIOWrapper(nccsv)
 
-                    reader = csv.DictReader(nccsv, delimiter='\t')
-                    for i in reader:
-                        i["_id"] = i[codes["code_field"]]
-                        i["_index"] = args.es_index
-                        i["_type"] = "code"
-                        i["_op_type"] = "index"
-                        i["type"] = codes["type_field"]
-                        i["sort_order"] = i["_id"]
-                        if codes["name_field"]:
-                            i["name"] = i[codes["name_field"]]
-                            i["name_welsh"] = i["name"]
-                            if codes["welsh_name_field"]:
-                                i["name_welsh"] = i[codes["welsh_name_field"]]
+                        # double tab delimiter in country codes causing issues
+                        if codes["type_field"] == "ctry":
+                            nccsv = (row.replace('\t\t', '\t') for row in nccsv)
 
-                        if '' in i:
-                            del i['']
-                        names_and_codes.append(i)
-                    print("[elasticsearch] %s codes to save" % len(names_and_codes))
-                    results = bulk(es, names_and_codes)
-                    print("[elasticsearch] saved %s codes to %s index" % (results[0], args.es_index))
-                    print("[elasticsearch] %s errors reported" % len(results[1]))
+                        reader = csv.DictReader(nccsv, delimiter=',')
+                        for i in reader:
+                            i["_id"] = i[codes["code_field"]]
+                            i["_index"] = args.es_index
+                            i["_type"] = "code"
+                            i["_op_type"] = "index"
+                            i["type"] = codes["type_field"]
+                            i["sort_order"] = i["_id"]
+                            if codes["name_field"]:
+                                i["name"] = i[codes["name_field"]]
+                                i["name_welsh"] = i["name"]
+                                if codes["welsh_name_field"]:
+                                    i["name_welsh"] = i[codes["welsh_name_field"]]
+
+                            if '' in i:
+                                del i['']
+                            names_and_codes.append(i)
+                        print("[elasticsearch] %s codes to save" % len(names_and_codes))
+                        results = bulk(es, names_and_codes)
+                        print("[elasticsearch] saved %s codes to %s index" % (results[0], args.es_index))
+                        print("[elasticsearch] %s errors reported" % len(results[1]))
 
 
 if __name__ == '__main__':

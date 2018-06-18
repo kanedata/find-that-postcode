@@ -6,7 +6,7 @@ AREA_TYPES = [
     ("hlthau", "Strategic Health Authority", "Former Strategic Health Authority (SHA)/ Local Health Board (LHB)/ Health Board (HB)/ Health Authority (HA)/ Health & Social Care Board (HSCB)", "The health area code for the postcode. SHAs were abolished in England in 2013 but the codes remain as a 'frozen' geography. The field will otherwise be blank for postcodes with no OA code."),
     ("hro", "Pan SHA", "Pan SHA", "The Pan SHA responsible for the associated strategic health authority for each postcode in England. Pseudo codes are included for Wales, Scotland, Northern Ireland, Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."),
     ("ctry", "Country", "Country", "The code for the appropriate country (i.e. one of the four constituent countries of the UK or Crown dependencies - the Channel Islands or the Isle of Man) to which each postcode is assigned."),
-    ("gor", "Region", "Region (former GOR)", "The region code for each postcode. Pseudo codes are included for Wales, Scotland, Northern Ireland, Channel Island and Isle of Man. The field will otherwise be blank for postcodes with no OA code."),
+    ("rgn", "Region", "Region (former GOR)", "The region code for each postcode. Pseudo codes are included for Wales, Scotland, Northern Ireland, Channel Island and Isle of Man. The field will otherwise be blank for postcodes with no OA code."),
     ("pcon", "Westminster parliamentary constituency", "Westminster parliamentary constituency", "The Westminster parliamentary constituency code for each postcode. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."),
     ("eer", "European Electoral Region", "European Electoral Region (EER)", "The European Electoral Region code for each postcode. A pseudo code is included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code"),
     ("teclec", "Local Learning and Skills Council", "Local Learning and Skills Council (LLSC)/ Dept. of Children, Education, Lifelong Learning and Skills (DCELLS)/Enterprise Region (ER)", "The LLSC (England), DCELLS (Wales) or ER (Scotland) code for each postcode. Pseudo codes are included for Northern Ireland, Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."),
@@ -27,7 +27,7 @@ AREA_TYPES = [
 ]
 
 KEY_AREA_TYPES = [
-    ("Key", ["ctry", "region", "cty", "laua", "ward", "oa11", "pcon", "gor"]),
+    ("Key", ["ctry", "region", "cty", "laua", "ward", "oa11", "pcon", "rgn"]),
     ("Secondary", ["ttwa", "pfa", "lep", "msoa11", "lsoa11", "park"]),
     ("Health", ["ccg", "hlthau", "hro", "pct"]),
     ("Other", ["eer", "bua11", "buasd11", "wz11", "teclec", "nuts"]),
@@ -58,7 +58,7 @@ OTHER_CODES = {
 }
 
 
-DEFAULT_UPLOAD_FIELDS = ["latlng", "laua", "laua_name", "gor", "gor_name"]
+DEFAULT_UPLOAD_FIELDS = ["latlng", "laua", "laua_name", "rgn", "rgn_name"]
 BASIC_UPLOAD_FIELDS = [
     ("latlng", "Latitude / Longitude", False),
     ("estnrth", "OS Easting / Northing", False),
@@ -70,28 +70,28 @@ BASIC_UPLOAD_FIELDS = [
 
 
 NAME_FILES = [
-    {"file": "Documents/2011 Census Output Area Classification Names and Codes UK.txt", "type_field": "oac11", "code_field": "OAC11", "name_field": "Subgroup", "welsh_name_field": None},
-    {"file": "Documents/BUASD_names and codes UK as at 12_13.txt", "type_field": "buasd11", "code_field": "BUASD13CD", "name_field": "BUASD13NM", "welsh_name_field": None},
-    {"file": "Documents/BUA_names and codes UK as at 12_13.txt", "type_field": "bua11", "code_field": "BUA13CD", "name_field": "BUA13NM", "welsh_name_field": None},
-    {"file": "Documents/CCG names and codes UK as at 07_15.txt", "type_field": "ccg", "code_field": "CCG15CD", "name_field": "CCG15NM", "welsh_name_field": "CCG15NMW"},
-    {"file": "Documents/Country names and codes UK as at 08_12.txt", "type_field": "ctry", "code_field": "CTRY12CD", "name_field": "CTRY12NM", "welsh_name_field": "CTRY12NMW"},
-    {"file": "Documents/County names and codes UK as at 12_10.txt", "type_field": "cty", "code_field": "CTY10CD", "name_field": "CTY10NM", "welsh_name_field": None},
-    {"file": "Documents/EER names and codes UK as at 12_10.txt", "type_field": "eer", "code_field": "EER10CD", "name_field": "EER10NM", "welsh_name_field": None},
-    {"file": "Documents/HLTHAU names and codes UK as at 12_16.txt", "type_field": "hlthau", "code_field": "HLTHAUCD", "name_field": "HLTHAUNM", "welsh_name_field": "HLTHAUNMW"},
-    {"file": "Documents/LAU2 names and codes UK as at 12_16 (NUTS).txt", "type_field": "nuts", "code_field": "LAU216CD", "name_field": "LAU216NM", "welsh_name_field": None},
-    {"file": "Documents/LA_UA names and codes UK as at 12_16.txt", "type_field": "laua", "code_field": "LAD16CD", "name_field": "LAD16NM", "welsh_name_field": None},
-    {"file": "Documents/LEP names and codes EN as at 12_13.txt", "type_field": "lep", "code_field": "LEP13CD1", "name_field": "LEP13NM1", "welsh_name_field": None},
-    {"file": "Documents/LSOA (2011) names and codes UK as at 12_12.txt", "type_field": "lsoa11", "code_field": "LSOA11CD", "name_field": "LSOA11NM", "welsh_name_field": None},
-    {"file": "Documents/MSOA (2011) names and codes UK as at 12_12.txt", "type_field": "msoa11", "code_field": "MSOA11CD", "name_field": "MSOA11NM", "welsh_name_field": None},
-    {"file": "Documents/National Park names and codes GB as at 08_16.txt", "type_field": "park", "code_field": "NPARK16CD", "name_field": "NPARK16NM", "welsh_name_field": None},
-    {"file": "Documents/Pan SHA names and codes EN as at 12_10 (HRO).txt", "type_field": "hro", "code_field": "PSHA10CD", "name_field": "PSHA10NM", "welsh_name_field": None},
-    {"file": "Documents/PCT names and codes UK as at 12_16.txt", "type_field": "pct", "code_field": "PCTCD", "name_field": "PCTNM", "welsh_name_field": "PCTNMW"},
-    {"file": "Documents/PFA names and codes GB as at 12_15.txt", "type_field": "pfa", "code_field": "PFA15CD", "name_field": "PFA15NM", "welsh_name_field": None},
-    {"file": "Documents/Region names and codes EN as at 12_10 (GOR).txt", "type_field": "gor", "code_field": "GOR10CD", "name_field": "GOR10NM", "welsh_name_field": "GOR10NMW"},
-    {"file": "Documents/Rural Urban (2011) Indicator names and codes GB as at 12_16.txt", "type_field": "ru11ind", "code_field": "RU11IND", "name_field": "RU11NM", "welsh_name_field": None},
-    {"file": "Documents/TECLEC names and codes UK as at 12_16.txt", "type_field": "teclec", "code_field": "TECLECCD", "name_field": "TECLECNM", "welsh_name_field": None},
-    {"file": "Documents/TTWA names and codes UK as at 12_11 v5.txt", "type_field": "ttwa", "code_field": "TTWA11CD", "name_field": "TTWA11NM", "welsh_name_field": None},
-    {"file": "Documents/Westminster Parliamentary Constituency names and codes UK as at 12_14.txt", "type_field": "pcon", "code_field": "PCON14CD", "name_field": "PCON14NM", "welsh_name_field": None},
-    {"file": "Documents/Ward names and codes UK as at 12_16.txt", "type_field": "ward", "code_field": "WD16CD", "name_field": "WD16NM", "welsh_name_field": None},
-    # {"file": "Documents/LAU216_LAU116_NUTS315_NUTS215_NUTS115_UK_LU.txt", "type_field": "", "name_field": "", "welsh_name_field": None},
+    {"file": "Documents/2011 Census Output Area Classification Names and Codes UK.csv", "type_field": "oac11", "code_field": "OAC11", "name_field": "Subgroup", "welsh_name_field": None},
+    {"file": "Documents/BUASD_names and codes UK", "type_field": "buasd11", "code_field": "BUASD13CD", "name_field": "BUASD13NM", "welsh_name_field": None},
+    {"file": "Documents/BUA_names and codes UK", "type_field": "bua11", "code_field": "BUA13CD", "name_field": "BUA13NM", "welsh_name_field": None},
+    {"file": "Documents/CCG names and codes UK", "type_field": "ccg", "code_field": "CCG15CD", "name_field": "CCG15NM", "welsh_name_field": "CCG15NMW"},
+    {"file": "Documents/Country names and codes UK", "type_field": "ctry", "code_field": "CTRY12CD", "name_field": "CTRY12NM", "welsh_name_field": "CTRY12NMW"},
+    {"file": "Documents/County names and codes UK", "type_field": "cty", "code_field": "CTY10CD", "name_field": "CTY10NM", "welsh_name_field": None},
+    {"file": "Documents/EER names and codes UK", "type_field": "eer", "code_field": "EER10CD", "name_field": "EER10NM", "welsh_name_field": None},
+    {"file": "Documents/HLTHAU names and codes UK", "type_field": "hlthau", "code_field": "HLTHAUCD", "name_field": "HLTHAUNM", "welsh_name_field": "HLTHAUNMW"},
+    {"file": "Documents/LAU2 names and codes UK", "type_field": "nuts", "code_field": "LAU216CD", "name_field": "LAU216NM", "welsh_name_field": None},
+    {"file": "Documents/LA_UA names and codes UK", "type_field": "laua", "code_field": "LAD16CD", "name_field": "LAD16NM", "welsh_name_field": None},
+    {"file": "Documents/LEP names and codes EN", "type_field": "lep", "code_field": "LEP13CD1", "name_field": "LEP13NM1", "welsh_name_field": None},
+    {"file": "Documents/LSOA (2011) names and codes UK", "type_field": "lsoa11", "code_field": "LSOA11CD", "name_field": "LSOA11NM", "welsh_name_field": None},
+    {"file": "Documents/MSOA (2011) names and codes UK", "type_field": "msoa11", "code_field": "MSOA11CD", "name_field": "MSOA11NM", "welsh_name_field": None},
+    {"file": "Documents/National Park names and codes GB", "type_field": "park", "code_field": "NPARK16CD", "name_field": "NPARK16NM", "welsh_name_field": None},
+    {"file": "Documents/Pan SHA names and codes EN", "type_field": "hro", "code_field": "PSHA10CD", "name_field": "PSHA10NM", "welsh_name_field": None},
+    {"file": "Documents/PCT names and codes UK", "type_field": "pct", "code_field": "PCTCD", "name_field": "PCTNM", "welsh_name_field": "PCTNMW"},
+    {"file": "Documents/PFA names and codes GB", "type_field": "pfa", "code_field": "PFA15CD", "name_field": "PFA15NM", "welsh_name_field": None},
+    {"file": "Documents/Region names and codes EN", "type_field": "rgn", "code_field": "GOR10CD", "name_field": "GOR10NM", "welsh_name_field": "GOR10NMW"},
+    {"file": "Documents/Rural Urban (2011) Indicator names and codes GB", "type_field": "ru11ind", "code_field": "RU11IND", "name_field": "RU11NM", "welsh_name_field": None},
+    {"file": "Documents/TECLEC names and codes UK", "type_field": "teclec", "code_field": "TECLECCD", "name_field": "TECLECNM", "welsh_name_field": None},
+    {"file": "Documents/TTWA names and codes UK", "type_field": "ttwa", "code_field": "TTWA11CD", "name_field": "TTWA11NM", "welsh_name_field": None},
+    {"file": "Documents/Westminster Parliamentary Constituency names and codes UK", "type_field": "pcon", "code_field": "PCON14CD", "name_field": "PCON14NM", "welsh_name_field": None},
+    {"file": "Documents/Ward names and codes UK", "type_field": "ward", "code_field": "WD16CD", "name_field": "WD16NM", "welsh_name_field": None},
+    # {"file": "Documents/LAU216_LAU116_NUTS315_NUTS215_NUTS115_UK_LU.csv", "type_field": "", "name_field": "", "welsh_name_field": None},
 ]

@@ -189,7 +189,7 @@ curl "http://localhost:9200/postcode/postcode/SW1A+1AA?pretty"
     "oseast1m": 529090,
     "pcd2": "SW1A 1AA",
     "laua": "E09000033",
-    "gor": "E12000007",
+    "rgn": "E12000007",
     "location": {
       "lon": -0.141588,
       "lat": 51.501009

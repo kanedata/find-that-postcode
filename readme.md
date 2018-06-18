@@ -291,5 +291,12 @@ wget -O /var/lib/dokku/data/storage/es-postcodes/nspl.zip https://ons.maps.arcgi
 # setup and run import
 dokku run es-postcodes python create_elasticsearch.py
 dokku run es-postcodes python import_postcodes.py '/data/nspl.zip'
-dokku run es-postcodes python data_import/import_data.py --folder '/data'
+dokku run es-postcodes python import_boundaries.py http://geoportal.statistics.gov.uk/datasets/37bcb9c9e788497ea4f80543fd14c0a7_2.geojson http://geoportal.statistics.gov.uk/datasets/deeb99fdf09949bc8ed4dc95c80da279_2.geojson http://geoportal.statistics.gov.uk/datasets/687f346f5023410ba86615655ff33ca9_2.geojson http://geoportal.statistics.gov.uk/datasets/686603e943f948acaa13fb5d2b0f1275_2.geojson http://geoportal.statistics.gov.uk/datasets/f99b145881724e15a04a8a113544dfc5_2.geojson http://geoportal.statistics.gov.uk/datasets/ac17d33d37b94e48abd8ccbcde640dde_2.geojson http://geoportal.statistics.gov.uk/datasets/44667328cf45481ba91aef2f646b5fc0_2.geojson http://geoportal.statistics.gov.uk/datasets/532e3bb99acf44549ebb882c15646059_2.geojson http://geoportal.statistics.gov.uk/datasets/b804b37c78004e788becf75f712f6a38_2.geojson http://geoportal.statistics.gov.uk/datasets/6e93e6b47edd49ab827a1831d8eb0f57_2.geojson http://geoportal.statistics.gov.uk/datasets/df607d4ffa124cdca8317e3e63d45d78_2.geojson http://geoportal.statistics.gov.uk/datasets/3e5a096a8c7c456fb6d3164a3f44b005_2.geojson http://geoportal.statistics.gov.uk/datasets/7ddabffc9b46444bbf548732642f1ea2_2.geojson http://geoportal.statistics.gov.uk/datasets/d3062ec5f03b49a7be631d71586cac8c_2.geojson
+dokku run es-postcodes python import_boundaries.py http://geoportal.statistics.gov.uk/datasets/f13dad37854b4a1f869bf178489ff99a_2.geojson
+dokku run es-postcodes python import_boundaries.py http://geoportal.statistics.gov.uk/datasets/afcc88affe5f450e9c03970b237a7999_2.geojson
+dokku run es-postcodes python import_boundaries.py http://geoportal.statistics.gov.uk/datasets/da831f80764346889837c72508f046fa_2.geojson
+dokku run es-postcodes python import_boundaries.py http://geoportal.statistics.gov.uk/datasets/826dc85fb600440889480f4d9dbb1a24_2.geojson
+dokku run es-postcodes python import_boundaries.py http://geoportal.statistics.gov.uk/datasets/a399c2a5922a4beaa080de63c0a218a3_2.geojson
+dokku run es-postcodes python import_boundaries.py http://geoportal.statistics.gov.uk/datasets/278ff7af4efb4a599f70156e6e19cc9f_0.geojson
+dokku run es-postcodes python import_boundaries.py http://geoportal.statistics.gov.uk/datasets/1f021bb824ee4820b353b4b58fab6df5_0.geojson
 ```

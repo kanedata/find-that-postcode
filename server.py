@@ -23,6 +23,26 @@ from process_csv import process_csv
 app = bottle.default_app()
 
 
+# everywhere gives a different env var for elasticsearch services...
+potential_env_vars = [
+    "ELASTICSEARCH_URL",
+    "ES_URL",
+    "BONSAI_URL"
+]
+for e_v in potential_env_vars:
+    if os.environ.get(e_v):
+        app.config["es"] = Elasticsearch(os.environ.get(e_v))
+        app.config["es_index"] = 'charitysearch'
+        app.config["es_type"] = 'charity'
+        break
+
+if os.environ.get("GA_TRACKING_ID"):
+    app.config["ga_tracking_id"] = os.environ.get("GA_TRACKING_ID")
+
+if os.environ.get("ADMIN_PASSWORD"):
+    app.config["admin_password"] = os.environ.get("ADMIN_PASSWORD")
+
+
 def return_result(result, status=200, filetype="json", template=None):
     if filetype == "html" and not template:
         bottle.abort(500, "No template provided")

@@ -188,7 +188,7 @@ def add_to_csv():
 
 
 @app.route('/addtocsv', method='GET')
-def add_to_csv():
+def add_to_csv_page():
     ats = Areatypes(app.config)
     ats.get()
     (status, result) = ats.topJSON()

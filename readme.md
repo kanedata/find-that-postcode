@@ -241,3 +241,48 @@ Todo / future features
 ----------------------
 
 - Find areas containing a point
+
+
+Dokku setup
+----------
+
+```bash
+# create app
+dokku apps:create es-postcodes
+
+# add permanent data storage
+dokku storage:mount es-postcodes /var/lib/dokku/data/storage/es-postcodes:/data
+
+# elasticsearch
+sudo dokku plugin:install https://github.com/dokku/dokku-elasticsearch.git elasticsearch
+export ELASTICSEARCH_IMAGE="elasticsearch"
+export ELASTICSEARCH_IMAGE_VERSION="2.4"
+dokku elasticsearch:create postcodes-es
+dokku elasticsearch:link postcodes-es es-postcodes
+
+# SSL
+sudo dokku plugin:install https://github.com/dokku/dokku-letsencrypt.git
+dokku config:set --no-restart es-postcodes DOKKU_LETSENCRYPT_EMAIL=your@email.tld
+dokku letsencrypt es-postcodes
+dokku letsencrypt:cron-job --add
+```
+
+### 2. Add as a git remote and push
+
+On local machine:
+
+```bash
+git remote add dokku dokku@SERVER_HOST:es-postcodes
+git push dokku master
+```
+
+### 3. Setup and run import
+
+On Dokku server run:
+
+```bash
+# setup and run import
+dokku run es-postcodes python data_import/create_elasticsearch.py
+dokku run es-postcodes python data_import/fetch_data.py --folder '/data'
+dokku run es-postcodes python data_import/import_data.py --folder '/data'
+```

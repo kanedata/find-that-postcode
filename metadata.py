@@ -73,7 +73,7 @@ NAME_FILES = [
     {"file": "Documents/2011 Census Output Area Classification Names and Codes UK.csv", "type_field": "oac11", "code_field": "OAC11", "name_field": "Subgroup", "welsh_name_field": None},
     {"file": "Documents/BUASD_names and codes UK", "type_field": "buasd11", "code_field": "BUASD13CD", "name_field": "BUASD13NM", "welsh_name_field": None},
     {"file": "Documents/BUA_names and codes UK", "type_field": "bua11", "code_field": "BUA13CD", "name_field": "BUA13NM", "welsh_name_field": None},
-    {"file": "Documents/CCG names and codes UK", "type_field": "ccg", "code_field": "CCG15CD", "name_field": "CCG15NM", "welsh_name_field": "CCG15NMW"},
+    {"file": "Documents/CCG names and codes UK", "type_field": "ccg", "code_field": "CCG18CD", "name_field": "CCG18NM", "welsh_name_field": "CCG18NMW"},
     {"file": "Documents/Country names and codes UK", "type_field": "ctry", "code_field": "CTRY12CD", "name_field": "CTRY12NM", "welsh_name_field": "CTRY12NMW"},
     {"file": "Documents/County names and codes UK", "type_field": "cty", "code_field": "CTY10CD", "name_field": "CTY10NM", "welsh_name_field": None},
     {"file": "Documents/EER names and codes UK", "type_field": "eer", "code_field": "EER10CD", "name_field": "EER10NM", "welsh_name_field": None},

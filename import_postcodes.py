@@ -109,26 +109,39 @@ def main():
                     codes = [i for i in NAME_FILES if i["file"] == j][0]
                     names_and_codes = []
                     print("[codes] adding codes for '%s' field" % codes["type_field"])
-                    with pczip.open(codes["file"], 'r') as nccsv:
-                        nccsv = io.TextIOWrapper(nccsv)
+                    with pczip.open(f.filename, 'r') as nccsv:
+                        nccsv = io.TextIOWrapper(nccsv, encoding='utf-8-sig')
 
                         # double tab delimiter in country codes causing issues
                         if codes["type_field"] == "ctry":
                             nccsv = (row.replace('\t\t', '\t') for row in nccsv)
 
                         reader = csv.DictReader(nccsv, delimiter=',')
+                        field_names = None
                         for i in reader:
-                            i["_id"] = i[codes["code_field"]]
+                            if not field_names:
+                                field_names = {}
+                                for n in reader.fieldnames:
+                                    if n.endswith("CD"):
+                                        field_names["code"] = n
+                                    elif n.endswith("NM"):
+                                        field_names["name"] = n
+                                    elif n.endswith("NMW"):
+                                        field_names["welsh_name"] = n
+                                for k in ["name", "code", "welsh_name"]:
+                                    if k not in field_names:
+                                        field_names[k] = codes.get("{}_field".format(k))
+                            i["_id"] = i[field_names["code"]]
                             i["_index"] = args.es_index
                             i["_type"] = "code"
                             i["_op_type"] = "index"
                             i["type"] = codes["type_field"]
                             i["sort_order"] = i["_id"]
                             if codes["name_field"]:
-                                i["name"] = i[codes["name_field"]]
+                                i["name"] = i[field_names["name"]]
                                 i["name_welsh"] = i["name"]
-                                if codes["welsh_name_field"]:
-                                    i["name_welsh"] = i[codes["welsh_name_field"]]
+                                if field_names["welsh_name"]:
+                                    i["name_welsh"] = i[field_names["welsh_name"]]
 
                             if '' in i:
                                 del i['']

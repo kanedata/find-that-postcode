@@ -117,7 +117,7 @@ def area_geojson(areacode):
 @app.route('/areas/<areacode>.<filetype>')
 def area(areacode, filetype="json"):
     a = Area(app.config)
-    examples_count = 50 if filetype=="html" else 10
+    examples_count = 5 if filetype=="html" else 5
     a.get_by_id(areacode.strip(), examples_count=examples_count)
     (status, result) = a.topJSON()
     return return_result(result, status, filetype, "area.html")

@@ -55,6 +55,11 @@ def main():
                     pccsv = io.TextIOWrapper(pccsv)
                     reader = csv.DictReader(pccsv)
                     for i in reader:
+                        # Skip Northern Irish postcodes as not allowed by license
+                        # https://www.ons.gov.uk/methodology/geography/licences
+                        if i["pcds"].lower().startswith('bt'):
+                            continue
+
                         i["_index"] = args.es_index
                         i["_type"] = "postcode"
                         i["_op_type"] = "index"

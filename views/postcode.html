@@ -10,6 +10,12 @@
     % subtitle = 'No longer used since %s' % postcode["attributes"]["doterm"]
     % end
 % end
+% import datetime
+% for f in ['dointr', 'doterm']:
+%   if postcode["attributes"].get(f):
+%     postcode["attributes"][f] = datetime.datetime.strptime(postcode["attributes"][f], "%Y-%m-%d")
+%   end
+% end
 % rebase("base.html", title=title, subtitle=subtitle, includes=['leaflet'])
 <div class="columns">
   <div class="column">
@@ -55,13 +61,13 @@
       </header>
       <div class="card-content">
         <div class="content">
-          <table class="table">
+          <table class="table is-fullwidth">
             <tbody>
               <tr><td>7 character version of postcode</td><td><pre>{{ postcode["attributes"]["pcd"] }}</pre></td></tr>
               <tr><td>8 character version of postcode</td><td><pre>{{ postcode["attributes"]["pcd2"] }}</pre></td></tr>
-              <tr><td>Date introduced</td><td>{{ postcode["attributes"]["dointr"] }}</td></tr>
+              <tr><td>Date introduced</td><td>{{ "{:%B %Y}".format(postcode["attributes"]["dointr"]) }}</td></tr>
               % if postcode["attributes"]["doterm"]:
-              <tr><td>Date terminated</td><td>{{ postcode["attributes"]["doterm"] }}</td></tr>
+              <tr><td>Date terminated</td><td>{{ "{:%B %Y}".format(postcode["attributes"]["doterm"]) }}</td></tr>
               % end
               <tr><td>Postcode user type</td><td>{{postcode["attributes"]["usertype"] }} ({{ other_codes["usertype"][postcode["attributes"]["usertype"]] }})</td></tr>
               <tr><td>Grid reference positional quality indicator</td><td>{{postcode["attributes"]["osgrdind"]}} ({{ other_codes["osgrdind"][postcode["attributes"]["osgrdind"]] }})</td></tr>
@@ -78,7 +84,7 @@
     <!--<pre>{{areas}}</pre>-->
     % for i in key_area_types:
     <h2 class="title">{{ i[0] }} areas</h2>
-    <table class="table">
+    <table class="table is-fullwidth">
       <tbody>
       % for area in i[1]:
         % if area in areas and area in areatypes and not areas[area]["id"].endswith("999999"):
@@ -98,7 +104,7 @@
     </table>
     % end
     <h2 class="title">Area classifications</h2>
-    <table class="table">
+    <table class="table is-fullwidth">
       <tbody>
         % if areas.get("oac11"):
         <tr>
@@ -133,5 +139,5 @@
   var postcode_location = [{{ postcode["attributes"]["location"]["lat"] }},{{ postcode["attributes"]["location"]["lon"] }}]
   var mymap = L.map('postcode-map').setView(postcode_location, 11);
   var layer = new L.StamenTileLayer("toner").addTo(mymap);
-  var marker = L.marker(postcode_location).addTo(mymap);
+  var marker = L.circleMarker(postcode_location, {radius: 5, fillOpacity: 0.8}).addTo(mymap);
 </script>

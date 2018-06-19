@@ -108,7 +108,7 @@ def areaname(filetype="json"):
 @app.route('/areas/<areacode>.geojson')
 def area_geojson(areacode):
     a = Area(app.config)
-    a.get_by_id(areacode.strip(), boundary=True)
+    a.get_by_id(areacode.strip(), boundary=True, examples_count=0)
     (status, result) = a.geoJSON()
     return return_result(result, status, "geojson")
 
@@ -117,7 +117,8 @@ def area_geojson(areacode):
 @app.route('/areas/<areacode>.<filetype>')
 def area(areacode, filetype="json"):
     a = Area(app.config)
-    a.get_by_id(areacode.strip())
+    examples_count = 50 if filetype=="html" else 10
+    a.get_by_id(areacode.strip(), examples_count=examples_count)
     (status, result) = a.topJSON()
     return return_result(result, status, filetype, "area.html")
 

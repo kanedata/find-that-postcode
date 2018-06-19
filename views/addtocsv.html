@@ -1,4 +1,4 @@
-% rebase("base.html", title='Add fields to CSV' )
+% rebase("base.html", title='Add fields to CSV', includes=['papaparse'])
 <form action="" method="post" enctype="multipart/form-data">
   <div class="columns">
     <div class="column">
@@ -9,15 +9,30 @@
       </div>
       <div class="field">
         <label class="label">CSV file</label>
-        <p class="control">
-          <input class="" type="file" name="csvfile">
-        </p>
+        <div class="file has-name is-fullwidth">
+          <label class="file-label">
+            <input class="file-input" type="file" name="csvfile" id="csvfile">
+            <span class="file-cta">
+              <span class="file-icon">
+                <i class="fas fa-upload"></i>
+              </span>
+              <span class="file-label">
+                Choose a file…
+              </span>
+            </span>
+            <span class="file-name" id="csvfilename"></span>
+          </label>
+        </div>
         <p class="help">Maximum file size 5MB</p>
+      </div>
+      <div class="field is-hidden" id="csvpreview">
+        <label class="label">CSV Preview</label>
+        <table class="table is-fullwidth is-narrow"></table>
       </div>
       <div class="field">
         <label class="label">Name of column containing postcodes</label>
         <p class="control">
-          <input class="input" type="text" name="column_name" value="postcode">
+          <input class="input" type="text" name="column_name" id="column_name" value="postcode">
         </p>
       </div>
       <div class="field">
@@ -30,7 +45,7 @@
       <div class="field">
         <label class="label">Fields to add</label>
         <p class="control">
-          <table class="table">
+          <table class="table is-fullwidth">
             <tbody>
               <tr>
                 <th>Basic fields</th>
@@ -94,3 +109,62 @@
     </div>
   </div>
 </form>
+<script>
+  var file = document.getElementById("csvfile");
+  file.onchange = function () {
+    if (file.files.length > 0) {
+      document.getElementById('csvfilename').innerHTML = file.files[0].name;
+      document.getElementById('csvpreview').classList.remove("is-hidden");
+      Papa.parse(file.files[0], {
+        header: true,
+        preview: 5,
+        complete: function (results) {
+          console.log("Finished:", results.data);
+          console.log("Finished:", results.meta.fields);
+          var preview = document.getElementById('csvpreview');
+          var header_row = document.createElement('tr');
+          for(const f of ['', 'Field name', 'Example values']){
+            header_row.appendChild(document.createElement('th')).appendChild(document.createTextNode(f));
+          }
+          preview.getElementsByTagName('table')[0].appendChild(header_row);
+          for(const f of results.meta.fields){
+            var row = document.createElement('tr');
+            var radio = row.appendChild(document.createElement('th')).appendChild(document.createElement('input'))
+            radio.setAttribute('type', 'radio');
+            radio.setAttribute('name', 'postcode_field');
+            radio.setAttribute('value', f);
+            if (f.toLowerCase().replace(/[^a-z]/gi, '')=="postcode"){
+              radio.setAttribute('checked', true);
+              document.getElementById('column_name').setAttribute('value', f);
+            }
+            radio.onclick = function(){
+              if(this.checked){
+                document.getElementById('column_name').setAttribute('value', this.value);
+              }
+            }
+            row.appendChild(document.createElement('th')).appendChild(document.createTextNode(f));
+            var field = document.createElement('td');
+            var field_ul = document.createElement('ul');
+            field_ul.classList.add('tags');
+            let values_seen = []
+            for (const r of results.data) {
+              if((!values_seen.includes(r[f])) && (r[f]!='')){
+                var field_li = field_ul.appendChild(document.createElement('li'))
+                field_li.classList.add('tag');
+                field_li.appendChild(document.createTextNode(r[f]));
+                values_seen.push(r[f]);
+              }
+            }
+            field.appendChild(field_ul)
+            row.appendChild(field);
+            preview.getElementsByTagName('table')[0].appendChild(row);
+          }
+        }
+      });
+    } else {
+      document.getElementById('csvfilename').innerHTML = "";
+      document.getElementById('csvpreview').classList.add("is-hidden");
+    }
+  };
+
+</script>

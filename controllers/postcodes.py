@@ -99,7 +99,7 @@ class Postcode(Controller):
         json = super().toJSON(role)
         for i in self.date_fields:
             if json[1].get("attributes", {}).get(i) and isinstance(json[1]["attributes"][i], datetime):
-                json[1]["attributes"][i] = json[1]["attributes"][i].strftime("%Y%m")
+                json[1]["attributes"][i] = json[1]["attributes"][i].strftime("%Y-%m-%d")
 
         ats = controllers.areatypes.Areatypes(self.config)
         ats.get()

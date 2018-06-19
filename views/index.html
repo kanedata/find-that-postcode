@@ -1,4 +1,4 @@
-% rebase("base.html", title='es-postcodes' )
+% rebase("base.html")
 <div class="content">
 </div>
 <section class="section">
@@ -10,7 +10,8 @@
       <h2 class="title"><a href="/areas/search.html">Search areas</a></h2>
     </div>
     <div class="column">
-      <h2 class="title">Get postcode by longitude and latitude</h2>
+      <h2 class="title">Find a postcode</h2>
+      <h3 class="subtitle">Nearest to a point</h3>
     </div>
   </div>
   <div class="columns">
@@ -42,17 +43,17 @@
       <form action="/points/redirect">
         <div class="field has-addons">
           <p class="control">
-            <input class="input is-large" type="text" name="lat" id="lat" placeholder="lat">
+            <input class="input is-large" type="text" name="lat" id="lat" placeholder="Latitude">
           </p>
           <p class="control">
-            <input class="input is-large" type="text" name="lon" id="lon" placeholder="lon">
+            <input class="input is-large" type="text" name="lon" id="lon" placeholder="Longitude">
           </p>
           <p class="control">
             <input type="submit" class="button is-info is-large" id="point_search" value="Search" />
           </p>
         </div>
       </form>
-      <button class="button is-link" id="get_current_latlong" onclick="get_latlon()">Use your location</button>
+      <button class="button is-text" id="get_current_latlong" onclick="get_latlon()">Use your location</button>
     </div>
   </div>
   <div class="columns">

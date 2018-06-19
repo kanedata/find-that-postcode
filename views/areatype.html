@@ -17,7 +17,7 @@
     % else:
     <p class="subtitle">Showing from {{ "{:,.0f}".format(result.get("meta", {}).get("pagination", {}).get("from",0) + 1) }} to {{ "{:,.0f}".format(min([result.get("meta", {}).get("pagination", {}).get("from",0) + result.get("meta", {}).get("pagination", {}).get("size",100), result["data"]["attributes"]["count_areas"]])) }} of {{ "{:,.0f}".format(result["data"]["attributes"]["count_areas"]) }}</p>
     % end
-    <table class="table">
+    <table class="table is-fullwidth">
       <tbody>
       % for i in result["data"]["relationships"]["areas"]["data"]:
         % for area in [area for area in result["included"] if area["id"]==i["id"] and i["id"].endswith("999999")==False]:

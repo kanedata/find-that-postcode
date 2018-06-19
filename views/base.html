@@ -1,4 +1,6 @@
 % default_title = 'dk-postcodes'
+% import datetime
+% now = datetime.datetime.now()
 <!DOCTYPE html>
 <html>
   <head>
@@ -47,7 +49,13 @@
       <div class="container">
         <div class="content has-text-centered">
           <p>
-            <strong>es-postcodes</strong> by <a href="">David Kane</a>.
+            <strong>dk-postcodes</strong> by <a href="https://drkane.co.uk/">David Kane</a>.
+          </p>
+          <p>
+            <a href="https://www.ons.gov.uk/methodology/geography/licences">Postcode data from ONS used under Open Government License</a><br> 
+            Contains OS data © Crown copyright and database right {{now.year}} <br>
+            Contains Royal Mail data © Royal Mail copyright and database right {{now.year}} <br> 
+            Contains National Statistics data © Crown copyright and database right {{now.year}}
           </p>
         </div>
       </div>

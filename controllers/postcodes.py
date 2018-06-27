@@ -32,6 +32,7 @@ class Postcode(Controller):
                 area = controllers.areas.Area(self.config)
                 area.get_by_id(postcode[i], examples_count=0)
                 if area.found:
+                    postcode[i + "_name"] = area.attributes.get("name")
                     self.relationships["areas"].append(area)
 
         # turn dates into dates

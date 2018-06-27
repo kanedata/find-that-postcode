@@ -93,6 +93,8 @@ def postcode(postcode, filetype="json"):
     pc = Postcode(app.config)
     pc.get_by_id(postcode)
     (status, result) = pc.topJSON()
+    if filetype=="json" and "included" in result and not "full" in bottle.request.params:
+        del result["included"]
     return return_result(result, status, filetype, "postcode.html")
 
 

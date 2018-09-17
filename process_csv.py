@@ -1,9 +1,9 @@
 from __future__ import print_function
-from elasticsearch import Elasticsearch
 import csv
 import argparse
 import sys
-from controllers.postcodes import *
+from elasticsearch import Elasticsearch
+from controllers.postcodes import Postcode
 
 # List of potential postcode fields
 POSTCODE_FIELDS = ["postcode", "postal_code", "post_code", "post code"]
@@ -24,7 +24,7 @@ def process_csv(csvfile, outfile, config,
         "N99999999": "",
         "W99999999": ""
     }
-    for key, row in enumerate(reader):
+    for _, row in enumerate(reader):
         for i in fields:
             row[i] = None
         postcode = Postcode.parse_postcode(row.get(postcode_field))
@@ -38,13 +38,15 @@ def process_csv(csvfile, outfile, config,
                     code = pc["_source"].get(i[:-5])
                     if code in code_cache:
                         row[i] = code_cache[code]
-                    else:
+                    elif code:
                         area = config.get("es").get(index=config.get("es_index"), doc_type="code", id=code, ignore=[404], _source_exclude=["boundary"])
                         if area["found"]:
                             row[i] = area["_source"].get("name")
                         else:
                             row[i] = code
                         code_cache[code] = row[i]
+                    else:
+                        row[i] = code
                 else:
                     row[i] = pc["_source"].get(i)
         writer.writerow(row)

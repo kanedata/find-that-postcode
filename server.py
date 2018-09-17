@@ -12,12 +12,11 @@ import io
 import bottle
 from elasticsearch import Elasticsearch
 
-from metadata import *
-from controllers.postcodes import *
-from controllers.areatypes import *
-from controllers.areas import *
-from controllers.points import *
-from controllers.controller import *
+from metadata import KEY_AREA_TYPES, OTHER_CODES, DEFAULT_UPLOAD_FIELDS, BASIC_UPLOAD_FIELDS
+from controllers.postcodes import Postcode
+from controllers.areatypes import Areatype, Areatypes
+from controllers.areas import Area, Areas
+from controllers.points import Point
 from process_csv import process_csv
 
 # set MEMFILE_MAX to allow bigger uploads
@@ -64,7 +63,7 @@ def return_result(result, status=200, filetype="json", template=None):
                                included={(i["type"], i["id"]): i for i in result.get("included", [])},
                                key_area_types=KEY_AREA_TYPES,
                                other_codes=OTHER_CODES
-                               )
+                              )
 
 
 @app.route('/')
@@ -72,28 +71,28 @@ def return_result(result, status=200, filetype="json", template=None):
 def index():
     ats = Areatypes(app.config)
     ats.get()
-    (status, result) = ats.topJSON()
+    (_, result) = ats.topJSON()
     return bottle.template('index.html',
                            result=result,
                            key_area_types=KEY_AREA_TYPES
-                           )
+                          )
 
 
 @app.route('/postcodes/redirect')
 def postcode_redirect():
-    postcode = bottle.request.query.postcode
-    return bottle.redirect('/postcodes/{}.html'.format(postcode))
+    pcd = bottle.request.query.postcode
+    return bottle.redirect('/postcodes/{}.html'.format(pcd))
 
 
-@app.route('/postcodes/<postcode>')
-@app.route('/postcodes/<postcode>.<filetype>')
-def postcode(postcode, filetype="json"):
+@app.route('/postcodes/<pcd>')
+@app.route('/postcodes/<pcd>.<filetype>')
+def postcode(pcd, filetype="json"):
     """ View details about a particular postcode
     """
     pc = Postcode(app.config)
-    pc.get_by_id(postcode)
+    pc.get_by_id(pcd)
     (status, result) = pc.topJSON()
-    if filetype=="json" and "included" in result and not "full" in bottle.request.params:
+    if filetype == "json" and "included" in result and "full" not in bottle.request.params:
         del result["included"]
     return return_result(result, status, filetype, "postcode.html")
 
@@ -119,7 +118,7 @@ def area_geojson(areacode):
 @app.route('/areas/<areacode>.<filetype>')
 def area(areacode, filetype="json"):
     a = Area(app.config)
-    examples_count = 5 if filetype=="html" else 5
+    examples_count = 5 if filetype == "html" else 5
     a.get_by_id(areacode.strip(), examples_count=examples_count)
     (status, result) = a.topJSON()
     return return_result(result, status, filetype, "area.html")
@@ -151,12 +150,12 @@ def areatypes_all(filetype="json"):
     return return_result(result, status, filetype, "areatypes.html")
 
 
-@app.route('/areatypes/<areatype>')
-@app.route('/areatypes/<areatype>.<filetype>')
-def areatype(areatype, filetype="json"):
+@app.route('/areatypes/<areatype_>')
+@app.route('/areatypes/<areatype_>.<filetype>')
+def areatype(areatype_, filetype="json"):
     app.config["stop_recursion"] = False
     at = Areatype(app.config)
-    at.get_by_id(areatype)
+    at.get_by_id(areatype_)
     (status, result) = at.topJSON()
     return return_result(result, status, filetype, "areatype.html")
 
@@ -187,8 +186,7 @@ def add_to_csv():
     upload = bottle.request.files.get('csvfile')
     column_name = bottle.request.forms.get("column_name", "postcode")
     fields = bottle.request.forms.getall("fields")
-    print(fields)
-    if len(fields) == 0:
+    if not fields:
         fields = DEFAULT_UPLOAD_FIELDS
 
     if "latlng" in fields:
@@ -202,7 +200,7 @@ def add_to_csv():
         fields.remove("estnrth")
 
     _, ext = os.path.splitext(upload.filename)
-    if ext not in ('.csv'):
+    if ext not in ['.csv']:
         return 'File extension not allowed.'
 
     with tempfile.SpooledTemporaryFile(mode='w+', newline='') as output:
@@ -217,14 +215,14 @@ def add_to_csv():
 def add_to_csv_page():
     ats = Areatypes(app.config)
     ats.get()
-    (status, result) = ats.topJSON()
+    (_, result) = ats.topJSON()
 
     return bottle.template('addtocsv.html',
                            result=result,
                            key_area_types=KEY_AREA_TYPES,
                            basic_fields=BASIC_UPLOAD_FIELDS,
                            default_fields=DEFAULT_UPLOAD_FIELDS
-                           )
+                          )
 
 
 def main():

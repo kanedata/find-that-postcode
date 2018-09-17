@@ -151,6 +151,13 @@ class Controller:
                 })
 
 
+    def get_es_version(self, es):
+        version_number = es.info().get("version").get("number")
+        if not version_number:
+            return None
+        return [int(v) for v in version_number.split(".")]
+
+
 class Pagination():
 
     default_size = 100

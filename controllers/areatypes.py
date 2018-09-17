@@ -21,17 +21,25 @@ class Areatype(Controller):
         if self.config.get("es") and not self.config.get("stop_recursion"):
             self.relationships["areas"] = []
             self.pagination = Pagination()
+            version = self.get_es_version(self.config.get("es"))[0]
+            sorting = "name.keyword:asc" if version >= 5 else "name:asc"
+
             query = {
                 "query": {
                     "match": {
                         "type": self.id
                     }
-                },
-                # "sort": [
-                #     {"sort_order.keyword": "asc"}  # @TODO sort by _id? ??
-                # ]
+                }
             }
-            result = self.config.get("es").search(index=self.config.get("es_index"), doc_type=self.es_type, body=query, from_=self.pagination.from_, size=self.pagination.size, _source_exclude=["boundary"])
+            result = self.config.get("es").search(
+                index=self.config.get("es_index"), 
+                doc_type=self.es_type, 
+                body=query, 
+                from_=self.pagination.from_, 
+                size=self.pagination.size, 
+                _source_exclude=["boundary"],
+                sort=sorting
+            )
             if result["hits"]["total"] > 0:
                 self.config["stop_recursion"] = True
                 self.relationships["areas"] = [controllers.areas.Area(self.config).set_from_data(a) for a in result["hits"]["hits"]]

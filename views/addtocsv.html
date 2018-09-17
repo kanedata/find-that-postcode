@@ -49,8 +49,8 @@
             <tbody>
               <tr>
                 <th>Basic fields</th>
-                <th>Code</th>
-                <th>Name</th>
+                <th>Code <input type="checkbox" id="select_all_codes" title="Select all code fields" /></th>
+                <th>Name <input type="checkbox" id="select_all_names" title="Select all name fields" /></th>
               </tr>
               % for b in basic_fields:
               <tr>
@@ -167,5 +167,21 @@
       document.getElementById('csvpreview').classList.add("is-hidden");
     }
   };
+
+  document.getElementById("select_all_codes").onchange = function(ev){
+    Array.prototype.forEach.call(document.getElementsByName("fields"), function (item) {
+      if(!item.value.endsWith("_name")){
+        item.checked = ev.target.checked;
+      }
+    });
+  }
+
+  document.getElementById("select_all_names").onchange = function(ev){
+    Array.prototype.forEach.call(document.getElementsByName("fields"), function (item) {
+      if(item.value.endsWith("_name")){
+        item.checked = ev.target.checked;
+      }
+    });
+  }
 
 </script>

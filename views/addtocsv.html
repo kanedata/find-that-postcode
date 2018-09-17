@@ -115,6 +115,7 @@
     if (file.files.length > 0) {
       document.getElementById('csvfilename').innerHTML = file.files[0].name;
       document.getElementById('csvpreview').classList.remove("is-hidden");
+      document.getElementById('csvpreview').getElementsByTagName('table')[0].innerHTML = '';
       Papa.parse(file.files[0], {
         header: true,
         preview: 5,

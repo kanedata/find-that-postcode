@@ -204,6 +204,11 @@ def add_to_csv():
         fields.append("lep2")
         fields.remove("lep")
 
+    if "lep_name" in fields:
+        fields.append("lep1_name")
+        fields.append("lep2_name")
+        fields.remove("lep_name")
+
     _, ext = os.path.splitext(upload.filename)
     if ext not in ['.csv']:
         return 'File extension not allowed.'

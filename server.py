@@ -199,6 +199,11 @@ def add_to_csv():
         fields.append("osnrth1m")
         fields.remove("estnrth")
 
+    if "lep" in fields:
+        fields.append("lep1")
+        fields.append("lep2")
+        fields.remove("lep")
+
     _, ext = os.path.splitext(upload.filename)
     if ext not in ['.csv']:
         return 'File extension not allowed.'

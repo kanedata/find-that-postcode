@@ -8,7 +8,7 @@ import controllers.areas
 
 class Areatype(Controller):
 
-    es_type = 'code'
+    es_index = 'geo_area'
     url_slug = 'areatypes'
 
     def __init__(self, config):
@@ -32,7 +32,7 @@ class Areatype(Controller):
                 }
             }
             result = self.config.get("es").search(
-                index=self.config.get("es_index"), 
+                index=self.es_index, 
                 doc_type=self.es_type, 
                 body=query, 
                 from_=self.pagination.from_, 
@@ -68,7 +68,7 @@ class Areatype(Controller):
 
 class Areatypes(Controller):
 
-    es_type = 'code'
+    es_index = 'geo_area'
     url_slug = 'areatypes'
 
     def __init__(self, config):
@@ -87,7 +87,7 @@ class Areatypes(Controller):
                 }
             }
         }
-        result = self.config.get("es").search(index=self.config.get("es_index", "postcode"), doc_type=self.es_type, body=query, _source_exclude=["boundary"])
+        result = self.config.get("es").search(index=self.es_index, doc_type=self.es_type, body=query, _source_exclude=["boundary"])
         self.area_counts = {i["key"]: i["doc_count"] for i in result["aggregations"]["group_by_type"]["buckets"]}
         self.attributes = []
         for a in self.areatypes:

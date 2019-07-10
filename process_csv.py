@@ -29,7 +29,7 @@ def process_csv(csvfile, outfile, config,
             row[i] = None
         postcode = Postcode.parse_postcode(row.get(postcode_field))
         if postcode:
-            pc = config.get("es").get(index=config.get("es_index"), doc_type="postcode", id=postcode, ignore=[404])
+            pc = config.get("es").get(index="geo_postcode", doc_type="_doc", id=postcode, ignore=[404])
             if not pc["found"]:
                 continue
 
@@ -39,7 +39,7 @@ def process_csv(csvfile, outfile, config,
                     if code in code_cache:
                         row[i] = code_cache[code]
                     elif code:
-                        area = config.get("es").get(index=config.get("es_index"), doc_type="code", id=code, ignore=[404], _source_exclude=["boundary"])
+                        area = config.get("es").get(index="geo_area", doc_type="_doc", id=code, ignore=[404], _source_exclude=["boundary"])
                         if area["found"]:
                             row[i] = area["_source"].get("name")
                         else:

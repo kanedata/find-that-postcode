@@ -42,7 +42,6 @@ def main():
 
     # Postcode details
     parser.add_argument('boundary_files', type=str, nargs='+',
-                        default='data/NSPL.zip',
                         help='URL or file path for each boundary file to import. Multiple URLs should be separated by a space')
     parser.add_argument('--examine', action='store_true', help="Give info about the shape of the file, don't execute the import")
 
@@ -53,7 +52,6 @@ def main():
     parser.add_argument('--es-port', default=9200, help='port for the elasticsearch instance')
     parser.add_argument('--es-url-prefix', default='', help='Elasticsearch url prefix')
     parser.add_argument('--es-use-ssl', action='store_true', help='Use ssl to connect to elasticsearch')
-    parser.add_argument('--es-index', default='postcode', help='index used to store postcode data')
 
     args = parser.parse_args()
 
@@ -133,8 +131,8 @@ def main():
                 boundaries_updated = 0
                 for k, i in enumerate(boundaries["features"]):
                     boundary = {
-                        "_index": args.es_index,
-                        "_type": "code",
+                        "_index": "geo_area",
+                        "_type": "_doc",
                         "_op_type": "update",
                         "_id": i["properties"][code_field],
                         "doc": {
@@ -146,7 +144,13 @@ def main():
                         }
                     }
                     bulk_boundaries.append(boundary)
-                    results = es.update(index=args.es_index, doc_type="code", id=boundary["_id"], body={"doc": boundary["doc"]}, ignore=[404, 400])
+                    results = es.update(
+                        index="geo_area",
+                        doc_type="_doc",
+                        id=boundary["_id"],
+                        body={"doc": boundary["doc"]},
+                        ignore=[404, 400]
+                    )
                     if results.get("error"):
                         e = "[%s] %s" % (boundary["_id"], results.get("error", {}).get("reason", "Operation failed"))
                         errors.append(e)

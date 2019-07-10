@@ -26,7 +26,6 @@ def main():
     parser.add_argument('--es-port', default=9200, help='port for the elasticsearch instance')
     parser.add_argument('--es-url-prefix', default='', help='Elasticsearch url prefix')
     parser.add_argument('--es-use-ssl', action='store_true', help='Use ssl to connect to elasticsearch')
-    parser.add_argument('--es-index', default='postcode', help='index used to store postcode data')
 
     args = parser.parse_args()
 
@@ -60,8 +59,8 @@ def main():
                         if i["pcds"].lower().startswith('bt'):
                             continue
 
-                        i["_index"] = args.es_index
-                        i["_type"] = "postcode"
+                        i["_index"] = "geo_postcode"
+                        i["_type"] = "_doc"
                         i["_op_type"] = "index"
                         i["_id"] = i["pcds"]
 
@@ -95,13 +94,13 @@ def main():
                             print("[postcodes] Processed %s postcodes" % pcount)
                             print("[elasticsearch] %s postcodes to save" % len(postcodes))
                             results = bulk(es, postcodes)
-                            print("[elasticsearch] saved %s postcodes to %s index" % (results[0], args.es_index))
+                            print("[elasticsearch] saved %s postcodes to %s index" % (results[0], "geo_postcode"))
                             print("[elasticsearch] %s errors reported" % len(results[1]))
                             postcodes = []
                     print("[postcodes] Processed %s postcodes" % pcount)
                     print("[elasticsearch] %s postcodes to save" % len(postcodes))
                     results = bulk(es, postcodes)
-                    print("[elasticsearch] saved %s postcodes to %s index" % (results[0], args.es_index))
+                    print("[elasticsearch] saved %s postcodes to %s index" % (results[0], "geo_postcode"))
                     print("[elasticsearch] %s errors reported" % len(results[1]))
                     postcodes = []
 
@@ -137,8 +136,8 @@ def main():
                                     if k not in field_names:
                                         field_names[k] = codes.get("{}_field".format(k))
                             i["_id"] = i[field_names["code"]]
-                            i["_index"] = args.es_index
-                            i["_type"] = "code"
+                            i["_index"] = "geo_area"
+                            i["_type"] = "_doc"
                             i["_op_type"] = "index"
                             i["type"] = codes["type_field"]
                             i["sort_order"] = i["_id"]
@@ -153,7 +152,7 @@ def main():
                             names_and_codes.append(i)
                         print("[elasticsearch] %s codes to save" % len(names_and_codes))
                         results = bulk(es, names_and_codes)
-                        print("[elasticsearch] saved %s codes to %s index" % (results[0], args.es_index))
+                        print("[elasticsearch] saved %s codes to %s index" % (results[0], "geo_area"))
                         print("[elasticsearch] %s errors reported" % len(results[1]))
 
 

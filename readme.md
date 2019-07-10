@@ -34,7 +34,7 @@ before data import.
 
 ### 4. Download NSPL files
 
-[Download the latest National Statistics Postcode Library](http://ons.maps.arcgis.com/home/item.html?id=a26683d2393743f4b87c89141cd1b2e8)
+[Download the latest National Statistics Postcode Library](https://geoportal.statistics.gov.uk/datasets/national-statistics-postcode-lookup-may-2019)
 file from the ONS geography site. Unfortunately there isn't a way to directly
 link to the latest file, it needs to be manually downloaded.
 
@@ -47,10 +47,10 @@ Run the following to import the data and save postcodes and codes to the
 elasticsearch index:
 
 ```bash
-python import_postcodes.py data/NSPL_FEB_2017_UK.zip
+python import_postcodes.py data/NSPL_MAY_2019_UK.zip
 ```
 
-Replace `data/NSPL_FEB_2017_UK.zip` with the relative or absolute path to the
+Replace `data/NSPL_MAY_2019_UK.zip` with the relative or absolute path to the
 file downloaded above.
 
 This will then run the import process. It takes a while to run as there are over
@@ -65,30 +65,30 @@ side, and copy the `GeoJSON` link, or download the file.
 
 These files are the latest available at April 2017:
 
-- Countries: <http://geoportal.statistics.gov.uk/datasets/37bcb9c9e788497ea4f80543fd14c0a7_2.geojson>
-- Westminster Parliamentary Constituencies: <http://geoportal.statistics.gov.uk/datasets/deeb99fdf09949bc8ed4dc95c80da279_2.geojson>
-- Counties and unitary authorities: <http://geoportal.statistics.gov.uk/datasets/687f346f5023410ba86615655ff33ca9_2.geojson>
-- Local Authority Districts: <http://geoportal.statistics.gov.uk/datasets/686603e943f948acaa13fb5d2b0f1275_2.geojson>
-- Regions: <http://geoportal.statistics.gov.uk/datasets/f99b145881724e15a04a8a113544dfc5_2.geojson>
-- CCGs: <http://geoportal.statistics.gov.uk/datasets/ac17d33d37b94e48abd8ccbcde640dde_2.geojson>
-- European electoral regions: <http://geoportal.statistics.gov.uk/datasets/44667328cf45481ba91aef2f646b5fc0_2.geojson>
-- Local Enterprise Partnerships: <http://geoportal.statistics.gov.uk/datasets/532e3bb99acf44549ebb882c15646059_2.geojson>
+- Countries: <https://opendata.arcgis.com/datasets/7be6a3c1be3b4385951224d2f522470a_0.geojson>
+- Westminster Parliamentary Constituencies: <https://opendata.arcgis.com/datasets/094f326b0b1247e3bcf1eb7236c24679_0.geojson>
+- Counties and unitary authorities: <https://opendata.arcgis.com/datasets/0de4288db3774cb78e45b8b74e9eab31_0.geojson>
+- Local Authority Districts: <https://opendata.arcgis.com/datasets/85305f03b26547ac8ef62c0ad13aaa52_0.geojson>
+- Regions: <https://opendata.arcgis.com/datasets/284d82f437554938b0d0fbb3c6522007_0.geojson>
+- CCGs: <https://opendata.arcgis.com/datasets/c3398f0560844f74b76ca4b4136eb6a3_2.geojson>
+- European electoral regions: <https://opendata.arcgis.com/datasets/20595dbf22534e20944c9cee42c665b3_0.geojson>
+- Local Enterprise Partnerships: <https://opendata.arcgis.com/datasets/d4d519d1d1a1455a9b82331228f77489_2.geojson>
 - NHS Commissioning Regions: <http://geoportal.statistics.gov.uk/datasets/b804b37c78004e788becf75f712f6a38_2.geojson>
-- NHS England Regions: <http://geoportal.statistics.gov.uk/datasets/6e93e6b47edd49ab827a1831d8eb0f57_2.geojson>
-- National Parks: <http://geoportal.statistics.gov.uk/datasets/df607d4ffa124cdca8317e3e63d45d78_2.geojson>
-- Police Force areas: <http://geoportal.statistics.gov.uk/datasets/3e5a096a8c7c456fb6d3164a3f44b005_2.geojson>
-- Strategic Clinical Networks: <http://geoportal.statistics.gov.uk/datasets/7ddabffc9b46444bbf548732642f1ea2_2.geojson>
-- Travel to Work Areas: <http://geoportal.statistics.gov.uk/datasets/d3062ec5f03b49a7be631d71586cac8c_2.geojson>
+- NHS England Regions: <https://opendata.arcgis.com/datasets/edcbf58c70004d0f8d44501d07c38fe9_0.geojson>
+- National Parks: <https://opendata.arcgis.com/datasets/f41bd8ff39ce4a2393c2f454006ea60a_0.geojson>
+- Police Force areas: <https://opendata.arcgis.com/datasets/282af275c1a24c2ea64ff9e05bdd7d7d_0.geojson>
+- Strategic Clinical Networks: <https://opendata.arcgis.com/datasets/7ddabffc9b46444bbf548732642f1ea2_2.geojson>
+- Travel to Work Areas: <https://opendata.arcgis.com/datasets/d3062ec5f03b49a7be631d71586cac8c_2.geojson>
 
 These files are large:
 
-- Parishes: <http://geoportal.statistics.gov.uk/datasets/f13dad37854b4a1f869bf178489ff99a_2.geojson>
-- Wards: <http://geoportal.statistics.gov.uk/datasets/afcc88affe5f450e9c03970b237a7999_2.geojson>
-- LSOAs: <http://geoportal.statistics.gov.uk/datasets/da831f80764346889837c72508f046fa_2.geojson>
-- MSOAs: <http://geoportal.statistics.gov.uk/datasets/826dc85fb600440889480f4d9dbb1a24_2.geojson>
-- Workplace Zones: <http://geoportal.statistics.gov.uk/datasets/a399c2a5922a4beaa080de63c0a218a3_2.geojson>
-- Built-up Areas: <http://geoportal.statistics.gov.uk/datasets/278ff7af4efb4a599f70156e6e19cc9f_0.geojson>
-- Built-up Area Sub-divisions: <http://geoportal.statistics.gov.uk/datasets/1f021bb824ee4820b353b4b58fab6df5_0.geojson>
+- Parishes: <https://opendata.arcgis.com/datasets/f89931e8a9414c3fbb0b9677545aabdd_2.geojson>
+- Wards: <https://opendata.arcgis.com/datasets/7f535363afdc4881a1c77fe90cfa7713_2.geojson>
+- LSOAs: <https://opendata.arcgis.com/datasets/da831f80764346889837c72508f046fa_2.geojson>
+- MSOAs: <https://opendata.arcgis.com/datasets/29fdaa2efced40378ce8173b411aeb0e_2.geojson>
+- Workplace Zones: <https://opendata.arcgis.com/datasets/a399c2a5922a4beaa080de63c0a218a3_2.geojson>
+- Built-up Areas: <https://opendata.arcgis.com/datasets/f6684981be23404e83321077306fa837_0.geojson>
+- Built-up Area Sub-divisions: <https://opendata.arcgis.com/datasets/1f021bb824ee4820b353b4b58fab6df5_0.geojson>
 
 Import the boundary files by running:
 

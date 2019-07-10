@@ -7,7 +7,7 @@ import controllers.areatypes
 
 class Area(Controller):
 
-    es_type = 'code'
+    es_index = 'geo_area'
     url_slug = 'areas'
     template = 'area.html'
 
@@ -18,7 +18,7 @@ class Area(Controller):
     def get_by_id(self, id, boundary=False, examples_count=5):
         id = self.parse_id(id)
         _source_exclude = [] if boundary else ["boundary"]
-        result = self.config.get("es").get(index=self.config.get("es_index"), doc_type=self.es_type, id=id, ignore=[404], _source_exclude=_source_exclude)
+        result = self.config.get("es").get(index=self.es_index, doc_type=self.es_type, id=id, ignore=[404], _source_exclude=_source_exclude)
         if result["found"]:
             self.relationships["areatype"] = {}
             self.boundary = result["_source"].get("boundary")
@@ -47,7 +47,7 @@ class Area(Controller):
 
             }
         }
-        example = self.config.get("es").search(index=self.config.get("es_index"), doc_type='postcode', body=query, size=examples_count)
+        example = self.config.get("es").search(index="geo_postcode", doc_type='_doc', body=query, size=examples_count)
         return [controllers.postcodes.Postcode(self.config).set_from_data(e) for e in example["hits"]["hits"]]
 
     def topJSON(self):
@@ -78,7 +78,7 @@ class Area(Controller):
 
 class Areas(Controller):
 
-    es_type = 'code'
+    es_index = 'geo_area'
     url_slug = 'areas'
 
     def __init__(self, config):
@@ -110,7 +110,7 @@ class Areas(Controller):
                 }
             }
             result = self.config.get("es").search(
-                index=self.config.get("es_index", "postcode"), 
+                index=self.es_index, 
                 doc_type=self.es_type, 
                 body=query, 
                 from_=self.pagination.from_, 
@@ -134,7 +134,7 @@ class Areas(Controller):
         result = scan(
             self.config.get("es"),
             query=q,
-            index=self.config.get("es_index", "postcode"), 
+            index=self.es_index, 
             doc_type=self.es_type, 
             _source_include=["type", "name"], 
             size=10000,

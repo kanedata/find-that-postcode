@@ -10,7 +10,7 @@ import controllers.areas
 
 class Postcode(Controller):
 
-    es_type = 'postcode'
+    es_index = 'geo_postcode'
     url_slug = 'postcodes'
     date_fields = ["dointr", "doterm"]
     not_area_fields = ["osgrdind", "usertype"]
@@ -21,7 +21,7 @@ class Postcode(Controller):
     def get_by_id(self, id):
         id = self.parse_id(id)
         if id:
-            result = self.config.get("es").get(index=self.config.get("es_index"), doc_type=self.es_type, id=id, ignore=[404])
+            result = self.config.get("es").get(index=self.es_index, doc_type=self.es_type, id=id, ignore=[404])
             if result["found"]:
                 self.set_from_data(result)
 

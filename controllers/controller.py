@@ -17,6 +17,7 @@ GEOJSON_TYPES = {
 class Controller:
 
     template = None
+    es_type = "_doc"
 
     def __init__(self, config={}):
         # main configuration

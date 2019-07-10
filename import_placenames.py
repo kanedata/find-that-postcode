@@ -39,7 +39,6 @@ def main():
     parser.add_argument('--es-port', default=9200, help='port for the elasticsearch instance')
     parser.add_argument('--es-url-prefix', default='', help='Elasticsearch url prefix')
     parser.add_argument('--es-use-ssl', action='store_true', help='Use ssl to connect to elasticsearch')
-    parser.add_argument('--es-index', default='postcode', help='index used to store postcode data')
 
     args = parser.parse_args()
 
@@ -68,8 +67,8 @@ def main():
         pcount = 0
         reader = csv.DictReader(a)
         for i in reader:
-            i["_index"] = args.es_index
-            i["_type"] = "placename"
+            i["_index"] = "geo_placename"
+            i["_type"] = "_doc"
             i["_op_type"] = "index"
             i["_id"] = i["place15cd"]
 

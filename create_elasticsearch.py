@@ -3,31 +3,23 @@ from elasticsearch import Elasticsearch
 import os
 
 
-INDEXES = [
-    {
-        "name": "postcode",
-        "mapping": [
-            ("postcode", {
-                "properties": {
-                    "location": {"type": "geo_point"}
-                }
-            }
-            ),
-            ("placename", {
-                "properties": {
-                    "location": {"type": "geo_point"}
-                }
-            }
-            ),
-            ("code", {
-                "properties": {
-                    "boundary": {"type": "geo_shape"}
-                }
-            }
-            ),
-        ]
+INDEXES = {
+    "geo_postcode": {
+        "properties": {
+            "location": {"type": "geo_point"}
+        }
+    },
+    "geo_placename": {
+        "properties": {
+            "location": {"type": "geo_point"}
+        }
+    },
+    "geo_area": {
+        "properties": {
+            "boundary": {"type": "geo_shape"}
+        }
     }
-]
+}
 
 
 def main():
@@ -45,8 +37,6 @@ def main():
                         help='Elasticsearch url prefix')
     parser.add_argument('--es-use-ssl', action='store_true',
                         help='Use ssl to connect to elasticsearch')
-    parser.add_argument('--es-index', default='postcode',
-                        help='index used to store postcode data')
 
     args = parser.parse_args()
 
@@ -63,20 +53,15 @@ def main():
             es = Elasticsearch(os.environ.get(e_v))
             break
 
-    INDEXES[0]["name"] = args.es_index
-
-    for i in INDEXES:
-        if es.indices.exists(i["name"]) and args.reset:
-            print("[elasticsearch] deleting '%s' index..." % (i["name"]))
-            res = es.indices.delete(index=i["name"])
+    for index, i in INDEXES.items():
+        if es.indices.exists(index) and args.reset:
+            print("[elasticsearch] deleting '%s' index..." % (index))
+            res = es.indices.delete(index=index)
             print("[elasticsearch] response: '%s'" % (res))
-        print("[elasticsearch] creating '%s' index..." % (i["name"]))
-        res = es.indices.create(index=i["name"])
-
-        if "mapping" in i:
-            for mapping in i["mapping"]:
-                res = es.indices.put_mapping(mapping[0], mapping[1], index=i["name"])
-                print("[elasticsearch] set mapping on %s index, %s type" % (i["name"], mapping[0]))
+        print("[elasticsearch] creating '%s' index..." % (index))
+        res = es.indices.create(index=index)
+        res = es.indices.put_mapping(doc_type='_doc', body=i, index=index)
+        print("[elasticsearch] set mapping on %s index" % (index))
 
 if __name__ == '__main__':
     main()

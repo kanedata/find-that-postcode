@@ -30,25 +30,23 @@ def process_csv(csvfile, outfile, config,
         postcode = Postcode.parse_postcode(row.get(postcode_field))
         if postcode:
             pc = config.get("es").get(index=config.get("es_index"), doc_type="postcode", id=postcode, ignore=[404])
-            if not pc["found"]:
-                continue
-
-            for i in fields:
-                if i.endswith("_name"):
-                    code = pc["_source"].get(i[:-5])
-                    if code in code_cache:
-                        row[i] = code_cache[code]
-                    elif code:
-                        area = config.get("es").get(index=config.get("es_index"), doc_type="code", id=code, ignore=[404], _source_exclude=["boundary"])
-                        if area["found"]:
-                            row[i] = area["_source"].get("name")
+            if pc["found"]:
+                for i in fields:
+                    if i.endswith("_name"):
+                        code = pc["_source"].get(i[:-5])
+                        if code in code_cache:
+                            row[i] = code_cache[code]
+                        elif code:
+                            area = config.get("es").get(index=config.get("es_index"), doc_type="code", id=code, ignore=[404], _source_exclude=["boundary"])
+                            if area["found"]:
+                                row[i] = area["_source"].get("name")
+                            else:
+                                row[i] = code
+                            code_cache[code] = row[i]
                         else:
                             row[i] = code
-                        code_cache[code] = row[i]
                     else:
-                        row[i] = code
-                else:
-                    row[i] = pc["_source"].get(i)
+                        row[i] = pc["_source"].get(i)
         writer.writerow(row)
 
 

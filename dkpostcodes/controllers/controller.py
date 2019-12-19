@@ -1,7 +1,6 @@
 from metadata import AREA_TYPES
 import math
 from urllib.parse import urlencode, urlunparse
-import bottle
 
 GEOJSON_TYPES = {
     "point": "Point",  # A single geographic coordinate.
@@ -21,7 +20,7 @@ class Controller:
     def __init__(self, config={}):
         # main configuration
         self.config = config
-        self.urlparts = bottle.request.urlparts if bottle else None
+        self.urlparts = None
         self.found = False
         self.errors = []
         self.attributes = {}

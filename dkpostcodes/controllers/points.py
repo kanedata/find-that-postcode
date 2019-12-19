@@ -2,7 +2,7 @@ from datetime import datetime
 import bottle
 
 from .controller import *
-import controllers.postcodes
+from . import postcodes
 
 
 class Point(Controller):

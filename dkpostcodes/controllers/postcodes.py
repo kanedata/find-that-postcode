@@ -5,7 +5,7 @@ import re
 from metadata import AREA_TYPES, KEY_AREA_TYPES, OTHER_CODES
 
 from .controller import *
-import controllers.areas
+from . import areas
 
 
 class Postcode(Controller):

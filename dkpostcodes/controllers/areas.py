@@ -1,8 +1,8 @@
 from elasticsearch.helpers import scan
 
 from .controller import Controller, Pagination, GEOJSON_TYPES
-import controllers.postcodes
-import controllers.areatypes
+from . import postcodes
+from . import areatypes
 
 
 class Area(Controller):

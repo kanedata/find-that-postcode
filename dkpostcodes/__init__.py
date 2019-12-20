@@ -2,6 +2,7 @@ import os
 
 from flask import Flask, render_template
 from . import db
+from . import commands
 from .controllers.areatypes import Areatypes
 
 def create_app(test_config=None):
@@ -27,6 +28,7 @@ def create_app(test_config=None):
         pass
     
     db.init_app(app)
+    commands.init_app(app)
     
     @app.route('/')
     @app.route('/index.html')

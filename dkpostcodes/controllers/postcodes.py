@@ -2,43 +2,71 @@ from datetime import datetime
 import bottle
 import re
 
-from metadata import AREA_TYPES, KEY_AREA_TYPES, OTHER_CODES
-
+from ..metadata import AREA_TYPES, KEY_AREA_TYPES, OTHER_CODES, OAC11_CODE, RU11IND_CODES
 from .controller import *
 from . import areas
+from . import areatypes
 
 
 class Postcode(Controller):
 
-    es_type = 'postcode'
+    es_index = 'geo_postcode'
     url_slug = 'postcodes'
     date_fields = ["dointr", "doterm"]
     not_area_fields = ["osgrdind", "usertype"]
 
-    def __init__(self, config):
-        super().__init__(config)
+    def __init__(self, id, data=None, pcareas=None):
+        super().__init__(id, data)
+        if areas:
+            self.relationships["areas"] = pcareas
 
-    def get_by_id(self, id):
-        id = self.parse_id(id)
-        if id:
-            result = self.config.get("es").get(index=self.config.get("es_index"), doc_type=self.es_type, id=id, ignore=[404])
-            if result["found"]:
-                self.set_from_data(result)
+    def __repr__(self):
+        return '<Postcode {}>'.format(self.id)
 
-    def process_attributes(self, postcode, get_areas=True):
-        self.relationships["areas"] = []
-        for i in list(postcode.keys()):
-            if postcode[i] and i not in self.not_area_fields:
-                area = controllers.areas.Area(self.config)
-                area.get_by_id(postcode[i], examples_count=0)
+
+    @classmethod
+    def get_from_es(cls, id, es, es_config=None):
+        if not es_config:
+            es_config = {}
+        data = es.get(
+            index=es_config.get("es_index", cls.es_index),
+            doc_type=es_config.get("es_type", cls.es_type),
+            id=cls.parse_id(id),
+            ignore=[404],
+            _source_exclude=es_config.get("_source_exclude", []),
+        )
+        
+        pcareas = []
+        postcode = data.get("_source")
+        for k in list(postcode.keys()):
+            if isinstance(postcode[k], str) and re.match(r'[A-Z][0-9]{8}', postcode[k]):
+                area = areas.Area.get_from_es(postcode[k], es, examples_count=0) 
                 if area.found:
-                    postcode[i + "_name"] = area.attributes.get("name")
-                    self.relationships["areas"].append(area)
+                    postcode[k + "_name"] = area.attributes.get("name")
+                    pcareas.append(area)
+
+        return cls(data.get("_id"), data.get("_source"), pcareas)
+    
+    def process_attributes(self, postcode):
 
         # turn dates into dates
         for i in self.date_fields:
             if postcode[i] and not isinstance(postcode[i], datetime):
                 postcode[i] = datetime.strptime(postcode[i], "%Y-%m-%dT%H:%M:%S")
+
+        if OAC11_CODE.get(postcode["oac11"]):
+            self.relationships["oac11"] = {
+                "code": postcode["oac11"],
+                "supergroup": OAC11_CODE.get(postcode["oac11"])[0],
+                "group": OAC11_CODE.get(postcode["oac11"])[1],
+                "subgroup": OAC11_CODE.get(postcode["oac11"])[2],
+            }
+
+        if RU11IND_CODES.get(postcode["ru11ind"]):
+            self.relationships["ru11ind"] = {
+                "code": postcode["ru11ind"],
+                "description": RU11IND_CODES.get(postcode["ru11ind"]),
+            }
 
         return postcode
 
@@ -59,11 +87,8 @@ class Postcode(Controller):
                 if a.relationships["areatype"].id == attr:
                     return a.id
 
-    def parse_id(self, postcode):
-        return self.parse_postcode(postcode)
-
     @staticmethod
-    def parse_postcode(postcode):
+    def parse_id(postcode):
         """
         standardises a postcode into the correct format
         """
@@ -101,9 +126,9 @@ class Postcode(Controller):
             if json[1].get("attributes", {}).get(i) and isinstance(json[1]["attributes"][i], datetime):
                 json[1]["attributes"][i] = json[1]["attributes"][i].strftime("%Y-%m-%d")
 
-        ats = controllers.areatypes.Areatypes(self.config)
-        ats.get()
-        for a in ats.attributes:
-            json[2].append(a.toJSON()[1])
+        # ats = areatypes.Areatypes(self.config, self.es)
+        # ats.get()
+        # for a in ats.attributes:
+        #     json[2].append(a.toJSON()[1])
 
         return json

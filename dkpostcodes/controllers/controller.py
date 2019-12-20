@@ -1,6 +1,7 @@
-from metadata import AREA_TYPES
 import math
 from urllib.parse import urlencode, urlunparse
+
+from ..metadata import AREA_TYPES
 
 GEOJSON_TYPES = {
     "point": "Point",  # A single geographic coordinate.
@@ -16,29 +17,40 @@ GEOJSON_TYPES = {
 class Controller:
 
     template = None
+    es_type = '_doc'
 
-    def __init__(self, config={}):
+    def __init__(self, id, data=None):
         # main configuration
-        self.config = config
         self.urlparts = None
         self.found = False
         self.errors = []
         self.attributes = {}
         self.relationships = {}
-        self.id = None
+        self.id = self.parse_id(id)
         self.pagination = None
-
-    def set_from_data(self, data=None):
         if data:
             self.found = True
-            self.attributes = self.process_attributes(data["_source"])
-            self.id = data["_id"]
-        return self
+            self.attributes = self.process_attributes(data)
+
+
+    @classmethod
+    def get_from_es(cls, id, es, es_config=None):
+        if not es_config:
+            es_config = {}
+        data = es.get(
+            index=es_config.get("es_index", cls.es_index),
+            doc_type=es_config.get("es_type", cls.es_type),
+            id=cls.parse_id(id),
+            ignore=[404],
+            _source_exclude=es_config.get("_source_exclude", []),
+        )
+        return cls(data.get("_id"), data.get("_source"))
 
     def process_attributes(self, data):
         return data
 
-    def parse_id(self, id):
+    @staticmethod
+    def parse_id(id):
         return id
 
     def url(self, filetype=None, query_vars={}):
@@ -75,28 +87,31 @@ class Controller:
         # query_vars = self.page_query_vars(query_vars)
         return urlencode(query_vars)
 
-    # role = top|identifier|embedded
-    def toJSON(self, role="top"):
-        json = {}
-        included = []
-        status = 404
-
-        # check if anything has been found
+    def get_errors(self):
         if not self.found:
-            json["errors"] = [
+            return [
                 {
-                    "status": str(status),
+                    "status": "404",
                     "title": "resource not found",
                     "detail": "resource could not be found"
                 }
             ]
-            return (status, json, included)
+        return []
 
-        status = 200
+    # role = top|identifier|embedded
+    def toJSON(self, role="top"):
+        json = {}
+        included = []
+
+        # check if anything has been found
+        if not self.found:
+            json["errors"] = self.get_errors()
+            return (json, included)
+
         json["type"] = self.url_slug
         json["id"] = self.id
         if role == "identifer":
-            return (status, json, included)
+            return (json, included)
 
         json["attributes"] = self.attributes
         json["links"] = {
@@ -125,12 +140,12 @@ class Controller:
                 if role != "embedded":
                     included.append(self.relationships[i].toJSON("embedded")[1])
 
-        return (status, json, included)
+        return (json, included)
 
     def topJSON(self):
         json = self.toJSON()
         if not self.found:
-            return (404, {
+            return {
                 "errors": [
                     {
                         "status": "404",
@@ -138,16 +153,16 @@ class Controller:
                         "title": "Code not found"
                     }
                 ]
-            })
+            }
 
-        return (200, {
-                "data": json[1],
-                "included": json[2],
-                "links": {
-                    "self": self.url(),
-                    "html": self.url("html")
-                }
-                })
+        return {
+            "data": json[0],
+            "included": json[1],
+            "links": {
+                "self": self.url(),
+                "html": self.url("html")
+            }
+        }
 
 
     def get_es_version(self, es):
@@ -162,8 +177,8 @@ class Pagination():
     default_size = 100
 
     def __init__(self):
-        self.page = int(bottle.request.query.page or 1)
-        self.size = int(bottle.request.query.size or self.default_size)
+        self.page = 1 # int(bottle.request.query.page or 1)
+        self.size = self.default_size #int(bottle.request.query.size or self.default_size)
         self.from_ = self.get_from()
         self.pagination = {
             "next": None,

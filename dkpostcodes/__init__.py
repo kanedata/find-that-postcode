@@ -1,8 +1,11 @@
 import os
+import datetime
 
 from flask import Flask, render_template
 from . import db
 from . import commands
+from . import blueprints
+from .metadata import KEY_AREA_TYPES, OTHER_CODES, AREA_TYPES
 from .controllers.areatypes import Areatypes
 
 def create_app(test_config=None):
@@ -29,17 +32,25 @@ def create_app(test_config=None):
     
     db.init_app(app)
     commands.init_app(app)
+
+    # template helpers
+    @app.context_processor
+    def inject_now():
+        return dict(
+            now=datetime.datetime.now(),
+            key_area_types=KEY_AREA_TYPES,
+            other_codes=OTHER_CODES,
+            area_types=AREA_TYPES,
+        )
     
+    # routes and blueprints
     @app.route('/')
     @app.route('/index.html')
     def index():
-        ats = Areatypes(app.config)
-        ats.get()
-        (_, result) = ats.topJSON()
-        return render_template('index.html',
-                            result=result,
-                            key_area_types=KEY_AREA_TYPES
-                            )
+        ats = Areatypes.get_from_es(db.get_db())
+        return render_template('index.html', result=ats)
+    
+    blueprints.init_app(app)
 
     # a simple page that says hello
     @app.route('/hello')

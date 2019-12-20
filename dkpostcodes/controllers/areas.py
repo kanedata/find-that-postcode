@@ -7,39 +7,63 @@ from . import areatypes
 
 class Area(Controller):
 
-    es_type = 'code'
+    es_index = 'geo_area'
     url_slug = 'areas'
     template = 'area.html'
 
-    def __init__(self, config):
-        super().__init__(config)
-        self.boundary = None
+    def __init__(self, id, data=None, entity=None, example_postcodes=None, boundary=None):
+        super().__init__(id, data)
+        self.example_postcodes = example_postcodes
+        self.entity = entity
+        self.boundary = boundary
 
-    def get_by_id(self, id, boundary=False, examples_count=5):
-        id = self.parse_id(id)
-        _source_exclude = [] if boundary else ["boundary"]
-        result = self.config.get("es").get(index=self.config.get("es_index"), doc_type=self.es_type, id=id, ignore=[404], _source_exclude=_source_exclude)
-        if result["found"]:
-            self.relationships["areatype"] = {}
-            self.boundary = result["_source"].get("boundary")
-            self.set_from_data(result)
-            if examples_count > 0:
-                self.relationships["example_postcodes"] = self.get_example_postcodes(examples_count)
+    def __repr__(self):
+        return '<Area {}>'.format(self.id)
+
+    @classmethod
+    def get_from_es(cls, id, es, es_config=None, examples_count=5, boundary=False):
+        if not es_config:
+            es_config = {}
+
+        # fetch the initial area
+        data = es.get(
+            index=es_config.get("es_index", cls.es_index),
+            doc_type=es_config.get("es_type", cls.es_type),
+            id=cls.parse_id(id),
+            ignore=[404],
+            _source_exclude=[] if boundary else ["boundary"],
+        )
+        entity = {}
+        if data["found"] and data["_source"].get("entity"):
+            entity = es.get(index="geo_entity", doc_type="_doc", id=data["_source"].get("entity"))
+
+        postcodes = []
+        if examples_count:
+            postcodes = cls.get_example_postcodes(id, es, examples_count=examples_count)
+        
+        return cls(
+            data.get("_id"),
+            data.get("_source"),
+            areatypes.Areatype(entity.get("_id"), entity.get("_source")),
+            postcodes,
+            data.get("_source", {}).get("boundary")
+        )
 
     def process_attributes(self, area):
-        self.relationships["areatype"] = controllers.areatypes.Areatype(self.config).get_by_id(area["type"])
-        del area["type"]
+        # self.relationships["areatype"] = areatypes.Areatype(self.config, self.es).get_by_id(area.get("type"))
+        # del area["type"]
         if "boundary" in area:
             del area["boundary"]
         return area
 
-    def get_example_postcodes(self, examples_count=5):
+    @classmethod
+    def get_example_postcodes(areacode, es, examples_count=5):
         query = {
             "query": {
                 "function_score": {
                     "query": {
                         "query_string": {
-                            "query": self.id
+                            "query": areacode
                         }
                     },
                     "random_score": {}
@@ -47,8 +71,8 @@ class Area(Controller):
 
             }
         }
-        example = self.config.get("es").search(index=self.config.get("es_index"), doc_type='postcode', body=query, size=examples_count)
-        return [controllers.postcodes.Postcode(self.config).set_from_data(e) for e in example["hits"]["hits"]]
+        example = es.search(index='geo_postcode', doc_type='_doc', body=query, size=examples_count)
+        return [postcodes.Postcode(e["_id"], e["_source"]) for e in example["hits"]["hits"]]
 
     def topJSON(self):
         json = super().topJSON()
@@ -78,11 +102,11 @@ class Area(Controller):
 
 class Areas(Controller):
 
-    es_type = 'code'
+    es_index = 'geo_area'
     url_slug = 'areas'
 
-    def __init__(self, config):
-        super().__init__(config)
+    def __init__(self, config, es):
+        super().__init__(config, es)
         self.data = []
         self.meta = {}
 
@@ -109,7 +133,7 @@ class Areas(Controller):
                     }
                 }
             }
-            result = self.config.get("es").search(
+            result = self.es.search(
                 index=self.config.get("es_index", "postcode"), 
                 doc_type=self.es_type, 
                 body=query, 
@@ -132,7 +156,7 @@ class Areas(Controller):
                 }
             }
         result = scan(
-            self.config.get("es"),
+            self.es,
             query=q,
             index=self.config.get("es_index", "postcode"), 
             doc_type=self.es_type, 

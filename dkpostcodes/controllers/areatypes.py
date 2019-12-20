@@ -1,4 +1,4 @@
-from metadata import AREA_TYPES, KEY_AREA_TYPES, OTHER_CODES
+from ..metadata import AREA_TYPES, KEY_AREA_TYPES, OTHER_CODES
 
 from .controller import *
 from . import areas
@@ -6,30 +6,34 @@ from . import areas
 
 class Areatype(Controller):
 
-    es_type = 'code'
+    es_index = 'geo_entity'
     url_slug = 'areatypes'
+    
 
-    def __init__(self, config):
+    def __init__(self, id, data=None):
+        super().__init__(id, data)
         self.areatypes = {i[0]: i for i in AREA_TYPES}
-        super().__init__(config)
+
+    def __repr__(self):
+        return '<AreaType {}>'.format(self.id)
 
     def get_by_id(self, areatype, p=1, size=None):
         self.set_from_data(areatype)
         self.areas = []
-        if self.config.get("es") and not self.config.get("stop_recursion"):
+        if self.es and not self.config.get("stop_recursion"):
             self.relationships["areas"] = []
             self.pagination = Pagination()
-            version = self.get_es_version(self.config.get("es"))[0]
+            version = self.get_es_version(self.es)[0]
             sorting = "name.keyword:asc" if version >= 5 else "name:asc"
 
             query = {
                 "query": {
                     "match": {
-                        "type": self.id
+                        "entity": self.id
                     }
                 }
             }
-            result = self.config.get("es").search(
+            result = self.es.search(
                 index=self.config.get("es_index"), 
                 doc_type=self.es_type, 
                 body=query, 
@@ -66,34 +70,52 @@ class Areatype(Controller):
 
 class Areatypes(Controller):
 
-    es_type = 'code'
     url_slug = 'areatypes'
 
-    def __init__(self, config):
-        super().__init__(config)
-
-    def get(self):
+    def __init__(self, id="__all", data=None, counts={}):
+        super().__init__(id, data)
         self.areatypes = {i[0]: i for i in AREA_TYPES}
+
+    def __repr__(self):
+        return '<AreaTypes>'
+
+    @classmethod
+    def get_from_es(cls, es, es_config=None, examples_count=5, boundary=False):
+        if not es_config:
+            es_config = {}
+
+        # fetch all the entities
+        entities = es.search(
+            index=es_config.get("es_index", Areatype.es_index),
+            doc_type=es_config.get("es_type", cls.es_type),
+            body={"query": {"match_all": {}}},
+            ignore=[404],
+        )
+        entities = [Areatype(e["_id"], e["_source"]) for e in entities["hits"]["hits"]]
+
+        # fetch counts per entity
         query = {
             "size": 0,
             "aggs": {
                 "group_by_type": {
                     "terms": {
-                        "field": "type.keyword",
+                        "field": "entity.keyword",
                         "size": 100
                     }
                 }
             }
         }
-        result = self.config.get("es").search(index=self.config.get("es_index", "postcode"), doc_type=self.es_type, body=query, _source_exclude=["boundary"])
-        self.area_counts = {i["key"]: i["doc_count"] for i in result["aggregations"]["group_by_type"]["buckets"]}
-        self.attributes = []
-        for a in self.areatypes:
-            areatype = Areatype(self.config)
-            areatype.set_from_data(a)
-            if a in self.area_counts:
-                areatype.attributes["count_areas"] = self.area_counts[a]
-            self.attributes.append(areatype)
+        result = es.search(
+            index=es_config.get("es_index", areas.Area.es_index),
+            doc_type=es_config.get("es_type", cls.es_type),
+            body=query,
+            ignore=[404],
+            _source_exclude=["boundary"],
+        )
+        doc_counts = {i["key"]: i["doc_count"] for i in result["aggregations"]["group_by_type"]["buckets"]}
+        for e in entities:
+            e.doc_count = doc_counts.get(e.id)
+        return cls(data=entities)
 
     def topJSON(self):
         return (200, {

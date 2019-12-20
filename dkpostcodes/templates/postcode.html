@@ -1,26 +1,18 @@
-% if result["data"]["type"]=="points":
-  % postcode = included[("postcodes", result["data"]["relationships"]["nearest_postcode"]["data"]["id"])]
-  % title = 'Point {:,.5f}, {:,.5f}'.format(result["data"]["attributes"]["lat"], result["data"]["attributes"]["lon"])
-  % subtitle = 'Closest postcode to point {0:,.5f}, {1:,.5f} is <a href="{2}">{3}</a>.<br>Centre of {3} is {4:,.1f} meters away.'.format(result["data"]["attributes"]["lat"], result["data"]["attributes"]["lon"], postcode["links"]["html"], postcode["id"], result["data"]["attributes"]["distance_from_postcode"])
-% else:
-  % postcode = result["data"]
-  % title = 'Postcode %s' % (postcode["id"],)
-  % subtitle = ""
-    % if postcode["attributes"]["doterm"]:
-    % subtitle = 'No longer used since %s' % postcode["attributes"]["doterm"]
-    % end
-% end
-% import datetime
-% for f in ['dointr', 'doterm']:
-%   if postcode["attributes"].get(f):
-%     postcode["attributes"][f] = datetime.datetime.strptime(postcode["attributes"][f], "%Y-%m-%d")
-%   end
-% end
-% rebase("base.html", title=title, subtitle=subtitle, includes=['leaflet'])
+{# {% if result["data"]["type"]=="points" %}
+  {% postcode = included[("postcodes", result["data"]["relationships"]["nearest_postcode"]["data"]["id"])] %}
+  {% title = 'Point {:,.5f}, {:,.5f}'.format(result["data"]["attributes"]["lat"], result["data"]["attributes"]["lon"]) %}
+  {% subtitle = 'Closest postcode to point {0:,.5f}, {1:,.5f} is <a href="{2}">{3}</a>.<br>Centre of {3} is {4:,.1f} meters away.'.format(result["data"]["attributes"]["lat"], result["data"]["attributes"]["lon"], postcode["links"]["html"], postcode["id"], result["data"]["attributes"]["distance_from_postcode"]) %}
+{% else %}
+% end #}
+{% set title = 'Postcode {}'.format(result.id) %}
+{% set subtitle = 'No longer used' if result.attributes.doterm else '' %}
+{% set includes = ['leaflet'] %}
+{% extends 'base.html' %}
+{% block content %}
 <div class="columns">
   <div class="column">
     <div class="columns">
-      % if postcode["attributes"]["location"]:
+      {% if result.attributes.location %}
       <div class="column">
         <div class="card">
           <header class="card-header">
@@ -28,12 +20,12 @@
           </header>
           <div class="card-content">
             <div class="content">
-              <a href="https://tools.wmflabs.org/geohack/geohack.php?params={{ postcode["attributes"]["location"]["lat"] }};{{ postcode["attributes"]["location"]["lon"] }}">{{ postcode["attributes"]["location"]["lat"] }}, {{ postcode["attributes"]["location"]["lon"] }}</a>
+              <a href='https://tools.wmflabs.org/geohack/geohack.php?params={{ result.attributes.location["lat"] }};{{ result.attributes.location["lon"] }}'>{{ result.attributes.location.lat }}, {{ result.attributes.location.lon }}</a>
             </div>
           </div>
         </div>
       </div>
-      % end
+      {% endif %}
       <div class="column">
         <div class="card">
           <header class="card-header">
@@ -41,7 +33,7 @@
           </header>
           <div class="card-content">
             <div class="content">
-              {{ postcode["attributes"]["oseast1m"] }}, {{ postcode["attributes"]["osnrth1m"] }}
+              {{ result.attributes.oseast1m }}, {{ result.attributes.osnrth1m }}
             </div>
           </div>
         </div>
@@ -49,11 +41,11 @@
     </div>
 
     <!-- static map -->
-    % if postcode["attributes"]["location"]:
+    {% if result.attributes.location %}
     <figure class="">
       <div id="postcode-map" style="height:500px;"></div>
     </figure>
-    % end
+    {% endif %}
     <br>
     <div class="card">
       <header class="card-header">
@@ -63,14 +55,14 @@
         <div class="content">
           <table class="table is-fullwidth">
             <tbody>
-              <tr><td>7 character version of postcode</td><td><pre>{{ postcode["attributes"]["pcd"] }}</pre></td></tr>
-              <tr><td>8 character version of postcode</td><td><pre>{{ postcode["attributes"]["pcd2"] }}</pre></td></tr>
-              <tr><td>Date introduced</td><td>{{ "{:%B %Y}".format(postcode["attributes"]["dointr"]) }}</td></tr>
-              % if postcode["attributes"]["doterm"]:
-              <tr><td>Date terminated</td><td>{{ "{:%B %Y}".format(postcode["attributes"]["doterm"]) }}</td></tr>
-              % end
-              <tr><td>Postcode user type</td><td>{{postcode["attributes"]["usertype"] }} ({{ other_codes["usertype"][postcode["attributes"]["usertype"]] }})</td></tr>
-              <tr><td>Grid reference positional quality indicator</td><td>{{postcode["attributes"]["osgrdind"]}} ({{ other_codes["osgrdind"][postcode["attributes"]["osgrdind"]] }})</td></tr>
+              <tr><td>7 character version of postcode</td><td><code>{{ result.attributes.pcd }}</code></td></tr>
+              <tr><td>8 character version of postcode</td><td><code>{{ result.attributes.pcd2 }}</code></td></tr>
+              <tr><td>Date introduced</td><td>{{ "{:%B %Y}".format(result.attributes.dointr) }}</td></tr>
+              {% if result.attributes.doterm %}
+              <tr><td>Date terminated</td><td>{{ "{:%B %Y}".format(result.attributes.doterm) }}</td></tr>
+              {% endif %}
+              <tr><td>Postcode user type</td><td>{{result.attributes.usertype }} ({{ other_codes.usertype[result.attributes.usertype] }})</td></tr>
+              <tr><td>Grid reference positional quality indicator</td><td>{{result.attributes.osgrdind}} ({{ other_codes.osgrdind[result.attributes.osgrdind] }})</td></tr>
             </tbody>
           </table>
         </div>
@@ -79,65 +71,70 @@
 
   </div>
   <div class="column">
-    % areas = {included[("areas", i["id"])]["relationships"]["areatype"]["data"]["id"]:included[("areas", i["id"])] for i in postcode["relationships"]["areas"]["data"] if ("areas", i["id"]) in included}
-    % areatypes = {included[i]["id"]:included[i] for i in included if i[0]=="areatypes"}
-    <!--<pre>{{areas}}</pre>-->
-    % for i in key_area_types:
+    {% for i in key_area_types %}
     <h2 class="title">{{ i[0] }} areas</h2>
     <table class="table is-fullwidth">
       <tbody>
-      % for area in i[1]:
-        % if area in areas and area in areatypes and not areas[area]["id"].endswith("999999"):
+      {% for key_area in i[1] %}
+        {% for a in result.relationships.areas if a.entity.attributes.abbreviation.lower() == key_area %}
         <tr>
-            <td><span title="{{ areatypes[area]["id"] }}">{{ areatypes[area]["attributes"]["name"] }}</span></td>
-            <td>
-              % if areas[area]["attributes"]["name"]=="":
-              <a href="{{ areas[area]["links"]["html"] }}">{{ areas[area]["id"] }}</a>
-              % else:
-              <a href="{{ areas[area]["links"]["html"] }}">{{ areas[area]["attributes"]["name"] }}</a> <span class="tag is-pulled-right">{{ areas[area]["id"] }}</span>
-              % end
-            </td>
-          </tr>
-        % end
-      % end
+          <td><span title="{{ a.entity.id }}">{{ a.entity.attributes.name }}</span></td>
+          <td>
+            {% if a.attributes.name %}
+            <a href="{{ a.id }}">{{ a.attributes.name }}</a> <span class="tag is-pulled-right">{{ a.id }}</span>
+            {% else %}
+            <a href="{{ a.id }}}">{{ a.id }}</a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      {% endfor %}
       </tbody>
     </table>
-    % end
+    {% endfor %}
     <h2 class="title">Area classifications</h2>
     <table class="table is-fullwidth">
       <tbody>
-        % if areas.get("oac11"):
+        {% if result.relationships.oac11 %}
         <tr>
           <td><span title="oac11">Output area classification</span></td>
           <td>
-              {{ areas["oac11"]["attributes"]["Supergroup"] }} &gt; <span class="tag is-pulled-right">{{ areas["oac11"]["id"][0] }}</span><br>
-              {{ areas["oac11"]["attributes"]["Group"] }} &gt; <span class="tag is-pulled-right">{{ areas["oac11"]["id"][0:2] }}</span><br>
-              {{ areas["oac11"]["attributes"]["Subgroup"] }} <span class="tag is-pulled-right">{{ areas["oac11"]["id"] }}</span>
+              {{ result.relationships.oac11.supergroup }} &gt; <span class="tag is-pulled-right">{{ result.relationships.oac11.code[0] }}</span><br>
+              {{ result.relationships.oac11.group }} &gt; <span class="tag is-pulled-right">{{ result.relationships.oac11.code[0:2] }}</span><br>
+              {{ result.relationships.oac11.subgroup }} <span class="tag is-pulled-right">{{ result.relationships.oac11.code }}</span>
           </td>
         </tr>
-        % end
-        % if areas.get("ru11ind"):
+        {% endif %}
+        {% if result.relationships.ru11ind %}
         <tr>
           <td><span title="ru11ind">Rural/urban classification</span></td>
-          <td>{{ areas["ru11ind"]["attributes"]["name"] }}  <span class="tag is-pulled-right">{{ areas["ru11ind"]["id"] }}</span></td>
+          <td>{{ result.relationships.ru11ind.description }}  <span class="tag is-pulled-right">{{ result.relationships.ru11ind.code }}</span></td>
         </tr>
-        % end
-        % if areas.get("ctry") and postcode["attributes"]["imd"] and other_codes["imd"][areas["ctry"]["id"]]:
+        {% endif %}
+        {% for a in result.relationships.areas if a.entity.id == 'E01' %}
+        {% if a.attributes.stats.imd2019 %}
+        {% set rank = a.attributes.stats.imd2019.imd_rank %}
+        {% set total = other_codes.imd[result.attributes.ctry] %}
         <tr>
-          <td><span title="imd">Index of multiple deprivation</span></td>
+          <td><span title="imd">Index of multiple deprivation (2019)</span></td>
           <td>
-            <p><strong>{{ "{:,.0f}".format(postcode["attributes"]["imd"]) }}</strong> out of {{ "{:,.0f}".format(other_codes["imd"][areas["ctry"]["id"]]) }} lower super output areas in {{ areas["ctry"]["attributes"]["name"]}} (where 1 is the most deprived LSOA).</p>
-            <p><strong>{{ "{:.0%}".format( float(postcode["attributes"]["imd"]) / float(other_codes["imd"][areas["ctry"]["id"]]) ) }}</strong> of LSOAs in {{ areas["ctry"]["attributes"]["name"]}} are more deprived than this one.</p>
+            <p><strong>{{ "{:,.0f}".format(rank) }}</strong> out of {{ "{:,.0f}".format(total) }} lower super output areas in {{ result.attributes.ctry_name }} (where 1 is the most deprived LSOA).</p>
+            <p><strong>{{ "{:.0%}".format( rank|float / total|float ) }}</strong> of LSOAs in {{ result.attributes.ctry.name }} are more deprived than this one.</p>
+            {% if a.attributes.stats.imd2015 %}
+            <p>In <strong>2015</strong> {{ "{:.0%}".format( a.attributes.stats.imd2015.imd_rank|float / total|float ) }}</strong> of LSOAs in {{ result.attributes.ctry.name }} were more deprived than this one.</p>
+            {% endif %}
           </td>
-        </tr>
-        % end
+        </tr> 
+        {% endif %}
+        {% endfor %}
       </tbody>
     </table>
   </div>
 </div>
 <script type="text/javascript">
-  var postcode_location = [{{ postcode["attributes"]["location"]["lat"] }},{{ postcode["attributes"]["location"]["lon"] }}]
+  var postcode_location = [{{ result.attributes["location"]["lat"] }},{{ result.attributes["location"]["lon"] }}]
   var mymap = L.map('postcode-map').setView(postcode_location, 11);
   var layer = new L.StamenTileLayer("toner").addTo(mymap);
   var marker = L.circleMarker(postcode_location, {radius: 5, fillOpacity: 0.8}).addTo(mymap);
 </script>
+{% endblock %}

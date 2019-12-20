@@ -7,13 +7,13 @@ from . import postcodes
 
 class Point(Controller):
 
-    es_type = 'postcode'
+    es_index = 'geo_postcode'
     url_slug = 'points'
     template = 'postcode.html'
     max_distance = 10000
 
-    def __init__(self, config):
-        super().__init__(config)
+    def __init__(self, config, es):
+        super().__init__(config, es)
 
     def get_by_id(self, lat, lon):
         self.set_from_data({
@@ -39,7 +39,7 @@ class Point(Controller):
                 }
             ]
         }
-        result = self.config.get("es").search(index=self.config.get("es_index", "postcode"), doc_type='postcode', body=query, size=1)
+        result = self.es.search(index=self.config.get("es_index", "postcode"), doc_type='postcode', body=query, size=1)
         if result["hits"]["total"] > 0:
             postcode = result["hits"]["hits"][0]
             self.relationships["nearest_postcode"] = controllers.postcodes.Postcode(self.config).set_from_data(postcode)

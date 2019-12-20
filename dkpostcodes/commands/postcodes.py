@@ -61,9 +61,9 @@ def import_nspl(url=NSPL_URL, es_index=PC_INDEX):
                     "doc_as_upsert": True,
                 }
 
-                # null any blank fields
+                # null any blank fields (or ones with a dummy code in)
                 for k in i:
-                    if i[k] == "":
+                    if i[k] == "" or i[k] in ["E99999999", "S99999999", "W99999999", "N99999999"]:
                         i[k] = None
 
                 # date fields

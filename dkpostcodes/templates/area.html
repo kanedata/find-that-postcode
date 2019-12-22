@@ -5,7 +5,8 @@
 {% subtitle = '%s (%s)' % (subtitle, result["data"]["attributes"]["name_welsh"]) %}
 {% end %} #}
 {# {% rebase("base.html", title=title, subtitle=subtitle, heading=result["data"]["attributes"]["name"], includes=['leaflet']) %} #}
-{% set title = "{} - {}".format(result.data.attributes.name, result.data.id) %}
+{% set includes = ['leaflet'] %}
+{% set title = "{} - {}".format(result.attributes.name, result.id) %}
 {% extends "base.html" %}
 {% block content %}
 <div class="columns">
@@ -21,7 +22,7 @@
       <div class="card-content">
         <div class="content">
           <table class="table is-fullwidth">
-            {% for k, v in result.data.attributes.items() %}
+            {% for k, v in result.attributes.items() %}
             {% if k not in ["examples", "name", "type", "name_welsh", "type_name", "sort_order", "has_boundary"] %}
             <tr>
               <td>{{k}}</td>
@@ -43,7 +44,7 @@
     <h3 class="title">Example postcodes</h3>
     <div class="card">
       <div class="card-content">
-        {% for i in result.data.relationships.example_postcodes.data[0:5] %}
+        {% for i in result.example_postcodes[0:5] %}
         <p class="content"><a href='/postcodes/{{ i["id"] }}.html'>{{ i.id }}</a></p>
         {% endfor %}
       </div>
@@ -51,28 +52,27 @@
     <br>
   </div>
 </div>
-{# <script type="text/javascript">
-  var postcode_location = [{{ example_postcode["attributes"]["location"].get("lat") }},{{ example_postcode["attributes"]["location"].get("lon") }}];
+<script type="text/javascript">
+  var postcode_location = [{{ result.example_postcodes[0].attributes.location.get("lat") }},{{ result.example_postcodes[0].attributes.location.get("lon") }}];
   var mymap = L.map('postcode-map').setView(postcode_location, 9);
   var layer = new L.StamenTileLayer("toner").addTo(mymap);
   L.osGraticule({ showLabels: false, lineColor: 'grey'}).addTo(mymap);
   var markers = L.featureGroup();
-  {% for i in result["data"]["relationships"]["example_postcodes"]["data"]: %}
-  {% postcode = included[("postcodes", i["id"])] %}
+  {% for postcode in result.example_postcodes: %}
   var marker = L.circleMarker([
-    {{ postcode["attributes"]["location"].get("lat") }},
-    {{ postcode["attributes"]["location"].get("lon") }}
+    {{ postcode.attributes.location.get("lat") }},
+    {{ postcode.attributes.location.get("lon") }}
   ], { radius: 5, fillOpacity: 0.8 }).addTo(markers);
-  marker.bindPopup("<a href=\"/postcodes/{{ postcode["id"] }}.html\">{{ postcode["id"] }}</a>", {autoClose: false}).openPopup();
-  {% end %}
+  marker.bindPopup("<a href=\"/postcodes/{{ postcode.id }}.html\">{{ postcode.id }}</a>", {autoClose: false}).openPopup();
+  {% endfor %}
   markers.addTo(mymap);
   mymap.fitBounds(markers.getBounds());
-  fetch('/areas/{{result["data"]["id"]}}.geojson')
+  fetch('/areas/{{result.id}}.geojson')
     .then(function (response) {
       return response.json();
     }).then(function (geojson) {
       var boundary_json = L.geoJSON(geojson).addTo(mymap);
       mymap.fitBounds(boundary_json.getBounds());
     });
-</script> #}
+</script>
 {% endblock %}

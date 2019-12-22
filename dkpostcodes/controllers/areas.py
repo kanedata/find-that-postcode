@@ -56,7 +56,7 @@ class Area(Controller):
             del area["boundary"]
         return area
 
-    @classmethod
+    @staticmethod
     def get_example_postcodes(areacode, es, examples_count=5):
         query = {
             "query": {

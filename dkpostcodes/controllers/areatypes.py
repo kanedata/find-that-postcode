@@ -90,6 +90,7 @@ class Areatypes(Controller):
             doc_type=es_config.get("es_type", cls.es_type),
             body={"query": {"match_all": {}}},
             ignore=[404],
+            size=1000,
         )
         entities = [Areatype(e["_id"], e["_source"]) for e in entities["hits"]["hits"]]
 

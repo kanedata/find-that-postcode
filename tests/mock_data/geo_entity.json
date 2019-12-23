@@ -1,0 +1,86 @@
+[
+    {
+        "_index": "geo_entity",
+        "_type": "_doc",
+        "_id": "S18",
+        "_score": 1,
+        "_source": {
+            "code": "S18",
+            "name": "Registration Districts",
+            "abbreviation": "REGD",
+            "theme": "Pending",
+            "coverage": "Pending",
+            "related_codes": [
+                "Pending"
+            ],
+            "status": "Pending",
+            "live_instances": null,
+            "archived_instances": null,
+            "crossborder_instances": null,
+            "last_modified": null,
+            "current_code_first": "Pending",
+            "current_code_last": "Pending",
+            "reserved_code": "Pending",
+            "owner": "NRS",
+            "date_introduced": null,
+            "date_start": null,
+            "date_archived": null
+        }
+    },
+    {
+        "_index": "geo_entity",
+        "_type": "_doc",
+        "_id": "E05",
+        "_score": 1,
+        "_source": {
+            "code": "E05",
+            "name": "Electoral Wards/Divisions",
+            "abbreviation": "WD",
+            "theme": "Administrative/Electoral",
+            "coverage": "England",
+            "related_codes": [
+                "W05",
+                "S13",
+                "N08"
+            ],
+            "status": "Current",
+            "live_instances": 7219,
+            "archived_instances": 6227,
+            "crossborder_instances": 0,
+            "last_modified": "2019-05-02T00:00:00",
+            "current_code_first": "E05000026",
+            "current_code_last": "E05012989",
+            "reserved_code": "E05999999",
+            "owner": "MHCLG",
+            "date_introduced": "2009-01-01T00:00:00",
+            "date_start": "2009-01-01T00:00:00"
+        }
+    },
+    {
+        "_index": "geo_entity",
+        "_type": "_doc",
+        "_id": "E07",
+        "_score": 1,
+        "_source": {
+            "code": "E07",
+            "name": "Non-metropolitan Districts",
+            "abbreviation": "NMD",
+            "theme": "Administrative",
+            "coverage": "England",
+            "related_codes": [
+                ""
+            ],
+            "status": "Current",
+            "live_instances": 192,
+            "archived_instances": 55,
+            "crossborder_instances": 0,
+            "last_modified": "2019-04-01T00:00:00",
+            "current_code_first": "E07000004",
+            "current_code_last": "E07000246",
+            "reserved_code": "E07999999",
+            "owner": "MHCLG",
+            "date_introduced": "2009-01-01T00:00:00",
+            "date_start": "2009-01-01T00:00:00"
+        }
+    }
+]

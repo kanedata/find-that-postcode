@@ -51,10 +51,10 @@ class Postcode(Controller):
 
         # turn dates into dates
         for i in self.date_fields:
-            if postcode[i] and not isinstance(postcode[i], datetime):
+            if postcode.get(i) and not isinstance(postcode[i], datetime):
                 postcode[i] = datetime.strptime(postcode[i], "%Y-%m-%dT%H:%M:%S")
 
-        if OAC11_CODE.get(postcode["oac11"]):
+        if OAC11_CODE.get(postcode.get("oac11")):
             self.relationships["oac11"] = {
                 "code": postcode["oac11"],
                 "supergroup": OAC11_CODE.get(postcode["oac11"])[0],
@@ -62,7 +62,7 @@ class Postcode(Controller):
                 "subgroup": OAC11_CODE.get(postcode["oac11"])[2],
             }
 
-        if RU11IND_CODES.get(postcode["ru11ind"]):
+        if RU11IND_CODES.get(postcode.get("ru11ind")):
             self.relationships["ru11ind"] = {
                 "code": postcode["ru11ind"],
                 "description": RU11IND_CODES.get(postcode["ru11ind"]),

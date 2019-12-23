@@ -72,7 +72,7 @@ class Areatypes(Controller):
 
     url_slug = 'areatypes'
 
-    def __init__(self, id="__all", data=None, counts={}):
+    def __init__(self, id="__all", data=None):
         super().__init__(id, data)
         self.areatypes = {i[0]: i for i in AREA_TYPES}
 

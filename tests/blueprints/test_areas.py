@@ -1,4 +1,5 @@
 from tests.fixtures import client
+import html
 
 AREA_CODE = 'S02000783'
 AREA_NAME = "Lower Bow & Larkfield, Fancy Farm, Mallard Bowl"
@@ -10,29 +11,26 @@ def test_area_json(client):
     assert rv.mimetype == 'application/json'
 
     assert data.get("data", {}).get("attributes", {}).get("name") == AREA_NAME
-
     assert len(data.get("data", {}).get("relationships", {}).get("example_postcodes", {}).get("data")) == 5
-
-    for i in data.get("included", []):
-        if i.get("type") == "postcodes":
-            assert AREA_CODE in [a["id"] for a in i.get("relationships", {}).get("areas", {}).get("data", [])]
 
 
 def test_missing_area_json(client):
     rv = client.get('/areas/123445676.json')
-    assert rv.status == '404'
+    assert rv.status == '404 NOT FOUND'
 
 
 def test_area_html(client):
     rv = client.get('/areas/{}.html'.format(AREA_CODE))
     content = rv.data.decode("utf8")
-    assert AREA_NAME in content
+    assert rv.mimetype == 'text/html'
+    assert html.escape(AREA_NAME) in content
     assert AREA_CODE in content
 
 
 def test_area_missing_html(client):
     rv = client.get('/areas/123445676.html')
     content = rv.data.decode("utf8").lower()
+    assert rv.mimetype == 'text/html'
     assert "not found" in content
 
 
@@ -44,9 +42,9 @@ def test_area_geojson(client):
     assert data.get("type") == "FeatureCollection"
     assert len(data.get("features")) == 1
     assert data.get("features")[0].get("type") == "Feature"
-    assert len(data["features"][0]["geometry"]["coordinates"]) > 3
-    assert len(data["features"][0]["geometry"]["attributes"]) > 0
-    assert data["features"][0]["geometry"]["attributes"]["name"] == AREA_NAME
+    assert len(data["features"][0]["geometry"]["coordinates"][0]) > 3
+    assert len(data["features"][0]["properties"]) > 0
+    assert data["features"][0]["properties"]["name"] == AREA_NAME
 
 
 def test_area_search(client):

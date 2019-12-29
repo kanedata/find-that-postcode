@@ -23,7 +23,34 @@
             "sort_order": "S02000783",
             "predecessor": [],
             "successor": [],
-            "equivalents": {}
+            "equivalents": {},
+            "boundary": {
+                "type": "polygon",
+                "coordinates": [
+                    [
+                        [
+                            100.0,
+                            0.0
+                        ],
+                        [
+                            101.0,
+                            0.0
+                        ],
+                        [
+                            101.0,
+                            1.0
+                        ],
+                        [
+                            100.0,
+                            1.0
+                        ],
+                        [
+                            100.0,
+                            0.0
+                        ]
+                    ]
+                ]
+            }
         }
     },
     {

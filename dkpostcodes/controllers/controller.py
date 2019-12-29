@@ -133,13 +133,13 @@ class Controller:
                 "data": None
             }
             if isinstance(self.relationships[i], list):
-                json["relationships"][i]["data"] = [j.toJSON("identifer")[1] for j in self.relationships[i]]
+                json["relationships"][i]["data"] = [j.toJSON("identifer")[0] for j in self.relationships[i]]
                 if role != "embedded":
-                    included += [j.toJSON("embedded")[1] for j in self.relationships[i]]
-            else:
-                json["relationships"][i]["data"] = self.relationships[i].toJSON("identifer")[1]
+                    included += [j.toJSON("embedded")[0] for j in self.relationships[i]]
+            elif self.relationships[i]:
+                json["relationships"][i]["data"] = self.relationships[i].toJSON("identifer")[0]
                 if role != "embedded":
-                    included.append(self.relationships[i].toJSON("embedded")[1])
+                    included.append(self.relationships[i].toJSON("embedded")[0])
 
         return (json, included)
 

@@ -35,6 +35,9 @@ class Postcode(Controller):
             ignore=[404],
             _source_exclude=es_config.get("_source_exclude", []),
         )
+
+        if not data.get("found"):
+            return cls(id)
         
         pcareas = []
         postcode = data.get("_source")
@@ -52,21 +55,26 @@ class Postcode(Controller):
         # turn dates into dates
         for i in self.date_fields:
             if postcode.get(i) and not isinstance(postcode[i], datetime):
-                postcode[i] = datetime.strptime(postcode[i], "%Y-%m-%dT%H:%M:%S")
+                try:
+                    postcode[i] = datetime.strptime(postcode[i][0:10], "%Y-%m-%d")
+                except ValueError:
+                    continue
 
         if OAC11_CODE.get(postcode.get("oac11")):
-            self.relationships["oac11"] = {
+            self.attributes["oac11"] = {
                 "code": postcode["oac11"],
                 "supergroup": OAC11_CODE.get(postcode["oac11"])[0],
                 "group": OAC11_CODE.get(postcode["oac11"])[1],
                 "subgroup": OAC11_CODE.get(postcode["oac11"])[2],
             }
+            del postcode["oac11"]
 
         if RU11IND_CODES.get(postcode.get("ru11ind")):
-            self.relationships["ru11ind"] = {
+            self.attributes["ru11ind"] = {
                 "code": postcode["ru11ind"],
                 "description": RU11IND_CODES.get(postcode["ru11ind"]),
             }
+            del postcode["ru11ind"]
 
         return postcode
 
@@ -123,8 +131,8 @@ class Postcode(Controller):
     def toJSON(self, role="top"):
         json = super().toJSON(role)
         for i in self.date_fields:
-            if json[1].get("attributes", {}).get(i) and isinstance(json[1]["attributes"][i], datetime):
-                json[1]["attributes"][i] = json[1]["attributes"][i].strftime("%Y-%m-%d")
+            if json[0].get("attributes", {}).get(i) and isinstance(json[0]["attributes"][i], datetime):
+                json[0]["attributes"][i] = json[0]["attributes"][i].strftime("%Y-%m-%d")
 
         # ats = areatypes.Areatypes(self.config, self.es)
         # ats.get()

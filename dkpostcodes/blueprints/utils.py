@@ -11,10 +11,13 @@ def return_result(result, filetype="json", template=None):
     if status != 200:
         errors = result.get_errors()
         if filetype in ("json", "geojson"):
-            return abort(make_response(jsonify(message=result), status))
+            return abort(make_response(jsonify(message=result.topJSON()), status))
         elif filetype == "html":
             # @TODO: non-json response here
-            return abort(make_response(jsonify(message=result), status))
+            return abort(make_response(render_template(
+                'error.html',
+                result=result,
+            ), status))
 
     if filetype in ("json", "geojson"):
         return jsonify(result.topJSON())

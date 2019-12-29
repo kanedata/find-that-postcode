@@ -76,7 +76,7 @@
     <table class="table is-fullwidth">
       <tbody>
       {% for key_area in i[1] %}
-        {% for a in result.relationships.areas if a.entity.attributes.abbreviation.lower() == key_area %}
+        {% for a in result.relationships.areas if a.entity.attributes.abbreviation and a.entity.attributes.abbreviation.lower() == key_area %}
         <tr>
           <td><span title="{{ a.entity.id }}">{{ a.entity.attributes.name }}</span></td>
           <td>

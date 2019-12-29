@@ -88,7 +88,8 @@ class MockElasticsearch:
             })
 
         # match all queries
-        return self.search_result_wrapper(mock_data.get(kwargs["index"], []))
+        hits = mock_data.get(kwargs["index"], [])[:kwargs.get("size", 10)]
+        return self.search_result_wrapper(hits)
 
     def get(self, **kwargs):
         potentials = {i.get("_id", "__missing"): i for i in mock_data.get(kwargs["index"], [])}

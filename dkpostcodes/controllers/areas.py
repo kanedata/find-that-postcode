@@ -13,7 +13,7 @@ class Area(Controller):
 
     def __init__(self, id, data=None, entity=None, example_postcodes=None, boundary=None):
         super().__init__(id, data)
-        self.example_postcodes = example_postcodes
+        self.relationships["example_postcodes"] = example_postcodes
         self.entity = entity
         self.boundary = boundary
 
@@ -52,8 +52,8 @@ class Area(Controller):
     def process_attributes(self, area):
         # self.relationships["areatype"] = areatypes.Areatype(self.config, self.es).get_by_id(area.get("type"))
         # del area["type"]
-        if "boundary" in area:
-            del area["boundary"]
+        # if "boundary" in area:
+        #     del area["boundary"]
         return area
 
     @staticmethod
@@ -78,8 +78,8 @@ class Area(Controller):
         json = super().topJSON()
         if self.found:
             # @TODO need to check whether boundary data actually exists before applying this
-            if json[1]["data"]["attributes"].get("has_boundary"):
-                json[1]["links"]["geojson"] = self.url(filetype="geojson")
+            if json["data"]["attributes"].get("has_boundary"):
+                json["links"]["geojson"] = self.url(filetype="geojson")
         return json
 
     def geoJSON(self):

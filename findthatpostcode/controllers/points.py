@@ -44,7 +44,6 @@ class Point(Controller):
 
         data = es.search(
             index=es_config.get("es_index", cls.es_index),
-            doc_type=es_config.get("es_type", cls.es_type),
             body=query,
             ignore=[404],
             size=1,
@@ -86,7 +85,7 @@ class Point(Controller):
                 }
             ]
         }
-        result = self.es.search(index=self.config.get("es_index", "postcode"), doc_type='postcode', body=query, size=1)
+        result = self.es.search(index=self.config.get("es_index", "postcode"), body=query, size=1)
         if result["hits"]["total"] > 0:
             postcode = result["hits"]["hits"][0]
             self.relationships["nearest_postcode"] = controllers.postcodes.Postcode(self.config).set_from_data(postcode)

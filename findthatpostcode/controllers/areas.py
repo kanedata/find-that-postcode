@@ -137,7 +137,6 @@ def search_areas(q, es, page=1, size=100, es_config=None):
     pagination = Pagination(page, size)
     result = es.search(
         index=es_config.get("es_index", Area.es_index),
-        doc_type=es_config.get("es_type", Area.es_type),
         body=query, 
         from_=pagination.from_,
         size=pagination.size,

@@ -6,7 +6,7 @@ from . import db
 from . import commands
 from . import blueprints
 from .metadata import KEY_AREA_TYPES, OTHER_CODES, AREA_TYPES
-from .controllers.areatypes import Areatypes
+from .controllers.areatypes import area_types_count
 
 def create_app(test_config=None):
     # create and configure the app
@@ -47,7 +47,7 @@ def create_app(test_config=None):
     @app.route('/')
     @app.route('/index.html')
     def index():
-        ats = Areatypes.get_from_es(db.get_db())
+        ats = area_types_count(db.get_db())
         return render_template('index.html', result=ats)
     
     blueprints.init_app(app)

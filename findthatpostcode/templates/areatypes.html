@@ -5,24 +5,12 @@
     <nav class="panel">
       <p class="panel-heading">{{ i[0] }} areas</p>
       {% for j in area_types if j[0] in i[1] %}
-        {% for k in result.attributes if k.id in j[1] %}
-          <span class="panel-block">
-          {{ j[2] }} ({{k.id}} - {{k.doc_count}})
-          </span>
-        {% endfor %}
-      {% endfor %}
-      {% for area in i[1] %}
-        {% for entity in area[1] %}
-          {% for area_type in result["data"] %}
-            {% if area_type["id"] == entity %}
-            <a href='{{ area_type["links"]["html"] }}' class="panel-block">{{ area_type["attributes"]["name"] }} &nbsp;<br>
-              {% if area_type["attributes"].get("count_areas") %}
-              <small> [{{ "{:,.0f}".format(area_type["attributes"]["count_areas"]) }}]</small>
-              {% endif %}
-            </a>
+          <a href='{{ j[0] }}' class="panel-block">
+            {{ j[2] }}&nbsp;<br>
+            {% if result.get(j[0]) %}
+            <small> [{{ "{:,.0f}".format(result.get(j[0])) }}]</small>
             {% endif %}
-          {% endfor %}
-        {% endfor %}
+          </a>
       {% endfor %}
     </nav>
   </div>

@@ -50,7 +50,8 @@
                         ]
                     ]
                 ]
-            }
+            },
+            "type": null
         }
     },
     {
@@ -78,6 +79,7 @@
             "predecessor": [],
             "successor": [],
             "equivalents": {},
+            "type": "lsoa11",
             "stats": {
                 "imd2015": {
                     "imd_education_adults_score": 0.385,
@@ -230,7 +232,8 @@
             "successor": [],
             "equivalents": {
                 "ons": "00CNFN0006"
-            }
+            },
+            "type": "oa11"
         }
     },
     {
@@ -261,7 +264,8 @@
             "successor": [],
             "equivalents": {
                 "ons": "00HBPZ0025"
-            }
+            },
+            "type": "oa11"
         }
     },
     {
@@ -292,7 +296,8 @@
             "successor": [],
             "equivalents": {
                 "ons": "00AZGM0028"
-            }
+            },
+            "type": "oa11"
         }
     },
     {
@@ -324,7 +329,8 @@
             "equivalents": {
                 "ons": "60QA000469",
                 "scottish_government": "60QA000469"
-            }
+            },
+            "type": "oa11"
         }
     },
     {
@@ -351,7 +357,8 @@
             "sort_order": "E33025320",
             "predecessor": [],
             "successor": [],
-            "equivalents": {}
+            "equivalents": {},
+            "type": "wz11"
         }
     },
     {
@@ -378,7 +385,8 @@
             "sort_order": "E36005088",
             "predecessor": [],
             "successor": [],
-            "equivalents": {}
+            "equivalents": {},
+            "type": null
         }
     }
 ]

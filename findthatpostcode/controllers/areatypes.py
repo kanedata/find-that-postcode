@@ -35,7 +35,6 @@ class Areatype(Controller):
             }
             result = self.es.search(
                 index=self.config.get("es_index"), 
-                doc_type=self.es_type, 
                 body=query, 
                 from_=self.pagination.from_, 
                 size=self.pagination.size, 
@@ -67,6 +66,33 @@ class Areatype(Controller):
             self.attributes["full_name"] = typedata[2]
             self.attributes["description"] = typedata[3]
 
+def area_types_count(es, es_config=None):
+    if not es_config:
+        es_config = {}
+
+    # fetch counts per entity
+    query = {
+        "size": 0,
+        "aggs": {
+            "group_by_type": {
+                "terms": {
+                    "field": "type.keyword",
+                    "size": 100
+                }
+            }
+        }
+    }
+    result = es.search(
+        index=es_config.get("es_index", areas.Area.es_index),
+        body=query,
+        ignore=[404],
+        _source_includes=[],
+    )
+    return {
+        i["key"]: i["doc_count"]
+        for i in result["aggregations"]["group_by_type"]["buckets"]
+    }
+
 
 class Areatypes(Controller):
 
@@ -84,23 +110,13 @@ class Areatypes(Controller):
         if not es_config:
             es_config = {}
 
-        # fetch all the entities
-        entities = es.search(
-            index=es_config.get("es_index", Areatype.es_index),
-            doc_type=es_config.get("es_type", cls.es_type),
-            body={"query": {"match_all": {}}},
-            ignore=[404],
-            size=1000,
-        )
-        entities = [Areatype(e["_id"], e["_source"]) for e in entities["hits"]["hits"]]
-
         # fetch counts per entity
         query = {
             "size": 0,
             "aggs": {
                 "group_by_type": {
                     "terms": {
-                        "field": "entity.keyword",
+                        "field": "type.keyword",
                         "size": 100
                     }
                 }
@@ -108,7 +124,6 @@ class Areatypes(Controller):
         }
         result = es.search(
             index=es_config.get("es_index", areas.Area.es_index),
-            doc_type=es_config.get("es_type", cls.es_type),
             body=query,
             ignore=[404],
             _source_excludes=["boundary"],

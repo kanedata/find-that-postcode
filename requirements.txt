@@ -22,6 +22,7 @@ python-dotenv==0.10.3
 requests==2.22.0
 requests-cache==0.5.2
 requests-mock==1.7.0
+Shapely==1.6.4.post2
 six==1.13.0
 tqdm==4.40.2
 urllib3==1.25.7

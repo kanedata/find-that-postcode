@@ -1,4 +1,6 @@
 from elasticsearch.helpers import scan
+import shapely.wkt
+import shapely.geometry
 
 from .controller import Controller, Pagination, GEOJSON_TYPES
 from . import postcodes
@@ -71,7 +73,7 @@ class Area(Controller):
 
             }
         }
-        example = es.search(index='geo_postcode', doc_type='_doc', body=query, size=examples_count)
+        example = es.search(index='geo_postcode', body=query, size=examples_count)
         return [postcodes.Postcode(e["_id"], e["_source"]) for e in example["hits"]["hits"]]
 
     def topJSON(self):
@@ -85,13 +87,20 @@ class Area(Controller):
     def geoJSON(self):
         if not self.boundary:
             return (404, "boundary not found")
+
+        if not isinstance(self.boundary, dict):
+            # assume boundary is a WKT string if not a dictionary
+            s = shapely.wkt.loads(self.boundary)
+            self.boundary = shapely.geometry.mapping(s)
+
+
         return (200, {
             "type": "FeatureCollection",
             "features": [
                 {
                     "type": "Feature",
                     "geometry": {
-                        "type": GEOJSON_TYPES[self.boundary["type"]],
+                        "type": GEOJSON_TYPES.get(self.boundary["type"], self.boundary["type"]),
                         "coordinates": self.boundary["coordinates"]
                     },
                     "properties": self.attributes

@@ -12,8 +12,55 @@ class Point(Controller):
     template = 'postcode.html'
     max_distance = 10000
 
-    def __init__(self, config, es):
-        super().__init__(config, es)
+    def __init__(self, id, data=None, nearest_postcode=None):
+        super().__init__(id, data)
+        if nearest_postcode:
+            self.relationships["nearest_postcode"] = nearest_postcode
+
+    def __repr__(self):
+        return '<Point {}, {}>'.format(self.id[0], self.id[1])
+        
+    @classmethod
+    def get_from_es(cls, id, es, es_config=None):
+        if not es_config:
+            es_config = {}
+
+        query = {
+            "query": {
+                "match_all": {}
+            },
+            "sort": [
+                {
+                    "_geo_distance": {
+                        "location": {
+                            "lat": id[0],
+                            "lon": id[1]
+                        },
+                        "unit": "m"
+                    }
+                }
+            ]
+        }
+
+        data = es.search(
+            index=es_config.get("es_index", cls.es_index),
+            doc_type=es_config.get("es_type", cls.es_type),
+            body=query,
+            ignore=[404],
+            size=1,
+            _source_exclude=es_config.get("_source_exclude", []),
+        )
+
+        if data["hits"]["total"] == 0:
+            return cls(id)
+
+        postcode = data["hits"]["hits"][0]
+        print(postcode)
+        return cls(
+            id,
+            data={"distance_from_postcode": postcode["sort"][0]},
+            nearest_postcode=postcodes.Postcode.get_from_es(postcode["_id"], es)
+        )
 
     def get_by_id(self, lat, lon):
         self.set_from_data({

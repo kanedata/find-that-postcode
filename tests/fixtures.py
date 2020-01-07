@@ -41,7 +41,7 @@ class MockElasticsearch:
         pass
 
     @staticmethod
-    def search_result_wrapper(hits=[], aggregates=None):
+    def search_result_wrapper(hits=[], aggregates=None, scroll=None):
         max_score = max([h.get("_score", 0) for h in hits]) if hits else 0
         result = {
             "took": 1,
@@ -60,6 +60,9 @@ class MockElasticsearch:
         }
         if aggregates:
             result["aggregations"] = aggregates
+        if scroll:
+            result["_scroll_id"] = 1
+
         return result
 
     def search(self, **kwargs):
@@ -89,7 +92,13 @@ class MockElasticsearch:
 
         # match all queries
         hits = mock_data.get(kwargs["index"], [])[:kwargs.get("size", 10)]
-        return self.search_result_wrapper(hits)
+
+        # if there's a sort parameter then include a sort array
+        if kwargs.get("body", {}).get("sort", []):
+            for h in hits:
+                h["sort"] = [1]
+
+        return self.search_result_wrapper(hits, scroll=kwargs.get("scroll"))
 
     def get(self, **kwargs):
         potentials = {i.get("_id", "__missing"): i for i in mock_data.get(kwargs["index"], [])}
@@ -108,3 +117,11 @@ class MockElasticsearch:
             "_id": kwargs["id"],
             "found": False
         }
+
+    def scroll(self, scroll_id, **kwargs):
+        result = self.search_result_wrapper()
+        result["_scroll_id"] = None
+        return result
+
+    def clear_scroll(self, **kwargs):
+        pass

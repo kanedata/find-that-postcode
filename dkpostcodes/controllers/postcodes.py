@@ -17,7 +17,7 @@ class Postcode(Controller):
 
     def __init__(self, id, data=None, pcareas=None):
         super().__init__(id, data)
-        if areas:
+        if pcareas:
             self.relationships["areas"] = pcareas
 
     def __repr__(self):

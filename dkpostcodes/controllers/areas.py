@@ -100,89 +100,80 @@ class Area(Controller):
         })
 
 
-class Areas(Controller):
-
-    es_index = 'geo_area'
-    url_slug = 'areas'
-
-    def __init__(self, config, es):
-        super().__init__(config, es)
-        self.data = []
-        self.meta = {}
-
-    def search(self, q):
-        self.pagination = Pagination()
-        if q:
-            self.meta["q"] = q
-            query = {
+def search_areas(q, es, page=1, size=100, es_config=None):
+    """
+    Search for areas based on a name
+    """
+    if not es_config:
+        es_config = {}
+    query = {
+        "query": {
+            "function_score": {
                 "query": {
-                    "function_score": {
-                        "query": {
-                            "query_string": {
-                                "query": q
-                            }
-                        },
-                        "boost": "5",
-                        "functions": [
-                            {"weight": 3, "filter": {"terms": {"type": ["ctry", "region", "cty", "laua", "rgn"]}}},
-                            {"weight": 2, "filter": {"terms": {"type": ["ttwa", "pfa", "lep", "park", "pcon"]}}},
-                            {"weight": 1.5, "filter": {"terms": {"type": ["ccg", "hlthau", "hro", "pct"]}}},
-                            {"weight": 1, "filter": {"terms": {"type": ["eer", "bua11", "buasd11", "teclec"]}}},
-                            {"weight": 0.4, "filter": {"terms": {"type": ["msoa11", "lsoa11", "wz11", "oa11", "nuts", "ward"]}}}
-                        ]
+                    "query_string": {
+                        "query": q
                     }
+                },
+                "boost": "5",
+                "functions": [
+                    {"weight": 3, "filter": {"terms": {"type": ["ctry", "region", "cty", "laua", "rgn"]}}},
+                    {"weight": 2, "filter": {"terms": {"type": ["ttwa", "pfa", "lep", "park", "pcon"]}}},
+                    {"weight": 1.5, "filter": {"terms": {"type": ["ccg", "hlthau", "hro", "pct"]}}},
+                    {"weight": 1, "filter": {"terms": {"type": ["eer", "bua11", "buasd11", "teclec"]}}},
+                    {"weight": 0.4, "filter": {"terms": {"type": ["msoa11", "lsoa11", "wz11", "oa11", "nuts", "ward"]}}}
+                ]
+            }
+        }
+    }
+    pagination = Pagination(page, size)
+    result = es.search(
+        index=es_config.get("es_index", Area.es_index),
+        doc_type=es_config.get("es_type", Area.es_type),
+        body=query, 
+        from_=pagination.from_,
+        size=pagination.size,
+        _source_exclude=["boundary"], 
+        ignore=[404]
+    )
+    return {
+        "result": [Area(a["_id"], a["_source"]) for a in result.get("hits", {}).get("hits", [])],
+        "scores": [a["_score"] for a in result.get("hits", {}).get("hits", [])],
+        "result_count": result.get("hits", {}).get("total", 0),
+    }
+
+
+def get_all_areas(es, areatypes=None, page=1, size=100, es_config=None):
+    """
+    Search for areas based on a name
+    """
+    if not es_config:
+        es_config = {}
+    query = {
+        "query": {
+            "match_all": {}
+        }
+    }
+    if areatypes:
+        query = {
+            "query": {
+                "terms": {
+                    "type": areatypes
                 }
             }
-            result = self.es.search(
-                index=self.config.get("es_index", "postcode"), 
-                doc_type=self.es_type, 
-                body=query, 
-                from_=self.pagination.from_, 
-                size=self.pagination.size, 
-                _source_exclude=["boundary"], 
-                ignore=[400]
-            )
-            self.data = [Area(self.config).set_from_data(a) for a in result.get("hits", {}).get("hits", [])]
-            self.meta["result_count"] = result.get("hits", {}).get("total", 0)
+        }
+    result = scan(
+        es,
+        query=query,
+        index=es_config.get("es_index", Area.es_index),
+        doc_type=es_config.get("es_type", Area.es_type),
+        _source_include=["type", "name"], 
+        size=10000,
+        ignore=[400]
+    )
 
-    def get_all(self, area_types=None):
-        q = None
-        if area_types:
-            q = {
-                "query": {
-                    "terms": {
-                        "type": area_types
-                    }
-                }
-            }
-        result = scan(
-            self.es,
-            query=q,
-            index=self.config.get("es_index", "postcode"), 
-            doc_type=self.es_type, 
-            _source_include=["type", "name"], 
-            size=10000,
-            ignore=[400]
-        )
-        for r in result:
-            yield {
-                "code": r["_id"], 
-                "name": r["_source"]["name"],
-                "type": r["_source"]["type"]
-            }
-
-
-    def topJSON(self):
-        # get all areatypes first
-        ats = controllers.areatypes.Areatypes(self.config)
-        ats.get()
-        included = []
-        for a in ats.attributes:
-            included.append(a.toJSON()[1])
-
-        return (200, {
-            "data": [a.toJSON()[1] for a in self.data],
-            "meta": self.pagination.get_meta(self.meta),
-            "links": self.pagination.get_links({}),
-            "included": included
-        })
+    for r in result:
+        yield {
+            "code": r["_id"], 
+            "name": r["_source"]["name"],
+            "type": r["_source"]["type"]
+        }

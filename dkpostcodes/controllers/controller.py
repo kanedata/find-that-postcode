@@ -177,9 +177,9 @@ class Pagination():
 
     default_size = 100
 
-    def __init__(self):
-        self.page = 1 # int(bottle.request.query.page or 1)
-        self.size = self.default_size #int(bottle.request.query.size or self.default_size)
+    def __init__(self, page=None, size=None):
+        self.page = page if isinstance(page, int) else 1
+        self.size = size if isinstance(size, int) else self.default_size
         self.from_ = self.get_from()
         self.pagination = {
             "next": None,

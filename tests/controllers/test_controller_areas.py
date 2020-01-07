@@ -1,7 +1,9 @@
+import types
+
 import pytest
 from tests.fixtures import MockElasticsearch
 
-from dkpostcodes.controllers.areas import Area, Areas
+from dkpostcodes.controllers.areas import Area, search_areas, get_all_areas
 from dkpostcodes.controllers.postcodes import Postcode
 
 def test_area_class():
@@ -19,22 +21,28 @@ def test_area_class_es():
     assert a.attributes["name"] == "Lower Bow & Larkfield, Fancy Farm, Mallard Bowl"
     assert str(a) == '<Area S02000783>'
 
-    assert len(a.example_postcodes) > 0
-    assert isinstance(a.example_postcodes[0], Postcode)
+    a = Area.get_from_es('E01020135', es) # get an area with example postcodes
 
-def test_areas_class():
+    assert len(a.relationships["example_postcodes"]) > 0
+    assert isinstance(a.relationships["example_postcodes"][0], Postcode)
 
-    a = Areas()
-    assert a.id == "__all"
-    assert len(a.attributes) == 0
-
-def test_areas_class_es():
+def test_search_areas():
 
     es = MockElasticsearch()
-    a = Areas.get_from_es(es)
+    a = search_areas(es, "test")
 
-    assert a.id == "__all"
-    assert len(a.attributes) > 0
-    assert len(a.areatypes) > 0
+    assert "result" in a
+    assert "result_count" in a
+    assert a["result_count"] > 0
+    assert isinstance(a["result"][0], Area)
+
+def test_get_all_areas():
+
+    es = MockElasticsearch()
+    a = get_all_areas(es)
+
+    assert isinstance(a, types.GeneratorType)
+    result = [area for area in a]
+    assert len(result)
 
     # @TODO: test this fetches the list of areas - with pagination

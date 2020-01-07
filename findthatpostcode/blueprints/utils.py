@@ -2,7 +2,7 @@ from functools import wraps
 
 from flask import abort, make_response, jsonify, render_template, request, current_app
 
-from dkpostcodes.metadata import KEY_AREA_TYPES, OTHER_CODES
+from findthatpostcode.metadata import KEY_AREA_TYPES, OTHER_CODES
 
 def return_result(result, filetype="json", template=None):
     if filetype == "html" and not template:

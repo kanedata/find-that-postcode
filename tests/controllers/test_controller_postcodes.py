@@ -1,7 +1,7 @@
 import pytest
 from tests.fixtures import MockElasticsearch
 
-from dkpostcodes.controllers.postcodes import Postcode
+from findthatpostcode.controllers.postcodes import Postcode
 
 def test_postcode_class():
     a = Postcode('testentity', {"code": "testentity", "name": "Test Entity"})

@@ -5,7 +5,7 @@ from contextlib import contextmanager
 import pytest
 from flask import appcontext_pushed, g
 
-import dkpostcodes
+import findthatpostcode
 
 mock_data = {}
 mock_data_dir = os.path.join(os.path.dirname(__file__), 'mock_data')
@@ -24,7 +24,7 @@ def db_set(app, db):
 
 @pytest.fixture
 def client():
-    app = dkpostcodes.create_app()
+    app = findthatpostcode.create_app()
     app.config['TESTING'] = True
     db = MockElasticsearch()
 

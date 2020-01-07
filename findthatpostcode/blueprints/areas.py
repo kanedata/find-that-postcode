@@ -1,8 +1,8 @@
 from flask import Blueprint, current_app, abort, jsonify, make_response
 
 from .utils import return_result
-from dkpostcodes.controllers.areas import Area
-from dkpostcodes.db import get_db
+from findthatpostcode.controllers.areas import Area
+from findthatpostcode.db import get_db
 
 bp = Blueprint('areas', __name__, url_prefix='/areas')
 

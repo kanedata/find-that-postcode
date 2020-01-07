@@ -3,8 +3,8 @@ import re
 from flask import Blueprint, current_app
 
 from .utils import return_result
-from dkpostcodes.controllers.postcodes import Postcode
-from dkpostcodes.db import get_db
+from findthatpostcode.controllers.postcodes import Postcode
+from findthatpostcode.db import get_db
 
 bp = Blueprint('postcodes', __name__, url_prefix='/postcodes')
 

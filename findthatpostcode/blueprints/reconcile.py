@@ -2,9 +2,9 @@ import json
 
 from flask import Blueprint, current_app, request, jsonify, url_for
 
-from dkpostcodes.controllers.postcodes import Postcode
-from dkpostcodes.controllers.areas import search_areas
-from dkpostcodes.db import get_db
+from findthatpostcode.controllers.postcodes import Postcode
+from findthatpostcode.controllers.areas import search_areas
+from findthatpostcode.db import get_db
 from .utils import jsonp, cors
 
 bp = Blueprint('reconcile', __name__, url_prefix='/reconcile')

@@ -3,8 +3,8 @@ import types
 import pytest
 from tests.fixtures import MockElasticsearch
 
-from dkpostcodes.controllers.areas import Area, search_areas, get_all_areas
-from dkpostcodes.controllers.postcodes import Postcode
+from findthatpostcode.controllers.areas import Area, search_areas, get_all_areas
+from findthatpostcode.controllers.postcodes import Postcode
 
 def test_area_class():
     a = Area('testentity', {"code": "testentity", "name": "Test Entity"})
@@ -29,7 +29,7 @@ def test_area_class_es():
 def test_search_areas():
 
     es = MockElasticsearch()
-    a = search_areas(es, "test")
+    a = search_areas("test", es)
 
     assert "result" in a
     assert "result_count" in a

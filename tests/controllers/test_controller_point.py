@@ -1,7 +1,7 @@
 import pytest
 from tests.fixtures import MockElasticsearch
 
-from dkpostcodes.controllers.points import Point
+from findthatpostcode.controllers.points import Point
 
 def test_point_class():
     a = Point((100, -100), {"code": "testentity", "name": "Test Entity"})

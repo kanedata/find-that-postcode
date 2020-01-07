@@ -1,4 +1,4 @@
-Elasticsearch Postcodes
+Find that Postcode
 =======================
 
 This project creates an elasticsearch index based on the UK postcode file, and

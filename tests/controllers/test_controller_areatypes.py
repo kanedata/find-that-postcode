@@ -1,8 +1,8 @@
 import pytest
 from tests.fixtures import MockElasticsearch
 
-from dkpostcodes.controllers.areatypes import Areatype, Areatypes
-from dkpostcodes.controllers.areas import Area
+from findthatpostcode.controllers.areatypes import Areatype, Areatypes
+from findthatpostcode.controllers.areas import Area
 
 def test_areatype_class():
     a = Areatype('testentity', {"code": "testentity", "name": "Test Entity"})

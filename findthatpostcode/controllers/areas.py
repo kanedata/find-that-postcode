@@ -33,7 +33,7 @@ class Area(Controller):
             doc_type=es_config.get("es_type", cls.es_type),
             id=cls.parse_id(id),
             ignore=[404],
-            _source_exclude=[] if boundary else ["boundary"],
+            _source_excludes=[] if boundary else ["boundary"],
         )
         entity = {}
         if data["found"] and data["_source"].get("entity"):
@@ -141,7 +141,7 @@ def search_areas(q, es, page=1, size=100, es_config=None):
         body=query, 
         from_=pagination.from_,
         size=pagination.size,
-        _source_exclude=["boundary"], 
+        _source_excludes=["boundary"], 
         ignore=[404]
     )
     return {

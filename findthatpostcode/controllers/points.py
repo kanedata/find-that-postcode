@@ -48,7 +48,7 @@ class Point(Controller):
             body=query,
             ignore=[404],
             size=1,
-            _source_exclude=es_config.get("_source_exclude", []),
+            _source_excludes=es_config.get("_source_exclude", []),
         )
 
         if data["hits"]["total"] == 0:

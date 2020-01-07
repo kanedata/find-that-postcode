@@ -39,7 +39,7 @@ class Areatype(Controller):
                 body=query, 
                 from_=self.pagination.from_, 
                 size=self.pagination.size, 
-                _source_exclude=["boundary"],
+                _source_excludes=["boundary"],
                 sort=sorting
             )
             if result["hits"]["total"] > 0:
@@ -111,7 +111,7 @@ class Areatypes(Controller):
             doc_type=es_config.get("es_type", cls.es_type),
             body=query,
             ignore=[404],
-            _source_exclude=["boundary"],
+            _source_excludes=["boundary"],
         )
         doc_counts = {i["key"]: i["doc_count"] for i in result["aggregations"]["group_by_type"]["buckets"]}
         for e in entities:

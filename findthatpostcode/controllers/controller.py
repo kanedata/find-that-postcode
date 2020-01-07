@@ -43,7 +43,7 @@ class Controller:
             doc_type=es_config.get("es_type", cls.es_type),
             id=cls.parse_id(id),
             ignore=[404],
-            _source_exclude=es_config.get("_source_exclude", []),
+            _source_excludes=es_config.get("_source_exclude", []),
         )
         return cls(data.get("_id"), data.get("_source"))
 

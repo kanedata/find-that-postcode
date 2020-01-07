@@ -37,7 +37,13 @@ def process_csv(csvfile, outfile, config,
                         if code in code_cache:
                             row[i] = code_cache[code]
                         elif code:
-                            area = config.get("es").get(index=config.get("es_index"), doc_type="code", id=code, ignore=[404], _source_exclude=["boundary"])
+                            area = config.get("es").get(
+                                index=config.get("es_index"),
+                                doc_type="code",
+                                id=code,
+                                ignore=[404],
+                                _source_excludes=["boundary"]
+                            )
                             if area["found"]:
                                 row[i] = area["_source"].get("name")
                             else:

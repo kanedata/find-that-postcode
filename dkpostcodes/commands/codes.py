@@ -17,6 +17,7 @@ from elasticsearch.helpers import bulk
 import tqdm
 
 from .. import db
+from ..metadata import AREA_TYPES
 
 requests_cache.install_cache()
 
@@ -107,6 +108,12 @@ def import_rgc(url=RGC_URL, es_index=ENTITY_INDEX):
 @with_appcontext
 def import_chd(url=CHD_URL, es_index=AREA_INDEX):
 
+    areatypes = {
+        entity_code: a[0]
+        for a in AREA_TYPES
+        for entity_code in a[1]
+    }
+
     es = db.get_db()
 
     r = requests.get(url, stream=True)
@@ -144,7 +151,7 @@ def import_chd(url=CHD_URL, es_index=AREA_INDEX):
                     "predecessor": [],
                     "successor": [],
                     "equivalents": {},
-                    # "type": area[""],
+                    "type": areatypes.get(area["ENTITYCD"]),
                 }
             }
 

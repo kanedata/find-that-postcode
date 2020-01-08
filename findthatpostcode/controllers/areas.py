@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from elasticsearch.helpers import scan
 import shapely.wkt
 import shapely.geometry
@@ -12,18 +14,26 @@ class Area(Controller):
     es_index = 'geo_area'
     url_slug = 'areas'
     template = 'area.html'
+    date_fields = ['date_end', 'date_start']
 
-    def __init__(self, id, data=None, entity=None, example_postcodes=None, boundary=None):
-        super().__init__(id, data)
-        self.relationships["example_postcodes"] = example_postcodes
-        self.entity = entity
-        self.boundary = boundary
+    def __init__(self, id, data=None, **kwargs):
+        super().__init__(id)
+        self.relationships["example_postcodes"] = kwargs.get("example_postcodes")
+        self.relationships["areatype"] = kwargs.get("areatype")
+        self.relationships["parent"] = kwargs.get("parent")
+        self.relationships["predecessor"] = kwargs.get("predecessor")
+        self.relationships["successor"] = kwargs.get("successor")
+        self.relationships["children"] = kwargs.get("children")
+        self.boundary = kwargs.get("boundary")
+        if data:
+            self.found = True
+            self.attributes = self.process_attributes(data)
 
     def __repr__(self):
         return '<Area {}>'.format(self.id)
 
     @classmethod
-    def get_from_es(cls, id, es, es_config=None, examples_count=5, boundary=False):
+    def get_from_es(cls, id, es, es_config=None, examples_count=5, boundary=False, recursive=True):
         if not es_config:
             es_config = {}
 
@@ -35,28 +45,60 @@ class Area(Controller):
             ignore=[404],
             _source_excludes=[] if boundary else ["boundary"],
         )
-        entity = {}
-        if data["found"] and data["_source"].get("entity"):
-            entity = es.get(index="geo_entity", doc_type="_doc", id=data["_source"].get("entity"))
+        relationships = {
+            "areatype": {},
+            "example_postcodes": [],
+            "boundary": data.get("_source", {}).get("boundary"),
+        }
+        if data["found"]: 
+            if data["_source"].get("type"):
+                relationships["areatype"] = areatypes.Areatype(data["_source"].get("type"))
+            elif data["_source"].get("entity"):
+                relationships["areatype"] = areatypes.Areatype.get_from_es(data["_source"].get("entity"), es)
 
-        postcodes = []
         if examples_count:
-            postcodes = cls.get_example_postcodes(id, es, examples_count=examples_count)
+            relationships["example_postcodes"] = cls.get_example_postcodes(id, es, examples_count=examples_count)
+        
+        if data.get("_source", {}) and recursive:
+            data["_source"]["child_count"], relationships["children"] = cls.get_children(id, es)
+
+        if data.get("_source", {}).get("parent") and recursive:
+            relationships["parent"] = cls.get_from_es(data["_source"]["parent"], es, examples_count=0, recursive=False)
+
+        if data.get("_source", {}).get("predecessor") and recursive:
+            relationships["predecessor"] = [
+                cls.get_from_es(i, es, examples_count=0, recursive=False)
+                for i in data["_source"]["predecessor"]
+            ]
+
+        if data.get("_source", {}).get("successor") and recursive:
+            relationships["successor"] = [
+                cls.get_from_es(i, es, examples_count=0, recursive=False)
+                for i in data["_source"]["successor"] if i
+            ]
         
         return cls(
             data.get("_id"),
-            data.get("_source"),
-            areatypes.Areatype(entity.get("_id"), entity.get("_source")),
-            postcodes,
-            data.get("_source", {}).get("boundary")
+            data=data.get("_source"),
+            **relationships
         )
 
-    def process_attributes(self, area):
-        # self.relationships["areatype"] = areatypes.Areatype(self.config, self.es).get_by_id(area.get("type"))
-        # del area["type"]
-        # if "boundary" in area:
-        #     del area["boundary"]
-        return area
+    def process_attributes(self, data):
+        if not self.relationships.get("areatype") and data.get("type"):
+            self.relationships["areatype"] = areatypes.Areatype(data.get("type"))
+        if "type" in data:
+            del data["type"]
+        if "boundary" in data:
+            del data["boundary"]
+
+        # turn dates into dates
+        for i in self.date_fields:
+            if data.get(i) and not isinstance(data[i], datetime):
+                try:
+                    data[i] = datetime.strptime(data[i][0:10], "%Y-%m-%d")
+                except ValueError:
+                    continue
+        return data
 
     @staticmethod
     def get_example_postcodes(areacode, es, examples_count=5):
@@ -70,11 +112,32 @@ class Area(Controller):
                     },
                     "random_score": {}
                 }
-
             }
         }
         example = es.search(index='geo_postcode', body=query, size=examples_count)
         return [postcodes.Postcode(e["_id"], e["_source"]) for e in example["hits"]["hits"]]
+
+    @staticmethod
+    def get_children(areacode, es):
+        query = {
+            "query": {
+                "function_score": {
+                    "query": {
+                        "match": {
+                            "parent": {
+                                "query": areacode
+                            }
+                        },
+                    },
+                    "random_score": {}
+                }
+            }
+        }
+        children = es.search(index='geo_area', body=query, size=10)
+        return (
+            children["hits"]["total"]["value"],
+            [Area(e["_id"], e["_source"]) for e in children["hits"]["hits"]]
+        )
 
     def topJSON(self):
         json = super().topJSON()
@@ -125,6 +188,8 @@ def search_areas(q, es, page=1, size=100, es_config=None):
                 },
                 "boost": "5",
                 "functions": [
+                    {"weight": 0.1, "filter": {"term": {"active": False}}},
+                    {"weight": 6, "filter": {"exists": {"field": "type"}}},
                     {"weight": 3, "filter": {"terms": {"type": ["ctry", "region", "cty", "laua", "rgn"]}}},
                     {"weight": 2, "filter": {"terms": {"type": ["ttwa", "pfa", "lep", "park", "pcon"]}}},
                     {"weight": 1.5, "filter": {"terms": {"type": ["ccg", "hlthau", "hro", "pct"]}}},
@@ -144,7 +209,7 @@ def search_areas(q, es, page=1, size=100, es_config=None):
         ignore=[404]
     )
     return {
-        "result": [Area(a["_id"], a["_source"]) for a in result.get("hits", {}).get("hits", [])],
+        "result": [Area.get_from_es(a["_id"], es, recursive=False) for a in result.get("hits", {}).get("hits", [])],
         "scores": [a["_score"] for a in result.get("hits", {}).get("hits", [])],
         "result_count": result.get("hits", {}).get("total", 0),
     }

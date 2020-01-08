@@ -1,8 +1,10 @@
-% rebase("base.html", heading='Search areas', title='Search areas - %s' % (get("result",{}).get("meta",{}).get("q",""),))
+{% set title = "Search areas" %}
+{% extends "base.html" %}
+{% block content %}
 <form>
   <div class="field has-addons">
     <p class="control is-expanded">
-      <input class="input is-large" type="text" placeholder="Area to search for" value="{{ get("result",{}).get("meta",{}).get("q","") }}" name="q" />
+      <input class="input is-large" type="text" placeholder="Area to search for" value="{{ q or '' }}" name="q" />
     </p>
     <p class="control">
       <input type="submit" class="button is-primary is-large" value="search" />
@@ -13,36 +15,42 @@
 </section>
 <section class="section">
   <div class="container">
-  % if get("result",{}).get("meta",{}).get("q"):
+  {% if q %}
     <div class="columns">
       <div class="column">
-      % if len(result.get("data",[]))>0:
-        % if result["meta"]["result_count"] <= result["meta"]["size"]:
-        <h2 class="title">Showing all {{ "{:,.0f}".format(result["meta"]["result_count"]) }} results for "{{ get("result",{}).get("meta",{}).get("q","") }}"</h2>
-        % else:
-        <h2 class="title">Showing from {{ "{:,.0f}".format(result["meta"]["from"] + 1) }} to {{ "{:,.0f}".format(min([result["meta"]["from"] + result["meta"]["size"], result["meta"]["result_count"]])) }} of {{ "{:,.0f}".format(result["meta"]["result_count"]) }} results for "{{ get("result",{}).get("meta",{}).get("q","") }}"</h2>
-        % end
+      {% if result %}
+        {% if result|length >= total %}
+        <h2 class="title is-5">Showing all {{ "{:,.0f}".format(total) }} results for "{{ q }}"</h2>
+        {% else %}
+        <h2 class="title is-5">Showing {{ "{:,.0f}".format(result|length) }} of {{ "{:,.0f}".format(total) }} results for "{{ q }}"</h2>
+        {# <h2 class="title is-5">Showing from {{ "{:,.0f}".format(result["meta"]["from"] + 1) }} to {{ "{:,.0f}".format(min([result["meta"]["from"] + result["meta"]["size"], result["meta"]["result_count"]])) }} of {{ "{:,.0f}".format(result["meta"]["result_count"]) }} results for "{{ get("result",{}).get("meta",{}).get("q","") }}"</h2> #}
+        {% endif %}
         <table class="table is-fullwidth">
           <tbody>
-          % for i in result.get("data",[]):
+          {% for i, score in result %}
             <tr>
               <td>
-                <a href="{{ i["links"]["html"] }}">{{ i["attributes"]["name"] }}</a>
+                <a href="{{ url_for('areas.get_area', areacode=i.id, filetype='html') }}">{{ i.attributes.name }}</a>
+                {% if not i.attributes.active %}
+                <span class="tag is-danger">Inactive</span>
+                {% endif %}
               </td>
               <td>
-                % areatype_id = (i["relationships"]["areatype"]["data"]["type"], i["relationships"]["areatype"]["data"]["id"])
-                % if areatype_id in included:
-                <span class="tag">{{ included[areatype_id]["attributes"]["name"] }}</span>
-                % end
+                {% if i.relationships.areatype %}
+                <span class="tag">{{ i.relationships.areatype.attributes.name }}</span>
+                {% elif i.attributes.entity %}
+                <span class="tag">{{ i.attributes.entity }}</span>
+                {% endif %}
               </td>
             </tr>
-          % end
+          {% endfor %}
           </tbody>
         </table>
-        % #include('pagination.html', pagination=pagination)
-        % else:
+        {# % #include('pagination.html', pagination=pagination) #}
+        {% else %}
         <h2 class="title">No results found</h2>
-        % end
+        {% endif %}
       </div>
     </div>
-  % end
+  {% endif %}
+{% endblock %}

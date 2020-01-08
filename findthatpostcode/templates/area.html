@@ -1,12 +1,29 @@
-{# {% areatype = included[("areatypes", result["data"]["relationships"]["areatype"]["data"]["id"])] %}
-{% title = '%s - %s' % (areatype["attributes"]["name"], result["data"]["id"]) %}
-{% subtitle = '<a href="/areatypes/%s.html">%s</a> - %s' % (areatype["id"], areatype["attributes"]["name"], result["data"]["id"]) %}
-{% if result["data"]["attributes"]["name_welsh"]!=result["data"]["attributes"]["name"]: %}
-{% subtitle = '%s (%s)' % (subtitle, result["data"]["attributes"]["name_welsh"]) %}
-{% end %} #}
-{# {% rebase("base.html", title=title, subtitle=subtitle, heading=result["data"]["attributes"]["name"], includes=['leaflet']) %} #}
+{% macro display_area(area) %}
+<div class="control">
+  <div class="tags has-addons">
+    {% if area.found and area.attributes %}
+    <a href="{{ url_for('areas.get_area', areacode=area.id, filetype='html') }}" class='tag is-info'>
+      {{ area.attributes.name }}
+      [{{ area.id }}]
+    </a>
+    {% if area.relationships.areatype %}
+    <a href="{{ url_for('areas.get_area', areacode=area.id, filetype='html') }}" class='tag'>
+      {{ area.relationships.areatype.attributes.name }}
+    </a>
+    {% endif %}
+    {% else %}
+    <span class='tag'>
+      {{ area.id }}
+    </span>
+    {% endif %}
+  </div>
+</div>
+{% endmacro %}
+
+
 {% set includes = ['leaflet'] %}
 {% set title = "{} - {}".format(result.attributes.name, result.id) %}
+{% set subtitle = result.relationships.areatype.attributes.name %}
 {% set example_postcodes = result.relationships.example_postcodes %}
 {% extends "base.html" %}
 {% block content %}
@@ -16,71 +33,132 @@
       <div id="postcode-map" style="height:500px;"></div>
     </figure>
     <br>
-    <div class="card">
-      <header class="card-header">
-        <p class="card-header-title">Technical details</p>
-      </header>
-      <div class="card-content">
-        <div class="content">
-          <table class="table is-fullwidth">
-            {% for k, v in result.attributes.items() %}
-            {% if k not in ["examples", "name", "type", "name_welsh", "type_name", "sort_order", "has_boundary"] %}
-            <tr>
-              <td>{{k}}</td>
-              <td>{{v}}</td>
-            </tr>
-            {% endif %}
-            {% endfor %}
-          </table>
-        </div>
-      </div>
-    </div>
   </div>
   <div class="column">
-    {% if "geojson" in result["links"] %}
+    {% if result.attributes.has_boundary %}
     <div class="clearfix">
-      <a href='{{ result["links"]["geojson"] }}' class="is-pulled-right">Boundary (geoJSON)</a>
+      <a href='{{ url_for('areas.get_area', areacode=result.id, filetype='geojson') }}' class="is-pulled-right button is-link">Boundary (geoJSON)</a>
     </div>
     {% endif %}
-    {% if example_postcodes %}
-    <h3 class="title">Example postcodes</h3>
-    <div class="card">
-      <div class="card-content">
-        {% for i in example_postcodes[0:5] %}
-        <p class="content"><a href='/postcodes/{{ i["id"] }}.html'>{{ i.id }}</a></p>
-        {% endfor %}
-      </div>
-    </div>
-    {% endif %}
+    <table class="table is-fullwidth">
+      {% if example_postcodes %}
+      <tr>
+        <td>Example postcodes</td>
+        <td>
+          <div class="tags">
+          {% for i in example_postcodes[0:5] %}
+          <a href='/postcodes/{{ i["id"] }}.html' class='tag'>{{ i.id }}</a>
+          {% endfor %}
+          </div>
+        </td>
+      </tr>
+      {% endif %}
+
+      {% if result.relationships.parent %}
+      <tr>
+        <td>Parent area</td>
+        <td>
+          {{ display_area(result.relationships.parent) }}
+        </td>
+      </tr>
+      {% endif %}
+
+      {% if result.relationships.children and result.attributes.child_count %}
+      <tr>
+        <td>Child area{% if result.attributes.child_count > 1 %}s{% endif %}</td>
+        <td>
+          <p>{{ result.attributes.child_count }} area{% if result.attributes.child_count > 1 %}s{% endif %}</p>
+          <div class="field is-grouped is-grouped-multiline">
+          {% for a in result.relationships.children %}
+          {{ display_area(a) }}<br>
+          {% endfor %}
+          </div>
+        </td>
+      </tr>
+      {% endif %}
+
+      {% if result.relationships.predecessor %}
+      <tr>
+        <td>Predecessor area{% if result.relationships.predecessor|length > 1 %}s{% endif %}</td>
+        <td>
+          <div class="field is-grouped is-grouped-multiline">
+          {% for a in result.relationships.predecessor %}
+          {{ display_area(a) }}
+          {% endfor %}
+          </div>
+        </td>
+      </tr>
+      {% endif %}
+      {% if result.relationships.successor %}
+      <tr>
+        <td>Successor area{% if result.relationships.successor|length > 1 %}s{% endif %}</td>
+        <td>
+          <div class="field is-grouped is-grouped-multiline">
+          {% for a in result.relationships.successor %}
+          {{ display_area(a) }}
+          {% endfor %}
+          </div>
+        </td>
+      </tr>
+      {% endif %}
+
+      <tr>
+        <td>Start date</td>
+        <td>{{ "{:%B %Y}".format(result.attributes.date_start) }}</td>
+      </tr>
+
+      {% if result.attributes.date_end %}
+      <tr>
+        <td>End date</td>
+        <td>{{ "{:%B %Y}".format(result.attributes.date_end) }}</td>
+      </tr>
+      {% endif %}
+
+      {% if result.attributes.owner %}
+      <tr>
+        <td>Owner</td>
+        <td>{{ result.attributes.owner}}</td>
+      </tr>
+      {% endif %}
+      {% if result.attributes.equivalents %}
+      <tr>
+        <td>Equivalent codes</td>
+        <td>
+          <div class="field is-grouped is-grouped-multiline">
+          {% for k, v in result.attributes.equivalents.items() %}
+            <div class="control">
+              <div class="tags has-addons">
+                <span class="tag is-dark">{{ k }}</span>
+                <span class="tag is-info">{{ v }}</span>
+              </div>
+            </div>
+          {% endfor %}
+          </div>
+        </td>
+      </tr>
+      {% endif %}
+      {% if result.attributes.statutory_instrument_title %}
+      <tr>
+        <td>Statutory instrument</td>
+        <td>
+          {{ result.attributes.statutory_instrument_title}}
+          {% if result.attributes.statutory_instrument_id %}
+          ({{result.attributes.statutory_instrument_id}})
+          {% endif %}
+        </td>
+      </tr>
+      {% endif %}
+    </table>
     <br>
   </div>
 </div>
+{% if example_postcodes or result.attributes.has_boundary %}
 <script type="text/javascript">
-  var postcode_location = [
-    {{ example_postcodes[0].attributes.location.get("lat") }},
-    {{ example_postcodes[0].attributes.location.get("lon") }}
-  ];
-  var mymap = L.map('postcode-map').setView(postcode_location, 9);
-  var layer = new L.StamenTileLayer("toner").addTo(mymap);
-  L.osGraticule({ showLabels: false, lineColor: 'grey'}).addTo(mymap);
-  {% if example_postcodes %}
-  var markers = L.featureGroup();
-  {% for postcode in example_postcodes: %}
-  var marker = L.circleMarker([
-    {{ postcode.attributes.location.get("lat") }},
-    {{ postcode.attributes.location.get("lon") }}
-  ], { radius: 5, fillOpacity: 0.8 }).addTo(markers);
-  marker.bindPopup("<a href=\"/postcodes/{{ postcode.id }}.html\">{{ postcode.id }}</a>", {autoClose: false}).openPopup();
-  {% endfor %}
-  markers.addTo(mymap);
-  mymap.fitBounds(markers.getBounds());
-  {% endif %}
-  fetch('/areas/{{result.id}}.geojson')
-    .then(function (response) {
-      return response.json();
-    }).then(function (geojson) {
-      var boundary_json = L.geoJSON(geojson).addTo(mymap);
-      mymap.fitBounds(boundary_json.getBounds());
-    });
+  var postcodes = [
+    {% for p in example_postcodes %}{{ p.attributes.location|tojson }},
+    {% endfor %}];
+  var geojson = {{ url_for('areas.get_area', areacode=result.id, filetype='geojson')|tojson }};
 </script>
+<script type="text/javascript" src="{{ url_for('static', filename='map.js') }}"></script>
+{% endif %}
 {% endblock %}

@@ -72,18 +72,18 @@
   </div>
   <div class="column">
     {% for i in key_area_types %}
-    <h2 class="title">{{ i[0] }} areas</h2>
+    <h2 class="title is-4">{{ i[0] }} areas</h2>
     <table class="table is-fullwidth">
       <tbody>
       {% for key_area in i[1] %}
-        {% for a in result.relationships.areas if a.entity.attributes.abbreviation and a.entity.attributes.abbreviation.lower() == key_area %}
+        {% for a in result.relationships.areas if a.relationships.areatype.attributes.abbreviation and a.relationships.areatype.attributes.abbreviation.lower() == key_area %}
         <tr>
-          <td><span title="{{ a.entity.id }}">{{ a.entity.attributes.name }}</span></td>
+          <td><span title="{{ a.relationships.areatype.id }}">{{ a.relationships.areatype.attributes.name }}</span></td>
           <td>
             {% if a.attributes.name %}
-            <a href="{{ a.id }}">{{ a.attributes.name }}</a> <span class="tag is-pulled-right">{{ a.id }}</span>
+            <a href="{{ url_for('areas.get_area', areacode=a.id, filetype='html') }}">{{ a.attributes.name }}</a> <span class="tag is-pulled-right">{{ a.id }}</span>
             {% else %}
-            <a href="{{ a.id }}}">{{ a.id }}</a>
+            <a href="{{ url_for('areas.get_area', areacode=a.id, filetype='html') }}">{{ a.id }}</a>
             {% endif %}
           </td>
         </tr>
@@ -92,27 +92,26 @@
       </tbody>
     </table>
     {% endfor %}
-    <h2 class="title">Area classifications</h2>
+    <h2 class="title is-4">Area classifications</h2>
     <table class="table is-fullwidth">
       <tbody>
-        {% if result.relationships.oac11 %}
+        {% if result.attributes.oac11 %}
         <tr>
           <td><span title="oac11">Output area classification</span></td>
           <td>
-              {{ result.relationships.oac11.supergroup }} &gt; <span class="tag is-pulled-right">{{ result.relationships.oac11.code[0] }}</span><br>
-              {{ result.relationships.oac11.group }} &gt; <span class="tag is-pulled-right">{{ result.relationships.oac11.code[0:2] }}</span><br>
-              {{ result.relationships.oac11.subgroup }} <span class="tag is-pulled-right">{{ result.relationships.oac11.code }}</span>
+              {{ result.attributes.oac11.supergroup }} &gt; <span class="tag is-pulled-right">{{ result.attributes.oac11.code[0] }}</span><br>
+              {{ result.attributes.oac11.group }} &gt; <span class="tag is-pulled-right">{{ result.attributes.oac11.code[0:2] }}</span><br>
+              {{ result.attributes.oac11.subgroup }} <span class="tag is-pulled-right">{{ result.attributes.oac11.code }}</span>
           </td>
         </tr>
         {% endif %}
-        {% if result.relationships.ru11ind %}
+        {% if result.attributes.ru11ind %}
         <tr>
           <td><span title="ru11ind">Rural/urban classification</span></td>
-          <td>{{ result.relationships.ru11ind.description }}  <span class="tag is-pulled-right">{{ result.relationships.ru11ind.code }}</span></td>
+          <td>{{ result.attributes.ru11ind.description }}  <span class="tag is-pulled-right">{{ result.attributes.ru11ind.code }}</span></td>
         </tr>
         {% endif %}
-        {% for a in result.relationships.areas if a.entity.id == 'E01' %}
-        {% if a.attributes.stats and a.attributes.stats.imd2019 %}
+        {% for a in result.relationships.areas if a.attributes.stats and a.attributes.stats.imd2019 %}
         {% set rank = a.attributes.stats.imd2019.imd_rank %}
         {% set total = other_codes.imd[result.attributes.ctry] %}
         <tr>
@@ -124,8 +123,7 @@
             <p>In <strong>2015</strong> {{ "{:.0%}".format( a.attributes.stats.imd2015.imd_rank|float / total|float ) }}</strong> of LSOAs in {{ result.attributes.ctry.name }} were more deprived than this one.</p>
             {% endif %}
           </td>
-        </tr> 
-        {% endif %}
+        </tr>
         {% endfor %}
       </tbody>
     </table>

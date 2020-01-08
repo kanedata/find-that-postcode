@@ -61,20 +61,18 @@ class Postcode(Controller):
                     continue
 
         if OAC11_CODE.get(postcode.get("oac11")):
-            self.attributes["oac11"] = {
+            postcode["oac11"] = {
                 "code": postcode["oac11"],
                 "supergroup": OAC11_CODE.get(postcode["oac11"])[0],
                 "group": OAC11_CODE.get(postcode["oac11"])[1],
                 "subgroup": OAC11_CODE.get(postcode["oac11"])[2],
             }
-            del postcode["oac11"]
 
         if RU11IND_CODES.get(postcode.get("ru11ind")):
-            self.attributes["ru11ind"] = {
+            postcode["ru11ind"] = {
                 "code": postcode["ru11ind"],
                 "description": RU11IND_CODES.get(postcode["ru11ind"]),
             }
-            del postcode["ru11ind"]
 
         return postcode
 

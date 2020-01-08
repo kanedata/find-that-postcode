@@ -7,7 +7,7 @@
       [{{ area.id }}]
     </a>
     {% if area.relationships.areatype %}
-    <a href="{{ url_for('areas.get_area', areacode=area.id, filetype='html') }}" class='tag'>
+    <a href="{{ url_for('areatypes.get_areatype', areacode=area.relationships.areatype.id, filetype='html') }}" class='tag'>
       {{ area.relationships.areatype.attributes.name }}
     </a>
     {% endif %}
@@ -37,7 +37,7 @@
   <div class="column">
     {% if result.attributes.has_boundary %}
     <div class="clearfix">
-      <a href='{{ url_for('areas.get_area', areacode=result.id, filetype='geojson') }}' class="is-pulled-right button is-link">Boundary (geoJSON)</a>
+      <a href="{{ url_for('areas.get_area', areacode=result.id, filetype='geojson') }}" class="is-pulled-right button is-link">Boundary (geoJSON)</a>
     </div>
     {% endif %}
     <table class="table is-fullwidth">

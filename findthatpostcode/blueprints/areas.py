@@ -27,6 +27,11 @@ def area_search(filetype="json"):
         total=areas['result_count']['value']
     )
 
+@bp.route('/names.csv')
+def all_names():
+    pass
+
+
 @bp.route('/<areacode>')
 @bp.route('/<areacode>.<filetype>')
 def get_area(areacode, filetype="json"):

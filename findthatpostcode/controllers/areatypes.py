@@ -25,59 +25,33 @@ class Areatype(Controller):
                 "related_codes": data[1],
                 "name": data[2],
                 "full_name": data[3],
-                "decription": data[4],
+                "description": data[4],
                 "abbreviation": data[0],
             }
         return data
 
-    # def get_by_id(self, areatype, p=1, size=None):
-    #     self.set_from_data(areatype)
-    #     self.areas = []
-    #     if self.es and not self.config.get("stop_recursion"):
-    #         self.relationships["areas"] = []
-    #         self.pagination = Pagination()
-    #         version = self.get_es_version(self.es)[0]
-    #         sorting = "name.keyword:asc" if version >= 5 else "name:asc"
+    @classmethod
+    def get_from_es(cls, id, es, es_config=None, full=False):
+        if cls.areatypes.get(id):
+            return cls(id)
+        return super().get_from_es(id, es, es_config=es_config)
 
-    #         query = {
-    #             "query": {
-    #                 "match": {
-    #                     "entity": self.id
-    #                 }
-    #             }
-    #         }
-    #         result = self.es.search(
-    #             index=self.config.get("es_index"), 
-    #             body=query, 
-    #             from_=self.pagination.from_, 
-    #             size=self.pagination.size, 
-    #             _source_excludes=["boundary"],
-    #             sort=sorting
-    #         )
-    #         if result["hits"]["total"] > 0:
-    #             self.config["stop_recursion"] = True
-    #             self.relationships["areas"] = [controllers.areas.Area(self.config).set_from_data(a) for a in result["hits"]["hits"]]
-    #             self.attributes["count_areas"] = result["hits"]["total"]
-    #             self.pagination.set_pagination(self.attributes["count_areas"])
-    #         else:
-    #             self.found = False
-    #     return self
-
-    # def set_from_data(self, areatype):
-    #     self.found = True
-    #     self.id = areatype
-    #     self.attributes = {
-    #         "id": areatype,
-    #         "count_areas": None,
-    #         "name": areatype,
-    #         "full_name": areatype,
-    #         "description": ""
-    #     }
-    #     typedata = self.areatypes.get(areatype)
-    #     if typedata:
-    #         self.attributes["name"] = typedata[1]
-    #         self.attributes["full_name"] = typedata[2]
-    #         self.attributes["description"] = typedata[3]
+    def get_areas(self, es, es_config=None, examples_count=10):
+        query = {
+            "query": {
+                "function_score": {
+                    "query": {
+                        "match": {
+                            "type": self.id
+                        }
+                    },
+                    "random_score": {}
+                }
+            }
+        }
+        example = es.search(index='geo_area', body=query, size=examples_count)
+        self.relationships["areas"] = [areas.Area(e["_id"], e["_source"]) for e in example["hits"]["hits"]]
+        self.attributes["count_areas"] = self.get_total_from_es(example)
 
 def area_types_count(es, es_config=None):
     if not es_config:

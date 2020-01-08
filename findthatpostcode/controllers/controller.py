@@ -54,6 +54,18 @@ class Controller:
     def parse_id(id):
         return id
 
+    @staticmethod
+    def get_total_from_es(result):
+        """
+        Elasticsearch python seems to have changed how it returns the total number of 
+        hits in a search - this gets a consistent figure no matter the version
+        """
+        if isinstance(result["hits"]["total"], dict):
+            return result["hits"]["total"]['value']
+        if isinstance(result["hits"]["total"], (float, int)):
+            return result["hits"]["total"]
+
+
     def url(self, filetype=None, query_vars={}):
         path = [self.url_slug, self.id.replace(" ", "+") + self.set_url_filetype(filetype)]
         return urlunparse([

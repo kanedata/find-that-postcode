@@ -45,16 +45,10 @@ def create_app(test_config=None):
     
     # routes and blueprints
     @app.route('/')
-    @app.route('/index.html')
     def index():
         ats = area_types_count(db.get_db())
         return render_template('index.html', result=ats)
     
     blueprints.init_app(app)
-
-    # a simple page that says hello
-    @app.route('/hello')
-    def hello():
-        return 'Hello, World!'
 
     return app

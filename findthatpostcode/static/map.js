@@ -22,7 +22,9 @@ for (const postcode of postcodes){
     // ).openPopup();
 }
 // markers.addTo(mymap);
-mymap.fitBounds(markers.getBounds());
+if(!geojson){
+    mymap.fitBounds(markers.getBounds());
+}
 fetch(geojson)
     .then(function (response) {
         return response.json();

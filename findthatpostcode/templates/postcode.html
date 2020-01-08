@@ -1,11 +1,17 @@
-{# {% if result["data"]["type"]=="points" %}
-  {% postcode = included[("postcodes", result["data"]["relationships"]["nearest_postcode"]["data"]["id"])] %}
-  {% title = 'Point {:,.5f}, {:,.5f}'.format(result["data"]["attributes"]["lat"], result["data"]["attributes"]["lon"]) %}
-  {% subtitle = 'Closest postcode to point {0:,.5f}, {1:,.5f} is <a href="{2}">{3}</a>.<br>Centre of {3} is {4:,.1f} meters away.'.format(result["data"]["attributes"]["lat"], result["data"]["attributes"]["lon"], postcode["links"]["html"], postcode["id"], result["data"]["attributes"]["distance_from_postcode"]) %}
+{% if point %}
+  {% set title = 'Point {:,.5f}, {:,.5f}'.format(*point.id) %}
+  {% set subtitle = 'Closest postcode to point {0:,.5f}, {1:,.5f} is <a href="{2}">{3}</a>.<br>Centre of {3} is {4:,.1f} meters away.'.format(
+    point.id[0],
+    point.id[1],
+    url_for('postcodes.get_postcode', postcode=result.id, filetype='html'),
+    result.id,
+    point.attributes.distance_from_postcode
+  ) %}
 {% else %}
-% end #}
-{% set title = 'Postcode {}'.format(result.id) %}
-{% set subtitle = 'No longer used' if result.attributes.doterm else '' %}
+  {% set title = 'Postcode {}'.format(result.id) %}
+  {% set subtitle = 'No longer used' if result.attributes.doterm else '' %}
+{% endif %}
+
 {% set includes = ['leaflet'] %}
 {% extends 'base.html' %}
 {% block content %}

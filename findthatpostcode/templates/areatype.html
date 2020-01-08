@@ -1,34 +1,38 @@
-% rebase("base.html", title='%s - Area' % (result["data"]["attributes"]["name"],))
+{% set title = "{} - Area".format(result.attributes.name) %}
+{% extends "base.html" %}
+{% block content %}
 <div class="columns">
   <div class="column">
+    {% if result.attributes.description %}
     <h2 class="title is-4">Description</h2>
-    <p>{{ result["data"]["attributes"]["description"] }}</p>
-    % if result["data"]["attributes"]["full_name"]!=result["data"]["attributes"]["name"]:
+    <p>{{ result.attributes.description }}</p>
+    {% endif %}
+    {% if result.attributes.full_name != result.attributes.name %}
     <br>
-    <p><strong>Full name:</strong> {{ result["data"]["attributes"]["full_name"] }}</p>
-    % end
+    <p><strong>Full name:</strong> {{ result.attributes.full_name }}</p>
+    {% endif %}
     <br>
-    <p><strong>Code:</strong> <code>{{ result["data"]["id"] }}</code></p>
+    <p><strong>Code:</strong> <code>{{ result.id }}</code></p>
   </div>
   <div class="column">
     <h3 class="title">Areas</h3>
-    % if result["data"]["attributes"]["count_areas"] <= result.get("meta", {}).get("pagination", {}).get("size",100):
-    <p class="subtitle">Showing all {{ "{:,.0f}".format(result["data"]["attributes"]["count_areas"]) }}</p>
-    % else:
-    <p class="subtitle">Showing from {{ "{:,.0f}".format(result.get("meta", {}).get("pagination", {}).get("from",0) + 1) }} to {{ "{:,.0f}".format(min([result.get("meta", {}).get("pagination", {}).get("from",0) + result.get("meta", {}).get("pagination", {}).get("size",100), result["data"]["attributes"]["count_areas"]])) }} of {{ "{:,.0f}".format(result["data"]["attributes"]["count_areas"]) }}</p>
-    % end
+    {% if result.attributes.count_areas <= result.relationships.areas|length %}
+    <p class="subtitle">Showing all {{ "{:,.0f}".format(result.attributes.count_areas) }} areas</p>
+    {% else %}
+    <p class="subtitle">Showing {{ "{:,.0f}".format(result.relationships.areas|length) }} of {{ "{:,.0f}".format(result.attributes.count_areas) }} areas</p>
+    {# <p class="subtitle">Showing from {{ "{:,.0f}".format(result.get("meta", {}).get("pagination", {}).get("from",0) + 1) }} to {{ "{:,.0f}".format(min([result.get("meta", {}).get("pagination", {}).get("from",0) + result.get("meta", {}).get("pagination", {}).get("size",100), result["data"]["attributes"]["count_areas"]])) }} of {{ "{:,.0f}".format(result["data"]["attributes"]["count_areas"]) }}</p> #}
+    {% endif %}
     <table class="table is-fullwidth">
       <tbody>
-      % for i in result["data"]["relationships"]["areas"]["data"]:
-        % for area in [area for area in result["included"] if area["id"]==i["id"] and i["id"].endswith("999999")==False]:
+      {% for i in result.relationships.areas if not i.id.endswith('999999') %}
         <tr>
-          <td><a href="/areas/{{ area["id"] }}.html">{{ area["attributes"]["name"] }}</a></td>
-          <td><a href="/areas/{{ area["id"] }}.html">{{ area["id"] }}</a></td>
+          <td><a href="/areas/{{ i.id }}.html">{{ i.attributes.name }}</a></td>
+          <td><a href="/areas/{{ i.id }}.html">{{ i.id }}</a></td>
         </tr>
-        % end
-      % end
+      {% endfor %}
       </tbody>
     </table>
-    % include('pagination.html', pagination=result["links"])
+    {# % include('pagination.html', pagination=result["links"]) #}
   </div>
 </div>
+{% endblock %}

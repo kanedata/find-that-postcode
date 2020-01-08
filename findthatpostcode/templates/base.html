@@ -2,16 +2,16 @@
 <!DOCTYPE html>
 <html>
   <head>
-		<link href="/static/bulma.min.css" rel="stylesheet" type="text/css" />
+		<link href="{{ url_for('static', filename='bulma.min.css') }}" rel="stylesheet" type="text/css" />
     {% if 'leaflet' in includes %}
-    <link rel="stylesheet" href="/static/leaflet/leaflet.css" />
-    <script type="text/javascript" src="/static/leaflet/leaflet.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='leaflet/leaflet.css') }}" />
+    <script type="text/javascript" src="{{ url_for('static', filename='leaflet/leaflet.js') }}"></script>
     <script type="text/javascript" src="https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js?v1.3.0"></script>
-    <script type="text/javascript" src="/static/leaflet/L.OSGraticule.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='leaflet/L.OSGraticule.js') }}"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/leaflet.snogylop@0.4.0/src/leaflet.snogylop.min.js"></script>
     {% endif %}
     {% if 'papaparse' in includes %}
-    <script src="/static/papaparse/papaparse.min.js"></script>
+    <script src="{{ url_for('static', filename='papaparse/papaparse.min.js') }}"></script>
     {% endif %}
     <title>{{ title or default_title }}</title>
   </head>
@@ -25,16 +25,18 @@
         </div>
       </div>
     </section>
-    {% if (heading or title) not in [None, default_title] %}
+    {% if (heading or title) not in [None, default_title] and (heading or title) %}
     <section class="hero is-primary is-bold">
       <div class="hero-body">
         <div class="container">
           <h1 class="title">
             {{ heading or title }}
           </h1>
+          {% if subtitle %}
           <h2 class="subtitle">
-            {{ subtitle }}
+            {{ subtitle|safe }}
           </h2>
+          {% endif %}
         </div>
       </div>
     </section>
@@ -48,7 +50,7 @@
       <div class="container">
         <div class="content has-text-centered">
           <p>
-            <strong>findthatpostcode</strong> by <a href="https://drkane.co.uk/">David Kane</a>.
+            <strong><a href="{{ url_for('index') }}">findthatpostcode</a></strong> by <a href="https://drkane.co.uk/">David Kane</a>.
           </p>
           <p>
             <a href="https://www.ons.gov.uk/methodology/geography/licences">Postcode data from ONS used under Open Government License</a><br> 

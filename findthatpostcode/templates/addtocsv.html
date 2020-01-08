@@ -1,4 +1,7 @@
-% rebase("base.html", title='Add fields to CSV', includes=['papaparse'])
+{% set includes = ['papaparse'] %}
+{% set title = 'Add fields to CSV' %}
+{% extends "base.html" %}
+{% block content %}
 <form action="" method="post" enctype="multipart/form-data">
   <div class="columns">
     <div class="column">
@@ -52,56 +55,56 @@
                 <th>Code <input type="checkbox" id="select_all_codes" title="Select all code fields" /></th>
                 <th>Name <input type="checkbox" id="select_all_names" title="Select all name fields" /></th>
               </tr>
-              % for b in basic_fields:
+              {% for b in basic_fields %}
               <tr>
                 <td>{{b[1]}}</td>
                 <td><input type="checkbox" name="fields" value="{{b[0]}}"
-                  % if b[0] in default_fields:
+                  {% if b[0] in default_fields %}
                   checked="checked"
-                  % end
+                  {% endif %}
                   ></td>
                 <td>
-                  % if b[2]:
+                  {% if b[2] %}
                   <input type="checkbox" name="fields" value="{{b[0]}}_name"
-                    % if "%s_name" % b[0] in default_fields:
+                    {% if "%s_name" % b[0] in default_fields %}
                     checked="checked"
-                    % end
+                    {% endif %}
                   >
-                  % end
+                  {% endif %}
                 </td>
               </tr>
-              % end
-            % for i in key_area_types:
+              {% endfor %}
+            {% for i in key_area_types %}
               <tr>
                 <th>{{ i[0] }} areas</th>
                 <th></th>
                 <th></th>
               </tr>
-              % for area in i[1]:
-                % for area_type in result["data"]:
-                  % if area_type["id"] == area:
+              {% for area in i[1] %}
+                {% for area_type in area_types %}
+                  {% if area_type[0] == area %}
               <tr>
                 <td>
-                  {{ area_type["attributes"]["name"] }}
-                  % if area_type["attributes"].get("count_areas"):
-                  <small> [{{ "{:,.0f}".format(area_type["attributes"]["count_areas"]) }}]</small>
-                  % end
+                  {{ area_type[2] }}
+                  {% if result.get(area) %}
+                  <small> [{{ "{:,.0f}".format(result.get(area)) }}]</small>
+                  {% endif %}
                 </td>
                 <td><input type="checkbox" name="fields" value="{{area}}"
-                  % if area in default_fields:
+                  {% if area in default_fields %}
                   checked="checked"
-                  % end
+                  {% endif %}
                   ></td>
                 <td><input type="checkbox" name="fields" value="{{area}}_name"
-                  % if "%s_name" % area in default_fields:
+                  {% if "%s_name" % area in default_fields %}
                   checked="checked"
-                  % end
+                  {% endif %}
                   ></td>
               </tr>
-                  % end
-                % end
-              % end
-            % end
+                  {% endif %}
+                {% endfor %}
+              {% endfor %}
+            {% endfor %}
             </tbody>
           </table>
         </p>
@@ -185,3 +188,4 @@
   }
 
 </script>
+{% endblock %}

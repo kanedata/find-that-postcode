@@ -1,0 +1,19 @@
+<div class="columns">
+
+{% for i in key_area_types %}
+  <div class="column">
+    <nav class="panel">
+      <p class="panel-heading">{{ i[0] }} areas</p>
+      {% for j in area_types if j[0] in i[1] %}
+          <a href="{{ url_for('areatypes.get_areatype', areacode=j[0], filetype='html') }}" class="panel-block">
+            {{ j[2] }}&nbsp;<br>
+            {% if result.get(j[0]) %}
+            <small> [{{ "{:,.0f}".format(result.get(j[0])) }}]</small>
+            {% endif %}
+          </a>
+      {% endfor %}
+    </nav>
+  </div>
+{% endfor %}
+</div>
+<br>

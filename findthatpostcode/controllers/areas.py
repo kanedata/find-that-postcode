@@ -135,7 +135,7 @@ class Area(Controller):
         }
         children = es.search(index='geo_area', body=query, size=10)
         return (
-            children["hits"]["total"]["value"],
+            Area.get_total_from_es(children),
             [Area(e["_id"], e["_source"]) for e in children["hits"]["hits"]]
         )
 

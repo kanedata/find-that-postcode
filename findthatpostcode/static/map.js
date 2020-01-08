@@ -22,7 +22,7 @@ for (const postcode of postcodes){
     // ).openPopup();
 }
 // markers.addTo(mymap);
-// mymap.fitBounds(markers.getBounds());
+mymap.fitBounds(markers.getBounds());
 fetch(geojson)
     .then(function (response) {
         return response.json();
@@ -34,7 +34,7 @@ fetch(geojson)
                 weight: 2,
                 fill: true,
                 fillColor: '#fff',
-                fillOpacity: 0.9
+                fillOpacity: 0.95
             }
         });
         boundary_json.addTo(mymap);

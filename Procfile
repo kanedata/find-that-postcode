@@ -1,1 +1,1 @@
-web: gunicorn findthatpostcode:create_app()
+web: gunicorn "findthatpostcode:create_app()"

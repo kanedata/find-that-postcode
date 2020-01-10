@@ -1,4 +1,4 @@
-Elasticsearch Postcodes
+Find that Postcode
 =======================
 
 This project creates an elasticsearch index based on the UK postcode file, and
@@ -18,7 +18,7 @@ Run the server. At the moment the scripts only work on a default server of
 
 ### 2. Install python dependencies
 
-You'll need to install the python `elasticsearch` and `bottle` libraries, either
+You'll need to install the python `elasticsearch` and `flask` libraries, either
 directly through `pip` or by running a virtual environment and running:
 
 ```bash
@@ -27,34 +27,49 @@ pip install -r requirements.txt
 
 The code is written in python 3 and hasn't been tested in python 2.
 
-### 3. Create elasticsearch indexes
+### 3. Point flask to the app
 
-Run `python create_elasticsearch.py` to create the needed index and mappings
+Flask needs to know which app it's running. The easiest way to do this is to create
+a file called `.env` in the project directory, and add the following contents:
+
+```bash
+FLASK_APP=findthatpostcode
+FLASK_ENV=development
+```
+
+### 4. Create elasticsearch indexes
+
+Run `flask init-db` to create the needed index and mappings
 before data import.
 
-### 4. Download NSPL files
+### 5. Import postcodes
 
-[Download the latest National Statistics Postcode Library](http://ons.maps.arcgis.com/home/item.html?id=a26683d2393743f4b87c89141cd1b2e8)
-file from the ONS geography site. Unfortunately there isn't a way to directly
-link to the latest file, it needs to be manually downloaded.
-
-This file can be stored anywhere but it may make sense to put it in a `data/`
-folder under this directory.
-
-### 5. Import postcodes and codes
-
-Run the following to import the data and save postcodes and codes to the
+Run the following to import the data and save postcodes to the
 elasticsearch index:
 
 ```bash
-python import_postcodes.py data/NSPL_FEB_2017_UK.zip
+flask import nspl --url https://example.com/url-to-nspl
 ```
 
-Replace `data/NSPL_FEB_2017_UK.zip` with the relative or absolute path to the
-file downloaded above.
+Replace `https://example.com/url-to-nspl` with the URL to the latest NSPL file.
+This file can be found through a search on the [ONS Geoportal](https://geoportal.statistics.gov.uk/search?collection=Dataset&sort=-modified&tags=PRD_NSPL). On the page for the file copy the link shown in the
+"Download" button on the right hand side.
 
 This will then run the import process. It takes a while to run as there are over
 2.5 million postcodes. The data will be around 1.3 GB in size on the disk.
+
+### 6. Import area codes
+
+Run the following to import the code history database and register of geographic codes.
+
+```bash
+flask import rgc
+flask import chd
+flask import msoanames # imports the names for MSOAs from House of Commons Library
+```
+
+The URL of the files used can be customised with the `--url` parameter. Unfortunately the 
+ONS geoportal doesn't provide a persistent URL to the latest data.
 
 ### 6. Import boundaries (optional)
 
@@ -84,7 +99,7 @@ These files are large:
 
 - Parishes: <http://geoportal.statistics.gov.uk/datasets/f13dad37854b4a1f869bf178489ff99a_2.geojson>
 - Wards: <http://geoportal.statistics.gov.uk/datasets/afcc88affe5f450e9c03970b237a7999_2.geojson>
-- LSOAs: <http://geoportal.statistics.gov.uk/datasets/da831f80764346889837c72508f046fa_2.geojson>
+- LSOAs: <https://opendata.arcgis.com/datasets/e993add3f1944437bc91ec7c76100c63_0.geojson>
 - MSOAs: <http://geoportal.statistics.gov.uk/datasets/826dc85fb600440889480f4d9dbb1a24_2.geojson>
 - Workplace Zones: <http://geoportal.statistics.gov.uk/datasets/a399c2a5922a4beaa080de63c0a218a3_2.geojson>
 - Built-up Areas: <http://geoportal.statistics.gov.uk/datasets/278ff7af4efb4a599f70156e6e19cc9f_0.geojson>
@@ -93,8 +108,10 @@ These files are large:
 Import the boundary files by running:
 
 ```bash
-python import_boundaries.py "http://geoportal.statistics.gov.uk/datasets/ac17d33d37b94e48abd8ccbcde640dde_2.geojson"
+flask import boundaries "http://geoportal.statistics.gov.uk/datasets/ac17d33d37b94e48abd8ccbcde640dde_2.geojson"
 ```
+
+You can add more than one URL to each import script.
 
 These imports will also take a while, and add significantly to the size of the
 elasticsearch index. It may increase in size to over 5GB.
@@ -102,20 +119,31 @@ elasticsearch index. It may increase in size to over 5GB.
 ### 7. Import placenames (optional)
 
 A further related dataset is placenames. The [ONS has a list of these](http://geoportal.statistics.gov.uk/datasets/a6c138d17ac54532b0ca8ee693922f10_0)
-which can be imported using the `import_placenames.py` script. An entry for each
-placename is added to the `postcode/placenames` elasticsearch index/type.
-
-To use, first download the [placenames CSV file from ONS](http://geoportal.statistics.gov.uk/datasets/a6c138d17ac54532b0ca8ee693922f10_0),
-and then run:
+which can be imported using the `import placenames` command. An entry for each
+placename is added to the `geo_placenames` elasticsearch index.
 
 ```bash
-python import_placenames.py "path/to/file.csv"
+python import placenames
 ```
+
+The `--url` parameter can be used to customise the URL used.
+
+### 7. Import statistics (optional)
+
+Statistics can be added to areas, using ONS data. The available statistics are
+added to LSOAs, but could also be added to other areas.
+
+```bash
+python import imd2019
+python import imd2015
+```
+
+The `--url` parameter can be used to customise the URL used to get the data.
 
 ### Run tests
 
 ```bash
-python -m pytest
+python -m pytest tests
 ```
 
 Using the data
@@ -123,17 +151,17 @@ Using the data
 
 ### Run the server
 
-The project comes with a simple server (using the [bottle]() framework) allowing
+The project comes with a simple server (using the [flask](https://flask.palletsprojects.com/) framework) allowing
 you to look at postcodes. The server returns either html pages (using `.html`)
 or json data by default.
 
 Run the server by:
 
 ```bash
-python server.py
+flask run
 ```
 
-By default the server is available at <http://localhost:8080/>.
+By default the server is available at <http://localhost:5000/>.
 
 #### Server endpoints
 
@@ -157,7 +185,7 @@ applications using the elasticsearch REST api.
 #### Find details on a postcode
 
 ```bash
-curl "http://localhost:9200/postcode/postcode/SW1A+1AA?pretty"
+curl "http://localhost:9200/geo_postcode/_doc/SW1A+1AA?pretty"
 ```
 
 ```json
@@ -217,22 +245,40 @@ curl "http://localhost:9200/postcode/postcode/SW1A+1AA?pretty"
 #### Find details on an area
 
 ```bash
-curl "http://localhost:9200/postcode/code/E14000639?pretty"
+curl "http://localhost:9200/geo_area/_doc/E00046056?pretty"
 ```
 
 ```json
 {
   "_index": "postcode",
   "_type": "code",
-  "_id": "E14000639",
+  "_id": "E00046056",
   "_version": 2,
   "found": true,
   "_source": {
-    "PCON14CD": "E14000639",
-    "name": "Cities of London and Westminster",
-    "PCON14NM": "Cities of London and Westminster",
-    "type": "pcon",
-    "name_welsh": "Cities of London and Westminster"
+    "code": "E00046056",
+    "name": "",
+    "name_welsh": null,
+    "statutory_instrument_id": "1111/1001",
+    "statutory_instrument_title": "GSS re-coding strategy",
+    "date_start": "2009-01-01T00:00:00",
+    "date_end": null,
+    "parent": "E01009081",
+    "entity": "E00",
+    "owner": "ONS",
+    "active": true,
+    "areaehect": 3.75,
+    "areachect": 3.75,
+    "areaihect": 0,
+    "arealhect": 3.75,
+    "sort_order": "E00046056",
+    "predecessor": [
+        "00CNFN0006"
+    ],
+    "successor": [],
+    "equivalents": {
+        "ons": "00CNFN0006"
+    }
   }
 }
 ```
@@ -248,26 +294,26 @@ Dokku setup
 
 ```bash
 # create app
-dokku apps:create es-postcodes
+dokku apps:create find-that-postcode
 
 # add permanent data storage
-dokku storage:mount es-postcodes /var/lib/dokku/data/storage/es-postcodes:/data
+dokku storage:mount find-that-postcode /var/lib/dokku/data/storage/find-that-postcode:/data
 
 # enable domain
-dokku domains:enable es-postcodes
-dokku domains:add es-postcodes postcodes.findthatcharity.uk
+dokku domains:enable find-that-postcode
+dokku domains:add find-that-postcode postcodes.findthatcharity.uk
 
 # elasticsearch
 sudo dokku plugin:install https://github.com/dokku/dokku-elasticsearch.git elasticsearch
 export ELASTICSEARCH_IMAGE="elasticsearch"
 export ELASTICSEARCH_IMAGE_VERSION="2.4"
 dokku elasticsearch:create postcodes-es
-dokku elasticsearch:link postcodes-es es-postcodes
+dokku elasticsearch:link postcodes-es find-that-postcode
 
 # SSL
 sudo dokku plugin:install https://github.com/dokku/dokku-letsencrypt.git
-dokku config:set --no-restart es-postcodes DOKKU_LETSENCRYPT_EMAIL=your@email.tld
-dokku letsencrypt es-postcodes
+dokku config:set --no-restart find-that-postcode DOKKU_LETSENCRYPT_EMAIL=your@email.tld
+dokku letsencrypt find-that-postcode
 dokku letsencrypt:cron-job --add
 ```
 
@@ -276,7 +322,7 @@ dokku letsencrypt:cron-job --add
 On local machine:
 
 ```bash
-git remote add dokku dokku@SERVER_HOST:es-postcodes
+git remote add dokku dokku@SERVER_HOST:find-that-postcode
 git push dokku master
 ```
 
@@ -285,18 +331,18 @@ git push dokku master
 On Dokku server run:
 
 ```bash
-# fetch the data files
-wget -O /var/lib/dokku/data/storage/es-postcodes/nspl.zip https://ons.maps.arcgis.com/sharing/rest/content/items/fd4d376782994b1ca2316a2fd0649315/data
-
 # setup and run import
-dokku run es-postcodes python create_elasticsearch.py
-dokku run es-postcodes python import_postcodes.py '/data/nspl.zip'
-dokku run es-postcodes python import_boundaries.py --dir='/data' http://geoportal.statistics.gov.uk/datasets/37bcb9c9e788497ea4f80543fd14c0a7_2.geojson http://geoportal.statistics.gov.uk/datasets/deeb99fdf09949bc8ed4dc95c80da279_2.geojson http://geoportal.statistics.gov.uk/datasets/687f346f5023410ba86615655ff33ca9_2.geojson http://geoportal.statistics.gov.uk/datasets/686603e943f948acaa13fb5d2b0f1275_2.geojson http://geoportal.statistics.gov.uk/datasets/f99b145881724e15a04a8a113544dfc5_2.geojson http://geoportal.statistics.gov.uk/datasets/ac17d33d37b94e48abd8ccbcde640dde_2.geojson http://geoportal.statistics.gov.uk/datasets/44667328cf45481ba91aef2f646b5fc0_2.geojson http://geoportal.statistics.gov.uk/datasets/532e3bb99acf44549ebb882c15646059_2.geojson http://geoportal.statistics.gov.uk/datasets/b804b37c78004e788becf75f712f6a38_2.geojson http://geoportal.statistics.gov.uk/datasets/6e93e6b47edd49ab827a1831d8eb0f57_2.geojson http://geoportal.statistics.gov.uk/datasets/df607d4ffa124cdca8317e3e63d45d78_2.geojson http://geoportal.statistics.gov.uk/datasets/3e5a096a8c7c456fb6d3164a3f44b005_2.geojson http://geoportal.statistics.gov.uk/datasets/7ddabffc9b46444bbf548732642f1ea2_2.geojson http://geoportal.statistics.gov.uk/datasets/d3062ec5f03b49a7be631d71586cac8c_2.geojson
-dokku run es-postcodes python import_boundaries.py --dir='/data' http://geoportal.statistics.gov.uk/datasets/f13dad37854b4a1f869bf178489ff99a_2.geojson
-dokku run es-postcodes python import_boundaries.py --dir='/data' http://geoportal.statistics.gov.uk/datasets/afcc88affe5f450e9c03970b237a7999_2.geojson
-dokku run es-postcodes python import_boundaries.py --dir='/data' http://geoportal.statistics.gov.uk/datasets/da831f80764346889837c72508f046fa_2.geojson
-dokku run es-postcodes python import_boundaries.py --dir='/data' http://geoportal.statistics.gov.uk/datasets/826dc85fb600440889480f4d9dbb1a24_2.geojson
-dokku run es-postcodes python import_boundaries.py --dir='/data' http://geoportal.statistics.gov.uk/datasets/a399c2a5922a4beaa080de63c0a218a3_2.geojson
-dokku run es-postcodes python import_boundaries.py --dir='/data' http://geoportal.statistics.gov.uk/datasets/278ff7af4efb4a599f70156e6e19cc9f_0.geojson
-dokku run es-postcodes python import_boundaries.py --dir='/data' http://geoportal.statistics.gov.uk/datasets/1f021bb824ee4820b353b4b58fab6df5_0.geojson
+dokku run find-that-postcode flask init-db
+dokku run find-that-postcode flask import nspl
+dokku run find-that-postcode flask import rgc
+dokku run find-that-postcode flask import chd
+dokku run find-that-postcode flask import msoanames
+dokku run find-that-postcode flask import boundaries http://geoportal.statistics.gov.uk/datasets/37bcb9c9e788497ea4f80543fd14c0a7_2.geojson http://geoportal.statistics.gov.uk/datasets/deeb99fdf09949bc8ed4dc95c80da279_2.geojson http://geoportal.statistics.gov.uk/datasets/687f346f5023410ba86615655ff33ca9_2.geojson http://geoportal.statistics.gov.uk/datasets/686603e943f948acaa13fb5d2b0f1275_2.geojson http://geoportal.statistics.gov.uk/datasets/f99b145881724e15a04a8a113544dfc5_2.geojson http://geoportal.statistics.gov.uk/datasets/ac17d33d37b94e48abd8ccbcde640dde_2.geojson http://geoportal.statistics.gov.uk/datasets/44667328cf45481ba91aef2f646b5fc0_2.geojson http://geoportal.statistics.gov.uk/datasets/532e3bb99acf44549ebb882c15646059_2.geojson http://geoportal.statistics.gov.uk/datasets/b804b37c78004e788becf75f712f6a38_2.geojson http://geoportal.statistics.gov.uk/datasets/6e93e6b47edd49ab827a1831d8eb0f57_2.geojson http://geoportal.statistics.gov.uk/datasets/df607d4ffa124cdca8317e3e63d45d78_2.geojson http://geoportal.statistics.gov.uk/datasets/3e5a096a8c7c456fb6d3164a3f44b005_2.geojson http://geoportal.statistics.gov.uk/datasets/7ddabffc9b46444bbf548732642f1ea2_2.geojson http://geoportal.statistics.gov.uk/datasets/d3062ec5f03b49a7be631d71586cac8c_2.geojson
+dokku run find-that-postcode flask import boundaries http://geoportal.statistics.gov.uk/datasets/f13dad37854b4a1f869bf178489ff99a_2.geojson
+dokku run find-that-postcode flask import boundaries http://geoportal.statistics.gov.uk/datasets/afcc88affe5f450e9c03970b237a7999_2.geojson
+dokku run find-that-postcode flask import boundaries http://geoportal.statistics.gov.uk/datasets/da831f80764346889837c72508f046fa_2.geojson
+dokku run find-that-postcode flask import boundaries http://geoportal.statistics.gov.uk/datasets/826dc85fb600440889480f4d9dbb1a24_2.geojson
+dokku run find-that-postcode flask import boundaries http://geoportal.statistics.gov.uk/datasets/a399c2a5922a4beaa080de63c0a218a3_2.geojson
+dokku run find-that-postcode flask import boundaries http://geoportal.statistics.gov.uk/datasets/278ff7af4efb4a599f70156e6e19cc9f_0.geojson
+dokku run find-that-postcode flask import boundaries http://geoportal.statistics.gov.uk/datasets/1f021bb824ee4820b353b4b58fab6df5_0.geojson
 ```

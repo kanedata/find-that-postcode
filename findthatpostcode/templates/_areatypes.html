@@ -1,0 +1,21 @@
+<div class="flex-l">
+
+{% for i in key_area_types %}
+  <div class="w-100 w-25-l pr0 pr3-l pv3">
+    <nav class="">
+      <h3 class="f3-ns f4 header-font ma0 normal">{{ i[0] }} areas</h3>
+      <ul class="list pl0">
+      {% for j in area_types if j[0] in i[1] %}
+        <li class="pb2">
+          <a href="{{ url_for('areatypes.get_areatype', areacode=j[0], filetype='html') }}" class="underline dark-blue f4">{{ j[2] }}</a>
+          {% if result.get and result.get(j[0]) %}
+          <small class="gray no-underline fr"> ({{ "{:,.0f}".format(result.get(j[0])) }}{% if loop.index0==0 %} areas{% endif %})</small>
+          {% endif %}
+        </li>
+      {% endfor %}
+      </ul>
+    </nav>
+  </div>
+{% endfor %}
+
+</div>

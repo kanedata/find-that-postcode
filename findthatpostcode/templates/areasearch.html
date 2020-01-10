@@ -1,0 +1,39 @@
+{% from '_utils.html' import input, display_area %}
+
+{% set title = "Search areas" %}
+{% extends "base.html" %}
+{% block content %}
+<form action="{{ url_for('areas.area_search') }}">
+  <div class="cf mt3 flex">
+    {{ input(type="text", name="q", placeholder="Area to search for", order="first", value=(q or '')) }}
+    {{ input(type="submit", value="Search", order="last") }}
+  </div>
+</form>
+
+{% if q %}
+<div class="columns">
+{% if result %}
+  {% if result|length >= total %}
+  <h2 class="header-font mb0 mt4 pa0 f4">Showing all {{ "{:,.0f}".format(total) }} results for "{{ q }}"</h2>
+  {% else %}
+  <h2 class="header-font mb0 mt4 pa0 f4">Showing {{ "{:,.0f}".format(result|length) }} of {{ "{:,.0f}".format(total) }} results for "{{ q }}"</h2>
+  {# <h2 class="title is-5">Showing from {{ "{:,.0f}".format(result["meta"]["from"] + 1) }} to {{ "{:,.0f}".format(min([result["meta"]["from"] + result["meta"]["size"], result["meta"]["result_count"]])) }} of {{ "{:,.0f}".format(result["meta"]["result_count"]) }} results for "{{ get("result",{}).get("meta",{}).get("q","") }}"</h2> #}
+  {% endif %}
+  <ul class="">
+    {% for i, score in result %}
+      <li class="pa0 mv3">
+        {{ display_area(i, hide_areatype=true, div_class="di") }} - 
+        {% if not i.attributes.active %}
+        <span class="red b">Inactive</span>
+        {% endif %}
+        <span class="gray">{{ i.relationships.areatype.attributes.name }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+  {# % #include('pagination.html', pagination=pagination) #}
+  {% else %}
+  <h2 class="header-font mb0 mt4 pa0 f4">No results found</h2>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

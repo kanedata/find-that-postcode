@@ -1,0 +1,10 @@
+{% set title = 'Area types' %}
+{% extends "base.html" %}
+{% block content %}
+<section class="section">
+  <h2 class="f2-ns f3 header-font ma0">
+    <a class="near-black no-underline dim" href="{{ url_for('areatypes.all') }}">Browse by area type</a>
+  </h2>
+  {% include "_areatypes.html" %}
+</section>
+{% endblock %}

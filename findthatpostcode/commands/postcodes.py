@@ -10,7 +10,7 @@ from collections import defaultdict
 import hashlib
 
 import click
-from flask import Flask
+from flask import Flask, current_app
 from flask.cli import with_appcontext
 import requests
 import requests_cache
@@ -18,8 +18,6 @@ from elasticsearch.helpers import bulk
 import tqdm
 
 from .. import db
-
-requests_cache.install_cache()
 
 PC_INDEX = 'geo_postcode'
 
@@ -31,6 +29,9 @@ ONSPD_URL = 'https://www.arcgis.com/sharing/rest/content/items/ae45e39fdafe4520b
 @click.option('--url', default=NSPL_URL)
 @with_appcontext
 def import_nspl(url=NSPL_URL, es_index=PC_INDEX):
+
+    if current_app.config["DEBUG"]:
+        requests_cache.install_cache()
 
     es = db.get_db()
 

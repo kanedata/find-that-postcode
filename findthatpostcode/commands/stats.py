@@ -9,7 +9,7 @@ import datetime
 from collections import defaultdict
 
 import click
-from flask import Flask
+from flask import Flask, current_app
 from flask.cli import with_appcontext
 import requests
 import requests_cache
@@ -18,8 +18,6 @@ import tqdm
 
 from .. import db
 from .codes import AREA_INDEX
-
-requests_cache.install_cache()
 
 IMD2019_URL = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/845345/File_7_-_All_IoD2019_Scores__Ranks__Deciles_and_Population_Denominators_3.csv'
 IMD2015_URL = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/467774/File_7_ID_2015_All_ranks__deciles_and_scores_for_the_Indices_of_Deprivation__and_population_denominators.csv'
@@ -107,7 +105,8 @@ IMD_FIELDS = {
 @with_appcontext
 def import_imd2019(url=IMD2019_URL, es_index=AREA_INDEX):
 
-
+    if current_app.config["DEBUG"]:
+        requests_cache.install_cache()
 
     es = db.get_db()
 
@@ -144,6 +143,9 @@ def import_imd2019(url=IMD2019_URL, es_index=AREA_INDEX):
 @click.option('--url', default=IMD2015_URL)
 @with_appcontext
 def import_imd2015(url=IMD2015_URL, es_index=AREA_INDEX):
+
+    if current_app.config["DEBUG"]:
+        requests_cache.install_cache()
 
     es = db.get_db()
 

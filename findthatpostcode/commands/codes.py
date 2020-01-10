@@ -19,8 +19,6 @@ import tqdm
 from .. import db
 from ..metadata import AREA_TYPES
 
-requests_cache.install_cache()
-
 RGC_URL = 'https://www.arcgis.com/sharing/rest/content/items/eb68d7b8bafe48b68aac10619c087a48/data'
 CHD_URL = 'https://www.arcgis.com/sharing/rest/content/items/56b8f6d2d26646cb9d21fadca2f09452/data'
 MSOA_URL = 'https://visual.parliament.uk/msoanames/static/MSOA-Names-v1.0.0.csv'
@@ -53,6 +51,9 @@ def process_float(value):
 @click.option('--es-index', default=ENTITY_INDEX)
 @with_appcontext
 def import_rgc(url=RGC_URL, es_index=ENTITY_INDEX):
+
+    if current_app.config["DEBUG"]:
+        requests_cache.install_cache()
 
     es = db.get_db()
 
@@ -107,6 +108,9 @@ def import_rgc(url=RGC_URL, es_index=ENTITY_INDEX):
 @click.option('--es-index', default=AREA_INDEX)
 @with_appcontext
 def import_chd(url=CHD_URL, es_index=AREA_INDEX):
+
+    if current_app.config["DEBUG"]:
+        requests_cache.install_cache()
 
     areatypes = {
         entity_code: a[0]
@@ -194,6 +198,9 @@ def import_chd(url=CHD_URL, es_index=AREA_INDEX):
 @click.option('--es-index', default=AREA_INDEX)
 @with_appcontext
 def import_msoa_names(url=MSOA_URL, es_index=AREA_INDEX):
+
+    if current_app.config["DEBUG"]:
+        requests_cache.install_cache()
 
     es = db.get_db()
 

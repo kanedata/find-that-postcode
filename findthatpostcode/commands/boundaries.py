@@ -9,7 +9,7 @@ import datetime
 from collections import defaultdict
 
 import click
-from flask import Flask
+from flask import Flask, current_app
 from flask.cli import with_appcontext
 import requests
 import requests_cache
@@ -20,8 +20,6 @@ import shapely.geometry
 from .. import db
 from .codes import AREA_INDEX
 
-requests_cache.install_cache()
-
 @click.command('boundaries')
 @click.option('--es-index', default=AREA_INDEX)
 @click.option('--code-field', default=None)
@@ -29,6 +27,9 @@ requests_cache.install_cache()
 @click.argument('urls', nargs=-1)
 @with_appcontext
 def import_boundaries(urls, examine=False, code_field=None, es_index=AREA_INDEX):
+
+    if current_app.config["DEBUG"]:
+        requests_cache.install_cache()
 
     es = db.get_db()
 

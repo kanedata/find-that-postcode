@@ -9,7 +9,7 @@ import datetime
 from collections import defaultdict
 
 import click
-from flask import Flask
+from flask import Flask, current_app
 from flask.cli import with_appcontext
 import requests
 import requests_cache
@@ -17,8 +17,6 @@ from elasticsearch.helpers import bulk
 import tqdm
 
 from .. import db
-
-requests_cache.install_cache()
 
 PLACENAMES_INDEX = 'geo_placename'
 
@@ -56,6 +54,9 @@ AREA_LOOKUP = [
 @click.option('--url', default=PLACENAMES_URL)
 @with_appcontext
 def import_placenames(url=PLACENAMES_URL, es_index=PLACENAMES_INDEX):
+
+    if current_app.config["DEBUG"]:
+        requests_cache.install_cache()
 
     es = db.get_db()
 

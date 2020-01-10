@@ -330,6 +330,7 @@ On Dokku server run:
 
 ```bash
 # setup and run import
+dokku config:set findthatpostcode FLASK_APP=findthatpostcode
 dokku run findthatpostcode flask init-db
 dokku run findthatpostcode flask import nspl
 dokku run findthatpostcode flask import rgc

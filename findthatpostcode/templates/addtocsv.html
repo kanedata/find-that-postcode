@@ -80,6 +80,23 @@
                 </td>
               </tr>
               {% endfor %}
+              <tr>
+                <th>Stats fields</th>
+                <th></th>
+                <th></th>
+              </tr>
+              {% for b in stats_fields %}
+              <tr>
+                <td>{{b[1]}}</td>
+                <td><input type="checkbox" name="fields" value="{{b[0]}}"
+                  {% if b[0] in default_fields %}
+                  checked="checked"
+                  {% endif %}
+                  ></td>
+                <td>
+                </td>
+              </tr>
+              {% endfor %}
             {% for i in key_area_types %}
               <tr>
                 <th>{{ i[0] }} areas</th>

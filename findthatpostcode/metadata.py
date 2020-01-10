@@ -63,9 +63,15 @@ BASIC_UPLOAD_FIELDS = [
     ("latlng", "Latitude / Longitude", False),
     ("estnrth", "OS Easting / Northing", False),
     ("pcds", "Standardised postcode", False),
-    ("imd", "Index of multiple deprivation rank", False),
     ("oac11", "2011 Output Area Classification (OAC)", True),
     ("ru11ind", "2011 Census rural-urban classification", True),
+]
+STATS_FIELDS = [
+    ("imd2019_rank", "Index of multiple deprivation (2019) rank", False, "stats.imd2019.imd_rank"),
+    ("imd2019_decile", "Index of multiple deprivation (2019) decile", False, "stats.imd2019.imd_decile"),
+    ("imd2015_rank", "Index of multiple deprivation (2015) rank", False, "stats.imd2015.imd_rank"),
+    ("imd2015_decile", "Index of multiple deprivation (2015) decile", False, "stats.imd2015.imd_decile"),
+    # ("popn", "Total population (2015)", False, "stats.population2015.population_total"),
 ]
 
 

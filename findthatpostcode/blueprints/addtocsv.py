@@ -7,7 +7,7 @@ from flask import Blueprint, current_app, abort, jsonify, make_response, request
 from .utils import return_result
 from .process_csv import process_csv
 from findthatpostcode.controllers.areatypes import area_types_count
-from findthatpostcode.metadata import BASIC_UPLOAD_FIELDS, DEFAULT_UPLOAD_FIELDS
+from findthatpostcode.metadata import BASIC_UPLOAD_FIELDS, DEFAULT_UPLOAD_FIELDS, STATS_FIELDS
 from findthatpostcode.db import get_db
 
 bp = Blueprint('addtocsv', __name__, url_prefix='/addtocsv')
@@ -20,6 +20,7 @@ def addtocsv():
         'addtocsv.html',
         result=ats,
         basic_fields=BASIC_UPLOAD_FIELDS,
+        stats_fields=STATS_FIELDS,
         default_fields=DEFAULT_UPLOAD_FIELDS
     )
 

@@ -1,1 +1,1 @@
-web: gunicorn --pythonpath server server:app
+web: gunicorn findthatpostcode:create_app()

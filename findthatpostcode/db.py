@@ -7,7 +7,11 @@ from flask.cli import with_appcontext
 INDEXES = {
     "geo_postcode": {
         "properties": {
-            "location": {"type": "geo_point"}
+            "location": {"type": "geo_point"},
+            "hash": {
+                "type": "text",
+                "index_prefixes": { }    
+            }
         }
     },
     "geo_placename": {

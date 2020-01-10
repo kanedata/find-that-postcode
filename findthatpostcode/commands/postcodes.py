@@ -7,6 +7,7 @@ import codecs
 import csv
 import datetime
 from collections import defaultdict
+import hashlib
 
 import click
 from flask import Flask
@@ -84,6 +85,11 @@ def import_nspl(url=NSPL_URL, es_index=PC_INDEX):
                 for j in ["oseast1m", "osnrth1m", "usertype", "osgrdind", "imd"]:
                     if i[j]:
                         i[j] = int(i[j])
+
+                # add postcode hash
+                i['hash'] = hashlib.md5(
+                    i["pcds"].lower().replace(" ", "").encode()
+                ).hexdigest()
 
                 record["doc"] = i
                 postcodes.append(record)

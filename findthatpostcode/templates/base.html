@@ -3,16 +3,8 @@
 <html>
   <head>
 		<link href="{{ url_for('static', filename='bulma.min.css') }}" rel="stylesheet" type="text/css" />
-    {% if 'leaflet' in includes %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='leaflet/leaflet.css') }}" />
-    <script type="text/javascript" src="{{ url_for('static', filename='leaflet/leaflet.js') }}"></script>
-    <script type="text/javascript" src="https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js?v1.3.0"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='leaflet/L.OSGraticule.js') }}"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/leaflet.snogylop@0.4.0/src/leaflet.snogylop.min.js"></script>
-    {% endif %}
-    {% if 'papaparse' in includes %}
-    <script src="{{ url_for('static', filename='papaparse/papaparse.min.js') }}"></script>
-    {% endif %}
+    {% block headscripts %}
+    {% endblock %}
     <title>{{ title or default_title }}</title>
   </head>
   <body>
@@ -61,5 +53,7 @@
         </div>
       </div>
     </footer>
+    {% block bodyscripts %}
+    {% endblock %}
   </body>
 </html>

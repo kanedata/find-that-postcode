@@ -12,8 +12,16 @@
   {% set subtitle = 'No longer used' if result.attributes.doterm else '' %}
 {% endif %}
 
-{% set includes = ['leaflet'] %}
 {% extends 'base.html' %}
+
+{% block headscripts %}
+<link rel="stylesheet" href="{{ url_for('static', filename='leaflet/leaflet.css') }}" />
+<script type="text/javascript" src="{{ url_for('static', filename='leaflet/leaflet.js') }}"></script>
+<script type="text/javascript" src="https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js?v1.3.0"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='leaflet/L.OSGraticule.js') }}"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/leaflet.snogylop@0.4.0/src/leaflet.snogylop.min.js"></script>
+{% endblock %}
+
 {% block content %}
 <div class="columns">
   <div class="column">
@@ -135,6 +143,9 @@
     </table>
   </div>
 </div>
+{% endblock %}
+
+{% block bodyscripts %}
 <script type="text/javascript">
   var postcode_location = [{{ result.attributes["location"]["lat"] }},{{ result.attributes["location"]["lon"] }}]
   var mymap = L.map('postcode-map').setView(postcode_location, 11);

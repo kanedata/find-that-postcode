@@ -24,7 +24,7 @@ def area_search(filetype="json"):
         'areasearch.html',
         result=list(result),
         q=q,
-        total=areas['result_count']['value']
+        total=areas['result_count']
     )
 
 @bp.route('/names.csv')

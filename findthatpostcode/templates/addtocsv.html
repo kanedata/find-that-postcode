@@ -1,6 +1,12 @@
-{% set includes = ['papaparse'] %}
 {% set title = 'Add fields to CSV' %}
 {% extends "base.html" %}
+
+{% block headscripts %}
+<script src="{{ url_for('static', filename='papaparse/papaparse.min.js') }}"></script>
+<script src="{{ url_for('static', filename='crypto-js/core.min.js') }}"></script>
+<script src="{{ url_for('static', filename='crypto-js/md5.min.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 <form action="" method="post" enctype="multipart/form-data">
   <div class="columns">
@@ -28,7 +34,7 @@
         </div>
         <p class="help">Maximum file size 5MB</p>
       </div>
-      <div class="field is-hidden" id="csvpreview">
+      <div class="field is-hidden" id="csvpreview" style='overflow-x:auto;max-width:600px;'>
         <label class="label">CSV Preview</label>
         <table class="table is-fullwidth is-narrow"></table>
       </div>
@@ -40,7 +46,7 @@
       </div>
       <div class="field">
         <p class="control">
-          <input class="button is-primary" type="submit" value="Upload" />
+          <input class="button is-primary" type="submit" value="Upload" id='fetch_postcodes' />
         </p>
       </div>
     </div>
@@ -112,80 +118,11 @@
     </div>
   </div>
 </form>
+{% endblock %}
+
+{% block bodyscripts %}
 <script>
-  var file = document.getElementById("csvfile");
-  file.onchange = function () {
-    if (file.files.length > 0) {
-      document.getElementById('csvfilename').innerHTML = file.files[0].name;
-      document.getElementById('csvpreview').classList.remove("is-hidden");
-      document.getElementById('csvpreview').getElementsByTagName('table')[0].innerHTML = '';
-      Papa.parse(file.files[0], {
-        header: true,
-        preview: 5,
-        complete: function (results) {
-          console.log("Finished:", results.data);
-          console.log("Finished:", results.meta.fields);
-          var preview = document.getElementById('csvpreview');
-          var header_row = document.createElement('tr');
-          for(const f of ['', 'Field name', 'Example values']){
-            header_row.appendChild(document.createElement('th')).appendChild(document.createTextNode(f));
-          }
-          preview.getElementsByTagName('table')[0].appendChild(header_row);
-          for(const f of results.meta.fields){
-            var row = document.createElement('tr');
-            var radio = row.appendChild(document.createElement('th')).appendChild(document.createElement('input'))
-            radio.setAttribute('type', 'radio');
-            radio.setAttribute('name', 'postcode_field');
-            radio.setAttribute('value', f);
-            if (f.toLowerCase().replace(/[^a-z]/gi, '')=="postcode"){
-              radio.setAttribute('checked', true);
-              document.getElementById('column_name').setAttribute('value', f);
-            }
-            radio.onclick = function(){
-              if(this.checked){
-                document.getElementById('column_name').setAttribute('value', this.value);
-              }
-            }
-            row.appendChild(document.createElement('th')).appendChild(document.createTextNode(f));
-            var field = document.createElement('td');
-            var field_ul = document.createElement('ul');
-            field_ul.classList.add('tags');
-            let values_seen = []
-            for (const r of results.data) {
-              if((!values_seen.includes(r[f])) && (r[f]!='')){
-                var field_li = field_ul.appendChild(document.createElement('li'))
-                field_li.classList.add('tag');
-                field_li.appendChild(document.createTextNode(r[f]));
-                values_seen.push(r[f]);
-              }
-            }
-            field.appendChild(field_ul)
-            row.appendChild(field);
-            preview.getElementsByTagName('table')[0].appendChild(row);
-          }
-        }
-      });
-    } else {
-      document.getElementById('csvfilename').innerHTML = "";
-      document.getElementById('csvpreview').classList.add("is-hidden");
-    }
-  };
-
-  document.getElementById("select_all_codes").onchange = function(ev){
-    Array.prototype.forEach.call(document.getElementsByName("fields"), function (item) {
-      if(!item.value.endsWith("_name")){
-        item.checked = ev.target.checked;
-      }
-    });
-  }
-
-  document.getElementById("select_all_names").onchange = function(ev){
-    Array.prototype.forEach.call(document.getElementsByName("fields"), function (item) {
-      if(item.value.endsWith("_name")){
-        item.checked = ev.target.checked;
-      }
-    });
-  }
-
+var hash_url = {{ url_for('postcodes.get_postcode_by_hash', hash='xxx', _external=true)|tojson }};
 </script>
+<script src="{{ url_for('static', filename='csv.js') }}"></script>
 {% endblock %}

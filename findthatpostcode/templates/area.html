@@ -26,6 +26,15 @@
 {% set subtitle = result.relationships.areatype.attributes.name %}
 {% set example_postcodes = result.relationships.example_postcodes %}
 {% extends "base.html" %}
+
+{% block headscripts %}
+<link rel="stylesheet" href="{{ url_for('static', filename='leaflet/leaflet.css') }}" />
+<script type="text/javascript" src="{{ url_for('static', filename='leaflet/leaflet.js') }}"></script>
+<script type="text/javascript" src="https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js?v1.3.0"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='leaflet/L.OSGraticule.js') }}"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/leaflet.snogylop@0.4.0/src/leaflet.snogylop.min.js"></script>
+{% endblock %}
+
 {% block content %}
 <div class="columns">
   <div class="column">
@@ -152,6 +161,9 @@
     <br>
   </div>
 </div>
+{% endblock %}
+
+{% block bodyscripts %}
 {% if example_postcodes or result.attributes.has_boundary %}
 <script type="text/javascript">
   var postcodes = [

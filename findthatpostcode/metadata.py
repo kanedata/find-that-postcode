@@ -27,8 +27,8 @@ AREA_TYPES = [
 ]
 
 KEY_AREA_TYPES = [
-    ("Key", ["ctry", "region", "cty", "laua", "ward", "oa11", "pcon", "rgn"]),
-    ("Secondary", ["ttwa", "pfa", "lep", "msoa11", "lsoa11", "park"]),
+    ("Key", ["ctry", "rgn", "cty", "laua", "ward", "lsoa11", "pcon"]),
+    ("Secondary", ["ttwa", "pfa", "lep", "msoa11", "oa11", "park"]),
     ("Health", ["ccg", "hlthau", "hro", "pct"]),
     ("Other", ["eer", "bua11", "buasd11", "wz11", "teclec", "nuts"]),
 ]

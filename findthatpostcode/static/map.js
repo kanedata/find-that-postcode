@@ -6,7 +6,7 @@ var mymap = L.map('postcode-map', {
     9
 );
 var layer = new L.StamenTileLayer("toner").addTo(mymap);
-// L.osGraticule({ showLabels: false, lineColor: '#ddd' }).addTo(mymap);
+L.osGraticule({ showLabels: false, lineColor: '#ddd' }).addTo(mymap);
 
 var markers = L.featureGroup();
 for (const postcode of postcodes){
@@ -21,24 +21,43 @@ for (const postcode of postcodes){
     //     }
     // ).openPopup();
 }
-// markers.addTo(mymap);
-if(!geojson){
+
+var postcode_show = function () {
+    if ("show_postcode" in window && show_postcode) {
+        markers.addTo(mymap);
+    }
+}
+
+if(geojson){
+    fetch(geojson)
+        .then(function (response) {
+            if (response.status !== 200) {
+                throw new Error("Not 200 response")
+            } else {
+                return response.json();
+            }
+        })
+        .then(function (geojson) {
+            var boundary_json = L.geoJSON(geojson, {
+                // invert: true,
+                style: {
+                    stroke: true,
+                    color: '#FFFF00',
+                    weight: 5,
+                    // fill: true,
+                    // fillColor: '#fff',
+                    // fillOpacity: 0.95
+                }
+            });
+            boundary_json.addTo(mymap);
+            postcode_show();
+            mymap.fitBounds(boundary_json.getBounds());
+        })
+        .catch((error) => {
+            postcode_show();
+            mymap.fitBounds(markers.getBounds());
+        });
+} else {
+    postcode_show();
     mymap.fitBounds(markers.getBounds());
 }
-fetch(geojson)
-    .then(function (response) {
-        return response.json();
-    }).then(function (geojson) {
-        var boundary_json = L.geoJSON(geojson, {
-            invert: true,
-            style: {
-                stroke: true,
-                weight: 2,
-                fill: true,
-                fillColor: '#fff',
-                fillOpacity: 0.95
-            }
-        });
-        boundary_json.addTo(mymap);
-        mymap.fitBounds(boundary_json.getBounds());
-    });

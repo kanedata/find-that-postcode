@@ -1,29 +1,11 @@
-{% macro display_area(area) %}
-<div class="control">
-  <div class="tags has-addons">
-    {% if area.found and area.attributes %}
-    <a href="{{ url_for('areas.get_area', areacode=area.id, filetype='html') }}" class='tag is-info'>
-      {{ area.attributes.name }}
-      [{{ area.id }}]
-    </a>
-    {% if area.relationships.areatype %}
-    <a href="{{ url_for('areatypes.get_areatype', areacode=area.relationships.areatype.id, filetype='html') }}" class='tag'>
-      {{ area.relationships.areatype.attributes.name }}
-    </a>
-    {% endif %}
-    {% else %}
-    <span class='tag'>
-      {{ area.id }}
-    </span>
-    {% endif %}
-  </div>
-</div>
-{% endmacro %}
-
-
+{% from '_utils.html' import info_block, display_area, area_loop %}
 {% set includes = ['leaflet'] %}
-{% set title = "{} - {}".format(result.attributes.name, result.id) %}
+{% set title = "{} - <code>{}</code>".format(result.attributes.name, result.id) %}
+{% if result.attributes.active %}
 {% set subtitle = result.relationships.areatype.attributes.name %}
+{% else %}
+{% set subtitle = "<span class='bg-red white pa2 mt2 dib'>INACTIVE</span> {}".format(result.relationships.areatype.attributes.name) %}
+{% endif %}
 {% set example_postcodes = result.relationships.example_postcodes %}
 {% extends "base.html" %}
 
@@ -36,130 +18,99 @@
 {% endblock %}
 
 {% block content %}
-<div class="columns">
-  <div class="column">
-    <figure>
-      <div id="postcode-map" style="height:500px;"></div>
-    </figure>
-    <br>
-  </div>
-  <div class="column">
+<div class="cf">
+  <div class="fl w-third-l w-100 pr4 f5">
     {% if result.attributes.has_boundary %}
-    <div class="clearfix">
-      <a href="{{ url_for('areas.get_area', areacode=result.id, filetype='geojson') }}" class="is-pulled-right button is-link">Boundary (geoJSON)</a>
+    <div class="mb3">
+      <a href="{{ url_for('areas.get_area', areacode=result.id, filetype='geojson') }}" class="link blue underline-hover">Boundary (geoJSON)</a>
     </div>
     {% endif %}
-    <table class="table is-fullwidth">
-      {% if example_postcodes %}
-      <tr>
-        <td>Example postcodes</td>
-        <td>
-          <div class="tags">
-          {% for i in example_postcodes[0:5] %}
-          <a href='/postcodes/{{ i["id"] }}.html' class='tag'>{{ i.id }}</a>
-          {% endfor %}
-          </div>
-        </td>
-      </tr>
-      {% endif %}
+    
+    {% if result.relationships.successor %}
+    {% call info_block("Successor area") %}
+      {{ area_loop(result.relationships.successor, result.id)}}
+    {% endcall %}
+    {% endif %}
 
-      {% if result.relationships.parent %}
-      <tr>
-        <td>Parent area</td>
-        <td>
-          {{ display_area(result.relationships.parent) }}
-        </td>
-      </tr>
-      {% endif %}
+    {% if example_postcodes %}
+    {% call info_block("Example postcodes") %}
+      <ul class="list pa0 ma0">
+        {% for i in example_postcodes[0:5] %}
+        <li class="dib">
+          <code class="pa1 code mr2">
+          <a href='/postcodes/{{ i["id"] }}.html' class='near-black link underline-hover'>{{ i.id }}</a>
+          </code>
+        </li>
+        {% endfor %}
+      </ul>
+    {% endcall %}
+    {% endif %}
+    
+    {% if result.relationships.parent %}
+    {% call info_block("Parent area") %}
+      {{ display_area(result.relationships.parent) }}
+    {% endcall %}
+    {% endif %}
+    
+    {% if result.relationships.children and result.attributes.child_count %}
+    {% call info_block("Child areas - {} areas".format(result.attributes.child_count)) %}
+      {{ area_loop(result.relationships.children, result.id)}}
+    {% endcall %}
+    {% endif %}
+    
+    {% if result.relationships.predecessor %}
+    {% call info_block("Predecessor area") %}
+      {{ area_loop(result.relationships.predecessor, result.id)}}
+    {% endcall %}
+    {% endif %}
 
-      {% if result.relationships.children and result.attributes.child_count %}
-      <tr>
-        <td>Child area{% if result.attributes.child_count > 1 %}s{% endif %}</td>
-        <td>
-          <p>{{ result.attributes.child_count }} area{% if result.attributes.child_count > 1 %}s{% endif %}</p>
-          <div class="field is-grouped is-grouped-multiline">
-          {% for a in result.relationships.children %}
-          {{ display_area(a) }}<br>
-          {% endfor %}
-          </div>
-        </td>
-      </tr>
-      {% endif %}
 
-      {% if result.relationships.predecessor %}
-      <tr>
-        <td>Predecessor area{% if result.relationships.predecessor|length > 1 %}s{% endif %}</td>
-        <td>
-          <div class="field is-grouped is-grouped-multiline">
-          {% for a in result.relationships.predecessor %}
-          {{ display_area(a) }}
-          {% endfor %}
-          </div>
-        </td>
-      </tr>
-      {% endif %}
-      {% if result.relationships.successor %}
-      <tr>
-        <td>Successor area{% if result.relationships.successor|length > 1 %}s{% endif %}</td>
-        <td>
-          <div class="field is-grouped is-grouped-multiline">
-          {% for a in result.relationships.successor %}
-          {{ display_area(a) }}
-          {% endfor %}
-          </div>
-        </td>
-      </tr>
-      {% endif %}
 
-      <tr>
-        <td>Start date</td>
-        <td>{{ "{:%B %Y}".format(result.attributes.date_start) }}</td>
-      </tr>
+    {% call info_block("Start date") %}
+        {{ "{:%B %Y}".format(result.attributes.date_start) }}
+    {% endcall %}
 
-      {% if result.attributes.date_end %}
-      <tr>
-        <td>End date</td>
-        <td>{{ "{:%B %Y}".format(result.attributes.date_end) }}</td>
-      </tr>
-      {% endif %}
+    {% if result.attributes.date_end %}
+    {% call info_block("End date") %}
+        {{ "{:%B %Y}".format(result.attributes.date_end) }}
+    {% endcall %}
+    {% endif %}
 
-      {% if result.attributes.owner %}
-      <tr>
-        <td>Owner</td>
-        <td>{{ result.attributes.owner}}</td>
-      </tr>
-      {% endif %}
-      {% if result.attributes.equivalents %}
-      <tr>
-        <td>Equivalent codes</td>
-        <td>
-          <div class="field is-grouped is-grouped-multiline">
+    {% if result.attributes.owner %}
+    {% call info_block("Owner") %}
+        {{ result.attributes.owner}}
+    {% endcall %}
+    {% endif %}
+
+    {% if result.attributes.equivalents %}
+    {% call info_block("Equivalent codes") %}
+          <ul class="list ma0 pa0">
           {% for k, v in result.attributes.equivalents.items() %}
-            <div class="control">
-              <div class="tags has-addons">
-                <span class="tag is-dark">{{ k }}</span>
-                <span class="tag is-info">{{ v }}</span>
-              </div>
-            </div>
+            <li><strong>{{ k }}</strong>: <code class="pv1 ph2 bg-light-gray code">{{ v }}</code></li>
           {% endfor %}
-          </div>
-        </td>
-      </tr>
-      {% endif %}
-      {% if result.attributes.statutory_instrument_title %}
-      <tr>
-        <td>Statutory instrument</td>
-        <td>
+          </ul>
+    {% endcall %}
+    {% endif %}
+
+    {% if result.attributes.statutory_instrument_title %}
+    {% call info_block("Statutory instrument") %}
           {{ result.attributes.statutory_instrument_title}}
           {% if result.attributes.statutory_instrument_id %}
           ({{result.attributes.statutory_instrument_id}})
           {% endif %}
-        </td>
-      </tr>
-      {% endif %}
-    </table>
+    {% endcall %}
+    {% endif %}
+    
+  </div>
+  
+  {% if result.attributes.has_boundary or example_postcodes %}
+  <div class="fl w-two-thirds-l w-100">
+    <figure class="ma0">
+      <div id="postcode-map" style="height:500px;"></div>
+    </figure>
     <br>
   </div>
+  {% endif %}
 </div>
 {% endblock %}
 

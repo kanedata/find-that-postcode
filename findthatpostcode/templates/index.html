@@ -1,137 +1,131 @@
+{% from '_utils.html' import input %}
+
+{% macro frontpageblock(title, subtitle, title_link) %}
+<div class="w-100 w-third-l ph0 ph3-l pv3">
+  <h2 class="f2-ns f3 header-font ma0 normal">
+    {% if title_link %}
+    <a href="{{ title_link }}" class="near-black">{{ title }}</a>
+    {% else %}
+    {{ title }}
+    {% endif %}
+  </h2>
+  {% if subtitle %}
+  <p class="f3-ns f4 black-70 header-font ma0 normal">
+    {{ subtitle }}
+  </p>
+  {% endif %}
+  {{ caller() }}
+</div>
+{% endmacro %}
+
+
+{% set frontpage = true %}
 {% extends "base.html" %}
 {% block content %}
-<div class="content">
+<div class="flex flex-wrap">
+
+  {% call frontpageblock("Search by postcode") %}
+  <form action="{{ url_for('postcodes.postcode_redirect') }}">
+    <div class="cf mt3 flex">
+      {{ input(type="text", name="postcode", placeholder="AB12 3CD", order="first") }}
+      {{ input(type="submit", value="Search", order="last") }}
+    </div>
+  </form>
+  {% endcall %}
+  
+  {% call frontpageblock("Search areas", title_link=url_for('areas.area_search')) %}
+  <form action="{{ url_for('areas.area_search') }}">
+    <div class="cf mt3 flex">
+      {{ input(type="text", name="q", placeholder="Summershire", order="first") }}
+      {{ input(type="submit", value="Search", order="last") }}
+    </div>
+  </form>
+  {% endcall %}
+  
+  {% call frontpageblock("Find a postcode", subtitle="Nearest to a point") %}
+  <form action="{{ url_for('points.point_redirect') }}">
+    <div class="cf mt3 flex-ns">
+      {{ input(type="text", name="lat", id="lat", placeholder="Latitude", order="first") }}
+      {{ input(type="text", name="lon", id="lon", placeholder="Longitude") }}
+      {{ input(type="submit", id="point_search", value="Search", order="last") }}
+    </div>
+  </form>
+  <a class="link near-black bn button-reset underline dim db pa0 mt2 bg-inherit" id="get_current_latlong" onclick="get_latlon()" href="#">Use your location</a>
+  {% endcall %}
+  
+  {% call frontpageblock("Add data to a CSV file", title_link=url_for('addtocsv.addtocsv')) %}
+  <p>Upload a CSV with a column of postcode data and add information about those postcodes
+  to it. Information includes latitude/longitude and areas.</p><br>
+  <a class="f6 f5-l button-reset fl pa3 no-underline tc bn bg-animate bg-yellow dim near-black pointer br2-ns" href="{{url_for('addtocsv.addtocsv')}}">Upload a CSV</a>
+  {% endcall %}
+
+  {% call frontpageblock("Use the API", title_link="#api") %}
+  <p>The API provides programmatic access to the postcode data, using the
+  <a href="http://jsonapi.org/">JSON api</a> specification.</p><br>
+  <a class="f6 f5-l button-reset fl pa3 no-underline tc bn bg-animate bg-yellow dim near-black pointer br2-ns" href="#api">Use the API</a>
+  {% endcall %}
+
 </div>
-<section class="section">
-  <div class="columns">
-    <div class="column">
-      <h2 class="title">Search by postcode</h2>
-    </div>
-    <div class="column">
-      <h2 class="title"><a href="{{ url_for('areas.area_search') }}">Search areas</a></h2>
-    </div>
-    <div class="column">
-      <h2 class="title">Find a postcode</h2>
-      <h3 class="subtitle">Nearest to a point</h3>
-    </div>
-  </div>
-  <div class="columns">
-    <div class="column">
-      <form action="{{ url_for('postcodes.postcode_redirect') }}">
-        <div class="field has-addons">
-          <p class="control">
-            <input class="input is-large" type="text" name="postcode" placeholder="AB12 3CD">
-          </p>
-          <p class="control">
-            <input type="submit" class="button is-info is-large" value="Search" />
-          </p>
-        </div>
-      </form>
-    </div>
-    <div class="column">
-      <form action="{{ url_for('areas.area_search') }}">
-        <div class="field has-addons">
-          <p class="control">
-            <input class="input is-large" type="text" name="q" placeholder="Summershire">
-          </p>
-          <p class="control">
-            <input type="submit" class="button is-info is-large" value="Search" />
-          </p>
-        </div>
-      </form>
-    </div>
-    <div class="column">
-      <form action="{{ url_for('points.point_redirect') }}">
-        <div class="field has-addons">
-          <p class="control">
-            <input class="input is-large" type="text" name="lat" id="lat" placeholder="Latitude">
-          </p>
-          <p class="control">
-            <input class="input is-large" type="text" name="lon" id="lon" placeholder="Longitude">
-          </p>
-          <p class="control">
-            <input type="submit" class="button is-info is-large" id="point_search" value="Search" />
-          </p>
-        </div>
-      </form>
-      <button class="button is-text" id="get_current_latlong" onclick="get_latlon()">Use your location</button>
-    </div>
-  </div>
-  <div class="columns">
-    <div class="column is-4">
-      <h2 class="title"><a href="/addtocsv">Add data to a CSV file</a></h2>
-      <p>Upload a CSV with a column of postcode data and add information about those postcodes
-      to it. Information includes latitude/longitude and areas.</p><br>
-      <a class="button is-info is-medium" href="/addtocsv">Upload a CSV</a>
-    </div>
-    <div class="column is-4">
-      <h2 class="title"><a href="#api">Use the API</a></h2>
-      <p>The API provides programmatic access to the postcode data, using the
-      <a href="http://jsonapi.org/">JSON api</a> specification.</p><br>
-      <a class="button is-info is-medium is-outlined" href="#api">Use the API</a>
-    </div>
-  </div>
-</section>
-<section class="section">
-  <h2 class="title"><a href="{{ url_for('areatypes.all') }}">Browse by area type</a></h2>
+
+<section class="section pa3 bg-light-gray mt4">
+  <h2 class="f2-ns f3 header-font normal ma0">
+    <a class="near-black no-underline dim" href="{{ url_for('areatypes.all') }}">Browse by area type</a>
+  </h2>
   {% include "_areatypes.html" %}
 </section>
+
 <section class="section" id="api">
-  <h2 class="title">Use the API</h2>
-  <div class="columns">
-    <div class="column">
-      <div class="content">
-        <p>The API provides programmatic access to the postcode data, using the <a href="http://jsonapi.org/">JSON api</a> specification.</p>
-        <p>The <code>.json</code> at the end of the url is optional, requests will return json by default unless <code>.html</code> is added.</p>
-        <p><a href="https://en.wikipedia.org/wiki/ONS_coding_system#Current_GSS_coding_system">ONS GSS codes</a> are used for area IDs.</p>
-      </div>
-      <div class="content is-medium">
-        <h3 class="title is-4">Example requests</h3>
-        <table>
-          <tr>
-            <td>Get data on a postcode</td>
-            <td><code>{{ url_for('postcodes.get_postcode', postcode='AB12 3CD', filetype='json')|replace('%20', '+') }}</code></td>
-            <td><a href="{{ url_for('postcodes.get_postcode', postcode='SW1A 1AA', filetype='json') }}">Example</a></td>
-            <td><a href="{{ url_for('postcodes.get_postcode', postcode='SW1A 1AA', filetype='html') }}">Example HTML</a></td>
-          </tr>
-          <tr>
-            <td>Get data about a postcode nearest<br>to a latitude, longitude point</td>
-            <td><code>{{ url_for('points.get', lat=51.501009, lon=-0.141588, filetype='json')|replace('%2C', ',') }}</code></td>
-            <td><a href="{{ url_for('points.get', lat=51.501009, lon=-0.141588, filetype='json') }}">Example</a></td>
-            <td><a href="{{ url_for('points.get', lat=51.501009, lon=-0.141588, filetype='html') }}">Example HTML</a></td>
-          </tr>
-          <tr>
-            <td>Get data about an area<br><small>Includes 5 random postcodes from the area</small></td>
-            <td><code>{{ url_for('areas.get_area', areacode='E01000001', filetype='json') }}</code></td>
-            <td><a href="{{ url_for('areas.get_area', areacode='E14000639', filetype='json') }}">Example</a></td>
-            <td><a href="{{ url_for('areas.get_area', areacode='E14000639', filetype='html') }}">Example HTML</a></td>
-          </tr>
-          <tr>
-            <td>Get an area's boundaries as geojson<br><small>NB not available for all areas</small></td>
-            <td><code>{{ url_for('areas.get_area', areacode='E01000001', filetype='geojson') }}</code></td>
-            <td><a href="{{ url_for('areas.get_area', areacode='E14000639', filetype='geojson') }}">Example</a></td>
-          </tr>
-          <tr>
-            <td>Search for areas containing a string</td>
-            <td><code>{{ url_for('areas.area_search', q='search term', filetype='json') }}</code></td>
-            <td><a href="{{ url_for('areas.area_search', q='Westminster', filetype='json') }}">Example</a></td>
-            <td><a href="{{ url_for('areas.area_search', q='Westminster', filetype='html') }}">Example HTML</a></td>
-          </tr>
-          <tr>
-            <td>Get information about a type of area<br><small>(local authority, parliamentary constituency, etc)</small></td>
-            <td><code>{{ url_for('areatypes.get_areatype', areacode='pcon', filetype='json') }}</code></td>
-            <td><a href="{{ url_for('areatypes.get_areatype', areacode='pcon', filetype='json') }}">Example</a></td>
-            <td><a href="{{ url_for('areatypes.get_areatype', areacode='pcon', filetype='html') }}">Example HTML</a></td>
-          </tr>
-          <tr>
-            <td>Get information about all types of area</td>
-            <td><code>{{ url_for('areatypes.all') }}</code></td>
-            <td></td>
-            <td><a href="{{ url_for('areatypes.all') }}">HTML</a></td>
-          </tr>
-        </table>
-      </div>
-    </div>
+  <h2 class="f2-ns f3 header-font normal">Use the API</h2>
+  <div class="fl w-third-l w-100 pa2">
+    <p>The API provides programmatic access to the postcode data, using the <a href="http://jsonapi.org/">JSON api</a> specification.</p>
+    <p>The <code>.json</code> at the end of the url is optional, requests will return json by default unless <code>.html</code> is added.</p>
+    <p><a href="https://en.wikipedia.org/wiki/ONS_coding_system#Current_GSS_coding_system">ONS GSS codes</a> are used for area IDs.</p>
+  </div>
+  <div class="fl w-two-thirds-l w-100 pa2 is-medium">
+    <h3 class="f3-ns f4 header-font ma0 normal">Example requests</h3>
+    <table class="w-100">
+      <tr>
+        <td>Get data on a postcode</td>
+        <td><code>{{ url_for('postcodes.get_postcode', postcode='AB12 3CD', filetype='json')|replace('%20', '+') }}</code></td>
+        <td><a href="{{ url_for('postcodes.get_postcode', postcode='SW1A 1AA', filetype='json') }}">Example</a></td>
+        <td><a href="{{ url_for('postcodes.get_postcode', postcode='SW1A 1AA', filetype='html') }}">Example HTML</a></td>
+      </tr>
+      <tr>
+        <td>Get data about a postcode nearest<br>to a latitude, longitude point</td>
+        <td><code>{{ url_for('points.get', lat=51.501009, lon=-0.141588, filetype='json')|replace('%2C', ',') }}</code></td>
+        <td><a href="{{ url_for('points.get', lat=51.501009, lon=-0.141588, filetype='json') }}">Example</a></td>
+        <td><a href="{{ url_for('points.get', lat=51.501009, lon=-0.141588, filetype='html') }}">Example HTML</a></td>
+      </tr>
+      <tr>
+        <td>Get data about an area<br><small>Includes 5 random postcodes from the area</small></td>
+        <td><code>{{ url_for('areas.get_area', areacode='E01000001', filetype='json') }}</code></td>
+        <td><a href="{{ url_for('areas.get_area', areacode='E14000639', filetype='json') }}">Example</a></td>
+        <td><a href="{{ url_for('areas.get_area', areacode='E14000639', filetype='html') }}">Example HTML</a></td>
+      </tr>
+      <tr>
+        <td>Get an area's boundaries as geojson<br><small>NB not available for all areas</small></td>
+        <td><code>{{ url_for('areas.get_area', areacode='E01000001', filetype='geojson') }}</code></td>
+        <td><a href="{{ url_for('areas.get_area', areacode='E14000639', filetype='geojson') }}">Example</a></td>
+      </tr>
+      <tr>
+        <td>Search for areas containing a string</td>
+        <td><code>{{ url_for('areas.area_search', q='search term', filetype='json') }}</code></td>
+        <td><a href="{{ url_for('areas.area_search', q='Westminster', filetype='json') }}">Example</a></td>
+        <td><a href="{{ url_for('areas.area_search', q='Westminster', filetype='html') }}">Example HTML</a></td>
+      </tr>
+      <tr>
+        <td>Get information about a type of area<br><small>(local authority, parliamentary constituency, etc)</small></td>
+        <td><code>{{ url_for('areatypes.get_areatype', areacode='pcon', filetype='json') }}</code></td>
+        <td><a href="{{ url_for('areatypes.get_areatype', areacode='pcon', filetype='json') }}">Example</a></td>
+        <td><a href="{{ url_for('areatypes.get_areatype', areacode='pcon', filetype='html') }}">Example HTML</a></td>
+      </tr>
+      <tr>
+        <td>Get information about all types of area</td>
+        <td><code>{{ url_for('areatypes.all') }}</code></td>
+        <td></td>
+        <td><a href="{{ url_for('areatypes.all') }}">HTML</a></td>
+      </tr>
+    </table>
   </div>
 </section>
 {% endblock %}

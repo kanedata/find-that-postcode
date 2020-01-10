@@ -18,6 +18,7 @@ function update_fields_table(results, table) {
     for (const f of ['', 'Field name', 'Example values']) {
         header_row.appendChild(document.createElement('th')).appendChild(document.createTextNode(f));
     }
+    header_row.childNodes[1].classList.add('w5');
     table.appendChild(header_row);
     for (const f of results.meta.fields) {
         var row = document.createElement('tr');
@@ -37,16 +38,16 @@ function update_fields_table(results, table) {
         row.appendChild(document.createElement('th')).appendChild(document.createTextNode(f));
         var field = document.createElement('td');
         var field_ul = document.createElement('ul');
-        field_ul.classList.add('tags');
+        field_ul.classList.add('list', 'pa0', 'ma0');
         let values_seen = []
         for (const r of results.data) {
-            if ((!values_seen.includes(r[f])) && (r[f] != '')) {
+            if ((!values_seen.includes(r[f])) && (r[f] != '') && (typeof r[f] != 'undefined')) {
                 var field_li = field_ul.appendChild(document.createElement('li'))
-                field_li.classList.add('tag');
+                field_li.classList.add('dib', 'code', 'mr2', 'bg-light-gray', 'mb1', 'tl', 'truncate', 'mw5');
                 field_li.appendChild(document.createTextNode(r[f]));
                 values_seen.push(r[f]);
             }
-            if(values_seen.length > 5){
+            if(values_seen.length >= 5){
                 break;
             }
         }
@@ -160,7 +161,7 @@ var file = document.getElementById("csvfile");
 file.onchange = function () {
     if (file.files.length > 0) {
         document.getElementById('csvfilename').innerHTML = file.files[0].name;
-        document.getElementById('csvpreview').classList.remove("is-hidden");
+        document.getElementById('csvpreview').classList.remove("dn");
         document.getElementById('csvpreview').getElementsByTagName('table')[0].innerHTML = '';
         Papa.parse(file.files[0], {
             header: true,
@@ -176,7 +177,7 @@ file.onchange = function () {
         });
     } else {
         document.getElementById('csvfilename').innerHTML = "";
-        document.getElementById('csvpreview').classList.add("is-hidden");
+        document.getElementById('csvpreview').classList.add("dn");
     }
 };
 

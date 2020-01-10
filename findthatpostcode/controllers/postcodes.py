@@ -93,6 +93,16 @@ class Postcode(Controller):
                 if a.relationships["areatype"].id == attr:
                     return a.id
 
+
+    def get_area(self, areatype):
+        """
+        Get the area for this postcode based on the type
+        """
+        for a in self.relationships["areas"]:
+            if a.relationships["areatype"].id == areatype:
+                return a
+
+
     @staticmethod
     def parse_id(postcode):
         """

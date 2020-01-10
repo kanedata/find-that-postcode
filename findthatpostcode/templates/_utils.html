@@ -1,0 +1,45 @@
+{% macro display_area(area, hide_areatype, div_class='') %}
+<div class="{{div_class}}">
+    <span class='pa1 bg-light-gray code mr1'><a href="{{ url_for('areas.get_area', areacode=area.id, filetype='html') }}" class='near-black code link underline-hover'>{{ area.id }}</a></span>
+    {% if area.found and area.attributes %}
+    <a href="{{ url_for('areas.get_area', areacode=area.id, filetype='html') }}" class='blue link underline-hover dim'>
+      {{ area.attributes.name }}
+    </a>
+    {% endif %}
+    {% if area.relationships.areatype and not hide_areatype %}
+    <a href="{{ url_for('areatypes.get_areatype', areacode=area.relationships.areatype.id, filetype='html') }}" class='gray f6 link underline-hover dim'>
+      ({{- area.relationships.areatype.attributes.name -}})
+    </a>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{% macro info_block(header) %}
+<div class="mb3">
+  <h3 class="mh0 mt0 mb2 header-font b">{{header}}</h3>
+  <div class="ma0">
+    {{ caller() }}
+  </div>
+</div>
+{% endmacro %}
+
+{% macro area_loop(areas, main_id) %}
+<ul class="list pa0 ma0">
+{% for a in areas if a.id != main_id %}
+<li class="mb1">{{ display_area(a) }}</li>
+{% endfor %}
+</ul>
+{% endmacro %}
+
+{% macro input(type, placeholder, value, name, order, id) %}
+
+{% if order=='first' %}
+{% set class = 'f6 f5-l input-reset bl bt bb br-0 b--black-20 fl near-black bg-white pa3 lh-solid w-100 w-75-m w-80-l br2-ns br--left-ns' %}
+{% elif order=='last' %}
+{% set class = 'f6 f5-l button-reset br bt bb bl-0 b--black-20 fl pv3 tc bg-animate bg-yellow dim near-black pointer w-100 w-25-m w-20-l br2-ns br--right-ns' %}
+{% else %}
+{% set class = 'f6 f5-l input-reset bt bb bl-0 br-0 b--black-20 fl near-black bg-white pa3 lh-solid w-100 w-75-m w-80-l' %}
+{% endif %}
+
+<input class="{{class}}" type="{{type}}" value="{{value}}" name="{{name}}" id="{{id}}" placeholder="{{placeholder}}" />
+{% endmacro %}

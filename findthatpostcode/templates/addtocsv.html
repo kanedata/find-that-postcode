@@ -1,3 +1,4 @@
+{% from '_utils.html' import info_block %}
 {% set title = 'Add fields to CSV' %}
 {% extends "base.html" %}
 
@@ -10,51 +11,51 @@
 {% block content %}
 <form action="" method="post" enctype="multipart/form-data">
   <div class="columns">
-    <div class="column">
-      <div class="content">
+    <div class="fl w-60-l pr2-l">
+      <div class="content measure">
         <p>Add geographical data to a CSV file by looking it up from a postcode column</p>
         <p>The file should be separated by commas (<code>,</code> - not semicolons or tabs)
         and the first row should contain the column names.</p>
       </div>
-      <div class="field">
-        <label class="label">CSV file</label>
-        <div class="file has-name is-fullwidth">
-          <label class="file-label">
-            <input class="file-input" type="file" name="csvfile" id="csvfile">
-            <span class="file-cta">
-              <span class="file-icon">
-                <i class="fas fa-upload"></i>
-              </span>
-              <span class="file-label">
-                Choose a file…
-              </span>
+      {% call info_block("CSV file") %}
+        <label class="file-label">
+          <input class="file-input" type="file" name="csvfile" id="csvfile">
+          <span class="file-cta">
+            <span class="file-icon">
+              <i class="fas fa-upload"></i>
             </span>
-            <span class="file-name" id="csvfilename"></span>
-          </label>
+            <span class="file-label">
+              Choose a file…
+            </span>
+          </span>
+          <span class="file-name db code pa2 bg-light-gray mt2 measure" id="csvfilename"></span>
+        </label>
+        <div class="file has-name is-fullwidth">
         </div>
-        <p class="help">Maximum file size 5MB</p>
-      </div>
-      <div class="field is-hidden" id="csvpreview" style='overflow-x:auto;max-width:600px;'>
-        <label class="label">CSV Preview</label>
-        <table class="table is-fullwidth is-narrow"></table>
+        <p class="gray f6">Maximum file size 5MB</p>
+      {% endcall %}
+
+      <div class="field dn pa2 bg-light-gray mb3" id="csvpreview">
+        <label class="mh0 mt0 mb2 header-font b">CSV Preview</label>
+        <table class="table f6"></table>
       </div>
       <div class="field">
-        <label class="label">Name of column containing postcodes</label>
+        <label class="mh0 mt0 mb2 header-font b">Name of column containing postcodes</label>
         <p class="control">
-          <input class="input" type="text" name="column_name" id="column_name" value="postcode">
+          <input class="f6 f5-l input-reset ba b--black-20 near-black bg-white pa3 lh-solid w5 br2-ns" type="text" name="column_name" id="column_name" value="postcode">
         </p>
       </div>
       <div class="field">
         <p class="control">
-          <input class="button is-primary" type="submit" value="Upload" id='fetch_postcodes' />
+          <input class="f6 f5-l button-reset bn pv3 ph4 b tc bg-animate bg-yellow dim near-black pointer br2-ns" type="submit" value="Upload" id='fetch_postcodes' />
         </p>
       </div>
     </div>
-    <div class="column">
+    <div class="fl w-40-l pl3-l">
       <div class="field">
-        <label class="label">Fields to add</label>
-        <p class="control">
-          <table class="table is-fullwidth">
+        <label class="mh0 mt0 mb2 header-font b">Fields to add</label>
+        <p class="control f6">
+          <table class="table f6">
             <tbody>
               <tr>
                 <th>Basic fields</th>
@@ -72,7 +73,7 @@
                 <td>
                   {% if b[2] %}
                   <input type="checkbox" name="fields" value="{{b[0]}}_name"
-                    {% if "%s_name" % b[0] in default_fields %}
+                    {% if '%s_name' % b[0] in default_fields %}
                     checked="checked"
                     {% endif %}
                   >

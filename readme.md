@@ -80,35 +80,34 @@ side, and copy the `GeoJSON` link, or download the file.
 
 These files are the latest available at April 2017:
 
-- Countries: <http://geoportal.statistics.gov.uk/datasets/37bcb9c9e788497ea4f80543fd14c0a7_2.geojson>
-- Westminster Parliamentary Constituencies: <http://geoportal.statistics.gov.uk/datasets/deeb99fdf09949bc8ed4dc95c80da279_2.geojson>
-- Counties and unitary authorities: <http://geoportal.statistics.gov.uk/datasets/687f346f5023410ba86615655ff33ca9_2.geojson>
-- Local Authority Districts: <http://geoportal.statistics.gov.uk/datasets/686603e943f948acaa13fb5d2b0f1275_2.geojson>
-- Regions: <http://geoportal.statistics.gov.uk/datasets/f99b145881724e15a04a8a113544dfc5_2.geojson>
-- CCGs: <http://geoportal.statistics.gov.uk/datasets/ac17d33d37b94e48abd8ccbcde640dde_2.geojson>
-- European electoral regions: <http://geoportal.statistics.gov.uk/datasets/44667328cf45481ba91aef2f646b5fc0_2.geojson>
-- Local Enterprise Partnerships: <http://geoportal.statistics.gov.uk/datasets/532e3bb99acf44549ebb882c15646059_2.geojson>
-- NHS Commissioning Regions: <http://geoportal.statistics.gov.uk/datasets/b804b37c78004e788becf75f712f6a38_2.geojson>
-- NHS England Regions: <http://geoportal.statistics.gov.uk/datasets/6e93e6b47edd49ab827a1831d8eb0f57_2.geojson>
-- National Parks: <http://geoportal.statistics.gov.uk/datasets/df607d4ffa124cdca8317e3e63d45d78_2.geojson>
-- Police Force areas: <http://geoportal.statistics.gov.uk/datasets/3e5a096a8c7c456fb6d3164a3f44b005_2.geojson>
-- Strategic Clinical Networks: <http://geoportal.statistics.gov.uk/datasets/7ddabffc9b46444bbf548732642f1ea2_2.geojson>
-- Travel to Work Areas: <http://geoportal.statistics.gov.uk/datasets/d3062ec5f03b49a7be631d71586cac8c_2.geojson>
+- Countries: <https://opendata.arcgis.com/datasets/7be6a3c1be3b4385951224d2f522470a_0.geojson>
+- Westminster Parliamentary Constituencies: <https://opendata.arcgis.com/datasets/094f326b0b1247e3bcf1eb7236c24679_0.geojson>
+- Counties and unitary authorities: <https://opendata.arcgis.com/datasets/0de4288db3774cb78e45b8b74e9eab31_0.geojson>
+- Local Authority Districts: <https://opendata.arcgis.com/datasets/cec4f9cf783a47bab9295b2e513dd342_0.geojson>
+- Regions: <https://opendata.arcgis.com/datasets/284d82f437554938b0d0fbb3c6522007_0.geojson>
+- CCGs: <https://opendata.arcgis.com/datasets/c3398f0560844f74b76ca4b4136eb6a3_2.geojson>
+- European electoral regions: <https://opendata.arcgis.com/datasets/20595dbf22534e20944c9cee42c665b3_0.geojson>
+- Local Enterprise Partnerships: <https://opendata.arcgis.com/datasets/d4d519d1d1a1455a9b82331228f77489_2.geojson>
+- NHS Commissioning Regions: <https://opendata.arcgis.com/datasets/edcbf58c70004d0f8d44501d07c38fe9_0.geojson>
+- National Parks: <https://opendata.arcgis.com/datasets/f41bd8ff39ce4a2393c2f454006ea60a_0.geojson>
+- Police Force areas: <https://opendata.arcgis.com/datasets/282af275c1a24c2ea64ff9e05bdd7d7d_0.geojson>
+- Travel to Work Areas: <https://opendata.arcgis.com/datasets/d3062ec5f03b49a7be631d71586cac8c_2.geojson>
+- Major Towns and Cities: <https://opendata.arcgis.com/datasets/58b0dfa605d5459b80bf08082999b27c_0.geojson>
+- Combined Authorities: <https://opendata.arcgis.com/datasets/c6bd4568af5947519cf266b80a94de2e_0.geojson>
 
 These files are large:
 
-- Parishes: <http://geoportal.statistics.gov.uk/datasets/f13dad37854b4a1f869bf178489ff99a_2.geojson>
-- Wards: <http://geoportal.statistics.gov.uk/datasets/afcc88affe5f450e9c03970b237a7999_2.geojson>
-- LSOAs: <https://opendata.arcgis.com/datasets/e993add3f1944437bc91ec7c76100c63_0.geojson>
-- MSOAs: <http://geoportal.statistics.gov.uk/datasets/826dc85fb600440889480f4d9dbb1a24_2.geojson>
-- Workplace Zones: <http://geoportal.statistics.gov.uk/datasets/a399c2a5922a4beaa080de63c0a218a3_2.geojson>
-- Built-up Areas: <http://geoportal.statistics.gov.uk/datasets/278ff7af4efb4a599f70156e6e19cc9f_0.geojson>
-- Built-up Area Sub-divisions: <http://geoportal.statistics.gov.uk/datasets/1f021bb824ee4820b353b4b58fab6df5_0.geojson>
+- Parishes (11,000): <https://opendata.arcgis.com/datasets/40b487621d814fcbb7c5ca8c816cb8ba_2.geojson> --code-field=par18cd
+- Wards (8,900): <https://opendata.arcgis.com/datasets/d2dce556b4604be49382d363a7cade72_0.geojson>
+- LSOAs (35,000): <https://opendata.arcgis.com/datasets/e993add3f1944437bc91ec7c76100c63_0.geojson>
+- MSOAs (7,200): <https://opendata.arcgis.com/datasets/29fdaa2efced40378ce8173b411aeb0e_2.geojson>
+- Built-up Areas (5,800): <https://opendata.arcgis.com/datasets/f6684981be23404e83321077306fa837_0.geojson>
+- Built-up Area Sub-divisions (1,800): <https://opendata.arcgis.com/datasets/1f021bb824ee4820b353b4b58fab6df5_0.geojson>
 
 Import the boundary files by running:
 
 ```bash
-flask import boundaries "http://geoportal.statistics.gov.uk/datasets/ac17d33d37b94e48abd8ccbcde640dde_2.geojson"
+flask import boundaries "https://opendata.arcgis.com/datasets/094f326b0b1247e3bcf1eb7236c24679_0.geojson"
 ```
 
 You can add more than one URL to each import script.
@@ -336,12 +335,30 @@ dokku run findthatpostcode flask import nspl
 dokku run findthatpostcode flask import rgc
 dokku run findthatpostcode flask import chd
 dokku run findthatpostcode flask import msoanames
-dokku run findthatpostcode flask import boundaries http://geoportal.statistics.gov.uk/datasets/37bcb9c9e788497ea4f80543fd14c0a7_2.geojson http://geoportal.statistics.gov.uk/datasets/deeb99fdf09949bc8ed4dc95c80da279_2.geojson http://geoportal.statistics.gov.uk/datasets/687f346f5023410ba86615655ff33ca9_2.geojson http://geoportal.statistics.gov.uk/datasets/686603e943f948acaa13fb5d2b0f1275_2.geojson http://geoportal.statistics.gov.uk/datasets/f99b145881724e15a04a8a113544dfc5_2.geojson http://geoportal.statistics.gov.uk/datasets/ac17d33d37b94e48abd8ccbcde640dde_2.geojson http://geoportal.statistics.gov.uk/datasets/44667328cf45481ba91aef2f646b5fc0_2.geojson http://geoportal.statistics.gov.uk/datasets/532e3bb99acf44549ebb882c15646059_2.geojson http://geoportal.statistics.gov.uk/datasets/b804b37c78004e788becf75f712f6a38_2.geojson http://geoportal.statistics.gov.uk/datasets/6e93e6b47edd49ab827a1831d8eb0f57_2.geojson http://geoportal.statistics.gov.uk/datasets/df607d4ffa124cdca8317e3e63d45d78_2.geojson http://geoportal.statistics.gov.uk/datasets/3e5a096a8c7c456fb6d3164a3f44b005_2.geojson http://geoportal.statistics.gov.uk/datasets/7ddabffc9b46444bbf548732642f1ea2_2.geojson http://geoportal.statistics.gov.uk/datasets/d3062ec5f03b49a7be631d71586cac8c_2.geojson
-dokku run findthatpostcode flask import boundaries http://geoportal.statistics.gov.uk/datasets/f13dad37854b4a1f869bf178489ff99a_2.geojson
-dokku run findthatpostcode flask import boundaries http://geoportal.statistics.gov.uk/datasets/afcc88affe5f450e9c03970b237a7999_2.geojson
-dokku run findthatpostcode flask import boundaries http://geoportal.statistics.gov.uk/datasets/da831f80764346889837c72508f046fa_2.geojson
-dokku run findthatpostcode flask import boundaries http://geoportal.statistics.gov.uk/datasets/826dc85fb600440889480f4d9dbb1a24_2.geojson
-dokku run findthatpostcode flask import boundaries http://geoportal.statistics.gov.uk/datasets/a399c2a5922a4beaa080de63c0a218a3_2.geojson
-dokku run findthatpostcode flask import boundaries http://geoportal.statistics.gov.uk/datasets/278ff7af4efb4a599f70156e6e19cc9f_0.geojson
-dokku run findthatpostcode flask import boundaries http://geoportal.statistics.gov.uk/datasets/1f021bb824ee4820b353b4b58fab6df5_0.geojson
+dokku run findthatpostcode flask import imd2019
+dokku run findthatpostcode flask import imd2015
+
+# import boundaries
+dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/7be6a3c1be3b4385951224d2f522470a_0.geojson
+dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/094f326b0b1247e3bcf1eb7236c24679_0.geojson
+dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/0de4288db3774cb78e45b8b74e9eab31_0.geojson
+dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/cec4f9cf783a47bab9295b2e513dd342_0.geojson
+dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/284d82f437554938b0d0fbb3c6522007_0.geojson
+dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/c3398f0560844f74b76ca4b4136eb6a3_2.geojson
+dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/20595dbf22534e20944c9cee42c665b3_0.geojson
+dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/d4d519d1d1a1455a9b82331228f77489_2.geojson
+dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/edcbf58c70004d0f8d44501d07c38fe9_0.geojson
+dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/f41bd8ff39ce4a2393c2f454006ea60a_0.geojson
+dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/282af275c1a24c2ea64ff9e05bdd7d7d_0.geojson
+dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/d3062ec5f03b49a7be631d71586cac8c_2.geojson
+dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/58b0dfa605d5459b80bf08082999b27c_0.geojson
+dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/c6bd4568af5947519cf266b80a94de2e_0.geojson
+
+# large boundary files
+dokku run findthatpostcode flask import boundaries --code-field=par18cd https://opendata.arcgis.com/datasets/40b487621d814fcbb7c5ca8c816cb8ba_2.geojson
+dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/d2dce556b4604be49382d363a7cade72_0.geojson
+dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/e993add3f1944437bc91ec7c76100c63_0.geojson
+dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/29fdaa2efced40378ce8173b411aeb0e_2.geojson
+dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/f6684981be23404e83321077306fa837_0.geojson
+dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/1f021bb824ee4820b353b4b58fab6df5_0.geojson
 ```

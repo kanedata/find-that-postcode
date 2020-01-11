@@ -1,11 +1,11 @@
 AREA_TYPES = [
-    ("oa11", ["E00", "W00", "S00"], "Output area", "2011 Census Output Area (OA)/ Small Area (SA)", "The 2011 Census OAs in GB and SAs in Northern Ireland were based on 2001 Census OAs, and they form the building bricks for defining higher level geographies. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no grid reference."),
+    ("oa11", ["E00", "W00", "S00", "N00"], "Output area", "2011 Census Output Area (OA)/ Small Area (SA)", "The 2011 Census OAs in GB and SAs in Northern Ireland were based on 2001 Census OAs, and they form the building bricks for defining higher level geographies. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no grid reference."),
     ("cty", ["E10", "E11", "E42"], "County", "County", "The current county to which the postcode has been assigned. Pseudo codes are included for English UAs, Wales, Scotland, Northern Ireland, Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."),
     ("laua", ["E06", "E07", "E08", "E09", "W06", "S12", "N09"], "Local Authority", "Local Authority District (LAD)/unitary authority (UA)/metropolitan district (MD)/London borough (LB)/ council area (CA)/district council area (DCA)", "The current district/UA to which the postcode has been assigned. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."),
     ("ward", ["E05", "W05", "S13", "N08"], "Ward", "(Electoral) ward/division", "The current administrative/electoral area to which the postcode has been assigned. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."),
     ("hlthau", ["S18"], "Strategic Health Authority", "Former Strategic Health Authority (SHA)/ Local Health Board (LHB)/ Health Board (HB)/ Health Authority (HA)/ Health & Social Care Board (HSCB)", "The health area code for the postcode. SHAs were abolished in England in 2013 but the codes remain as a 'frozen' geography. The field will otherwise be blank for postcodes with no OA code."),
     ("hro", ["S19"], "Pan SHA", "Pan SHA", "The Pan SHA responsible for the associated strategic health authority for each postcode in England. Pseudo codes are included for Wales, Scotland, Northern Ireland, Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."),
-    ("ctry", ["E92"], "Country", "Country", "The code for the appropriate country (i.e. one of the four constituent countries of the UK or Crown dependencies - the Channel Islands or the Isle of Man) to which each postcode is assigned."),
+    ("ctry", ["E92", "W92", "S92", "N92", "L93", "M83", ], "Country", "Country", "The code for the appropriate country (i.e. one of the four constituent countries of the UK or Crown dependencies - the Channel Islands or the Isle of Man) to which each postcode is assigned."),
     ("rgn", ["E12"], "Region", "Region (former GOR)", "The region code for each postcode. Pseudo codes are included for Wales, Scotland, Northern Ireland, Channel Island and Isle of Man. The field will otherwise be blank for postcodes with no OA code."),
     ("pcon", ["E14", "W07", "S14", "N06"], "Westminster parliamentary constituency", "Westminster parliamentary constituency", "The Westminster parliamentary constituency code for each postcode. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."),
     ("eer", ["E15", "W08", "S15", "N07"], "European Electoral Region", "European Electoral Region (EER)", "The European Electoral Region code for each postcode. A pseudo code is included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code"),
@@ -30,7 +30,7 @@ KEY_AREA_TYPES = [
     ("Key", ["ctry", "rgn", "cty", "laua", "ward", "lsoa11", "pcon"]),
     ("Secondary", ["ttwa", "pfa", "lep", "msoa11", "oa11", "park"]),
     ("Health", ["ccg", "hlthau", "hro", "pct"]),
-    ("Other", ["eer", "bua11", "buasd11", "wz11", "teclec", "nuts"]),
+    ("Other", ["eer", "bua11", "buasd11", "wz11", "teclec"]),
 ]
 
 OTHER_CODES = {

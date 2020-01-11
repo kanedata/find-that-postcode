@@ -108,6 +108,12 @@
         <td class="db dtc-l bw0 bw1-l bt b--light-gray"><a href="{{ url_for('areas.get_area', areacode='E14000639', filetype='geojson') }}">Example</a></td>
       </tr>
       <tr class="">
+        <td class="db dtc-l bw1 bt b--light-gray">Get data about a place<br><small>Includes 5 random postcodes from the area</small></td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"><code>{{ url_for('places.get_place', areacode='IPN0000001', filetype='json') }}</code></td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"><a href="{{ url_for('places.get_place', areacode='IPN0000543', filetype='json') }}">Example</a></td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"><a href="{{ url_for('places.get_place', areacode='IPN0000543', filetype='html') }}">Example HTML</a></td>
+      </tr>
+      <tr class="">
         <td class="db dtc-l bw1 bt b--light-gray">Search for areas containing a string</td>
         <td class="db dtc-l bw0 bw1-l bt b--light-gray"><code>{{ url_for('areas.area_search', q='search term', filetype='json') }}</code></td>
         <td class="db dtc-l bw0 bw1-l bt b--light-gray"><a href="{{ url_for('areas.area_search', q='Westminster', filetype='json') }}">Example</a></td>

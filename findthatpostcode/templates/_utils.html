@@ -1,8 +1,14 @@
 {% macro display_area(area, hide_areatype, div_class='') %}
+  {% if area.__class__.__name__ == 'Place' %}
+  {% set url_source = 'places.get_place' %}
+  {% else %}
+  {% set url_source = 'areas.get_area' %}
+  {% endif %}
+
 <div class="{{div_class}}">
     <span class='pa1 bg-light-gray code mr1'><a href="{{ url_for('areas.get_area', areacode=area.id, filetype='html') }}" class='near-black code link underline-hover'>{{ area.id }}</a></span>
     {% if area.found and area.attributes %}
-    <a href="{{ url_for('areas.get_area', areacode=area.id, filetype='html') }}" class='blue link underline-hover dim'>
+    <a href="{{ url_for(url_source, areacode=area.id, filetype='html') }}" class='blue link underline-hover dim'>
       {{ area.attributes.name }}
     </a>
     {% endif %}

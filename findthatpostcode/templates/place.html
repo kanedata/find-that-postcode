@@ -1,0 +1,95 @@
+{% from '_utils.html' import info_block, display_area, area_loop %}
+
+{% set title = result.attributes.name %}
+{% set subtitle = '{} in {} <code>{}</code>'.format(result.attributes.type, result.attributes.country, result.id) %}
+
+{% extends 'base.html' %}
+
+{% block headscripts %}
+<link rel="stylesheet" href="{{ url_for('static', filename='leaflet/leaflet.css') }}" />
+<script type="text/javascript" src="{{ url_for('static', filename='leaflet/leaflet.js') }}"></script>
+<script type="text/javascript" src="https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js?v1.3.0"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='leaflet/L.OSGraticule.js') }}"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/leaflet.snogylop@0.4.0/src/leaflet.snogylop.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="cf">
+
+  <div class="fl w-third-l w-100 pr4 f5">
+    {% call info_block("Latitude and longitude") %}
+    <code class="pa1">
+      <a href='https://tools.wmflabs.org/geohack/geohack.php?params={{ result.attributes.location["lat"] }};{{ result.attributes.location["lon"] }}'>
+        {{ result.attributes.location.lat }}, {{ result.attributes.location.lon }}
+      </a>
+    </code>
+    {% endcall %}
+
+    {% for i in key_area_types[0:1] %}
+      <h2 class="header-font mt0 mb1">{{ i[0] }} areas</h2>
+      {% for key_area in i[1] %}
+        {% set a = result.get_area(key_area) %}
+        {% if a %}
+        {% call info_block(a.relationships.areatype.attributes.name) %}
+          {{ display_area(a, hide_areatype=true) }}
+        {% endcall %}
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+
+  </div>
+
+  {% if result.attributes.location %}
+  <div class="fl w-two-thirds-l w-100">
+    <figure class="ma0 pa0"><div id="postcode-map" style="height:500px;"></div></figure>
+    <p class="f5 b mt0 mb1 w-100">
+      Location within 
+      <a href="{{ url_for('areas.get_area', areacode=result.get_area('laua').id, filetype='html') }}" class="link blue underline-hover">
+        {{- result.get_area('laua').attributes.name -}} 
+      </a>
+      Local Authority
+    </p>
+  </div>
+  {% endif %}
+</div>
+<div class="flex flex-wrap">
+
+  <div class="fl w-third-l w-100 pr4 f5 mb3">
+    <h2 class="header-font mt2 pt2 mb1 bt bw3 b--yellow">Nearby postcodes</h2>
+    {% for i in result.relationships.nearest_postcodes %}
+    <div class="mt1">
+      <span class="pa1 bg-light-gray code mr1"><a href="{{ url_for('postcodes.get_postcode', postcode=i.id, filetype='html') }}" class="near-black code link underline-hover">{{ i.id }}</a></span>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="fl w-third-l w-100 pr4 f5 mb3">
+    <h2 class="header-font mt2 pt2 mb1 bt bw3 b--yellow">Nearby places</h2>
+    {% for i in result.relationships.nearest_places %}
+    <div class="mt1">
+      {{ display_area(i) }}
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="fl w-third-l w-100 pr4 f5 mb3">
+    <h2 class="header-font mt2 pt2 mb1 bt bw3 b--yellow">Technical details</h2>
+    {% call info_block("OS Easting/Northing") %}
+      <code class="pa1">
+        {{ result.attributes.gridgb1e }}, {{ result.attributes.gridgb1n }}
+      </code>
+    {% endcall %}
+  </div>
+
+
+
+</div>
+{% endblock %}
+
+{% block bodyscripts %}
+<script type="text/javascript">
+  var postcodes = [{{ result.attributes.location|tojson }}];
+  var show_postcode = true;
+  var geojson = {{ url_for('areas.get_area', areacode=result.get_area('laua').id, filetype='geojson')|tojson }};
+</script>
+<script type="text/javascript" src="{{ url_for('static', filename='map.js') }}"></script>
+{% endblock %}

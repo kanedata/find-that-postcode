@@ -5,6 +5,7 @@ import re
 from ..metadata import AREA_TYPES, KEY_AREA_TYPES, OTHER_CODES, OAC11_CODE, RU11IND_CODES
 from .controller import *
 from . import areas
+from . import places
 from . import areatypes
 
 
@@ -15,10 +16,11 @@ class Postcode(Controller):
     date_fields = ["dointr", "doterm"]
     not_area_fields = ["osgrdind", "usertype"]
 
-    def __init__(self, id, data=None, pcareas=None):
+    def __init__(self, id, data=None, pcareas=None, places=None):
         super().__init__(id, data)
         if pcareas:
             self.relationships["areas"] = pcareas
+            self.relationships["nearest_places"] = places
 
     def __repr__(self):
         return '<Postcode {}>'.format(self.id)
@@ -48,7 +50,9 @@ class Postcode(Controller):
                     postcode[k + "_name"] = area.attributes.get("name")
                     pcareas.append(area)
 
-        return cls(data.get("_id"), data.get("_source"), pcareas)
+        places = cls.get_nearest_places(data.get("_source", {}).get("location"), es, 10)
+
+        return cls(data.get("_id"), data.get("_source"), pcareas, places)
     
     def process_attributes(self, postcode):
 
@@ -75,6 +79,31 @@ class Postcode(Controller):
             }
 
         return postcode
+
+    @staticmethod
+    def get_nearest_places(location, es, examples_count=10):
+        if not location:
+            return []
+        query = {
+            "query": {
+                "match": {
+                    "descnm": {"query": "LOC"}
+                }
+            },
+            "sort": [
+                {
+                    "_geo_distance": {
+                        "location": {
+                            "lat": location.get("lat"),
+                            "lon": location.get("lon")
+                        },
+                        "unit": "m"
+                    }
+                }
+            ]
+        }
+        example = es.search(index='geo_placename', body=query, size=examples_count)
+        return [places.Place(e["_id"], e["_source"]) for e in example["hits"]["hits"]]
 
     def get_attribute(self, attr):
         """

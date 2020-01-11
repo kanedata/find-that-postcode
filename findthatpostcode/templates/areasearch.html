@@ -22,11 +22,15 @@
   <ul class="">
     {% for i, score in result %}
       <li class="pa0 mv3">
-        {{ display_area(i, hide_areatype=true, div_class="di") }} - 
-        {% if not i.attributes.active %}
-        <span class="red b">Inactive</span>
-        {% endif %}
-        <span class="gray">{{ i.relationships.areatype.attributes.name }}</span>
+        {{ display_area(i, hide_areatype=true, div_class="di") }}
+        <span class="gray">
+        {% if i.relationships.areatype %} - 
+          {% if i.attributes.active==false %}
+          <span class="red b">Inactive</span>
+          {% endif %}
+          {{ i.relationships.areatype.attributes.name }}
+        {% elif i.__class__.__name__=='Place' %} - Place{% endif %}
+        </span>
       </li>
     {% endfor %}
   </ul>

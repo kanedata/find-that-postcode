@@ -7,6 +7,7 @@ import shapely.geometry
 from .controller import Controller, Pagination, GEOJSON_TYPES
 from . import postcodes
 from . import areatypes
+from . import places
 
 
 class Area(Controller):
@@ -190,7 +191,7 @@ def search_areas(q, es, page=1, size=100, es_config=None):
                 "functions": [
                     {"weight": 0.1, "filter": {"term": {"active": False}}},
                     {"weight": 6, "filter": {"exists": {"field": "type"}}},
-                    {"weight": 3, "filter": {"terms": {"type": ["ctry", "region", "cty", "laua", "rgn"]}}},
+                    {"weight": 3, "filter": {"terms": {"type": ["ctry", "region", "cty", "laua", "rgn", "LOC"]}}},
                     {"weight": 2, "filter": {"terms": {"type": ["ttwa", "pfa", "lep", "park", "pcon"]}}},
                     {"weight": 1.5, "filter": {"terms": {"type": ["ccg", "hlthau", "hro", "pct"]}}},
                     {"weight": 1, "filter": {"terms": {"type": ["eer", "bua11", "buasd11", "teclec"]}}},
@@ -201,15 +202,22 @@ def search_areas(q, es, page=1, size=100, es_config=None):
     }
     pagination = Pagination(page, size)
     result = es.search(
-        index=es_config.get("es_index", Area.es_index),
+        index="geo_area,geo_placename",
         body=query, 
         from_=pagination.from_,
         size=pagination.size,
         _source_excludes=["boundary"], 
         ignore=[404]
     )
+    return_result = []
+    for a in result.get("hits", {}).get("hits", []):
+        if a["_index"] == 'geo_placename':
+            return_result.append(places.Place(a["_id"], a["_source"]))
+        else:
+            return_result.append(Area(a["_id"], a["_source"]))
+    print([i.id for i in return_result])
     return {
-        "result": [Area.get_from_es(a["_id"], es, recursive=False) for a in result.get("hits", {}).get("hits", [])],
+        "result": return_result,
         "scores": [a["_score"] for a in result.get("hits", {}).get("hits", [])],
         "result_count": result.get("hits", {}).get("total", 0),
     }

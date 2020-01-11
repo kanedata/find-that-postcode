@@ -22,6 +22,26 @@ PLACENAMES_INDEX = 'geo_placename'
 
 PLACENAMES_URL = 'https://www.arcgis.com/sharing/rest/content/items/e8e725daf8944af6a336a9d183114697/data'
 
+PLACE_TYPES = {
+    "BUA": ["Built-up Area", "England and Wales"],
+    "BUASD": ["Built-up Area Sub-Division", "England and Wales"],
+    "CA": ["Council Area", "Scotland"],
+    "CED": ["County Electoral Division", "England"],
+    "COM": ["Community", "Wales"],
+    "CTY": ["County", "England"],
+    "CTYHIST": ["Historic County", "Great Britain"],
+    "CTYLT": ["Lieutenancy County", "Great Britain"],
+    "LOC": ["Locality", "Great Britain"],
+    "LONB": ["London Borough", "England"],
+    "MD": ["Metropolitan District", "England"],
+    "NMD": ["Non-metropolitan District", "England"],
+    "NPARK": ["National Park Great", "Britain"],
+    "PAR": ["Civil Parish", "England and Scotland"],
+    "RGN": ["Region", "England"],
+    "UA": ["Unitary Authority", "England and Wales"],
+    "WD": ["Electoral Ward/Division", "Great Britain"],
+}
+
 AREA_LOOKUP = [
     ("cty15cd", "cty", "cty15nm"),
     ("lad15cd", "laua", "lad15nm"),
@@ -108,6 +128,7 @@ def import_placenames(url=PLACENAMES_URL, es_index=PLACENAMES_INDEX):
                         if j[2] and j[2] in i:
                             del i[j[2]]
                 i["areas"] = areas
+                i["type"], i["country"] = PLACE_TYPES.get(i["descnm"], [i["descnm"], "United Kingdom"])
 
                 record["doc"] = i
                 placenames.append(record)

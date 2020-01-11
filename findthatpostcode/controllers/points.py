@@ -54,7 +54,6 @@ class Point(Controller):
             return cls(id)
 
         postcode = data["hits"]["hits"][0]
-        print(postcode)
         return cls(
             id,
             data={"distance_from_postcode": postcode["sort"][0]},

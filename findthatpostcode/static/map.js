@@ -1,10 +1,12 @@
 
+var center = [53.825564, -2.421976];
+if(postcodes.length > 0){
+    center = [postcodes[0]["lat"], postcodes[0]["lon"]];
+}
+
 var mymap = L.map('postcode-map', {
     zoomSnap: 0.1
-}).setView(
-    [postcodes[0]["lat"], postcodes[0]["lon"]],
-    9
-);
+}).setView(center, 9);
 var layer = new L.StamenTileLayer("toner").addTo(mymap);
 L.osGraticule({ showLabels: false, lineColor: '#ddd' }).addTo(mymap);
 
@@ -39,14 +41,14 @@ if(geojson){
         })
         .then(function (geojson) {
             var boundary_json = L.geoJSON(geojson, {
-                // invert: true,
+                invert: true,
                 style: {
                     stroke: true,
-                    color: '#FFFF00',
-                    weight: 5,
-                    // fill: true,
-                    // fillColor: '#fff',
-                    // fillOpacity: 0.95
+                    color: '#00449e',
+                    weight: 3,
+                    fill: true,
+                    fillColor: '#fff',
+                    fillOpacity: 0.95
                 }
             });
             boundary_json.addTo(mymap);

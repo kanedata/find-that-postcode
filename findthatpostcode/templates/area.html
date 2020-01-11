@@ -1,5 +1,5 @@
 {% from '_utils.html' import info_block, display_area, area_loop %}
-{% set includes = ['leaflet'] %}
+
 {% set title = "{} - <code>{}</code>".format(result.attributes.name, result.id) %}
 {% if result.attributes.active %}
 {% set subtitle = result.relationships.areatype.attributes.name %}
@@ -100,6 +100,13 @@
           {% endif %}
     {% endcall %}
     {% endif %}
+    
+    {% call info_block("External links") %}
+      <ul class="list pa0 ma0">
+        <li><a href="http://statistics.data.gov.uk/doc/statistical-geography/{{ result.id }}">ONS Geography Linked data</a></li>
+        <li><a href="https://mapit.mysociety.org/area/{{ result.id }}.html">MapIt (mySociety)</a></li>
+      </ul>
+    {% endcall %}
     
   </div>
   

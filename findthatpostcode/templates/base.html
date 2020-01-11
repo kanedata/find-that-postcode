@@ -1,14 +1,15 @@
 {% set default_title = 'Find that Postcode' %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://unpkg.com/tachyons@4.9.1/css/tachyons.min.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Archivo:400,700|Raleway:400,700">
     <link rel="stylesheet" href="https://dkane.net/theme/css/style.css" />
     <link rel="stylesheet" href="https://dkane.net/theme/css/pygment.css" />
     {% block headscripts %}
     {% endblock %}
-    <title>{{ title or default_title }}</title>
+    <title>{{ (title or default_title)|striptags }}</title>
   </head>
   <body class="home w-100 sans-serif near-black base-font bg-wavy">
     <header class="body header-font normal ph3 ph5-ns pt3 {% if frontpage %}pt5-ns pb5{% else %}pb4{% endif %} moon-gray">
@@ -39,7 +40,7 @@
         {% endif %}
         {% endif %}
       </header>
-      <section id="content" class="fl w-100 ph3 pv5 ph5-ns entry-content lh-copy f4">
+      <section id="content" class="fl w-100 ph3 pv5 ph5-ns lh-copy f4">
         {% block content %}{% endblock %}
       </section>
     </main>

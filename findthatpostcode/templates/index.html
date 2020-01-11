@@ -84,46 +84,46 @@
   <div class="fl w-two-thirds-l w-100 pa2 is-medium">
     <h3 class="f3-ns f4 header-font ma0 normal">Example requests</h3>
     <table class="w-100">
-      <tr>
-        <td>Get data on a postcode</td>
-        <td><code>{{ url_for('postcodes.get_postcode', postcode='AB12 3CD', filetype='json')|replace('%20', '+') }}</code></td>
-        <td><a href="{{ url_for('postcodes.get_postcode', postcode='SW1A 1AA', filetype='json') }}">Example</a></td>
-        <td><a href="{{ url_for('postcodes.get_postcode', postcode='SW1A 1AA', filetype='html') }}">Example HTML</a></td>
+      <tr class="">
+        <td class="db dtc-l bw1 bt b--light-gray">Get data on a postcode</td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"><code>{{ url_for('postcodes.get_postcode', postcode='AB12 3CD', filetype='json')|replace('%20', '+') }}</code></td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"><a href="{{ url_for('postcodes.get_postcode', postcode='SW1A 1AA', filetype='json') }}">Example</a></td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"><a href="{{ url_for('postcodes.get_postcode', postcode='SW1A 1AA', filetype='html') }}">Example HTML</a></td>
       </tr>
-      <tr>
-        <td>Get data about a postcode nearest<br>to a latitude, longitude point</td>
-        <td><code>{{ url_for('points.get', lat=51.501009, lon=-0.141588, filetype='json')|replace('%2C', ',') }}</code></td>
-        <td><a href="{{ url_for('points.get', lat=51.501009, lon=-0.141588, filetype='json') }}">Example</a></td>
-        <td><a href="{{ url_for('points.get', lat=51.501009, lon=-0.141588, filetype='html') }}">Example HTML</a></td>
+      <tr class="">
+        <td class="db dtc-l bw1 bt b--light-gray">Get data about a postcode nearest<br>to a latitude, longitude point</td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"><code>{{ url_for('points.get', lat=51.501009, lon=-0.141588, filetype='json')|replace('%2C', ',') }}</code></td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"><a href="{{ url_for('points.get', lat=51.501009, lon=-0.141588, filetype='json') }}">Example</a></td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"><a href="{{ url_for('points.get', lat=51.501009, lon=-0.141588, filetype='html') }}">Example HTML</a></td>
       </tr>
-      <tr>
-        <td>Get data about an area<br><small>Includes 5 random postcodes from the area</small></td>
-        <td><code>{{ url_for('areas.get_area', areacode='E01000001', filetype='json') }}</code></td>
-        <td><a href="{{ url_for('areas.get_area', areacode='E14000639', filetype='json') }}">Example</a></td>
-        <td><a href="{{ url_for('areas.get_area', areacode='E14000639', filetype='html') }}">Example HTML</a></td>
+      <tr class="">
+        <td class="db dtc-l bw1 bt b--light-gray">Get data about an area<br><small>Includes 5 random postcodes from the area</small></td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"><code>{{ url_for('areas.get_area', areacode='E01000001', filetype='json') }}</code></td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"><a href="{{ url_for('areas.get_area', areacode='E14000639', filetype='json') }}">Example</a></td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"><a href="{{ url_for('areas.get_area', areacode='E14000639', filetype='html') }}">Example HTML</a></td>
       </tr>
-      <tr>
-        <td>Get an area's boundaries as geojson<br><small>NB not available for all areas</small></td>
-        <td><code>{{ url_for('areas.get_area', areacode='E01000001', filetype='geojson') }}</code></td>
-        <td><a href="{{ url_for('areas.get_area', areacode='E14000639', filetype='geojson') }}">Example</a></td>
+      <tr class="">
+        <td class="db dtc-l bw1 bt b--light-gray">Get an area's boundaries as geojson<br><small>NB not available for all areas</small></td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"><code>{{ url_for('areas.get_area', areacode='E01000001', filetype='geojson') }}</code></td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"><a href="{{ url_for('areas.get_area', areacode='E14000639', filetype='geojson') }}">Example</a></td>
       </tr>
-      <tr>
-        <td>Search for areas containing a string</td>
-        <td><code>{{ url_for('areas.area_search', q='search term', filetype='json') }}</code></td>
-        <td><a href="{{ url_for('areas.area_search', q='Westminster', filetype='json') }}">Example</a></td>
-        <td><a href="{{ url_for('areas.area_search', q='Westminster', filetype='html') }}">Example HTML</a></td>
+      <tr class="">
+        <td class="db dtc-l bw1 bt b--light-gray">Search for areas containing a string</td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"><code>{{ url_for('areas.area_search', q='search term', filetype='json') }}</code></td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"><a href="{{ url_for('areas.area_search', q='Westminster', filetype='json') }}">Example</a></td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"><a href="{{ url_for('areas.area_search', q='Westminster', filetype='html') }}">Example HTML</a></td>
       </tr>
-      <tr>
-        <td>Get information about a type of area<br><small>(local authority, parliamentary constituency, etc)</small></td>
-        <td><code>{{ url_for('areatypes.get_areatype', areacode='pcon', filetype='json') }}</code></td>
-        <td><a href="{{ url_for('areatypes.get_areatype', areacode='pcon', filetype='json') }}">Example</a></td>
-        <td><a href="{{ url_for('areatypes.get_areatype', areacode='pcon', filetype='html') }}">Example HTML</a></td>
+      <tr class="">
+        <td class="db dtc-l bw1 bt b--light-gray">Get information about a type of area<br><small>(local authority, parliamentary constituency, etc)</small></td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"><code>{{ url_for('areatypes.get_areatype', areacode='pcon', filetype='json') }}</code></td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"><a href="{{ url_for('areatypes.get_areatype', areacode='pcon', filetype='json') }}">Example</a></td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"><a href="{{ url_for('areatypes.get_areatype', areacode='pcon', filetype='html') }}">Example HTML</a></td>
       </tr>
-      <tr>
-        <td>Get information about all types of area</td>
-        <td><code>{{ url_for('areatypes.all') }}</code></td>
-        <td></td>
-        <td><a href="{{ url_for('areatypes.all') }}">HTML</a></td>
+      <tr class="">
+        <td class="db dtc-l bw1 bt b--light-gray">Get information about all types of area</td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"><code>{{ url_for('areatypes.all') }}</code></td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"></td>
+        <td class="db dtc-l bw0 bw1-l bt b--light-gray"><a href="{{ url_for('areatypes.all') }}">HTML</a></td>
       </tr>
     </table>
   </div>

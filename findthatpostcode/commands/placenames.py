@@ -91,7 +91,7 @@ def import_placenames(url=PLACENAMES_URL, es_index=PLACENAMES_INDEX):
         print("[placenames] Opening %s" % f.filename)
 
         with z.open(f, 'r') as pccsv:
-            pccsv = io.TextIOWrapper(pccsv)
+            pccsv = io.TextIOWrapper(pccsv, encoding='latin1')
             reader = csv.DictReader(pccsv)
             for i in reader:
                 record = {

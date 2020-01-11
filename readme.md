@@ -337,6 +337,7 @@ dokku run findthatpostcode flask import chd
 dokku run findthatpostcode flask import msoanames
 dokku run findthatpostcode flask import imd2019
 dokku run findthatpostcode flask import imd2015
+dokku run findthatpostcode flask import placenames
 
 # import boundaries
 dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/7be6a3c1be3b4385951224d2f522470a_0.geojson

@@ -60,6 +60,10 @@ def create_app(test_config=None):
     def index():
         ats = area_types_count(db.get_db())
         return render_template('index.html', result=ats)
+
+    @app.route('/about')
+    def about():
+        return render_template('about.html')
     
     blueprints.init_app(app)
 

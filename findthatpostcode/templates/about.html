@@ -1,0 +1,34 @@
+{% from '_utils.html' import input %}
+
+{% set title = 'About this site' %}
+{% extends "base.html" %}
+{% block content %}
+<section class="section entry-content" id="api">
+  <p class="measure normal">
+    This site presents data on UK postcodes and geographical areas, based on open data released by
+    the <a href="" class="link blue underline-hover">Office for National Statistics</a> and
+    <a href="" class="link blue underline-hover">Ordnance Survey</a>.
+  </p>
+  <p class="measure normal">
+    It is intended to help the process of enhancing existing data sets, for example by
+    allowing someone to lookup which local authority a postcode is in.
+  </p>
+  <h2 class="f2-ns f3 header-font normal">Data sources</h2>
+  <ul>
+    <li><strong>Postcode data</strong>: <a class="link blue underline-hover" href="https://geoportal.statistics.gov.uk/datasets/national-statistics-postcode-lookup-november-2019">NSPL</a></li>
+    <li><strong>Area data</strong>: <a class="link blue underline-hover" href="https://geoportal.statistics.gov.uk/datasets/code-history-database-june-2019-for-the-united-kingdom">Code History Database</a> and 
+      <a class="link blue underline-hover" href="https://geoportal.statistics.gov.uk/datasets/register-of-geographic-codes-june-2019-for-the-united-kingdom">Register of Geographic Codes</a></li>
+    <li><strong>Boundary data</strong>: <a class="link blue underline-hover" href="http://geoportal.statistics.gov.uk/datasets?q=Latest_Boundaries&sort_by=name&sort_order=asc">ONS Geoportal</a></li>
+    <li><strong>Placenames</strong>: <a class="link blue underline-hover" href="https://geoportal.statistics.gov.uk/datasets/index-of-place-names-in-great-britain-september-2019">Index of Place Names in Great Britain</a></li>
+    <li><strong>MSOA names</strong>: <a class="link blue underline-hover" href="https://visual.parliament.uk/msoanames">House of Commons Library</a></li>
+  </ul>
+  <p>
+    <a href="https://www.ons.gov.uk/methodology/geography/licences" class="link blue underline-hover">Postcode data from ONS used under Open Government License</a><br> 
+    Contains OS data © Crown copyright and database right {{now.year}} <br>
+    Contains Royal Mail data © Royal Mail copyright and database right {{now.year}} <br> 
+    Contains National Statistics data © Crown copyright and database right {{now.year}}
+  </p>
+</section>
+
+{% include "_api.html" %}
+{% endblock %}

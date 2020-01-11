@@ -34,7 +34,7 @@ def import_boundaries(urls, examine=False, code_field=None, es_index=AREA_INDEX)
     es = db.get_db()
 
     for url in urls:
-        import_boundary(es, url, examine, es_index)
+        import_boundary(es, url, examine, es_index, code_field)
 
 def import_boundary(es, url, examine=False, es_index=AREA_INDEX, code_field=None):
     r = requests.get(url, stream=True)

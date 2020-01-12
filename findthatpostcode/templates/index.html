@@ -1,10 +1,10 @@
 {% from '_utils.html' import input %}
 
-{% macro frontpageblock(title, subtitle, title_link) %}
-<div class="w-100 w-third-l ph0 ph3-l pv3">
+{% macro frontpageblock(title, subtitle, title_link, div_classes='') %}
+<div class="w-100 ph0 ph3-l pv3 {{div_classes}}">
   <h2 class="f2-ns f3 header-font ma0 normal">
     {% if title_link %}
-    <a href="{{ title_link }}" class="near-black">{{ title }}</a>
+    <a href="{{ title_link }}" class="near-black link underline-hover">{{ title }}</a>
     {% else %}
     {{ title }}
     {% endif %}
@@ -22,50 +22,26 @@
 {% set frontpage = true %}
 {% extends "base.html" %}
 {% block content %}
-<div class="flex flex-wrap">
-
-  {% call frontpageblock("Search by postcode") %}
-  <form action="{{ url_for('postcodes.postcode_redirect') }}">
-    <div class="cf mt3 flex">
-      {{ input(type="text", name="postcode", placeholder="AB12 3CD", order="first") }}
-      {{ input(type="submit", value="Search", order="last") }}
-    </div>
-  </form>
+<section class="flex flex-wrap w-60-l w-100 center">
+  
+  {% call frontpageblock("Search", title_link=url_for('search.search_index'), div_classes='mb6') %}
+  {% include "_search.html" %}
   {% endcall %}
   
-  {% call frontpageblock("Search areas", title_link=url_for('areas.area_search')) %}
-  <form action="{{ url_for('areas.area_search') }}">
-    <div class="cf mt3 flex">
-      {{ input(type="text", name="q", placeholder="Summershire", order="first") }}
-      {{ input(type="submit", value="Search", order="last") }}
-    </div>
-  </form>
-  {% endcall %}
   
-  {% call frontpageblock("Find a postcode", subtitle="Nearest to a point") %}
-  <form action="{{ url_for('points.point_redirect') }}">
-    <div class="cf mt3 flex-ns">
-      {{ input(type="text", name="lat", id="lat", placeholder="Latitude", order="first") }}
-      {{ input(type="text", name="lon", id="lon", placeholder="Longitude") }}
-      {{ input(type="submit", id="point_search", value="Search", order="last") }}
-    </div>
-  </form>
-  <a class="link near-black bn button-reset underline dim db pa0 mt2 bg-inherit" id="get_current_latlong" onclick="get_latlon()" href="#">Use your location</a>
-  {% endcall %}
-  
-  {% call frontpageblock("Add data to a CSV file", title_link=url_for('addtocsv.addtocsv')) %}
+  {% call frontpageblock("Add data to a CSV file", title_link=url_for('addtocsv.addtocsv'), div_classes='w-50-l') %}
   <p>Upload a CSV with a column of postcode data and add information about those postcodes
   to it. Information includes latitude/longitude and areas.</p><br>
   <a class="f6 f5-l button-reset fl pa3 no-underline tc bn bg-animate bg-yellow dim near-black pointer br2-ns" href="{{url_for('addtocsv.addtocsv')}}">Upload a CSV</a>
   {% endcall %}
 
-  {% call frontpageblock("Use the API", title_link="#api") %}
+  {% call frontpageblock("Use the API", title_link="#api", div_classes='w-50-l') %}
   <p>The API provides programmatic access to the postcode data, using the
   <a href="http://jsonapi.org/">JSON api</a> specification.</p><br>
   <a class="f6 f5-l button-reset fl pa3 no-underline tc bn bg-animate bg-yellow dim near-black pointer br2-ns" href="#api">Use the API</a>
   {% endcall %}
 
-</div>
+</section>
 
 <section class="section pa3 bg-light-gray mt4">
   <h2 class="f2-ns f3 header-font normal ma0">
@@ -88,10 +64,8 @@ function get_latlon(){
   document.getElementById("get_current_latlong").style.visibility='visible';
 
   navigator.geolocation.getCurrentPosition(function(position) {
-    console.log(position.coords.latitude, position.coords.longitude)
-    document.getElementById("lat").value = position.coords.latitude;
-    document.getElementById("lon").value = position.coords.longitude;
-    document.getElementById("point_search").click();
+    document.getElementById("q").value = position.coords.latitude + "," + position.coords.longitude;
+    document.getElementById("search_button").click();
   });
 }
 </script>

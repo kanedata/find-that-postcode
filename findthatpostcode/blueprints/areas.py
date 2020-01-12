@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, abort, jsonify, make_response, request, render_template
+from flask import Blueprint, current_app, abort, jsonify, make_response, request, render_template, redirect, url_for
 
 from .utils import return_result
 from findthatpostcode.controllers.areas import Area, search_areas
@@ -10,22 +10,7 @@ bp = Blueprint('areas', __name__, url_prefix='/areas')
 @bp.route('/search')
 @bp.route('/search.<filetype>')
 def area_search(filetype="json"):
-    q = request.values.get("q")
-    if not q:
-        return render_template(
-            'areasearch.html',
-            q=q,
-        )
-
-
-    areas = search_areas(q, get_db())
-    result = zip(areas["result"], areas["scores"])
-    return render_template(
-        'areasearch.html',
-        result=list(result),
-        q=q,
-        total=areas['result_count']
-    )
+    return redirect(url_for('search.search_index', q=request.values.get("q")), code=301)
 
 @bp.route('/names.csv')
 def all_names():

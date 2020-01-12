@@ -215,7 +215,6 @@ def search_areas(q, es, page=1, size=100, es_config=None):
             return_result.append(places.Place(a["_id"], a["_source"]))
         else:
             return_result.append(Area(a["_id"], a["_source"]))
-    print([i.id for i in return_result])
     return {
         "result": return_result,
         "scores": [a["_score"] for a in result.get("hits", {}).get("hits", [])],

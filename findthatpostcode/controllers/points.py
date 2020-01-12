@@ -19,28 +19,38 @@ class Point(Controller):
 
     def __repr__(self):
         return '<Point {}, {}>'.format(self.id[0], self.id[1])
-        
-    @classmethod
-    def get_from_es(cls, id, es, es_config=None):
-        if not es_config:
-            es_config = {}
 
-        query = {
+    @staticmethod
+    def get_nearest_postcodes_query(lat, lon):
+        return {
             "query": {
-                "match_all": {}
+                "bool": {
+                    "must_not": {
+                        "exists": {
+                            "field": "doterm"
+                        }
+                    }
+                }
             },
             "sort": [
                 {
                     "_geo_distance": {
                         "location": {
-                            "lat": id[0],
-                            "lon": id[1]
+                            "lat": lat,
+                            "lon": lon
                         },
                         "unit": "m"
                     }
                 }
             ]
         }
+        
+    @classmethod
+    def get_from_es(cls, id, es, es_config=None):
+        if not es_config:
+            es_config = {}
+
+        query = cls.get_nearest_postcodes_query(id[0], id[1])
 
         data = es.search(
             index=es_config.get("es_index", cls.es_index),
@@ -68,22 +78,7 @@ class Point(Controller):
                 "lon": lon
             }
         })
-        query = {
-            "query": {
-                "match_all": {}
-            },
-            "sort": [
-                {
-                    "_geo_distance": {
-                        "location": {
-                            "lat": lat,
-                            "lon": lon
-                        },
-                        "unit": "m"
-                    }
-                }
-            ]
-        }
+        query = self.get_nearest_postcodes_query(lat, lon)
         result = self.es.search(index=self.config.get("es_index", "postcode"), body=query, size=1)
         if result["hits"]["total"] > 0:
             postcode = result["hits"]["hits"][0]

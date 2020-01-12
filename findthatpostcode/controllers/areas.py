@@ -109,8 +109,17 @@ class Area(Controller):
             "query": {
                 "function_score": {
                     "query": {
-                        "query_string": {
-                            "query": areacode
+                        "bool": {
+                            "must_not": {
+                                "exists": {
+                                    "field": "doterm"
+                                }
+                            },
+                            "must": {
+                                "query_string": {
+                                    "query": areacode
+                                }
+                            }
                         }
                     },
                     "random_score": {}

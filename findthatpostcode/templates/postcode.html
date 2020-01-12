@@ -53,6 +53,7 @@
   {% if result.attributes.location %}
   <div class="fl w-two-thirds-l w-100">
     <figure class="ma0 pa0"><div id="postcode-map" style="height:500px;"></div></figure>
+    {% if result.get_area('laua') %}
     <p class="f5 b mt0 mb1 w-100">
       Location within 
       <a href="{{ url_for('areas.get_area', areacode=result.get_area('laua').id, filetype='html') }}" class="link blue underline-hover">
@@ -60,6 +61,7 @@
       </a>
       Local Authority
     </p>
+    {% endif %}
   </div>
   {% endif %}
 </div>

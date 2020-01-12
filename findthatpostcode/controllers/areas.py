@@ -44,7 +44,7 @@ class Area(Controller):
             doc_type=es_config.get("es_type", cls.es_type),
             id=cls.parse_id(id),
             ignore=[404],
-            _source_excludes=[] if boundary else ["boundary"],
+            _source_excludes=([] if boundary else ["boundary"]),
         )
         relationships = {
             "areatype": {},
@@ -90,6 +90,8 @@ class Area(Controller):
         if "type" in data:
             del data["type"]
         if "boundary" in data:
+            if not self.boundary:
+                self.boundary = data["boundary"]
             del data["boundary"]
 
         # turn dates into dates
@@ -222,32 +224,38 @@ def search_areas(q, es, page=1, size=100, es_config=None):
     }
 
 
-def get_all_areas(es, areatypes=None, page=1, size=100, es_config=None):
+def get_all_areas(es, areatypes=None, es_config=None):
     """
     Search for areas based on a name
     """
     if not es_config:
         es_config = {}
     query = {
-        "query": {
-            "match_all": {}
-        }
+        "match_all": {}
     }
     if areatypes:
         query = {
-            "query": {
-                "terms": {
-                    "type": areatypes
-                }
+            "terms": {
+                "type": areatypes
             }
         }
+    query = {
+        "query": {
+            "bool" : {
+                "must_not": {
+                    "term": {
+                        "name.keyword": ""
+                    }
+                },
+                "must" : query
+            }
+        }
+    }
     result = scan(
         es,
         query=query,
         index=es_config.get("es_index", Area.es_index),
-        doc_type=es_config.get("es_type", Area.es_type),
-        _source_include=["type", "name"], 
-        size=10000,
+        _source_include=["type", "name"],
         ignore=[400]
     )
 

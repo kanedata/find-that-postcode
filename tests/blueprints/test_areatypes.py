@@ -1,31 +1,37 @@
 from tests.fixtures import client
+import html
 
-AREATYPE_CODE = 'cty'
+AREATYPE_CODE = 'lsoa11'
 
 def test_areatype_json(client):
     rv = client.get('/areatypes/{}.json'.format(AREATYPE_CODE))
     data = rv.get_json()
 
-    assert data.get("data", {}).get("attributes", {}).get("full_name") == "County"
-
-    assert len(data.get("included", [])) == 28
+    assert data.get("data", {}).get("attributes", {}).get("full_name") == "2011 Census Lower Layer Super Output Area (LSOA)/ Data Zone (DZ)/ SOA"
+    assert len(data.get("included", [])) == 8
 
 
 def test_areatype_json_missing(client):
-    pass
+    rv = client.get('/areatypes/{}.json'.format('kjhgdskgds'))
+    assert rv.status == '404 NOT FOUND'
 
 
 def test_areatype_html(client):
-    pass
+    rv = client.get('/areatypes/{}.html'.format(AREATYPE_CODE))
+    content = rv.data.decode("utf8")
+    assert rv.mimetype == 'text/html'
+    assert html.escape('Lower Super Output Area') in content
+    assert AREATYPE_CODE in content
 
 
 def test_areatype_html_missing(client):
-    pass
-
-
-def test_areatypes_json(client):
-    pass
+    rv = client.get('/areatypes/{}.html'.format('kjhgdskgds'))
+    assert rv.status == '404 NOT FOUND'
 
 
 def test_areatypes_html(client):
-    pass
+    rv = client.get('/areatypes')
+    content = rv.data.decode("utf8")
+    assert rv.mimetype == 'text/html'
+    assert html.escape('Lower Super Output Area') in content
+    assert AREATYPE_CODE in content

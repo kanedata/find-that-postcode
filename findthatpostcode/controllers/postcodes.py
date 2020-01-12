@@ -51,7 +51,6 @@ class Postcode(Controller):
                     pcareas.append(area)
 
         places = cls.get_nearest_places(data.get("_source", {}).get("location"), es, 10)
-
         return cls(data.get("_id"), data.get("_source"), pcareas, places)
     
     def process_attributes(self, postcode):
@@ -63,7 +62,7 @@ class Postcode(Controller):
                     postcode[i] = datetime.strptime(postcode[i][0:10], "%Y-%m-%d")
                 except ValueError:
                     continue
-
+        
         if OAC11_CODE.get(postcode.get("oac11")):
             postcode["oac11"] = {
                 "code": postcode["oac11"],
@@ -170,10 +169,5 @@ class Postcode(Controller):
         for i in self.date_fields:
             if json[0].get("attributes", {}).get(i) and isinstance(json[0]["attributes"][i], datetime):
                 json[0]["attributes"][i] = json[0]["attributes"][i].strftime("%Y-%m-%d")
-
-        # ats = areatypes.Areatypes(self.config, self.es)
-        # ats.get()
-        # for a in ats.attributes:
-        #     json[2].append(a.toJSON()[1])
 
         return json

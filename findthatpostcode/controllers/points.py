@@ -105,5 +105,31 @@ class Point(Controller):
 
         json = super().topJSON()
         postcode_json = self.relationships["nearest_postcode"].toJSON()
-        json[1]["included"] += postcode_json[2]
+        json["included"] += postcode_json[1]
         return json
+
+
+    def url(self, filetype=None, query_vars={}):
+        path = [self.url_slug, "{},{}".format(*self.id) + self.set_url_filetype(filetype)]
+        return urlunparse([
+            self.urlparts.scheme if self.urlparts else "",
+            self.urlparts.netloc if self.urlparts else "",
+            "/".join(path),
+            "",
+            self.get_query_string(query_vars),
+            ""
+        ])
+        
+    def relationship_url(self, relationship, related=True, filetype=None, query_vars={}):
+        if related:
+            path = [self.url_slug, "{},{}".format(*self.id), relationship + self.set_url_filetype(filetype)]
+        else:
+            path = [self.url_slug, "{},{}".format(*self.id), "relationships", relationship + self.set_url_filetype(filetype)]
+        return urlunparse([
+            self.urlparts.scheme if self.urlparts else "",
+            self.urlparts.netloc if self.urlparts else "",
+            "/".join(path),
+            "",
+            self.get_query_string(query_vars),
+            ""
+        ])

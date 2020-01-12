@@ -13,12 +13,20 @@ bp = Blueprint('points', __name__, url_prefix='/points')
 def point_redirect():
     lat = float(request.args.get("lat"))
     lon = float(request.args.get("lon"))
-    return redirect(url_for('points.get', lat=lat, lon=lon, filetype='html'), code=303)
+    return redirect(url_for('points.get', latlon="{},{}.html".format(lat, lon)), code=303)
 
 
-@bp.route('/<lat>,<lon>')
-@bp.route('/<lat>,<lon>.<filetype>')
-def get(lat, lon, filetype="json"):
+@bp.route('/<latlon>')
+def get(latlon):
+    filetype = 'json'
+    if latlon.endswith('.json'):
+        latlon = latlon[:-5]
+    elif latlon.endswith('.html'):
+        latlon = latlon[:-5]
+        filetype = 'html'
+    lat, lon = latlon.split(",")
     es = get_db()
     result = Point.get_from_es((float(lat), float(lon)), es)
-    return return_result(result.relationships["nearest_postcode"], filetype, 'postcode.html', point=result)
+    if filetype=='html':
+        return return_result(result.relationships["nearest_postcode"], filetype, 'postcode.html', point=result)
+    return return_result(result, filetype, 'postcode.html')

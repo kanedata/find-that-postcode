@@ -48,12 +48,12 @@ def test_area_geojson(client):
 
 
 def test_area_search(client):
-    pass
+    rv = client.get("/areas/search")
+    assert rv.headers['Location'] == 'http://localhost/search/'
+    assert rv.status_code == 301
 
-
-def test_area_search_nonsense(client):
-    pass
-
-
-def test_area_search_blank(client):
-    pass
+def test_area_names(client):
+    rv = client.get("/areas/names.csv")
+    content = rv.data.decode("utf8")
+    assert rv.mimetype == 'text/csv'
+    assert 'E01020135' in content

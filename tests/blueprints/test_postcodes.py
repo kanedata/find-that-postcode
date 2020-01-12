@@ -35,10 +35,10 @@ def test_postcode_missing_html(client):
     rv = client.get('/postcodes/14214124.html')
     assert rv.status == '404 NOT FOUND'
     assert rv.mimetype == 'text/html'
-    content = rv.data.decode("utf8").lower()
-    assert "14214124" in content
-    assert "not found" in content
 
 
 def test_postcode_redirect(client):
-    pass
+    rv = client.get('/postcodes/redirect?postcode=EX36 4AT')
+    assert rv.status_code == 303
+    assert rv.mimetype == 'text/html'
+    assert rv.headers['Location'].endswith('/postcodes/EX36%204AT.html')

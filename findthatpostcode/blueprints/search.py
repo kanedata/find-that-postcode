@@ -37,7 +37,7 @@ def search_index():
 
     latlon = is_latlon(q)
     if latlon:
-        return redirect(url_for('points.get', lat=latlon["lat"], lon=latlon["lon"], filetype='html'), code=303)
+        return redirect(url_for('points.get', latlon="{},{}.html".format(latlon["lat"], latlon["lon"])), code=303)
 
     if is_postcode(q):
         return redirect(url_for('postcodes.get_postcode', postcode=q, filetype='html'), code=303)

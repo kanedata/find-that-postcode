@@ -1,4 +1,5 @@
 import os
+import copy
 import json
 from contextlib import contextmanager
 
@@ -67,8 +68,10 @@ class MockElasticsearch:
 
     def search(self, **kwargs):
 
+        index = kwargs.get("index").split(",")
+
         # get some specific queries used in the data
-        if kwargs.get("index") == 'geo_area' and kwargs.get("body", {}).get("aggs", {}).get("group_by_type", {}).get("terms", {}).get("field") == 'entity.keyword':
+        if 'geo_area' in index and kwargs.get("body", {}).get("aggs", {}).get("group_by_type", {}).get("terms", {}).get("field") == 'entity.keyword':
             return self.search_result_wrapper([], {
                 "group_by_type": {
                     "doc_count_error_upper_bound": 0,
@@ -89,14 +92,38 @@ class MockElasticsearch:
                     ]
                 }
             })
+        if 'geo_area' in index and kwargs.get("body", {}).get("aggs", {}).get("group_by_type", {}).get("terms", {}).get("field") == 'type.keyword':
+            return self.search_result_wrapper([], {
+                "group_by_type": {
+                    "doc_count_error_upper_bound": 0,
+                    "sum_other_doc_count": 455,
+                    "buckets": [
+                        {
+                            "key": "cty",
+                            "doc_count": 175741
+                        },
+                        {
+                            "key": "laua",
+                            "doc_count": 135306
+                        },
+                        {
+                            "key": "lsoa11",
+                            "doc_count": 50868
+                        }
+                    ]
+                }
+            })
 
         # match all queries
-        hits = mock_data.get(kwargs["index"], [])[:kwargs.get("size", 10)]
+        hits = []
+        for i in index:
+            hits.extend(copy.deepcopy(mock_data.get(i, [])))
+        hits = hits[:kwargs.get("size", 10)]
 
         # if there's a sort parameter then include a sort array
         if kwargs.get("body", {}).get("sort", []):
             for h in hits:
-                h["sort"] = [1]
+                h["sort"] = [68.9707515287199]
 
         return self.search_result_wrapper(hits, scroll=kwargs.get("scroll"))
 
@@ -109,7 +136,7 @@ class MockElasticsearch:
                 "_seq_no": 694904,
                 "_primary_term": 9,
                 "found": True,
-                **potentials[kwargs["id"]]
+                **copy.deepcopy(potentials[kwargs["id"]])
             }
         return {
             "_index": kwargs["index"],

@@ -136,7 +136,7 @@ class Controller:
         if len(self.relationships) > 0:
             json["relationships"] = {}
 
-        for i in self.relationships:
+        for i, items in self.relationships.items():
             json["relationships"][i] = {
                 "links": {
                     "self": self.relationship_url(i, False),
@@ -144,14 +144,14 @@ class Controller:
                 },
                 "data": None
             }
-            if isinstance(self.relationships[i], list):
-                json["relationships"][i]["data"] = [j.toJSON("identifer")[0] for j in self.relationships[i]]
+            if isinstance(items, list):
+                json["relationships"][i]["data"] = [j.toJSON("identifer")[0] for j in items]
                 if role != "embedded":
-                    included += [j.toJSON("embedded")[0] for j in self.relationships[i]]
-            elif self.relationships[i]:
-                json["relationships"][i]["data"] = self.relationships[i].toJSON("identifer")[0]
+                    included += [j.toJSON("embedded")[0] for j in items]
+            elif hasattr(items, "toJSON"):
+                json["relationships"][i]["data"] = items.toJSON("identifer")[0]
                 if role != "embedded":
-                    included.append(self.relationships[i].toJSON("embedded")[0])
+                    included.append(items.toJSON("embedded")[0])
 
         return (json, included)
 

@@ -2,7 +2,6 @@ from functools import wraps
 
 from flask import abort, make_response, jsonify, render_template, request, current_app
 
-from findthatpostcode.metadata import KEY_AREA_TYPES, OTHER_CODES
 
 def return_result(result, filetype="json", template=None, **kwargs):
     if filetype == "html" and not template:
@@ -11,7 +10,6 @@ def return_result(result, filetype="json", template=None, **kwargs):
     status = 200 if result.found else 404
 
     if status != 200:
-        errors = result.get_errors()
         if filetype in ("json", "geojson"):
             return abort(make_response(jsonify(message=result.topJSON()), status))
         elif filetype == "html":
@@ -46,6 +44,7 @@ def jsonp(func):
         else:
             return func(*args, **kwargs)
     return decorated_function
+
 
 def cors(func):
     """Adds cors headers for requests (allows all)."""

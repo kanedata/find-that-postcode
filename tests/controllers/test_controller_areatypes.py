@@ -1,8 +1,5 @@
-import pytest
-from tests.fixtures import MockElasticsearch
-
 from findthatpostcode.controllers.areatypes import Areatype
-from findthatpostcode.controllers.areas import Area
+
 
 def test_areatype_class():
     a = Areatype('testentity', {"code": "testentity", "name": "Test Entity"})
@@ -12,4 +9,3 @@ def test_areatype_class():
     assert str(a) == '<AreaType testentity>'
 
     # @TODO: test this fetches the list of areas - with pagination
-

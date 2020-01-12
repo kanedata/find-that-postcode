@@ -1,6 +1,4 @@
-import re
-
-from flask import Blueprint, current_app, request, redirect, url_for
+from flask import Blueprint, request, redirect, url_for
 
 from .utils import return_result
 from findthatpostcode.controllers.points import Point
@@ -27,6 +25,6 @@ def get(latlon):
     lat, lon = latlon.split(",")
     es = get_db()
     result = Point.get_from_es((float(lat), float(lon)), es)
-    if filetype=='html':
+    if filetype == 'html':
         return return_result(result.relationships["nearest_postcode"], filetype, 'postcode.html', point=result)
     return return_result(result, filetype, 'postcode.html')

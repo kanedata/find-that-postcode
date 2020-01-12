@@ -1,15 +1,11 @@
 """
 Import commands for the register of geographic codes and code history database
 """
-import zipfile
-import io
 import codecs
 import csv
-import datetime
-from collections import defaultdict
 
 import click
-from flask import Flask, current_app
+from flask import current_app
 from flask.cli import with_appcontext
 import requests
 import requests_cache
@@ -22,6 +18,7 @@ from .codes import AREA_INDEX
 IMD2019_URL = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/845345/File_7_-_All_IoD2019_Scores__Ranks__Deciles_and_Population_Denominators_3.csv'
 IMD2015_URL = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/467774/File_7_ID_2015_All_ranks__deciles_and_scores_for_the_Indices_of_Deprivation__and_population_denominators.csv'
 
+
 def parse_field(k, v):
     if not isinstance(v, str):
         return v
@@ -32,6 +29,7 @@ def parse_field(k, v):
     if k.endswith("_score"):
         return float(v)
     return v
+
 
 IMD_FIELDS = {
     "LSOA code (2011)": "lsoa_code",
@@ -99,6 +97,7 @@ IMD_FIELDS = {
     "Working age population 18-59/64: for use with Employment Deprivation Domain (excluding prisoners)": "population_workingage",
 }
 
+
 @click.command('imd2019')
 @click.option('--es-index', default=AREA_INDEX)
 @click.option('--url', default=IMD2019_URL)
@@ -111,7 +110,7 @@ def import_imd2019(url=IMD2019_URL, es_index=AREA_INDEX):
     es = db.get_db()
 
     r = requests.get(url, stream=True)
-    
+
     reader = csv.DictReader(codecs.iterdecode(r.iter_lines(), 'utf-8-sig'))
     area_updates = []
     for k, area in tqdm.tqdm(enumerate(reader)):
@@ -138,6 +137,7 @@ def import_imd2019(url=IMD2019_URL, es_index=AREA_INDEX):
     print("[elasticsearch] saved %s areas to %s index" % (results[0], es_index))
     print("[elasticsearch] %s errors reported" % len(results[1]))
 
+
 @click.command('imd2015')
 @click.option('--es-index', default=AREA_INDEX)
 @click.option('--url', default=IMD2015_URL)
@@ -150,7 +150,7 @@ def import_imd2015(url=IMD2015_URL, es_index=AREA_INDEX):
     es = db.get_db()
 
     r = requests.get(url, stream=True)
-    
+
     reader = csv.DictReader(codecs.iterdecode(r.iter_lines(), 'utf-8-sig'))
     area_updates = []
     for k, area in tqdm.tqdm(enumerate(reader)):

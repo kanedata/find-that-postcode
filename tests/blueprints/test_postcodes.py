@@ -1,5 +1,6 @@
 from tests.fixtures import client
 
+
 def test_postcode_json(client):
     rv = client.get('/postcodes/EX36 4AT')
     postcode_json = rv.get_json()

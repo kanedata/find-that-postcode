@@ -1,15 +1,9 @@
 """
 Import commands for the register of geographic codes and code history database
 """
-import zipfile
-import io
-import codecs
-import csv
-import datetime
-from collections import defaultdict
 
 import click
-from flask import Flask, current_app
+from flask import current_app
 from flask.cli import with_appcontext
 import requests
 import requests_cache
@@ -19,6 +13,7 @@ import shapely.geometry
 
 from .. import db
 from .codes import AREA_INDEX
+
 
 @click.command('boundaries')
 @click.option('--es-index', default=AREA_INDEX)
@@ -35,6 +30,7 @@ def import_boundaries(urls, examine=False, code_field=None, es_index=AREA_INDEX)
 
     for url in urls:
         import_boundary(es, url, examine, es_index, code_field)
+
 
 def import_boundary(es, url, examine=False, es_index=AREA_INDEX, code_field=None):
     r = requests.get(url, stream=True)
@@ -56,7 +52,7 @@ def import_boundary(es, url, examine=False, es_index=AREA_INDEX, code_field=None
             errors.append("[ERROR][%s] No code field found in file" % (url,))
         else:
             errors.append("[ERROR][%s] Too many code fields found in file" % (url,))
-            errors.append("[ERROR][%s] Code fields: %s" % (url,"; ".join(code_fields)))
+            errors.append("[ERROR][%s] Code fields: %s" % (url, "; ".join(code_fields)))
 
     if len(errors) > 0:
         if examine:
@@ -66,7 +62,7 @@ def import_boundary(es, url, examine=False, es_index=AREA_INDEX, code_field=None
             raise ValueError("; ".join(errors))
 
     code = code_field.lower().replace("cd", "")
-    
+
     if examine:
         print("[%s] Opened file: [%s]" % (code, url))
         print("[%s] Looking for code field: [%s]" % (code, code_field))
@@ -87,7 +83,6 @@ def import_boundary(es, url, examine=False, es_index=AREA_INDEX, code_field=None
         print("[%s] %s features to import" % (code, len(boundaries["features"])))
         bulk_boundaries = []
         errors = []
-        boundaries_updated = 0
         for k, i in tqdm.tqdm(enumerate(boundaries["features"]), total=len(boundaries["features"])):
             shp = shapely.geometry.shape(i["geometry"]).buffer(0)
             boundary = {

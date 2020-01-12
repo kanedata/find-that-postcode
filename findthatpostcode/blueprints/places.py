@@ -1,6 +1,4 @@
-import re
-
-from flask import Blueprint, current_app, request, redirect, url_for, jsonify
+from flask import Blueprint, request, redirect, url_for, jsonify
 
 from .utils import return_result
 from findthatpostcode.controllers.places import Place

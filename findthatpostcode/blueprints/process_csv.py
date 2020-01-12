@@ -1,7 +1,5 @@
 from __future__ import print_function
 import csv
-import argparse
-import sys
 from findthatpostcode.controllers.postcodes import Postcode
 
 # List of potential postcode fields

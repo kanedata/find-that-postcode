@@ -10,7 +10,7 @@ INDEXES = {
             "location": {"type": "geo_point"},
             "hash": {
                 "type": "text",
-                "index_prefixes": { }    
+                "index_prefixes": {}
             }
         }
     },
@@ -26,6 +26,7 @@ INDEXES = {
     }
 }
 
+
 def get_db():
     if 'db' not in g:
         g.db = Elasticsearch(current_app.config['ES_URL'])
@@ -34,7 +35,8 @@ def get_db():
 
 
 def close_db(e=None):
-    db = g.pop('db', None)
+    g.pop('db', None)
+
 
 def init_db(reset=False):
     es = get_db()

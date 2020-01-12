@@ -1,6 +1,6 @@
-from ..metadata import AREA_TYPES, KEY_AREA_TYPES, OTHER_CODES
+from ..metadata import AREA_TYPES
 
-from .controller import *
+from .controller import Controller
 from . import areas
 
 
@@ -52,6 +52,7 @@ class Areatype(Controller):
         example = es.search(index='geo_area', body=query, size=examples_count)
         self.relationships["areas"] = [areas.Area(e["_id"], e["_source"]) for e in example["hits"]["hits"]]
         self.attributes["count_areas"] = self.get_total_from_es(example)
+
 
 def area_types_count(es, es_config=None):
     if not es_config:

@@ -1,7 +1,7 @@
-import pytest
 from tests.fixtures import MockElasticsearch
 
 from findthatpostcode.controllers.controller import Controller
+
 
 def test_controller_class():
     id_ = 'testentity'
@@ -11,7 +11,7 @@ def test_controller_class():
     a = Controller(id_, data)
     assert a.id == id_
     assert a.attributes["name"] == data["name"]
-    assert a.found == True
+    assert a.found is True
     assert len(a.get_errors()) == 0
 
     # test internal functions
@@ -22,9 +22,10 @@ def test_controller_class():
     a = Controller(id_, {})
     assert a.id == id_
     assert a.attributes.get("name") is None
-    assert a.found == False
+    assert a.found is False
     assert len(a.get_errors()) == 1
-    assert a.get_errors()[0]["status"] == '404' 
+    assert a.get_errors()[0]["status"] == '404'
+
 
 def test_controller_fetch():
 
@@ -33,5 +34,5 @@ def test_controller_fetch():
     a = Controller.get_from_es("EX36 4AT", es, es_config={"es_index": "geo_postcode", "es_type": "_doc"})
     assert isinstance(a.id, str)
     assert len(a.attributes) > 4
-    assert a.found == True
+    assert a.found is True
     assert len(a.get_errors()) == 0

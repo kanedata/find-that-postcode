@@ -1,5 +1,6 @@
 from tests.fixtures import client
 
+
 def test_index(client):
     rv = client.get('/')
     content = rv.data.decode("utf8")
@@ -7,6 +8,7 @@ def test_index(client):
     assert 'Contains OS data © Crown copyright and database right' in content
     assert 'Contains Royal Mail data © Royal Mail copyright and database right' in content
     assert 'Contains National Statistics data © Crown copyright and database right' in content
+
 
 def test_about(client):
     rv = client.get('/about')

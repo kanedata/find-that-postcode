@@ -2,9 +2,8 @@ import tempfile
 import os
 import codecs
 
-from flask import Blueprint, current_app, abort, jsonify, make_response, request, render_template
+from flask import Blueprint, make_response, request, render_template
 
-from .utils import return_result
 from .process_csv import process_csv
 from findthatpostcode.controllers.areatypes import area_types_count
 from findthatpostcode.metadata import BASIC_UPLOAD_FIELDS, DEFAULT_UPLOAD_FIELDS, STATS_FIELDS

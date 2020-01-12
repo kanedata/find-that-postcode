@@ -3,6 +3,7 @@ import html
 
 AREATYPE_CODE = 'lsoa11'
 
+
 def test_areatype_json(client):
     rv = client.get('/areatypes/{}.json'.format(AREATYPE_CODE))
     data = rv.get_json()

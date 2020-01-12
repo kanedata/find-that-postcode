@@ -1,7 +1,6 @@
-from datetime import datetime
-import bottle
+from urllib.parse import urlunparse
 
-from .controller import *
+from .controller import Controller
 from . import postcodes
 
 
@@ -44,7 +43,7 @@ class Point(Controller):
                 }
             ]
         }
-        
+
     @classmethod
     def get_from_es(cls, id, es, es_config=None):
         if not es_config:
@@ -82,7 +81,7 @@ class Point(Controller):
         result = self.es.search(index=self.config.get("es_index", "postcode"), body=query, size=1)
         if result["hits"]["total"] > 0:
             postcode = result["hits"]["hits"][0]
-            self.relationships["nearest_postcode"] = controllers.postcodes.Postcode(self.config).set_from_data(postcode)
+            self.relationships["nearest_postcode"] = postcodes.Postcode(self.config).set_from_data(postcode)
             self.attributes["distance_from_postcode"] = postcode["sort"][0]
 
     def topJSON(self):
@@ -103,7 +102,6 @@ class Point(Controller):
         json["included"] += postcode_json[1]
         return json
 
-
     def url(self, filetype=None, query_vars={}):
         path = [self.url_slug, "{},{}".format(*self.id) + self.set_url_filetype(filetype)]
         return urlunparse([
@@ -114,7 +112,7 @@ class Point(Controller):
             self.get_query_string(query_vars),
             ""
         ])
-        
+
     def relationship_url(self, relationship, related=True, filetype=None, query_vars={}):
         if related:
             path = [self.url_slug, "{},{}".format(*self.id), relationship + self.set_url_filetype(filetype)]

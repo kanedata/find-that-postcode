@@ -3,19 +3,16 @@ Import commands for the register of geographic codes and code history database
 """
 import zipfile
 import io
-import codecs
 import csv
 import datetime
-from collections import defaultdict
 import hashlib
 
 import click
-from flask import Flask, current_app
+from flask import current_app
 from flask.cli import with_appcontext
 import requests
 import requests_cache
 from elasticsearch.helpers import bulk
-import tqdm
 
 from .. import db
 
@@ -23,6 +20,7 @@ PC_INDEX = 'geo_postcode'
 
 NSPL_URL = 'https://www.arcgis.com/sharing/rest/content/items/ad7fd1d95f06431aaaceecdce4985c7e/data'
 ONSPD_URL = 'https://www.arcgis.com/sharing/rest/content/items/ae45e39fdafe4520bba99c760c303109/data'
+
 
 @click.command('nspl')
 @click.option('--es-index', default=PC_INDEX)
@@ -54,7 +52,7 @@ def import_nspl(url=NSPL_URL, es_index=PC_INDEX):
                 # https://www.ons.gov.uk/methodology/geography/licences
                 if i["pcds"].lower().startswith('bt'):
                     continue
-                
+
                 record = {
                     "_index": es_index,
                     "_type": "_doc",

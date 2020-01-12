@@ -1,6 +1,6 @@
 import json
 
-from flask import Blueprint, current_app, request, jsonify, url_for
+from flask import Blueprint, current_app, request, jsonify
 
 from findthatpostcode.controllers.postcodes import Postcode
 from findthatpostcode.controllers.areas import search_areas
@@ -35,6 +35,7 @@ def recon_query(q, es):
                 "match": a.attributes["name"].lower() == query.lower(),
             })
     return result
+
 
 @bp.route('/', strict_slashes=False, methods=['GET', 'POST'])
 @jsonp

@@ -1,12 +1,10 @@
 from datetime import datetime
-import bottle
 import re
 
-from ..metadata import AREA_TYPES, KEY_AREA_TYPES, OTHER_CODES, OAC11_CODE, RU11IND_CODES
-from .controller import *
+from ..metadata import OAC11_CODE, RU11IND_CODES
+from .controller import Controller
 from . import areas
 from . import places
-from . import areatypes
 
 
 class Postcode(Controller):
@@ -25,7 +23,6 @@ class Postcode(Controller):
     def __repr__(self):
         return '<Postcode {}>'.format(self.id)
 
-
     @classmethod
     def get_from_es(cls, id, es, es_config=None):
         if not es_config:
@@ -40,19 +37,19 @@ class Postcode(Controller):
 
         if not data.get("found"):
             return cls(id)
-        
+
         pcareas = []
         postcode = data.get("_source")
         for k in list(postcode.keys()):
             if isinstance(postcode[k], str) and re.match(r'[A-Z][0-9]{8}', postcode[k]):
-                area = areas.Area.get_from_es(postcode[k], es, examples_count=0) 
+                area = areas.Area.get_from_es(postcode[k], es, examples_count=0)
                 if area.found:
                     postcode[k + "_name"] = area.attributes.get("name")
                     pcareas.append(area)
 
         places = cls.get_nearest_places(data.get("_source", {}).get("location"), es, 10)
         return cls(data.get("_id"), data.get("_source"), pcareas, places)
-    
+
     def process_attributes(self, postcode):
 
         # turn dates into dates
@@ -62,7 +59,7 @@ class Postcode(Controller):
                     postcode[i] = datetime.strptime(postcode[i][0:10], "%Y-%m-%d")
                 except ValueError:
                     continue
-        
+
         if OAC11_CODE.get(postcode.get("oac11")):
             postcode["oac11"] = {
                 "code": postcode["oac11"],
@@ -121,7 +118,6 @@ class Postcode(Controller):
                 if a.relationships["areatype"].id == attr:
                     return a.id
 
-
     def get_area(self, areatype):
         """
         Get the area for this postcode based on the type
@@ -129,7 +125,6 @@ class Postcode(Controller):
         for a in self.relationships["areas"]:
             if a.relationships["areatype"].id == areatype:
                 return a
-
 
     @staticmethod
     def parse_id(postcode):

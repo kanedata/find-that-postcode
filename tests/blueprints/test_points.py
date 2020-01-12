@@ -1,6 +1,5 @@
-import html 
-
 from tests.fixtures import client
+
 
 def test_point_json(client):
     rv = client.get('/points/51.501,-0.2936')

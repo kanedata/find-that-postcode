@@ -6,10 +6,9 @@ import io
 import codecs
 import csv
 import datetime
-from collections import defaultdict
 
 import click
-from flask import Flask, current_app
+from flask import current_app
 from flask.cli import with_appcontext
 import requests
 import requests_cache
@@ -25,10 +24,12 @@ MSOA_URL = 'https://visual.parliament.uk/msoanames/static/MSOA-Names-v1.0.0.csv'
 ENTITY_INDEX = 'geo_entity'
 AREA_INDEX = 'geo_area'
 
+
 def process_date(value, date_format='%d/%m/%Y'):
     if value in ['', 'n/a']:
         return None
     return datetime.datetime.strptime(value, date_format)
+
 
 def process_int(value):
     if value in ['', 'n/a']:
@@ -38,6 +39,7 @@ def process_int(value):
     value = value.replace(",", "")
     return int(value)
 
+
 def process_float(value):
     if value in ['', 'n/a']:
         return None
@@ -45,6 +47,7 @@ def process_float(value):
         return value
     value = value.replace(",", "")
     return float(value)
+
 
 @click.command('rgc')
 @click.option('--url', default=RGC_URL)
@@ -66,7 +69,7 @@ def import_rgc(url=RGC_URL, es_index=ENTITY_INDEX):
             reader = csv.DictReader(io.TextIOWrapper(infile, 'utf-8-sig'))
             entities = []
             for entity in reader:
-                
+
                 # tidy up a couple of records
                 entity["Related entity codes"] = entity["Related entity codes"].replace("n/a", "").split(", ")
 
@@ -96,12 +99,13 @@ def import_rgc(url=RGC_URL, es_index=ENTITY_INDEX):
                         "date_start": process_date(entity['Entity start date']),
                     },
                 })
-            
+
             print("[entities] Processed %s entities" % len(entities))
             print("[elasticsearch] %s entities to save" % len(entities))
             results = bulk(es, entities)
             print("[elasticsearch] saved %s entities to %s index" % (results[0], es_index))
             print("[elasticsearch] %s errors reported" % len(results[1]))
+
 
 @click.command('chd')
 @click.option('--url', default=CHD_URL)
@@ -146,7 +150,7 @@ def import_chd(url=CHD_URL, es_index=AREA_INDEX):
                     "parent": area["PARENTCD"] if area["PARENTCD"] else None,
                     "entity": area["ENTITYCD"],
                     "owner": area["OWNER"],
-                    "active": area["STATUS"]=='live',
+                    "active": area["STATUS"] == 'live',
                     "areaehect": process_float(area["AREAEHECT"]),
                     "areachect": process_float(area["AREACHECT"]),
                     "areaihect": process_float(area["AREAIHECT"]),
@@ -163,7 +167,7 @@ def import_chd(url=CHD_URL, es_index=AREA_INDEX):
         reader = csv.DictReader(io.TextIOWrapper(infile, 'utf-8-sig'))
         click.echo('Opening {}'.format(infile.name))
         for k, area in tqdm.tqdm(enumerate(reader)):
-            if area['GEOGCD_P']=='':
+            if area['GEOGCD_P'] == '':
                 continue
             if area['GEOGCD'] in areas:
                 areas[area['GEOGCD']]["doc"]["predecessor"].append(area['GEOGCD_P'])
@@ -193,6 +197,7 @@ def import_chd(url=CHD_URL, es_index=AREA_INDEX):
     print("[elasticsearch] saved %s areas to %s index" % (results[0], es_index))
     print("[elasticsearch] %s errors reported" % len(results[1]))
 
+
 @click.command('msoanames')
 @click.option('--url', default=MSOA_URL)
 @click.option('--es-index', default=AREA_INDEX)
@@ -205,13 +210,13 @@ def import_msoa_names(url=MSOA_URL, es_index=AREA_INDEX):
     es = db.get_db()
 
     r = requests.get(url, stream=True)
-    
+
     reader = csv.DictReader(codecs.iterdecode(r.iter_lines(), 'utf-8-sig'))
     area_updates = []
     for k, area in tqdm.tqdm(enumerate(reader)):
         new_doc = {
-            "doc" : {
-                "name" : area['msoa11hclnm'],
+            "doc": {
+                "name": area['msoa11hclnm'],
                 "name_welsh": area['msoa11hclnmw'] if area['msoa11hclnmw'] else None
             }
         }

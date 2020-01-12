@@ -1,10 +1,10 @@
 import types
 
-import pytest
 from tests.fixtures import MockElasticsearch
 
 from findthatpostcode.controllers.areas import Area, search_areas, get_all_areas
 from findthatpostcode.controllers.postcodes import Postcode
+
 
 def test_area_class():
     a = Area('testentity', {"code": "testentity", "name": "Test Entity"})
@@ -12,19 +12,21 @@ def test_area_class():
     assert a.attributes["name"] == "Test Entity"
     assert str(a) == '<Area testentity>'
 
+
 def test_area_class_es():
 
     es = MockElasticsearch()
     a = Area.get_from_es('S02000783', es)
-    
+
     assert a.id == 'S02000783'
     assert a.attributes["name"] == "Lower Bow & Larkfield, Fancy Farm, Mallard Bowl"
     assert str(a) == '<Area S02000783>'
 
-    a = Area.get_from_es('E01020135', es) # get an area with example postcodes
+    a = Area.get_from_es('E01020135', es)  # get an area with example postcodes
 
     assert len(a.relationships["example_postcodes"]) > 0
     assert isinstance(a.relationships["example_postcodes"][0], Postcode)
+
 
 def test_search_areas():
 
@@ -35,6 +37,7 @@ def test_search_areas():
     assert "result_count" in a
     assert a["result_count"] > 0
     assert isinstance(a["result"][0], Area)
+
 
 def test_get_all_areas():
 

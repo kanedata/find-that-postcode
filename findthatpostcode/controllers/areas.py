@@ -51,7 +51,7 @@ class Area(Controller):
             "example_postcodes": [],
             "boundary": data.get("_source", {}).get("boundary"),
         }
-        if data["found"]: 
+        if data["found"]:
             if data["_source"].get("type"):
                 relationships["areatype"] = areatypes.Areatype(data["_source"].get("type"))
             elif data["_source"].get("entity"):
@@ -59,7 +59,7 @@ class Area(Controller):
 
         if examples_count:
             relationships["example_postcodes"] = cls.get_example_postcodes(id, es, examples_count=examples_count)
-        
+
         if data.get("_source", {}) and recursive:
             data["_source"]["child_count"], relationships["children"] = cls.get_children(id, es)
 
@@ -77,7 +77,7 @@ class Area(Controller):
                 cls.get_from_es(i, es, examples_count=0, recursive=False)
                 for i in data["_source"]["successor"] if i
             ]
-        
+
         return cls(
             data.get("_id"),
             data=data.get("_source"),
@@ -168,7 +168,6 @@ class Area(Controller):
             s = shapely.wkt.loads(self.boundary)
             self.boundary = shapely.geometry.mapping(s)
 
-
         return (200, {
             "type": "FeatureCollection",
             "features": [
@@ -214,10 +213,10 @@ def search_areas(q, es, page=1, size=100, es_config=None):
     pagination = Pagination(page, size)
     result = es.search(
         index="geo_area,geo_placename",
-        body=query, 
+        body=query,
         from_=pagination.from_,
         size=pagination.size,
-        _source_excludes=["boundary"], 
+        _source_excludes=["boundary"],
         ignore=[404]
     )
     return_result = []
@@ -250,13 +249,13 @@ def get_all_areas(es, areatypes=None, es_config=None):
         }
     query = {
         "query": {
-            "bool" : {
+            "bool": {
                 "must_not": {
                     "term": {
                         "name.keyword": ""
                     }
                 },
-                "must" : query
+                "must": query
             }
         }
     }
@@ -270,7 +269,7 @@ def get_all_areas(es, areatypes=None, es_config=None):
 
     for r in result:
         yield {
-            "code": r["_id"], 
+            "code": r["_id"],
             "name": r["_source"]["name"],
             "type": r["_source"]["type"]
         }

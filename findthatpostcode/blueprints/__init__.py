@@ -7,6 +7,7 @@ from . import reconcile
 from . import addtocsv
 from . import search
 
+
 def init_app(app):
 
     app.register_blueprint(areas.bp)

@@ -1,8 +1,6 @@
 import math
 from urllib.parse import urlencode, urlunparse
 
-from ..metadata import AREA_TYPES
-
 GEOJSON_TYPES = {
     "point": "Point",  # A single geographic coordinate.
     "linestring": "LineString",  # An arbitrary line given two or more points.
@@ -33,7 +31,6 @@ class Controller:
             self.found = True
             self.attributes = self.process_attributes(data)
 
-
     @classmethod
     def get_from_es(cls, id, es, es_config=None):
         if not es_config:
@@ -57,14 +54,13 @@ class Controller:
     @staticmethod
     def get_total_from_es(result):
         """
-        Elasticsearch python seems to have changed how it returns the total number of 
+        Elasticsearch python seems to have changed how it returns the total number of
         hits in a search - this gets a consistent figure no matter the version
         """
         if isinstance(result["hits"]["total"], dict):
             return result["hits"]["total"]['value']
         if isinstance(result["hits"]["total"], (float, int)):
             return result["hits"]["total"]
-
 
     def url(self, filetype=None, query_vars={}):
         path = [self.url_slug, self.id.replace(" ", "+") + self.set_url_filetype(filetype)]
@@ -176,7 +172,6 @@ class Controller:
                 "html": self.url("html")
             }
         }
-
 
     def get_es_version(self, es):
         version_number = es.info().get("version").get("number")

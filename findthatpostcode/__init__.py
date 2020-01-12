@@ -8,6 +8,7 @@ from . import blueprints
 from .metadata import KEY_AREA_TYPES, OTHER_CODES, AREA_TYPES
 from .controllers.areatypes import area_types_count
 
+
 def get_es_url(default):
 
     potential_env_vars = [
@@ -19,6 +20,7 @@ def get_es_url(default):
         if os.environ.get(e_v):
             return os.environ.get(e_v)
     return default
+
 
 def create_app(test_config=None):
     # create and configure the app
@@ -41,7 +43,7 @@ def create_app(test_config=None):
         os.makedirs(app.instance_path)
     except OSError:
         pass
-    
+
     db.init_app(app)
     commands.init_app(app)
 
@@ -54,7 +56,7 @@ def create_app(test_config=None):
             other_codes=OTHER_CODES,
             area_types=AREA_TYPES,
         )
-    
+
     # routes and blueprints
     @app.route('/')
     def index():
@@ -64,7 +66,7 @@ def create_app(test_config=None):
     @app.route('/about')
     def about():
         return render_template('about.html')
-    
+
     blueprints.init_app(app)
 
     return app

@@ -1,6 +1,4 @@
-import re
-
-from flask import Blueprint, current_app, request, redirect, url_for, jsonify, abort, make_response
+from flask import Blueprint, request, redirect, url_for, jsonify, abort
 from elasticsearch.helpers import scan
 from dictlib import dig_get
 
@@ -17,14 +15,14 @@ def postcode_redirect():
     pcd = request.args.get("postcode")
     return redirect(url_for('postcodes.get_postcode', postcode=pcd, filetype='html'), code=303)
 
+
 @bp.route('/<postcode>')
 @bp.route('/<postcode>.<filetype>')
 def get_postcode(postcode, filetype="json"):
-
     es = get_db()
-    
     result = Postcode.get_from_es(postcode, es)
     return return_result(result, filetype, 'postcode.html')
+
 
 @bp.route('/hash/<hash>')
 @bp.route('/hash/<hash>.json')
@@ -51,7 +49,7 @@ def get_postcode_by_hash(hash):
     areas = scan(
         es,
         index='geo_area',
-        query = {"query": {"terms": {"type": name_fields}}},
+        query={"query": {"terms": {"type": name_fields}}},
         _source_includes=["name"]
     )
     areanames = {
@@ -65,6 +63,7 @@ def get_postcode_by_hash(hash):
         }
 
     lsoas = {}
+
     def get_stats(data):
         lsoa = data.get("lsoa11")
         if not lsoa or not stats or lsoa not in lsoas:
@@ -82,7 +81,16 @@ def get_postcode_by_hash(hash):
                 for i in scan(
                     es,
                     index='geo_area',
-                    query={"query":{"terms": {"_id": [r.get("_source", {}).get("lsoa11") for r in results if r.get("_source", {}).get("lsoa11")]}}},
+                    query={
+                        "query": {
+                            "terms": {
+                                "_id": [
+                                    r.get("_source", {}).get("lsoa11")
+                                    for r in results if r.get("_source", {}).get("lsoa11")
+                                ]
+                            }
+                        }
+                    },
                     _source_includes=[i[3] for i in stats],
                 )
             }

@@ -1,11 +1,6 @@
-from datetime import datetime
 import re
 
-from elasticsearch.helpers import scan
-import shapely.wkt
-import shapely.geometry
-
-from .controller import Controller, Pagination, GEOJSON_TYPES
+from .controller import Controller
 from . import postcodes
 from . import areas
 
@@ -48,7 +43,7 @@ class Place(Controller):
         }
         for k, v in data.get("_source", {}).get("areas", {}).items():
             if isinstance(v, str) and re.match(r'[A-Z][0-9]{8}', v):
-                area = areas.Area.get_from_es(v, es, examples_count=0) 
+                area = areas.Area.get_from_es(v, es, examples_count=0)
                 if area.found:
                     # data["_source"]["areas"][k + "_name"] = area.attributes.get("name")
                     relationships["areas"].append(area)
@@ -56,7 +51,7 @@ class Place(Controller):
         if examples_count:
             relationships["nearest_postcodes"] = cls.get_nearest_postcodes(data.get("_source", {}).get("location"), es, examples_count=examples_count)
             relationships["nearest_places"] = cls.get_nearest_places(data.get("_source", {}).get("location"), es, examples_count=10)
-        
+
         return cls(
             data.get("_id"),
             data=data.get("_source"),
@@ -115,7 +110,6 @@ class Place(Controller):
         }
         example = es.search(index='geo_placename', body=query, size=examples_count)
         return [Place(e["_id"], e["_source"]) for e in example["hits"]["hits"]]
-
 
     def get_area(self, areatype):
         """

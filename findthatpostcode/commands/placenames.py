@@ -3,18 +3,14 @@ Import commands for placenames
 """
 import zipfile
 import io
-import codecs
 import csv
-import datetime
-from collections import defaultdict
 
 import click
-from flask import Flask, current_app
+from flask import current_app
 from flask.cli import with_appcontext
 import requests
 import requests_cache
 from elasticsearch.helpers import bulk
-import tqdm
 
 from .. import db
 
@@ -68,6 +64,7 @@ AREA_LOOKUP = [
     ("eer18cd", "eer", "eer18nm"),
     ("pfa18cd", "pfa", "pfa18nm"),
 ]
+
 
 @click.command('placenames')
 @click.option('--es-index', default=PLACENAMES_INDEX)

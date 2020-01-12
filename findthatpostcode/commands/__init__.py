@@ -6,6 +6,7 @@ from . import postcodes
 from . import stats
 from . import placenames
 
+
 def init_app(app):
 
     import_cli = AppGroup('import')

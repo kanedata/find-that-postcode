@@ -4,6 +4,7 @@ import html
 AREA_CODE = 'S02000783'
 AREA_NAME = "Lower Bow & Larkfield, Fancy Farm, Mallard Bowl"
 
+
 def test_area_json(client):
     rv = client.get('/areas/{}.json'.format(AREA_CODE))
     data = rv.get_json()
@@ -51,6 +52,7 @@ def test_area_search(client):
     rv = client.get("/areas/search")
     assert rv.headers['Location'] == 'http://localhost/search/'
     assert rv.status_code == 301
+
 
 def test_area_names(client):
     rv = client.get("/areas/names.csv")

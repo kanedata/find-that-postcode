@@ -1,9 +1,8 @@
 import re
 
-from flask import Blueprint, current_app, abort, jsonify, make_response, request, render_template, redirect, url_for
+from flask import Blueprint, request, render_template, redirect, url_for
 
-from .utils import return_result
-from findthatpostcode.controllers.areas import Area, search_areas
+from findthatpostcode.controllers.areas import search_areas
 from findthatpostcode.db import get_db
 
 bp = Blueprint('search', __name__, url_prefix='/search')
@@ -19,6 +18,7 @@ def is_latlon(q):
             "lon": m.group("lon"),
         }
     return False
+
 
 def is_postcode(q):
     r = r'^[A-Z]{1,2}[0-9][0-9A-Z]? ?[0-9][A-Z]{2}$'

@@ -17,11 +17,7 @@
 {% extends 'base.html' %}
 
 {% block headscripts %}
-<link rel="stylesheet" href="{{ url_for('static', filename='leaflet/leaflet.css') }}" />
-<script type="text/javascript" src="{{ url_for('static', filename='leaflet/leaflet.js') }}"></script>
-<script type="text/javascript" src="https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js?v1.3.0"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='leaflet/L.OSGraticule.js') }}"></script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/leaflet.snogylop@0.4.0/src/leaflet.snogylop.min.js"></script>
+{% include "_leaflet.html" %}
 {% endblock %}
 
 {% block content %}
@@ -159,5 +155,5 @@
   var show_postcode = true;
   var geojson = {{ url_for('areas.get_area', areacode=result.get_area('laua').id, filetype='geojson')|tojson }};
 </script>
-<script type="text/javascript" src="{{ url_for('static', filename='map.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/map.js') }}"></script>
 {% endblock %}

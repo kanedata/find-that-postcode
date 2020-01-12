@@ -3,9 +3,9 @@
 {% extends "base.html" %}
 
 {% block headscripts %}
-<script src="{{ url_for('static', filename='papaparse/papaparse.min.js') }}"></script>
-<script src="{{ url_for('static', filename='crypto-js/core.min.js') }}"></script>
-<script src="{{ url_for('static', filename='crypto-js/md5.min.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.1.0/papaparse.min.js" integrity="sha256-Fh801SO9gqegfUdkDxyzXzIUPWzO/Vatqj8uN+5xcL4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/core.min.js" integrity="sha256-hV6Ff1ZbnLObO8BWHPZs1oA3aPZkX4bnnEKO4nX1sm0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/md5.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -142,5 +142,5 @@
 <script>
 var hash_url = {{ url_for('postcodes.get_postcode_by_hash', hash='xxx', _external=true)|tojson }};
 </script>
-<script src="{{ url_for('static', filename='csv.js') }}"></script>
+<script src="{{ url_for('static', filename='js/csv.js') }}"></script>
 {% endblock %}

@@ -1,3 +1,43 @@
+const DEFAULT_HASH_LENGTH = 4;
+var current_stage = 'select-file';
+
+var stages = [
+    'select-file',
+    'select-postcode-field',
+    'select-fields'
+];
+
+function hide_stage(stage, show_top) {
+    var stage_el = document.getElementById('stage-' + stage);
+    Array.from(stage_el.getElementsByClassName('contents'))
+         .forEach(i => i.classList.add("dn"));
+    if(show_top){
+        Array.from(stage_el.getElementsByClassName('contents-top'))
+            .forEach(i => i.classList.remove("dn"));
+    } else {
+        Array.from(stage_el.getElementsByClassName('contents-top'))
+            .forEach(i => i.classList.add("dn"));
+    }
+}
+
+function show_stage(stage) {
+    var stage_el = document.getElementById('stage-' + stage);
+    Array.from(stage_el.getElementsByClassName('contents'))
+        .forEach(i => i.classList.remove("dn"));
+    Array.from(stage_el.getElementsByClassName('contents-top'))
+        .forEach(i => i.classList.add("dn"));
+}
+
+function set_stage(stage){
+    current_stage = stage;
+    var previous_stages = stages.slice(0, stages.indexOf(stage));
+    var next_stages = stages.slice(stages.indexOf(stage)+1);
+
+    previous_stages.forEach(s => hide_stage(s, true));
+    next_stages.forEach(s => hide_stage(s, false));
+    show_stage(stage);
+}
+
 function clean_postcode(pc) {
     if (typeof pc === 'string' || pc instanceof String) {
         pc = pc.toUpperCase().replace(/[^A-Z0-9]/, '');
@@ -6,55 +46,69 @@ function clean_postcode(pc) {
     return pc;
 }
 
-function hash_postcode(pc) {
+function hash_postcode(pc, length) {
+    length = length || DEFAULT_HASH_LENGTH;
     pc = pc.toLowerCase().replace(/[^a-z0-9]/, '');
     var pchash = CryptoJS.MD5(pc);
-    return pchash.toString(CryptoJS.enc.Hex).slice(0, 3);
+    return pchash.toString(CryptoJS.enc.Hex).slice(0, length);
 }
 
-function update_fields_table(results, table) {
-    table.innerHTML = '';
-    var header_row = document.createElement('tr');
-    for (const f of ['', 'Field name', 'Example values']) {
-        header_row.appendChild(document.createElement('th')).appendChild(document.createTextNode(f));
-    }
-    header_row.childNodes[1].classList.add('w5');
-    table.appendChild(header_row);
+function update_fields_list(results, div) {
+    div.innerHTML = '';
+    var ul = document.createElement('ul');
+    ul.classList.add('list', 'pa0', 'ma0');
     for (const f of results.meta.fields) {
-        var row = document.createElement('tr');
-        var radio = row.appendChild(document.createElement('th')).appendChild(document.createElement('input'))
+        var f_slug = f.toLowerCase().replace(/"\s+"/gi, "-").replace(/[^a-z0-9]/gi, '');
+        var li = document.createElement('li');
+        li.classList.add('mb2');
+        var label = document.createElement('label');
+        label.setAttribute('for', "field-"+f_slug);
+        label.classList.add('pointer');
+        var span = document.createElement('span');
+        span.innerText = f;
+        span.classList.add('code', 'pa1', 'bg-light-gray', 'underline-hover');
+        var radio = document.createElement('input');
         radio.setAttribute('type', 'radio');
         radio.setAttribute('name', 'postcode_field');
         radio.setAttribute('value', f);
-        if (f.toLowerCase().replace(/[^a-z]/gi, '') == "postcode") {
+        radio.setAttribute('id', "field-"+f_slug);
+        radio.classList.add('dn');
+
+        if (f_slug.includes("postcode") | f_slug.includes("postal-code")) {
             radio.setAttribute('checked', true);
             document.getElementById('column_name').setAttribute('value', f);
+            document.getElementById('column-name-desc').innerText = f + " (autodetected)";
         }
         radio.onclick = function () {
             if (this.checked) {
                 document.getElementById('column_name').setAttribute('value', this.value);
+                document.getElementById('column-name-desc').innerText = f;
+                set_stage('select-fields');
             }
         }
-        row.appendChild(document.createElement('th')).appendChild(document.createTextNode(f));
-        var field = document.createElement('td');
+        
         var field_ul = document.createElement('ul');
         field_ul.classList.add('list', 'pa0', 'ma0');
         let values_seen = []
         for (const r of results.data) {
             if ((!values_seen.includes(r[f])) && (r[f] != '') && (typeof r[f] != 'undefined')) {
                 var field_li = field_ul.appendChild(document.createElement('li'))
-                field_li.classList.add('dib', 'code', 'mr2', 'bg-light-gray', 'mb1', 'tl', 'truncate', 'mw5');
-                field_li.appendChild(document.createTextNode(r[f]));
+                field_li.classList.add('dib', 'mr2', 'gray', 'mt1', 'f6', 'tl', 'truncate', 'mw5');
+                field_li.appendChild(document.createTextNode('"' + r[f] + '"'));
                 values_seen.push(r[f]);
             }
             if(values_seen.length >= 5){
                 break;
             }
         }
-        field.appendChild(field_ul)
-        row.appendChild(field);
-        table.appendChild(row);
+
+        label.append(radio);
+        label.append(span);
+        label.append(field_ul);
+        li.append(label);
+        ul.appendChild(li);
     }
+    div.append(ul);
 }
 
 function get_results(hashes, fields_to_add) {
@@ -64,10 +118,16 @@ function get_results(hashes, fields_to_add) {
         url.search = url_parameters.toString();
         return url;
     });
+    var rows_done = 0;
     return Promise.all(urls.map(url => 
         fetch(url)
             .then(res => res.json())
             .then((data) => {
+                rows_done++;
+                var percent_done = ((rows_done / urls.length) * 100).toFixed(1) + "%"
+                document.getElementById("result-text").innerText = "Creating file…";
+                document.getElementById("progress-bar-inner").innerText = percent_done;
+                document.getElementById("progress-bar-inner").style.width = percent_done;
                 return Object.fromEntries(data.data.map(i => [i["id"], i]));
             })
             .catch((error) => {
@@ -138,13 +198,20 @@ function create_new_file(results, new_data, column_name, fields_to_add){
 
 function click_download(results, filename) {
     var column_name = document.getElementById('column_name').value;
+    var data_length = results.data.length;
 
-    var hashes = new Set(Array.from(results.data).filter(r => r[column_name]).map(r => hash_postcode(r[column_name])));
+    var hashes = new Set(
+        Array.from(results.data)
+             .filter(r => r[column_name])
+             .map(r => hash_postcode(r[column_name])
+        )
+    );
     var fields_to_add = parse_fields_to_add(
         Array.from(document.getElementsByName("fields"))
              .filter(i => i.checked)
              .map(i => i.value)
     );
+    document.getElementById("result").classList.remove("dn");
 
     get_results(hashes, fields_to_add).then(data => openSaveFileDialog(
         create_new_file(
@@ -157,42 +224,63 @@ function click_download(results, filename) {
     ));
 }
 
-var file = document.getElementById("csvfile");
-file.onchange = function () {
-    if (file.files.length > 0) {
-        document.getElementById('csvfilename').innerHTML = file.files[0].name;
-        document.getElementById('csvpreview').classList.remove("dn");
-        document.getElementById('csvpreview').getElementsByTagName('table')[0].innerHTML = '';
-        Papa.parse(file.files[0], {
-            header: true,
-            worker: true,
-            complete: function (results) {
-                var preview = document.getElementById('csvpreview');
-                update_fields_table(results, preview.getElementsByTagName('table')[0]);
-                document.getElementById("fetch_postcodes").onclick = function(ev){
-                    ev.preventDefault();
-                    click_download(results, file.files[0].name);
-                } 
+document.addEventListener('DOMContentLoaded', function (event) {
+    document.getElementById('reset-select-postcode-field').onclick = function(ev){
+        ev.preventDefault();
+        set_stage('select-postcode-field');
+    }
+    document.getElementById('reset-select-file').onclick = function(ev){
+        ev.preventDefault();
+        set_stage('select-file');
+    }
+
+    set_stage('select-file');
+    var file = document.getElementById("csvfile");
+    file.onchange = function () {
+        if (file.files.length > 0) {
+            document.getElementById('csvfilename').innerHTML = file.files[0].name;
+            document.getElementById('csvpreview').classList.remove("dn");
+            // document.getElementById('csvpreview').getElementsByTagName('table')[0].innerHTML = '';
+            document.getElementById('csvpreview').innerHTML = '';
+            Papa.parse(file.files[0], {
+                header: true,
+                worker: true,
+                complete: function (results) {
+                    var preview = document.getElementById('csvpreview');
+                    // update_fields_table(results, preview.getElementsByTagName('table')[0]);
+                    update_fields_list(results, preview);
+                    document.getElementById("fetch_postcodes").onclick = function(ev){
+                        ev.preventDefault();
+                        click_download(results, file.files[0].name);
+                    }
+                    document.getElementById('csvfilename').innerHTML = file.files[0].name + " (" + results.data.length + " rows)";
+
+                    if (document.getElementById('column_name').value != "") {
+                        set_stage('select-fields');
+                    } else {
+                        set_stage('select-postcode-field');
+                    }
+                }
+            });
+        } else {
+            document.getElementById('csvfilename').innerHTML = "";
+            document.getElementById('csvpreview').classList.add("dn");
+        }
+    };
+
+    document.getElementById("select_all_codes").onchange = function (ev) {
+        Array.prototype.forEach.call(document.getElementsByName("fields"), function (item) {
+            if (!item.value.endsWith("_name")) {
+                item.checked = ev.target.checked;
             }
         });
-    } else {
-        document.getElementById('csvfilename').innerHTML = "";
-        document.getElementById('csvpreview').classList.add("dn");
     }
-};
 
-document.getElementById("select_all_codes").onchange = function (ev) {
-    Array.prototype.forEach.call(document.getElementsByName("fields"), function (item) {
-        if (!item.value.endsWith("_name")) {
-            item.checked = ev.target.checked;
-        }
-    });
-}
-
-document.getElementById("select_all_names").onchange = function (ev) {
-    Array.prototype.forEach.call(document.getElementsByName("fields"), function (item) {
-        if (item.value.endsWith("_name")) {
-            item.checked = ev.target.checked;
-        }
-    });
-}
+    document.getElementById("select_all_names").onchange = function (ev) {
+        Array.prototype.forEach.call(document.getElementsByName("fields"), function (item) {
+            if (item.value.endsWith("_name")) {
+                item.checked = ev.target.checked;
+            }
+        });
+    }
+});

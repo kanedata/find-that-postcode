@@ -1,4 +1,9 @@
 {% set title = 'Area types' %}
+{% set countries = ['England', 'Wales', 'Scotland', 'NI'] %}
+{% set othercountries = {
+  "M": "Isle of Man",
+  "L": "Channel Islands",
+} %}
 {% extends "base.html" %}
 {% block content %}
 <section class="section">
@@ -6,5 +11,49 @@
     <a class="near-black no-underline dim" href="{{ url_for('areatypes.all') }}">Browse by area type</a>
   </h2>
   {% include "_areatypes.html" %}
+  <h3 class="f3-ns f4 header-font ma0 normal">Full list</h3>
+  <table class="table f5 collapse">
+    <thead class="dn">
+      <tr>
+        <th>Type</th>
+        <th>Areas</th>
+        {% for c in countries %}
+        <th>{{c}}</th>
+        {% endfor %}
+        <th>Other</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for group in area_types.values()|groupby("theme") %}
+    <tr>
+      <td colspan="7"><h4>{{ group.grouper }}</h4></td>
+        </tr>
+      {% for j, v in area_types.items() if v.theme == group.grouper %}
+        <tr class="striped--near-white">
+          <td class="mw6">
+            <a href="{{ url_for('areatypes.get_areatype', areacode=j, filetype='html') }}" class="underline dark-blue f4">{{ v.name }}</a>
+          </td>
+          <td class="f5 tr pa2">
+          {% if result.get and result.get(j) %}
+          {{ "{:,.0f}".format(result.get(j)) }}{% if loop.index0==0 %} areas{% endif %}</small>
+          {% endif %}
+          </td>
+          {% for c in countries %}
+            {% if c[0] in v.countries or ("K04" in v.entities and c[0] in ["E", "W"]) %}
+            <td class="bg-light-green f5 pa2 tc w3">{{c}}</td>
+            {% else %}
+            <td class="w3"></td>
+            {% endif %}
+          {% endfor %}
+          <td class="f6">
+          {% for c in v.countries if c in othercountries %}
+          {{othercountries.get(c)}}
+          {% endfor %}
+          </td>
+        </tr>
+      {% endfor %}
+    {% endfor %}
+        </tbody>
+      </table>
 </section>
 {% endblock %}

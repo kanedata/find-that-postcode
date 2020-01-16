@@ -16,7 +16,7 @@ from elasticsearch.helpers import bulk
 import tqdm
 
 from .. import db
-from ..metadata import AREA_TYPES
+from ..metadata import AREA_TYPES, ENTITIES
 
 RGC_URL = 'https://www.arcgis.com/sharing/rest/content/items/eb68d7b8bafe48b68aac10619c087a48/data'
 CHD_URL = 'https://www.arcgis.com/sharing/rest/content/items/56b8f6d2d26646cb9d21fadca2f09452/data'
@@ -97,6 +97,7 @@ def import_rgc(url=RGC_URL, es_index=ENTITY_INDEX):
                         "owner": entity['Entity owner'],
                         "date_introduced": process_date(entity['Date entity introduced on RGC']),
                         "date_start": process_date(entity['Entity start date']),
+                        "type": ENTITIES.get(entity["Entity code"]),
                     },
                 })
 
@@ -115,12 +116,6 @@ def import_chd(url=CHD_URL, es_index=AREA_INDEX):
 
     if current_app.config["DEBUG"]:
         requests_cache.install_cache()
-
-    areatypes = {
-        entity_code: a[0]
-        for a in AREA_TYPES
-        for entity_code in a[1]
-    }
 
     es = db.get_db()
 
@@ -159,7 +154,7 @@ def import_chd(url=CHD_URL, es_index=AREA_INDEX):
                     "predecessor": [],
                     "successor": [],
                     "equivalents": {},
-                    "type": areatypes.get(area["ENTITYCD"]),
+                    "type": ENTITIES.get(area["ENTITYCD"]),
                 }
             }
 

@@ -20,10 +20,10 @@
       <code>{{ result.id }}</code>
     {% endcall %}
 
-    {% if result.attributes.related_codes %}
+    {% if result.attributes.entities %}
     {% call info_block("Code formats") %}
       <ul class="list pa0 ma0">
-      {% for i in result.attributes.related_codes %}
+      {% for i in result.attributes.entities %}
         <li class="mb1"><code>{{ i }}XXXXXX</code></li>
       {% endfor %}
       </ul>

@@ -125,11 +125,9 @@
               <th class="tl ph2"></th>
             </tr>
             {% for area in i[1] %}
-              {% for area_type in area_types %}
-                {% if area_type[0] == area %}
             <tr>
               <td class="ph2">
-                {{ area_type[2] }}
+                {{ area_types.get(area, {}).name }}
                 {% if result.get(area) %}
                 <small> [{{ "{:,.0f}".format(result.get(area)) }}]</small>
                 {% endif %}
@@ -145,8 +143,6 @@
                 {% endif %}
                 ></td>
             </tr>
-                {% endif %}
-              {% endfor %}
             {% endfor %}
           {% endfor %}
           </tbody>

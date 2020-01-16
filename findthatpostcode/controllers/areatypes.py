@@ -8,7 +8,7 @@ class Areatype(Controller):
 
     es_index = 'geo_entity'
     url_slug = 'areatypes'
-    areatypes = {i[0]: i for i in AREA_TYPES}
+    areatypes = AREA_TYPES
 
     def __init__(self, id, data=None):
         if not data:
@@ -22,7 +22,7 @@ class Areatype(Controller):
         if isinstance(data, (list, tuple)):
             return {
                 "code": data[0],
-                "related_codes": data[1],
+                "entities": data[1],
                 "name": data[2],
                 "full_name": data[3],
                 "description": data[4],

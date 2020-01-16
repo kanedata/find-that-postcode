@@ -2,7 +2,7 @@ import io
 import csv
 import re
 
-from flask import Blueprint, abort, jsonify, make_response, request, redirect, url_for
+from flask import Blueprint, abort, jsonify, make_response, request, redirect, url_for, render_template
 
 from .utils import return_result
 from findthatpostcode.controllers.areas import Area, get_all_areas
@@ -39,6 +39,28 @@ def all_names():
     return output
 
 
+@bp.route('/<areacodes>.geojson')
+def get_area_boundary(areacodes):
+    es = get_db()
+    areacodes = areacodes.split("+")
+    features = []
+    for areacode in areacodes:
+        result = Area.get_from_es(
+            areacode,
+            es,
+            boundary=True,
+            examples_count=0
+        )
+        status, r = result.geoJSON()
+        if status == 200:
+            features.extend(r.get("features"))
+    if status != 200:
+        return abort(make_response(jsonify(message=r), status))
+    return jsonify({
+        "type": "FeatureCollection",
+        "features": features
+    })
+
 @bp.route('/<areacode>')
 @bp.route('/<areacode>.<filetype>')
 def get_area(areacode, filetype="json"):
@@ -56,3 +78,7 @@ def get_area(areacode, filetype="json"):
         return jsonify(r)
 
     return return_result(result, filetype, "area.html")
+
+@bp.route('/<areacodes>/map')
+def get_area_map(areacodes):
+    return render_template("area_map.html", areacodes=areacodes)

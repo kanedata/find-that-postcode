@@ -25,6 +25,7 @@
       </h1>
     </header>
     <main class="ph0 bg-white cf">
+      {% block header %}
       <header class="fl w-100 ph3 ph5-ns entry-content lh-copy f4">
         {% if (heading or title) not in [None, default_title] and (heading or title) %}
         <h2 class="f2-ns mt4 mb0 f3 lh-solid normal">
@@ -37,7 +38,8 @@
         {% endif %}
         {% endif %}
       </header>
-      <section id="content" class="fl w-100 ph3 pv5 ph5-ns lh-copy f4">
+      {% endblock %}
+      <section id="content" class="{% block sectionstyles %}fl w-100 ph3 pv5 ph5-ns lh-copy f4{% endblock %}">
         {% block content %}{% endblock %}
       </section>
     </main>

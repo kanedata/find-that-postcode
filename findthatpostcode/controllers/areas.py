@@ -61,7 +61,10 @@ class Area(Controller):
             relationships["example_postcodes"] = cls.get_example_postcodes(id, es, examples_count=examples_count)
 
         if data.get("_source", {}) and recursive:
-            data["_source"]["child_count"], relationships["children"] = cls.get_children(id, es)
+            children = cls.get_children(id, es)
+            data["_source"]["child_count"] = children["total"]
+            relationships["children"] = children["areas"]
+            data["_source"]["child_counts"] = children["counts"]
 
         if data.get("_source", {}).get("parent") and recursive:
             relationships["parent"] = cls.get_from_es(data["_source"]["parent"], es, examples_count=0, recursive=False)
@@ -127,11 +130,49 @@ class Area(Controller):
             }
         }
         example = es.search(index='geo_postcode', body=query, size=examples_count)
+
+        # if len(example["hits"]["hits"]) == 0:
+        #     query = {
+        #         "query": {
+        #             "function_score": {
+        #                 "query": {
+        #                     "bool": {
+        #                         "must_not": {
+        #                             "exists": {
+        #                                 "field": "doterm"
+        #                             }
+        #                         },
+        #                         "filter": {
+        #                             "geo_shape": {
+        #                                 "location": {
+        #                                     "indexed_shape": {
+        #                                         "index": "geo_area",
+        #                                         "id": areacode,
+        #                                         "path": "boundary"
+        #                                     }
+        #                                 }
+        #                             }
+        #                         }
+        #                     }
+        #                 },
+        #                 "random_score": {}
+        #             }
+        #         }
+        #     }
+        #     example = es.search(index='geo_postcode',
+        #                         body=query, size=examples_count)
+
+
         return [postcodes.Postcode(e["_id"], e["_source"]) for e in example["hits"]["hits"]]
 
     @staticmethod
     def get_children(areacode, es):
         query = {
+            "aggs": {
+                "types": {
+                    "terms": {"field": "type.keyword"}
+                }
+            },
             "query": {
                 "function_score": {
                     "query": {
@@ -145,11 +186,18 @@ class Area(Controller):
                 }
             }
         }
-        children = es.search(index='geo_area', body=query, size=10)
-        return (
-            Area.get_total_from_es(children),
-            [Area(e["_id"], e["_source"]) for e in children["hits"]["hits"]]
-        )
+        children = es.search(index='geo_area', body=query, size=10, _source_includes=['code', 'name', 'type'])
+        return {
+            "total": Area.get_total_from_es(children),
+            "areas": {
+                t["key"]: [Area(e["_id"], e["_source"]) for e in children["hits"]["hits"] if e["_source"].get("type") == t["key"]]
+                for t in children.get("aggregations", {}).get("types", {}).get("buckets", [])
+            },
+            "counts": {
+                t["key"]: t["doc_count"]
+                for t in children.get("aggregations", {}).get("types", {}).get("buckets", [])
+            }
+        }
 
     def topJSON(self):
         json = super().topJSON()
@@ -225,10 +273,13 @@ def search_areas(q, es, page=1, size=100, es_config=None):
             return_result.append(places.Place(a["_id"], a["_source"]))
         else:
             return_result.append(Area(a["_id"], a["_source"]))
+    total = result.get("hits", {}).get("total", 0)
+    if isinstance(total, dict):
+        total = total.get("value", 0)
     return {
         "result": return_result,
         "scores": [a["_score"] for a in result.get("hits", {}).get("hits", [])],
-        "result_count": result.get("hits", {}).get("total", 0),
+        "result_count": total,
     }
 
 

@@ -48,12 +48,6 @@
     {% endcall %}
     {% endif %}
     
-    {% if result.relationships.children and result.attributes.child_count %}
-    {% call info_block("Child areas - {} areas".format(result.attributes.child_count)) %}
-      {{ area_loop(result.relationships.children, result.id)}}
-    {% endcall %}
-    {% endif %}
-    
     {% if result.relationships.predecessor %}
     {% call info_block("Predecessor area") %}
       {{ area_loop(result.relationships.predecessor, result.id)}}
@@ -106,14 +100,29 @@
     
   </div>
   
-  {% if result.attributes.has_boundary or example_postcodes %}
   <div class="fl w-two-thirds-l w-100">
+    {% if result.attributes.has_boundary or example_postcodes %}
     <figure class="ma0">
       <div id="postcode-map" style="height:500px;"></div>
     </figure>
     <br>
+    {% endif %}
+
+    
+    
+    {% if result.relationships.children and result.attributes.child_count %}
+    {% call info_block("Child areas - {} areas".format(result.attributes.child_count)) %}
+      <ul class="list pa0 ma0">
+      {% for k, v in result.attributes.child_counts.items() %}
+        <li>
+          <h4 class="b f5 i">{{ area_types[k].name }} <span class="gray normal">{{ "{:,.0f}".format(v) }} areas<span></h4>
+          {{ area_loop(result.relationships.children[k], result.id)}}
+        </li>
+      {% endfor %}
+      </ul>
+    {% endcall %}
+    {% endif %}
   </div>
-  {% endif %}
 </div>
 {% endblock %}
 

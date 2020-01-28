@@ -3,6 +3,7 @@ import re
 from flask import Blueprint, request, render_template, redirect, url_for
 
 from findthatpostcode.controllers.areas import search_areas
+from findthatpostcode.controllers.controller import Pagination
 from findthatpostcode.db import get_db
 
 bp = Blueprint('search', __name__, url_prefix='/search')
@@ -42,11 +43,23 @@ def search_index():
     if is_postcode(q):
         return redirect(url_for('postcodes.get_postcode', postcode=q, filetype='html'), code=303)
 
-    areas = search_areas(q, get_db())
+    pagination = Pagination(request)
+    areas = search_areas(
+        q,
+        get_db(),
+        pagination=pagination,
+    )
     result = zip(areas["result"], areas["scores"])
+    pagination.set_pagination(areas['result_count'])
+    nav = {
+        p: url_for('search.search_index', q=q, **args) if isinstance(args, dict) else args
+        for p, args in pagination.pagination.items()
+        if args
+    }
     return render_template(
         'areasearch.html',
         result=list(result),
-        q=request.values.get("q"),
-        total=areas['result_count']
+        q=q,
+        total=areas['result_count'],
+        nav=nav
     )

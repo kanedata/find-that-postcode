@@ -1,0 +1,17 @@
+{% macro pagination(nav) %}
+<nav class="pagination is-centered">
+  {% if nav.first %}
+  <a href="{{nav.first}}" class="link blue underline-hover">&laquo; First</a>
+  {% endif %}
+  {% if nav.prev %}
+  <a href="{{nav.prev}}" class="link blue underline-hover">&lsaquo; Prev</a>
+  {% endif %}
+  <span class="ph3">Page {{nav.current_page}} of {{nav.max_page}}</span>
+  {% if nav.next %}
+  <a href="{{nav.next}}" class="link blue underline-hover">Next &rsaquo;</a>
+  {% endif %}
+  {% if nav.last %}
+  <a href="{{nav.last}}" class="link blue underline-hover">Last &raquo;</a>
+  {% endif %}
+</nav>
+{% endmacro %}

@@ -231,7 +231,7 @@ class Area(Controller):
         })
 
 
-def search_areas(q, es, page=1, size=100, es_config=None):
+def search_areas(q, es, pagination=None, es_config=None):
     """
     Search for areas based on a name
     """
@@ -258,15 +258,22 @@ def search_areas(q, es, page=1, size=100, es_config=None):
             }
         }
     }
-    pagination = Pagination(page, size)
-    result = es.search(
-        index="geo_area,geo_placename",
-        body=query,
-        from_=pagination.from_,
-        size=pagination.size,
-        _source_excludes=["boundary"],
-        ignore=[404]
-    )
+    if pagination:
+        result = es.search(
+            index="geo_area,geo_placename",
+            body=query,
+            from_=pagination.from_,
+            size=pagination.size,
+            _source_excludes=["boundary"],
+            ignore=[404]
+        )
+    else:
+        result = es.search(
+            index="geo_area,geo_placename",
+            body=query,
+            _source_excludes=["boundary"],
+            ignore=[404]
+        )
     return_result = []
     for a in result.get("hits", {}).get("hits", []):
         if a["_index"] == 'geo_placename':

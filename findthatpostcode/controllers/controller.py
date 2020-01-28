@@ -182,9 +182,13 @@ class Controller:
 
 class Pagination():
 
-    default_size = 100
+    default_size = 10
 
-    def __init__(self, page=None, size=None):
+    def __init__(self, request, size=None):
+        try:
+            page = int(request.values.get('p'))
+        except (ValueError, TypeError):
+            page = 1
         self.page = page if isinstance(page, int) else 1
         self.size = size if isinstance(size, int) else self.default_size
         self.from_ = self.get_from()
@@ -196,8 +200,8 @@ class Pagination():
         }
 
     def page_query_vars(self, query_vars={}):
-        if self.page and self.page > 1 and "page" not in query_vars:
-            query_vars["page"] = self.p
+        if self.page and self.page > 1 and "p" not in query_vars:
+            query_vars["p"] = self.page
         if self.size and self.size and self.size != self.default_size and "size" not in query_vars:
             query_vars["size"] = self.size
         return query_vars
@@ -211,6 +215,7 @@ class Pagination():
 
     def set_pagination(self, total_results, url_args={}, range=5):
         self.total = total_results
+        self.min_page = 1
         self.max_page = math.ceil(float(total_results) / float(self.size))
 
         if self.size != self.default_size:
@@ -218,30 +223,32 @@ class Pagination():
 
         # next page link
         if self.page < self.max_page:
-            url_args["page"] = self.page + 1
-            self.pagination["next"] = url_args
+            self.pagination["next"] = {"p": self.page + 1, **url_args}
 
         # previous page link
         if self.page > 1:
-            url_args["page"] = self.page - 1
-            self.pagination["prev"] = url_args
+            self.pagination["prev"] = {"p": self.page - 1, **url_args}
 
         # start_page link
         if (self.page - 1) > 1:
-            url_args["page"] = 1
-            self.pagination["first"] = url_args
+            self.pagination["first"] = {"p": self.min_page, **url_args}
 
         # end page link
         if (self.page + 1) < self.max_page:
-            url_args["page"] = self.max_page
-            self.pagination["last"] = url_args
+            self.pagination["last"] = {"p": self.max_page, **url_args}
 
+        self.pagination['current_page'] = self.page
+        self.pagination['min_page'] = self.min_page
+        self.pagination['max_page'] = self.max_page
+        self.pagination['max_item'] = self.total
+        self.pagination['start_item'] = self.from_ + 1
+        self.pagination['end_item'] = min([self.from_ + self.size, self.total])
         # page ranges
         # @TODO calculate page ranges
 
     def get_meta(self, meta):
         meta["from"] = self.get_from()
-        meta["page"] = self.page
+        meta["p"] = self.page
         meta["size"] = self.size
         return meta
 

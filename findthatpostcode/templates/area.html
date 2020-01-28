@@ -112,14 +112,21 @@
     
     {% if result.relationships.children and result.attributes.child_count %}
     {% call info_block("Child areas - {} areas".format(result.attributes.child_count)) %}
-      <ul class="list pa0 ma0">
+      {% set selected = child if child else result.attributes.child_counts.keys()|list|first %}
+      <ul class="list pa0 ma0 db w-100 cf bw2 b--light-gray bb" id="children">
       {% for k, v in result.attributes.child_counts.items() %}
-        <li>
-          <h4 class="b f5 i">{{ area_types[k].name }} <span class="gray normal">{{ "{:,.0f}".format(v) }} areas<span></h4>
-          {{ area_loop(result.relationships.children[k], result.id)}}
+        <li class="db fl mr3 {% if k == selected %}bw2 b--light-gray bt bl br bg-white{% else %}bg-near-white{% endif %}" style="margin-bottom: -0.25rem;">
+          <a class="b f5 i pv2 ph3 db {% if k == selected %}{% else %}{% endif %} near-black link glow" 
+             href="{{ url_for('areas.get_area', areacode=result.id, filetype='html', child=k, _anchor='children') }}">
+            {{ area_types[k].name }}<br>
+            <span class="normal">{{ "{:,.0f}".format(v) }} areas<span>
+          </a>
         </li>
       {% endfor %}
       </ul>
+      <div class="pa3">
+      {{ area_loop(result.relationships.children[selected], result.id)}}
+      </div>
     {% endcall %}
     {% endif %}
   </div>

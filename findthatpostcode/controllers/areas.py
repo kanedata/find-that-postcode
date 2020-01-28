@@ -186,7 +186,7 @@ class Area(Controller):
                 }
             }
         }
-        children = es.search(index='geo_area', body=query, size=10, _source_includes=['code', 'name', 'type'])
+        children = es.search(index='geo_area', body=query, size=100, _source_includes=['code', 'name', 'type'])
         return {
             "total": Area.get_total_from_es(children),
             "areas": {

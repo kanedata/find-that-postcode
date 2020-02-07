@@ -4,6 +4,7 @@ from flask import Blueprint, current_app, request, jsonify
 
 from findthatpostcode.controllers.postcodes import Postcode
 from findthatpostcode.controllers.areas import search_areas
+from findthatpostcode.controllers.controller import Pagination
 from findthatpostcode.db import get_db
 from .utils import jsonp, cors
 

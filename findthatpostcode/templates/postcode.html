@@ -147,6 +147,13 @@
 
 
 </div>
+{% if result.id.startswith("BT") %}
+<p class="f5 gray i">
+  Northern Ireland postcodes are included based on the 
+  <a href="https://www.ons.gov.uk/methodology/geography/licences" class='link blue underline-hover'>Northern Ireland End User Licence</a>.
+  The licence covers internal use of the data. Commercial use may require additional permission. 
+</p>
+{% endif %}
 {% endblock %}
 
 {% block bodyscripts %}

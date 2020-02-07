@@ -48,11 +48,6 @@ def import_nspl(url=NSPL_URL, es_index=PC_INDEX):
             pccsv = io.TextIOWrapper(pccsv)
             reader = csv.DictReader(pccsv)
             for i in reader:
-                # Skip Northern Irish postcodes as not allowed by license
-                # https://www.ons.gov.uk/methodology/geography/licences
-                if i["pcds"].lower().startswith('bt'):
-                    continue
-
                 record = {
                     "_index": es_index,
                     "_type": "_doc",

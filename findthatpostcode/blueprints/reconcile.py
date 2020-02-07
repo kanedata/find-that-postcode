@@ -24,8 +24,8 @@ def recon_query(q, es):
                 "match": True,
             })
     elif query:
-        limit = min(int(q.get("limit", 5)), 10)
-        areas = search_areas(query, es, size=limit)
+        pagination = Pagination(request)
+        areas = search_areas(query, es, pagination=pagination)
         for a, score in zip(areas["result"], areas["scores"]):
             result.append({
                 "id": a.id,

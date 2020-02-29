@@ -128,7 +128,14 @@ function get_results(hashes, fields_to_add) {
                 document.getElementById("result-text").innerText = "Creating file…";
                 document.getElementById("progress-bar-inner").innerText = percent_done;
                 document.getElementById("progress-bar-inner").style.width = percent_done;
-                return Object.fromEntries(data.data.map(i => [i["id"], i]));
+                return Object.fromEntries(
+                    data.data.map(i => [
+                        i["id"], 
+                        Object.fromEntries(
+                            Object.entries(i).filter(v => v[0]!="id")
+                        )
+                    ])
+                );
             })
             .catch((error) => {
                 console.log('Error: ', error)
@@ -198,7 +205,6 @@ function create_new_file(results, new_data, column_name, fields_to_add){
 
 function click_download(results, filename) {
     var column_name = document.getElementById('column_name').value;
-    var data_length = results.data.length;
 
     var hashes = new Set(
         Array.from(results.data)

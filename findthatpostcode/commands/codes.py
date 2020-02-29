@@ -20,7 +20,7 @@ from ..metadata import AREA_TYPES, ENTITIES
 
 RGC_URL = 'https://www.arcgis.com/sharing/rest/content/items/eb68d7b8bafe48b68aac10619c087a48/data'
 CHD_URL = 'https://www.arcgis.com/sharing/rest/content/items/56b8f6d2d26646cb9d21fadca2f09452/data'
-MSOA_URL = 'https://visual.parliament.uk/msoanames/static/MSOA-Names-v1.0.0.csv'
+MSOA_URL = 'https://visual.parliament.uk/msoanames/static/MSOA-Names-v1.1.0.csv'
 ENTITY_INDEX = 'geo_entity'
 AREA_INDEX = 'geo_area'
 

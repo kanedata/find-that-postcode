@@ -18,11 +18,12 @@ import tqdm
 from .. import db
 from ..metadata import AREA_TYPES, ENTITIES
 
-RGC_URL = 'https://www.arcgis.com/sharing/rest/content/items/eb68d7b8bafe48b68aac10619c087a48/data'
-CHD_URL = 'https://www.arcgis.com/sharing/rest/content/items/56b8f6d2d26646cb9d21fadca2f09452/data'
+RGC_URL = 'https://www.arcgis.com/sharing/rest/content/items/56a91921e10d4fb4b367ef592ceb0bab/data'
+CHD_URL = 'https://www.arcgis.com/sharing/rest/content/items/62e09bbfb3ad4745b94c15c52c38e5ea/data'
 MSOA_URL = 'https://visual.parliament.uk/msoanames/static/MSOA-Names-v1.1.0.csv'
 ENTITY_INDEX = 'geo_entity'
 AREA_INDEX = 'geo_area'
+DEFAULT_ENCODING = 'latin1'
 
 
 def process_date(value, date_format='%d/%m/%Y'):
@@ -94,7 +95,7 @@ def import_rgc(url=RGC_URL, es_index=ENTITY_INDEX):
                         "current_code_first": entity['Current code (first in range)'],
                         "current_code_last": entity['Current code (last in range)'],
                         "reserved_code": entity['Reserved code (for CHD use)'],
-                        "owner": entity['Entity owner'],
+                        "owner": entity.get('Entity owner'),
                         "date_introduced": process_date(entity['Date entity introduced on RGC']),
                         "date_start": process_date(entity['Entity start date']),
                         "type": ENTITIES.get(entity["Entity code"]),
@@ -111,8 +112,9 @@ def import_rgc(url=RGC_URL, es_index=ENTITY_INDEX):
 @click.command('chd')
 @click.option('--url', default=CHD_URL)
 @click.option('--es-index', default=AREA_INDEX)
+@click.option('--encoding', default=DEFAULT_ENCODING)
 @with_appcontext
-def import_chd(url=CHD_URL, es_index=AREA_INDEX):
+def import_chd(url=CHD_URL, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
 
     if current_app.config["DEBUG"]:
         requests_cache.install_cache()
@@ -126,7 +128,7 @@ def import_chd(url=CHD_URL, es_index=AREA_INDEX):
 
     with z.open('ChangeHistory.csv', 'r') as infile:
         click.echo('Opening {}'.format(infile.name))
-        reader = csv.DictReader(io.TextIOWrapper(infile, 'utf-8-sig'))
+        reader = csv.DictReader(io.TextIOWrapper(infile, encoding))
         for k, area in tqdm.tqdm(enumerate(reader)):
             areas[area["GEOGCD"]] = {
                 "_index": es_index,
@@ -140,8 +142,8 @@ def import_chd(url=CHD_URL, es_index=AREA_INDEX):
                     "name_welsh": area["GEOGNMW"] if area['GEOGNMW'] else None,
                     "statutory_instrument_id": area["SI_ID"] if area['SI_ID'] else None,
                     "statutory_instrument_title": area["SI_TITLE"] if area['SI_TITLE'] else None,
-                    "date_start": process_date(area["OPER_DATE"], '%d/%m/%Y %H:%M:%S'),
-                    "date_end": process_date(area["TERM_DATE"], '%d/%m/%Y %H:%M:%S'),
+                    "date_start": process_date(area["OPER_DATE"][0:10], '%d/%m/%Y'),
+                    "date_end": process_date(area["TERM_DATE"][0:10], '%d/%m/%Y'),
                     "parent": area["PARENTCD"] if area["PARENTCD"] else None,
                     "entity": area["ENTITYCD"],
                     "owner": area["OWNER"],
@@ -159,7 +161,7 @@ def import_chd(url=CHD_URL, es_index=AREA_INDEX):
             }
 
     with z.open('Changes.csv', 'r') as infile:
-        reader = csv.DictReader(io.TextIOWrapper(infile, 'utf-8-sig'))
+        reader = csv.DictReader(io.TextIOWrapper(infile, encoding))
         click.echo('Opening {}'.format(infile.name))
         for k, area in tqdm.tqdm(enumerate(reader)):
             if area['GEOGCD_P'] == '':
@@ -177,7 +179,7 @@ def import_chd(url=CHD_URL, es_index=AREA_INDEX):
         "welsh_government": ["GEOGCDWG", "GEOGNMWG", "GEOGNMWWG"],
     }
     with z.open('Equivalents.csv', 'r') as infile:
-        reader = csv.DictReader(io.TextIOWrapper(infile, 'utf-8-sig'))
+        reader = csv.DictReader(io.TextIOWrapper(infile, encoding))
         click.echo('Opening {}'.format(infile.name))
         for area in tqdm.tqdm(reader):
             if area['GEOGCD'] not in areas:

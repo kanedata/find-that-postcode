@@ -80,7 +80,7 @@ side, and copy the `GeoJSON` link, or download the file.
 
 These files are the latest available at April 2017:
 
-- Countries: <https://opendata.arcgis.com/datasets/7be6a3c1be3b4385951224d2f522470a_0.geojson>
+- Countries: <https://opendata.arcgis.com/datasets/b789ba2f70fe45eb92402cee87092730_0.geojson>
 - Westminster Parliamentary Constituencies: <https://opendata.arcgis.com/datasets/094f326b0b1247e3bcf1eb7236c24679_0.geojson>
 - Counties and unitary authorities: <https://opendata.arcgis.com/datasets/0de4288db3774cb78e45b8b74e9eab31_0.geojson>
 - Local Authority Districts: <https://opendata.arcgis.com/datasets/cec4f9cf783a47bab9295b2e513dd342_0.geojson>

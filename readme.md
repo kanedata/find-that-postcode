@@ -122,7 +122,7 @@ which can be imported using the `import placenames` command. An entry for each
 placename is added to the `geo_placenames` elasticsearch index.
 
 ```bash
-python import placenames
+flask import placenames
 ```
 
 The `--url` parameter can be used to customise the URL used.
@@ -133,8 +133,8 @@ Statistics can be added to areas, using ONS data. The available statistics are
 added to LSOAs, but could also be added to other areas.
 
 ```bash
-python import imd2019
-python import imd2015
+flask import imd2019
+flask import imd2015
 ```
 
 The `--url` parameter can be used to customise the URL used to get the data.

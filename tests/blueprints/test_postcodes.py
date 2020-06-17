@@ -43,3 +43,29 @@ def test_postcode_redirect(client):
     assert rv.status_code == 303
     assert rv.mimetype == 'text/html'
     assert rv.headers['Location'].endswith('/postcodes/EX36%204AT.html')
+
+def test_postcode_hash(client):
+    rv = client.get('/postcodes/hash/abc1.json?properties=ward_code')
+    assert rv.mimetype == 'application/json'
+    assert 'data' in rv.json
+    assert rv.json['data']
+
+def test_postcode_hash_too_small(client):
+    rv = client.get('/postcodes/hash/ab.json?properties=ward_code')
+    assert rv.status_code == 400
+
+def test_postcode_hashes(client):
+    rv = client.post('/postcodes/hashes.json', data=dict(
+        hash='abc1',
+        properties=['ward_code'],
+    ))
+    assert rv.mimetype == 'application/json'
+    assert 'data' in rv.json
+    assert rv.json['data']
+
+def test_postcode_hashes_too_small(client):
+    rv = client.post('/postcodes/hashes.json', data=dict(
+        hash='ab',
+        properties=['ward_code'],
+    ))
+    assert rv.status_code == 400

@@ -26,14 +26,39 @@ def get_postcode(postcode, filetype="json"):
 
 @bp.route('/hash/<hash>')
 @bp.route('/hash/<hash>.json')
-def get_postcode_by_hash(hash):
+def single_hash(hash):
+    fields = request.values.getlist('properties')
+    return jsonify({
+        "data": get_postcode_by_hash(hash, fields)
+    })
+
+
+@bp.route('/hashes.json', methods = ['GET', 'POST'])
+def multi_hash():
+    fields = request.values.getlist('properties')
+    hashes = request.values.getlist('hash')
+    return jsonify({
+        "data": get_postcode_by_hash(hashes, fields)
+    })
+
+
+def get_postcode_by_hash(hashes, fields):
 
     es = get_db()
 
-    if len(hash) < 3:
-        abort(400, description="Hash length must be at least 3 characters")
+    if not isinstance(hashes, list):
+        hashes = [hashes]
 
-    fields = request.values.getlist('properties')
+    query = []
+    for hash_ in hashes:
+        if len(hash_) < 3:
+            abort(400, description="Hash length must be at least 3 characters")
+        query.append({
+            "prefix": {
+                "hash": hash_,
+            },
+        })
+
     name_fields = [i.replace("_name", "") for i in fields if i.endswith("_name")]
     extra_fields = []
     stats = [i for i in STATS_FIELDS if i[0] in fields]
@@ -43,7 +68,13 @@ def get_postcode_by_hash(hash):
     results = list(scan(
         es,
         index='geo_postcode',
-        query={"query": {"prefix": {"hash": hash}}},
+        query={
+            "query": {
+                "bool": {
+                    "should": query
+                }
+            }
+        },
         _source_includes=fields + name_fields + extra_fields,
     ))
     areas = scan(
@@ -95,13 +126,11 @@ def get_postcode_by_hash(hash):
                 )
             }
 
-        return jsonify({
-            "data": [
-                {
-                    "id": r["_id"],
-                    **r["_source"],
-                    **get_names(r["_source"]),
-                    **get_stats(r["_source"])
-                } for r in results
-            ]
-        })
+        return [
+            {
+                "id": r["_id"],
+                **r["_source"],
+                **get_names(r["_source"]),
+                **get_stats(r["_source"])
+            } for r in results
+        ]

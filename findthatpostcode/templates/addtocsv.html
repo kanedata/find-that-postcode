@@ -187,7 +187,7 @@
 
 {% block bodyscripts %}
 <script>
-var hash_url = {{ url_for('postcodes.get_postcode_by_hash', hash='xxx', _external=true)|tojson }};
+var hash_url = {{ url_for('postcodes.multi_hash', _external=true)|tojson }};
 </script>
 <script src="{{ url_for('static', filename='js/csv.js') }}"></script>
 {% endblock %}

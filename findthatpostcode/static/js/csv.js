@@ -1,4 +1,5 @@
 const DEFAULT_HASH_LENGTH = 4;
+const HASH_CHUNK_SIZE = 100;
 var current_stage = 'select-file';
 
 var stages = [
@@ -51,6 +52,16 @@ function hash_postcode(pc, length) {
     pc = pc.toLowerCase().replace(/[^a-z0-9]/, '');
     var pchash = CryptoJS.MD5(pc);
     return pchash.toString(CryptoJS.enc.Hex).slice(0, length);
+}
+
+function chunk_array(arr, len) {
+    var chunks = [],
+        i = 0,
+        n = arr.length;
+    while (i < n) {
+        chunks.push(arr.slice(i, i += len));
+    }
+    return chunks;
 }
 
 function update_fields_list(results, div) {
@@ -112,19 +123,23 @@ function update_fields_list(results, div) {
 }
 
 function get_results(hashes, fields_to_add) {
-    const url_parameters = new URLSearchParams(fields_to_add.map(f => ['properties', f]));
-    var urls = Array.from(hashes.values()).map(hash => {
-        var url = new URL(hash_url.replace('xxx', hash));
-        url.search = url_parameters.toString();
-        return url;
+    var hash_chunks = chunk_array(Array.from(hashes.values()), HASH_CHUNK_SIZE);
+    var formDatas = hash_chunks.map(hash_chunk => {
+        const formData = new FormData();
+        fields_to_add.forEach(f => formData.append('properties', f));
+        hash_chunk.forEach(h => formData.append('hash', h));
+        return formData;
     });
     var rows_done = 0;
-    return Promise.all(urls.map(url => 
-        fetch(url)
+    return Promise.all(formDatas.map(formData => 
+        fetch(hash_url, {
+            method: 'POST',
+            body: formData,
+        })
             .then(res => res.json())
             .then((data) => {
                 rows_done++;
-                var percent_done = ((rows_done / urls.length) * 100).toFixed(1) + "%"
+                var percent_done = ((rows_done / formDatas.length) * 100).toFixed(1) + "%"
                 document.getElementById("result-text").innerText = "Creating file…";
                 document.getElementById("progress-bar-inner").innerText = percent_done;
                 document.getElementById("progress-bar-inner").style.width = percent_done;

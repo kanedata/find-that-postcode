@@ -2,6 +2,8 @@ import os
 import datetime
 
 from flask import Flask, render_template
+from flask_cors import CORS
+
 from . import db
 from . import commands
 from . import blueprints
@@ -46,6 +48,7 @@ def create_app(test_config=None):
 
     db.init_app(app)
     commands.init_app(app)
+    CORS(app)
 
     # template helpers
     @app.context_processor

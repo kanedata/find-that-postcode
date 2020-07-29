@@ -7,6 +7,7 @@ from tests.fixtures import client
 def test_reconcile_spec(client):
     rv = client.get('/reconcile')
     spec = rv.get_json()
+    assert rv.headers['Access-Control-Allow-Origin'] == '*'
     assert "extend" in spec
     # assert "propose_properties" in spec["extend"]
     # assert "service_url" in spec["extend"]["propose_properties"]
@@ -41,6 +42,7 @@ extend_q = {
 def test_reconcile_extend(client):
     rv = client.get('/reconcile?{}'.format(urlencode(extend_q)))
     result = rv.get_json()
+    assert rv.headers['Access-Control-Allow-Origin'] == '*'
     assert "meta" in result
     assert "EX36 4AT" in result["rows"]
     assert result["rows"]["EX36 4AT"]["lsoa11"] == 'E01020135'
@@ -61,6 +63,7 @@ def test_reconcile_extend_jsonp(client):
 def test_reconcile_extend_post(client):
     rv = client.post('/reconcile', data=extend_q)
     result = rv.get_json()
+    assert rv.headers['Access-Control-Allow-Origin'] == '*'
     assert "meta" in result
     assert "EX36 4AT" in result["rows"]
     assert result["rows"]["EX36 4AT"]["lsoa11"] == 'E01020135'
@@ -94,6 +97,7 @@ recon_q = {
 def test_reconcile(client):
     rv = client.get('/reconcile?{}'.format(urlencode(recon_q)))
     result = rv.get_json()
+    assert rv.headers['Access-Control-Allow-Origin'] == '*'
     assert "q0" in result
     assert "q1" in result
 
@@ -101,5 +105,6 @@ def test_reconcile(client):
 def test_reconcile_post(client):
     rv = client.post('/reconcile', data=recon_q)
     result = rv.get_json()
+    assert rv.headers['Access-Control-Allow-Origin'] == '*'
     assert "q0" in result
     assert "q1" in result

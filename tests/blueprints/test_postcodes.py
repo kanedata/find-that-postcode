@@ -6,6 +6,7 @@ def test_postcode_json(client):
     postcode_json = rv.get_json()
 
     assert rv.mimetype == 'application/json'
+    assert rv.headers['Access-Control-Allow-Origin'] == '*'
 
     areas = postcode_json.get("data", {}).get("relationships", {}).get("areas", {}).get("data", [])
     area_codes = [a["id"] for a in areas]
@@ -47,6 +48,7 @@ def test_postcode_redirect(client):
 def test_postcode_hash(client):
     rv = client.get('/postcodes/hash/abc1.json?properties=ward_code')
     assert rv.mimetype == 'application/json'
+    assert rv.headers['Access-Control-Allow-Origin'] == '*'
     assert 'data' in rv.json
     assert rv.json['data']
 
@@ -60,6 +62,7 @@ def test_postcode_hashes(client):
         properties=['ward_code'],
     ))
     assert rv.mimetype == 'application/json'
+    assert rv.headers['Access-Control-Allow-Origin'] == '*'
     assert 'data' in rv.json
     assert rv.json['data']
 
@@ -68,4 +71,5 @@ def test_postcode_hashes_too_small(client):
         hash='ab',
         properties=['ward_code'],
     ))
+    assert rv.headers['Access-Control-Allow-Origin'] == '*'
     assert rv.status_code == 400

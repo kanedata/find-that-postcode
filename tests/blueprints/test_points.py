@@ -5,6 +5,7 @@ def test_point_json(client):
     rv = client.get('/points/51.501,-0.2936')
     point_json = rv.get_json()
 
+    assert rv.headers['Access-Control-Allow-Origin'] == '*'
     assert point_json.get("data", {}).get("relationships", {}).get("nearest_postcode", {}).get("data", {}).get("id") == "EX36 4AT"
     assert point_json.get("data", {}).get("attributes", {}).get("distance_from_postcode") == 68.9707515287199
 

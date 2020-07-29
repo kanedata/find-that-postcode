@@ -10,6 +10,7 @@ def test_area_json(client):
     data = rv.get_json()
 
     assert rv.mimetype == 'application/json'
+    assert rv.headers['Access-Control-Allow-Origin'] == '*'
 
     assert data.get("data", {}).get("attributes", {}).get("name") == AREA_NAME
     assert len(data.get("data", {}).get("relationships", {}).get("example_postcodes", {}).get("data")) == 5
@@ -40,6 +41,7 @@ def test_area_geojson(client):
     data = rv.get_json()
 
     assert rv.mimetype == 'application/json'
+    assert rv.headers['Access-Control-Allow-Origin'] == '*'
     assert data.get("type") == "FeatureCollection"
     assert len(data.get("features")) == 1
     assert data.get("features")[0].get("type") == "Feature"

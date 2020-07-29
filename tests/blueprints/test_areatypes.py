@@ -8,6 +8,7 @@ def test_areatype_json(client):
     rv = client.get('/areatypes/{}.json'.format(AREATYPE_CODE))
     data = rv.get_json()
 
+    assert rv.headers['Access-Control-Allow-Origin'] == '*'
     assert data.get("data", {}).get("attributes", {}).get("full_name") == "2011 Census Lower Layer Super Output Area (LSOA)/ Data Zone (DZ)/ SOA"
     assert len(data.get("included", [])) == 8
 

@@ -1,6 +1,6 @@
 from ..metadata import AREA_TYPES
 
-from .controller import Controller
+from findthatpostcode.controllers.controller import Controller
 from . import areas
 
 
@@ -36,7 +36,7 @@ class Areatype(Controller):
             return cls(id)
         return super().get_from_es(id, es, es_config=es_config)
 
-    def get_areas(self, es, es_config=None, examples_count=10):
+    def get_areas(self, es, es_config=None, pagination=None):
         query = {
             "query": {
                 "function_score": {
@@ -49,7 +49,15 @@ class Areatype(Controller):
                 }
             }
         }
-        example = es.search(index='geo_area', body=query, size=examples_count)
+        search_params = dict(
+            index='geo_area',
+            body=query,
+            sort='_id:asc',
+        )
+        if pagination:
+            search_params['from_'] = pagination.from_
+            search_params['size'] = pagination.size
+        example = es.search(**search_params)
         self.relationships["areas"] = [areas.Area(e["_id"], e["_source"]) for e in example["hits"]["hits"]]
         self.attributes["count_areas"] = self.get_total_from_es(example)
 

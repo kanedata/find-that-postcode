@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request, url_for
 
 from .utils import return_result
+from findthatpostcode.controllers.controller import Pagination
 from findthatpostcode.controllers.areatypes import Areatype, area_types_count
 from findthatpostcode.db import get_db
 
@@ -17,5 +18,13 @@ def all():
 @bp.route('/<areacode>.<filetype>')
 def get_areatype(areacode, filetype="json"):
     result = Areatype.get_from_es(areacode, get_db())
-    result.get_areas(get_db())
-    return return_result(result, filetype, "areatype.html")
+    pagination = Pagination(request)
+    result.get_areas(get_db(), pagination=pagination)
+    
+    pagination.set_pagination(result.attributes['count_areas'])
+    nav = {
+        p: url_for('areatypes.get_areatype', areacode=areacode, filetype=filetype, **args) if isinstance(args, dict) else args
+        for p, args in pagination.pagination.items()
+        if args
+    }
+    return return_result(result, filetype, "areatype.html", nav=nav)

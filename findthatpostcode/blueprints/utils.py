@@ -29,6 +29,8 @@ def return_result(result, filetype="json", template=None, **kwargs):
             **kwargs
         )
 
+    abort(404)
+
 
 def jsonp(func):
     """Wraps JSONified output for JSONP requests."""

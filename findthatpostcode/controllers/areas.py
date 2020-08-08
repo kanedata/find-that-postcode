@@ -317,6 +317,7 @@ def get_all_areas(es, areatypes=None, es_config=None):
             }
         }
     }
+    print(es)
     result = scan(
         es,
         query=query,

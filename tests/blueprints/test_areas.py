@@ -25,7 +25,7 @@ def test_area_html(client):
     rv = client.get('/areas/{}.html'.format(AREA_CODE))
     content = rv.data.decode("utf8")
     assert rv.mimetype == 'text/html'
-    assert html.escape(AREA_NAME) in content
+    assert AREA_NAME in content
     assert AREA_CODE in content
 
 

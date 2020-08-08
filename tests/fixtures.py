@@ -145,7 +145,7 @@ class MockElasticsearch:
             "found": False
         }
 
-    def scroll(self, scroll_id, **kwargs):
+    def scroll(self, body=None, scroll_id=None, **kwargs):
         result = self.search_result_wrapper()
         result["_scroll_id"] = None
         return result

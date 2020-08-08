@@ -8,7 +8,7 @@ class Point(Controller):
 
     es_index = 'geo_postcode'
     url_slug = 'points'
-    template = 'postcode.html'
+    template = 'postcode.html.j2'
     max_distance = 10000
 
     def __init__(self, id, data=None, nearest_postcode=None):

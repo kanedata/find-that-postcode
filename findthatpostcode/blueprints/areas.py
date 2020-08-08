@@ -77,8 +77,8 @@ def get_area(areacode, filetype="json"):
             return abort(make_response(jsonify(message=r), status))
         return jsonify(r)
 
-    return return_result(result, filetype, "area.html", child=request.values.get('child'))
+    return return_result(result, filetype, "area.html.j2", child=request.values.get('child'))
 
 @bp.route('/<areacodes>/map')
 def get_area_map(areacodes):
-    return render_template("area_map.html", areacodes=areacodes)
+    return render_template("area_map.html.j2", areacodes=areacodes)

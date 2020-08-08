@@ -14,7 +14,7 @@ class Area(Controller):
 
     es_index = 'geo_area'
     url_slug = 'areas'
-    template = 'area.html'
+    template = 'area.html.j2'
     date_fields = ['date_end', 'date_start']
 
     def __init__(self, id, data=None, **kwargs):

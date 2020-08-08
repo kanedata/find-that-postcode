@@ -16,7 +16,7 @@ bp = Blueprint('addtocsv', __name__, url_prefix='/addtocsv')
 def addtocsv():
     ats = area_types_count(get_db())
     return render_template(
-        'addtocsv.html',
+        'addtocsv.html.j2',
         result=ats,
         basic_fields=BASIC_UPLOAD_FIELDS,
         stats_fields=STATS_FIELDS,

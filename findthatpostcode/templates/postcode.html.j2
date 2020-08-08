@@ -1,4 +1,4 @@
-{% from '_utils.html' import info_block, display_area, area_loop %}
+{% from '_utils.html.j2' import info_block, display_area, area_loop %}
 
 {% if point %}
   {% set title = 'Point {:,.5f}, {:,.5f}'.format(*point.id) %}
@@ -14,10 +14,10 @@
   {% set subtitle = 'No longer used' if result.attributes.doterm else '' %}
 {% endif %}
 
-{% extends 'base.html' %}
+{% extends 'base.html.j2' %}
 
 {% block headscripts %}
-{% include "_leaflet.html" %}
+{% include "_leaflet.html.j2" %}
 {% endblock %}
 
 {% block content %}

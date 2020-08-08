@@ -1,6 +1,6 @@
-{% from '_utils.html' import info_block %}
+{% from '_utils.html.j2' import info_block %}
 {% set title = 'Add fields to CSV' %}
-{% extends "base.html" %}
+{% extends "base.html.j2" %}
 
 {% block headscripts %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.1.0/papaparse.min.js" integrity="sha256-Fh801SO9gqegfUdkDxyzXzIUPWzO/Vatqj8uN+5xcL4=" crossorigin="anonymous"></script>

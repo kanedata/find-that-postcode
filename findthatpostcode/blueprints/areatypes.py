@@ -11,7 +11,7 @@ bp = Blueprint('areatypes', __name__, url_prefix='/areatypes')
 @bp.route('/', strict_slashes=False)
 def all():
     ats = area_types_count(get_db())
-    return render_template('areatypes.html', result=ats)
+    return render_template('areatypes.html.j2', result=ats)
 
 
 @bp.route('/<areacode>')
@@ -27,4 +27,4 @@ def get_areatype(areacode, filetype="json"):
         for p, args in pagination.pagination.items()
         if args
     }
-    return return_result(result, filetype, "areatype.html", nav=nav)
+    return return_result(result, filetype, "areatype.html.j2", nav=nav)

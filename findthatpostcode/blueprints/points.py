@@ -26,5 +26,5 @@ def get(latlon):
     es = get_db()
     result = Point.get_from_es((float(lat), float(lon)), es)
     if filetype == 'html':
-        return return_result(result.relationships["nearest_postcode"], filetype, 'postcode.html', point=result)
-    return return_result(result, filetype, 'postcode.html')
+        return return_result(result.relationships["nearest_postcode"], filetype, 'postcode.html.j2', point=result)
+    return return_result(result, filetype, 'postcode.html.j2')

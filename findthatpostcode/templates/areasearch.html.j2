@@ -1,12 +1,12 @@
-{% from '_utils.html' import input, display_area %}
-{% from '_pagination.html' import pagination %}
+{% from '_utils.html.j2' import input, display_area %}
+{% from '_pagination.html.j2' import pagination %}
 
 {% set title = "Search" %}
-{% extends "base.html" %}
+{% extends "base.html.j2" %}
 {% block content %}
 <section class="flex flex-wrap w-60-l w-100 center">
   <div class="w-100 ph0 ph3-l pv3">
-    {% include "_search.html" %}
+    {% include "_search.html.j2" %}
   </div>
 
 {% if q %}

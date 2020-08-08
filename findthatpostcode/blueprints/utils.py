@@ -15,7 +15,7 @@ def return_result(result, filetype="json", template=None, **kwargs):
         elif filetype == "html":
             # @TODO: non-json response here
             return abort(make_response(render_template(
-                'error.html',
+                'error.html.j2',
                 result=result,
                 **kwargs
             ), status))

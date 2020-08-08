@@ -9,7 +9,7 @@ class Place(Controller):
 
     es_index = 'geo_placename'
     url_slug = 'places'
-    template = 'place.html'
+    template = 'place.html.j2'
 
     def __init__(self, id, data=None, **kwargs):
         super().__init__(id)

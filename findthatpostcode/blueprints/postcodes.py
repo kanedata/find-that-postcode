@@ -21,7 +21,7 @@ def postcode_redirect():
 def get_postcode(postcode, filetype="json"):
     es = get_db()
     result = Postcode.get_from_es(postcode, es)
-    return return_result(result, filetype, 'postcode.html')
+    return return_result(result, filetype, 'postcode.html.j2')
 
 
 @bp.route('/hash/<hash>')

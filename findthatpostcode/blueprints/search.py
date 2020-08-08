@@ -32,7 +32,7 @@ def search_index():
     q = request.values.get("q")
     if not q:
         return render_template(
-            'areasearch.html',
+            'areasearch.html.j2',
             q=q,
         )
 
@@ -57,7 +57,7 @@ def search_index():
         if args
     }
     return render_template(
-        'areasearch.html',
+        'areasearch.html.j2',
         result=list(result),
         q=q,
         total=areas['result_count'],

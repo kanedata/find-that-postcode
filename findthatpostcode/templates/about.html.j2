@@ -1,7 +1,7 @@
-{% from '_utils.html' import input %}
+{% from '_utils.html.j2' import input %}
 
 {% set title = 'About this site' %}
-{% extends "base.html" %}
+{% extends "base.html.j2" %}
 {% block content %}
 <section class="section entry-content measure-wide" id="api">
   <p class="normal">
@@ -35,5 +35,5 @@
   </p>
 </section>
 
-{% include "_api.html" %}
+{% include "_api.html.j2" %}
 {% endblock %}

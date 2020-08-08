@@ -64,11 +64,11 @@ def create_app(test_config=None):
     @app.route('/')
     def index():
         ats = area_types_count(db.get_db())
-        return render_template('index.html', result=ats)
+        return render_template('index.html.j2', result=ats)
 
     @app.route('/about')
     def about():
-        return render_template('about.html')
+        return render_template('about.html.j2')
 
     blueprints.init_app(app)
 

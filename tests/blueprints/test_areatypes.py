@@ -37,3 +37,10 @@ def test_areatypes_html(client):
     assert rv.mimetype == 'text/html'
     assert html.escape('Lower Super Output Area') in content
     assert AREATYPE_CODE in content
+
+
+def test_areatype_csv(client):
+    rv = client.get('/areatypes/{}.csv'.format(AREATYPE_CODE))
+    content = rv.data.decode("utf8")
+    assert rv.mimetype == 'text/csv'
+    assert 'E01020135' in content

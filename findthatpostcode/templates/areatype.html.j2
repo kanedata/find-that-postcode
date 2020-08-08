@@ -33,12 +33,14 @@
   </div>
   <div class="fl w-two-thirds-l w-100">
     <h3 class="f3-ns f4 header-font pa0 ma0">Areas</h3>
+    <p class="subtitle">
     {% if result.attributes.count_areas <= result.relationships.areas|length %}
-    <p class="subtitle">Showing all {{ "{:,.0f}".format(result.attributes.count_areas) }} areas</p>
+    Showing all {{ "{:,.0f}".format(result.attributes.count_areas) }} areas
     {% else %}
-    <p class="subtitle">Showing {{ "{:,.0f}".format(result.relationships.areas|length) }} of {{ "{:,.0f}".format(result.attributes.count_areas) }} areas</p>
-    {# <p class="subtitle">Showing from {{ "{:,.0f}".format(result.get("meta", {}).get("pagination", {}).get("from",0) + 1) }} to {{ "{:,.0f}".format(min([result.get("meta", {}).get("pagination", {}).get("from",0) + result.get("meta", {}).get("pagination", {}).get("size",100), result["data"]["attributes"]["count_areas"]])) }} of {{ "{:,.0f}".format(result["data"]["attributes"]["count_areas"]) }}</p> #}
+    Showing {{ "{:,.0f}".format(result.relationships.areas|length) }} of {{ "{:,.0f}".format(result.attributes.count_areas) }} areas
     {% endif %}
+    - <a href="{{ url_for('areatypes.get_areatype', areacode=result.id, filetype='csv') }}" class="f6">Download all as CSV</a>
+    </p>
     <ul class="">
       {% for i in result.relationships.areas if not i.id.endswith('999999') %}
         <li class="pa0 mv3">

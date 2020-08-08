@@ -3,7 +3,9 @@ from flask import Blueprint, render_template, request, url_for
 from .utils import return_result
 from findthatpostcode.controllers.controller import Pagination
 from findthatpostcode.controllers.areatypes import Areatype, area_types_count
+from findthatpostcode.controllers.areas import get_all_areas
 from findthatpostcode.db import get_db
+from findthatpostcode.blueprints.areas import areas_csv
 
 bp = Blueprint('areatypes', __name__, url_prefix='/areatypes')
 
@@ -17,6 +19,12 @@ def all():
 @bp.route('/<areacode>')
 @bp.route('/<areacode>.<filetype>')
 def get_areatype(areacode, filetype="json"):
+    if filetype=='csv':
+        areas = get_all_areas(
+            get_db(),
+            areatypes=[areacode.strip().lower()]
+        )
+        return areas_csv(areas, '{}.csv'.format(areacode))
     result = Areatype.get_from_es(areacode, get_db())
     pagination = Pagination(request)
     result.get_areas(get_db(), pagination=pagination)

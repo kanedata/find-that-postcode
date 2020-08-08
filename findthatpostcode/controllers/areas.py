@@ -317,12 +317,11 @@ def get_all_areas(es, areatypes=None, es_config=None):
             }
         }
     }
-    print(es)
     result = scan(
         es,
         query=query,
         index=es_config.get("es_index", Area.es_index),
-        _source_include=["type", "name"],
+        _source_includes=["type", "name", "active", "date_start", "date_end"],
         ignore=[400]
     )
 
@@ -330,5 +329,8 @@ def get_all_areas(es, areatypes=None, es_config=None):
         yield {
             "code": r["_id"],
             "name": r["_source"]["name"],
-            "type": r["_source"]["type"]
+            "type": r["_source"]["type"],
+            "active": r["_source"].get("active"),
+            "date_start": r["_source"].get("date_start"),
+            "date_end": r["_source"].get("date_end"),
         }

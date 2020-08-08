@@ -23,9 +23,11 @@ def all_names():
         get_db(),
         areatypes=[a.strip().lower() for a in request.values.get("types", "").split(",") if a]
     )
+    return areas_csv(areas, 'names.csv')
 
+def areas_csv(areas, filename):
     si = io.StringIO()
-    writer = csv.DictWriter(si, fieldnames=["code", "name", "type"])
+    writer = csv.DictWriter(si, fieldnames=["code", "name", "type", "active", "date_start", "date_end"])
     writer.writeheader()
     for row in areas:
         if not row.get("name") or not row.get("type"):
@@ -34,7 +36,7 @@ def all_names():
             writer.writerow(row)
 
     output = make_response(si.getvalue())
-    output.headers["Content-Disposition"] = "attachment; filename=names.csv"
+    output.headers["Content-Disposition"] = "attachment; filename={}".format(filename)
     output.headers["Content-type"] = "text/csv"
     return output
 

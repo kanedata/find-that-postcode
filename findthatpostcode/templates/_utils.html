@@ -12,6 +12,9 @@
       {{ area.attributes.name }}
     </a>
     {% endif %}
+    {% if not area.attributes.active %}
+    <span class='bg-washed-red red br2 pa1 f6 dib'>INACTIVE</span>
+    {% endif %}
     {% if area.relationships.areatype and not hide_areatype %}
     <a href="{{ url_for('areatypes.get_areatype', areacode=area.relationships.areatype.id, filetype='html') }}" class='gray f6 link underline-hover dim'>
       ({{- area.relationships.areatype.attributes.name -}})

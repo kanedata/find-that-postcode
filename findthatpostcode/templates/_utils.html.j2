@@ -12,7 +12,7 @@
       {{ area.attributes.name }}
     </a>
     {% endif %}
-    {% if not area.attributes.active %}
+    {% if area.attributes.active == false %}
     <span class='bg-washed-red red br2 pa1 f6 dib'>INACTIVE</span>
     {% endif %}
     {% if area.relationships.areatype and not hide_areatype %}

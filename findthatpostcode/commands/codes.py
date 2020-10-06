@@ -18,9 +18,9 @@ import tqdm
 from .. import db
 from ..metadata import AREA_TYPES, ENTITIES
 
-RGC_URL = 'https://www.arcgis.com/sharing/rest/content/items/56a91921e10d4fb4b367ef592ceb0bab/data'
-CHD_URL = 'https://www.arcgis.com/sharing/rest/content/items/62e09bbfb3ad4745b94c15c52c38e5ea/data'
-MSOA_URL = 'https://visual.parliament.uk/msoanames/static/MSOA-Names-v1.1.0.csv'
+RGC_URL = 'https://www.arcgis.com/sharing/rest/content/items/7216e9b54a1b49459aaaf59b3f122abc/data'
+CHD_URL = 'https://www.arcgis.com/sharing/rest/content/items/e2b210c49bd440b89667294ffbe61fa8/data'
+MSOA_URL = 'https://visual.parliament.uk/msoanames/static/MSOA-Names-1.5.0.csv'
 ENTITY_INDEX = 'geo_entity'
 AREA_INDEX = 'geo_area'
 DEFAULT_ENCODING = 'latin1'

@@ -11,13 +11,13 @@ elasticsearch==7.8.1
 entrypoints==0.3
 et-xmlfile==1.0.1
 flake8==3.7.9
-Flask==1.1.1
+Flask==1.1.2
 Flask-Cors==3.0.8
 gunicorn==19.7.1
 idna==2.8
 itsdangerous==1.1.0
 jdcal==1.4.1
-Jinja2==2.10.3
+Jinja2==2.11.2
 MarkupSafe==1.1.1
 mccabe==0.6.1
 mock==3.0.5
@@ -27,7 +27,7 @@ pycodestyle==2.5.0
 pyflakes==2.1.1
 pytest==3.0.7
 python-dotenv==0.10.3
-requests==2.22.0
+requests==2.24.0
 requests-cache==0.5.2
 requests-mock==1.7.0
 Shapely==1.7.0

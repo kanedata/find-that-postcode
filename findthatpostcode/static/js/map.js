@@ -1,4 +1,7 @@
-
+const UK_BOUNDS = [
+    [60.86, 1.76],
+    [49.86, -8.65]
+]
 var center = [53.825564, -2.421976];
 if(window.postcodes && postcodes.length > 0){
     center = [postcodes[0]["lat"], postcodes[0]["lon"]];
@@ -9,6 +12,19 @@ var mymap = L.map('postcode-map', {
 }).setView(center, 9);
 var layer = new L.StamenTileLayer("toner").addTo(mymap);
 L.osGraticule({ showLabels: false, lineColor: '#ddd' }).addTo(mymap);
+
+var location_map = L.map('location-map', {
+    zoomControl: false,
+    attributionControl: false,
+    boxZoom: false,
+    doubleClickZoom: false,
+    dragging: false,
+    scrollWheelZoom: false,
+});
+new L.StamenTileLayer("toner").addTo(location_map);
+location_map.fitBounds(UK_BOUNDS);
+location_map.setMinZoom(location_map.getZoom());
+location_map.setMaxZoom(location_map.getZoom());
 
 if(window.postcodes){
     var markers = L.featureGroup();
@@ -42,7 +58,6 @@ if(geojson){
             }
         })
         .then(function (geojson) {
-            console.log(geojson);
             var boundary_json = L.geoJSON(geojson, {
                 invert: geojson.features.length == 1,
                 style: {
@@ -67,10 +82,15 @@ if(geojson){
             boundary_json.addTo(mymap);
             postcode_show();
             mymap.fitBounds(boundary_json.getBounds());
+
+            boundary_json.eachLayer((layer) => {
+                L.marker(layer.getBounds().getCenter()).addTo(location_map);
+            });
         })
         .catch((error) => {
             postcode_show();
             mymap.fitBounds(markers.getBounds());
+            console.log(error);
         });
 } else {
     postcode_show();

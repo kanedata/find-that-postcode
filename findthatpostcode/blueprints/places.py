@@ -49,5 +49,4 @@ def nearest(lat, lon, filetype="json"):
 @bp.route('/<areacode>.<filetype>')
 def get_place(areacode, filetype="json"):
     result = Place.get_from_es(areacode, get_db())
-    print(result)
     return return_result(result, filetype, "place.html.j2")

@@ -34,7 +34,6 @@ class Postcode(Controller):
             ignore=[404],
             _source_excludes=es_config.get("_source_exclude", []),
         )
-        print(data)
 
         if not data.get("found"):
             return cls(id)

@@ -53,16 +53,6 @@
         "full_name": "Built-up Area Sub-division",
         "description": "The code for the BUASDs in England and Wales. Pseudo codes are included for those OAs not classed as 'built-up' and cross-border codes are included for areas straddling the English/Welsh border. Pseudo codes are also included for Scotland, Northern Ireland, Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code"
     },
-    "ca": {
-        "entities": [
-            "S12"
-        ],
-        "status": "Current",
-        "theme": "Administrative",
-        "name": "Council Areas",
-        "full_name": "Council Areas",
-        "description": null
-    },
     "cal": {
         "entities": [
             "E56"
@@ -460,16 +450,6 @@
         "full_name": "Island Groups",
         "description": null
     },
-    "iz": {
-        "entities": [
-            "S02"
-        ],
-        "status": "Current",
-        "theme": "Statistical Building Block",
-        "name": "Intermediate Zones",
-        "full_name": "Intermediate Zones",
-        "description": null
-    },
     "lac": {
         "entities": [
             "E32"
@@ -517,6 +497,7 @@
             "E08",
             "E09",
             "N09",
+            "S12",
             "W06"
         ],
         "status": "Current",
@@ -634,6 +615,7 @@
     "msoa11": {
         "entities": [
             "E02",
+            "S02",
             "W02"
         ],
         "status": "Current",

@@ -15,6 +15,7 @@
     <header class="body header-font normal ph3 ph5-ns pt3 {% if frontpage %}pt5-ns pb5{% else %}pb4{% endif %} moon-gray">
       <div class="fr f3-ns mt1 mr2 w-100 w-auto-ns tr pb3">
           <a href="{{ url_for('about') }}" class="white logo underline double underline-yellow">About</a>
+          <a href="{{ url_for('about') }}#data-sources" class="white logo underline double underline-yellow">Data sources</a>
       |    <a href="{{ url_for('search.search_index') }}" class="white logo underline double underline-yellow">Search</a>
       |    <a href="{{ url_for('index') }}#api" class="white logo underline double underline-yellow">API</a>
       </div>
@@ -43,14 +44,41 @@
         {% block content %}{% endblock %}
       </section>
     </main>
-    <footer id="contentinfo" class="body ph3 ph5-ns db mv5 moon-gray">
-        © {{now.year}} <a href="https://drkane.net/" class="link yellow">David Kane</a>
-          <p>
-            <a href="https://www.ons.gov.uk/methodology/geography/licences" class="link yellow">Postcode data from ONS used under Open Government License</a><br> 
-            Contains OS data © Crown copyright and database right {{now.year}} <br>
-            Contains Royal Mail data © Royal Mail copyright and database right {{now.year}} <br> 
-            Contains National Statistics data © Crown copyright and database right {{now.year}}
-          </p>
+
+    
+    <footer id="contentinfo" class="body ph3 ph5-ns db pv5 moon-gray bg-near-black cf">
+      <div class="fl w-100 w-70-ns">
+        <p class="ma0 pa0">© {{now.year}} <a href="https://dkane.net/" class="link yellow underline-hover">David Kane</a></p>
+        <p class="mv2 pa0">
+            <strong>Find that Postcode</strong>
+            | <a href="/about" class="link yellow underline-hover">About</a>
+            | <a href="/about#data-sources" class="link yellow underline-hover">Data sources</a>
+            | <a href="https://findthatcharity.uk/" target="_blank" class="link yellow underline-hover">Find that Charity</a>
+        </p>
+        <div class="mv2 pa0">
+        </div>
+        <div class="mv2 pa0">
+            <a href="https://github.com/drkane/find-that-postcode" class="" title="View code on Github">
+                <span class="icon mw2 dib">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w2" aria-label="Github" role="img" viewBox="0 0 512 512">
+                        <rect width="512" height="512" rx="15%"></rect>
+                        <clipPath id="a">
+                            <rect width="512" height="512" rx="15%"></rect>
+                        </clipPath>
+                        <path fill="#fff" d="M335 499c14 0 12 17 12 17H165s-2-17 12-17c13 0 16-6 16-12l-1-50c-71 16-86-28-86-28-12-30-28-37-28-37-24-16 1-16 1-16 26 2 40 26 40 26 22 39 59 28 74 22 2-17 9-28 16-35-57-6-116-28-116-126 0-28 10-51 26-69-3-6-11-32 3-67 0 0 21-7 70 26 42-12 86-12 128 0 49-33 70-26 70-26 14 35 6 61 3 67 16 18 26 41 26 69 0 98-60 120-117 126 10 8 18 24 18 48l-1 70c0 6 3 12 16 12z" clip-path="url(#a)"></path>
+                    </svg>
+                </span>
+            </a>
+        </div>
+      </div>
+      <div class="fl tr-ns w-100 w-30-ns">
+        <p class="f7">
+          <a href="https://www.ons.gov.uk/methodology/geography/licences" class="link yellow">Postcode data from ONS used under Open Government License</a><br> 
+          Contains OS data © Crown copyright and database right {{now.year}} <br>
+          Contains Royal Mail data © Royal Mail copyright and database right {{now.year}} <br> 
+          Contains National Statistics data © Crown copyright and database right {{now.year}}
+        </p>
+      <div class="mv2 pa0">
     </footer>
     {% block bodyscripts %}
     {% endblock %}

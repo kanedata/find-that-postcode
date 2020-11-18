@@ -1,14 +1,26 @@
 {% from '_utils.html.j2' import info_block %}
-{% set title = 'Merge geojson' %}
+{% set title = 'Combine GeoJSON files' %}
 {% extends "base.html.j2" %}
 
 {% block content %}
 <div id="merge-files">
-  <input type="file" id="files-to-merge" v-on:change="addFiles">
-  <table v-if="files.length">
-    <tr v-for="f in files">
-      <th><% f.name %></th>
-      <td>
+  <div class="w-100 mb4 entry-content cf">
+    <p class="measure">This tool can combine two or more GeoJSON files into one merged file.</p>
+    <p class="measure">Choose two or more files from your computer and then click "Download merged file" to save the results.</p>
+    <p class="measure">
+      The tool only accept valid <a href="https://geojson.org/" target="_blank">GeoJSON</a>
+      files with a type of <code>FeatureCollection</code>. All features will be merged into
+      one <code>FeatureCollection</code>.
+    </p>
+    <div class="content measure pa3 bg-light-gray f5" id="privacy">
+      <h3 class="pa0 ma0 header-font">Privacy</h3>
+      <p class="">Your file will not leave your own computer and no data from it is sent to Find that Postcode.</p>
+    </div>
+  </div>
+  <table v-if="files.length" class="mt4 mb2">
+    <tr v-for="f, i in files">
+      <th class="pr3 pv2"><% f.name %></th>
+      <td class="pr3 pv2">
         <template v-if="f.geojson"><% f.geojson.features.length %> features</template>
         <template v-if="f.errors.length">
           <ul>
@@ -16,11 +28,28 @@
           </ul>
         </template>
       </td>
+      <td class="pr3 pv2">
+        <button v-on:click.prevent="files.splice(i, 1)" class="button-reset bn pv2 ph3 b tc bg-animate bg-washed-red dim near-black pointer br2-ns">Remove file</button>
+      </td>
     </tr>
   </table>
-  <p v-else>No files selected</p>
-  <button v-if="files.length" v-on:click.prevent="clearFiles">Remove all files</button>
-  <button v-if="files.length" v-on:click.prevent="downloadMergedFile">Download merged file</button>
+  <label for="files-to-merge" class="button-reset bn pv2 ph3 b tc bg-animate bg-yellow dim near-black pointer br2-ns">
+    + Add file
+    <input type="file" id="files-to-merge" v-on:change="addFiles" multiple class="dn" accept=".geojson,.json,application/geo+json,application/json">
+  </label>
+  <p v-else class="mv4">Add two or more GeoJSON files to merge</p>
+  <p v-if="files.length==1" class="mv4">Add more files to create a merged GeoJSON file..</p>
+  <p v-else-if="result.features" class="mv4">Merged GeoJSON file will have <% result.features.length %> features from <% files.length %> files.</p>
+  <template v-if="files.length > 1">
+    <div class="mb3">
+      <label for="filename" class="b">File name</label><br>
+      <input type="text" v-model="filename" class="f6 f5-l input-reset ba b--black-20 near-black bg-white pa1 lh-solid"/>
+    </div>
+    <button v-on:click.prevent="downloadMergedFile" class="button-reset bn pv3 ph4 b tc bg-animate bg-yellow dim near-black pointer br2-ns">
+      Download merged file
+    </button>
+  </template>
+  <button v-if="files.length" v-on:click.prevent="clearFiles" class="button-reset bn pv3 ph4 b tc bg-animate bg-washed-red dim near-black pointer br2-ns">Remove all files</button>
 </div>
 {% endblock %}
 
@@ -32,6 +61,19 @@ var app = new Vue({
   el: '#merge-files',
   data: {
     files: [],
+    result: {},
+    filename: 'mergedfile'
+  },
+  watch: {
+    'files': function(){
+      if(this.files.length <= 1){
+        this.result = {};
+        return
+      }
+      var result = Object.assign({}, this.files[0].geojson);
+      result.features = this.files.filter((f) => f.geojson.features).map((f) => f.geojson.features).flat(1);
+      this.result = result;
+    }
   },
   methods: {
     addFiles(ev){
@@ -53,12 +95,10 @@ var app = new Vue({
       })
     },
     downloadMergedFile(){
-      var result = Object.assign({}, this.files[0].geojson);
-      result.features = this.files.filter((f) => f.geojson.features).map((f) => f.geojson.features).flat(1);
-      const blob = new Blob([JSON.stringify(result)], { type: 'application/geo+json' });
+      const blob = new Blob([JSON.stringify(this.result)], { type: 'application/geo+json' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = 'merged_geo.geojson';
+      link.download = this.filename + '.geojson';
       link.click();
       URL.revokeObjectURL(link.href);
     },

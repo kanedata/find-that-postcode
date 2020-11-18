@@ -29,15 +29,19 @@
   {% endcall %}
   
   
-  {% call frontpageblock("Add data to a CSV file", title_link=url_for('addtocsv.addtocsv'), div_classes='w-50-l') %}
-  <p>Upload a CSV with a column of postcode data and add information about those postcodes
-  to it. Information includes latitude/longitude and areas.</p><br>
-  <a class="f6 f5-l button-reset fl pa3 no-underline tc bn bg-animate bg-yellow dim near-black pointer br2-ns" href="{{url_for('addtocsv.addtocsv')}}">Upload a CSV</a>
+  {% call frontpageblock("Tools", div_classes='w-50-l') %}
+  <p>
+    <a href="{{url_for('addtocsv.addtocsv')}}" class="link blue underline b">Add data to a CSV</a> with a column of postcode data.
+    Information includes latitude/longitude and areas.
+  </p>
+  <p>
+    <a href="{{url_for('tools.merge_geojson')}}" class="link blue underline b">Combine GeoJSON files</a> into one merged file.
+  </p>
   {% endcall %}
 
   {% call frontpageblock("Use the API", title_link="#api", div_classes='w-50-l') %}
   <p>The API provides programmatic access to the postcode data, using the
-  <a href="http://jsonapi.org/">JSON api</a> specification.</p><br>
+  <a href="http://jsonapi.org/" class="link blue underline">JSON api</a> specification.</p><br>
   <a class="f6 f5-l button-reset fl pa3 no-underline tc bn bg-animate bg-yellow dim near-black pointer br2-ns" href="#api">Use the API</a>
   {% endcall %}
 

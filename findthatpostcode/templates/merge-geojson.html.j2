@@ -1,0 +1,71 @@
+{% from '_utils.html.j2' import info_block %}
+{% set title = 'Merge geojson' %}
+{% extends "base.html.j2" %}
+
+{% block content %}
+<div id="merge-files">
+  <input type="file" id="files-to-merge" v-on:change="addFiles">
+  <table v-if="files.length">
+    <tr v-for="f in files">
+      <th><% f.name %></th>
+      <td>
+        <template v-if="f.geojson"><% f.geojson.features.length %> features</template>
+        <template v-if="f.errors.length">
+          <ul>
+            <li v-for="e in f.errors" class="red"><% e %></li>
+          </ul>
+        </template>
+      </td>
+    </tr>
+  </table>
+  <p v-else>No files selected</p>
+  <button v-if="files.length" v-on:click.prevent="clearFiles">Remove all files</button>
+  <button v-if="files.length" v-on:click.prevent="downloadMergedFile">Download merged file</button>
+</div>
+{% endblock %}
+
+{% block bodyscripts %}
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script>
+var app = new Vue({
+  delimiters: ["<%", "%>"],
+  el: '#merge-files',
+  data: {
+    files: [],
+  },
+  methods: {
+    addFiles(ev){
+      const fileList = Array.from(ev.target.files).map((f)=>f.text());
+      Promise.all(fileList).then((results)=>{
+        results.forEach((f, i)=>{
+          var file = ev.target.files[i];
+          file.errors = [];
+          try {
+            file.geojson = JSON.parse(f);
+            if(file.geojson.type != "FeatureCollection"){
+              file.errors.push("No FeatureCollection found");
+            }
+          } catch(e){
+            file.errors.push("Could not convert JSON file")
+          }
+          this.files.push(file);
+        });
+      })
+    },
+    downloadMergedFile(){
+      var result = Object.assign({}, this.files[0].geojson);
+      result.features = this.files.filter((f) => f.geojson.features).map((f) => f.geojson.features).flat(1);
+      const blob = new Blob([JSON.stringify(result)], { type: 'application/geo+json' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'merged_geo.geojson';
+      link.click();
+      URL.revokeObjectURL(link.href);
+    },
+    clearFiles(){
+      this.files = [];
+    },
+  }
+});
+</script>
+{% endblock %}

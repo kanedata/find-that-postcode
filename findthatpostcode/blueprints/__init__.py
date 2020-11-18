@@ -6,6 +6,7 @@ from . import places
 from . import reconcile
 from . import addtocsv
 from . import search
+from . import tools
 
 
 def init_app(app):
@@ -18,3 +19,4 @@ def init_app(app):
     app.register_blueprint(addtocsv.bp)
     app.register_blueprint(places.bp)
     app.register_blueprint(search.bp)
+    app.register_blueprint(tools.bp)

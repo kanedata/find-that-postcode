@@ -142,8 +142,14 @@
         </li>
       {% endfor %}
       </ul>
-      <div class="pa3">
-      {{ area_loop(result.relationships.children[selected], result.id)}}
+      <div class="pa3 f5">
+        <p>
+          <a class="link blue underline-hover"
+             href="{{ url_for('areas.get_area_children_boundary', areacode=result.id, areatype=selected)}}">
+            Boundaries (GeoJSON)
+          </a>
+        </p>
+        {{ area_loop(result.relationships.children[selected]|sort(attribute="id"), result.id)}}
       </div>
     {% endcall %}
     {% endif %}

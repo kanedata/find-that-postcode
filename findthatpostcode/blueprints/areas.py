@@ -63,6 +63,37 @@ def get_area_boundary(areacodes):
         "features": features
     })
 
+
+@bp.route('/<areacode>/children/<areatype>.geojson')
+def get_area_children_boundary(areacode, areatype):
+    es = get_db()
+    area = Area.get_from_es(
+        areacode,
+        es,
+        boundary=False,
+        examples_count=0
+    )
+    features = []
+    errors = {}
+    for child_area in area.relationships["children"][areatype]:
+        result = Area.get_from_es(
+            child_area.id,
+            es,
+            boundary=True,
+            examples_count=0
+        )
+        status, r = result.geoJSON()
+        if status == 200:
+            features.extend(r.get("features"))
+        else:
+            errors[child_area.id] = r
+    if not features:
+        return abort(make_response(jsonify(message=errors), status))
+    return jsonify({
+        "type": "FeatureCollection",
+        "features": features
+    })
+
 @bp.route('/<areacode>')
 @bp.route('/<areacode>.<filetype>')
 def get_area(areacode, filetype="json"):

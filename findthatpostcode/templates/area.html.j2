@@ -114,6 +114,15 @@
     <figure class="ma0 w-30 fl">
       <div id="location-map" style="height:500px;"></div>
     </figure>
+    {#% if result.relationships.parent %}
+    <p class="f5 b mt0 mb1 w-100">
+      Location within 
+      <a href="{{ url_for('areas.get_area', areacode=result.relationships.parent.id, filetype='html') }}" class="link blue underline-hover">
+        {{- result.relationships.parent.attributes.name -}} 
+      </a>
+      {{ result.relationships.parent.relationships.areatype.attributes.name }}
+    </p>
+    {% endif %#}
     <br>
     {% endif %}
 
@@ -157,6 +166,9 @@
     {% for p in example_postcodes %}{{ p.attributes.location|tojson }},
     {% endfor %}];
   var geojson = {{ url_for('areas.get_area_boundary', areacodes=result.id)|tojson }};
+  {% if result.relationships.parent %}
+  var parent_geojson = {{ url_for('areas.get_area_boundary', areacodes=result.relationships.parent.id)|tojson }};
+  {% endif %}
 </script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/map.js') }}"></script>
 {% endif %}

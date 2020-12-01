@@ -91,6 +91,31 @@ if(geojson){
                     L.marker(layer.getBounds().getCenter()).addTo(location_map);
                 });
             }
+
+            // if(typeof parent_geojson !== 'undefined'){
+            //     fetch(parent_geojson)
+            //         .then(function (response) {
+            //             if (response.status !== 200) {
+            //                 throw new Error("Not 200 response")
+            //             } else {
+            //                 return response.json();
+            //             }
+            //         })
+            //         .then(function (geojson) {
+            //             var parent_geojson = L.geoJSON(geojson, {
+            //                 style: {
+            //                     stroke: true,
+            //                     color: '#00449e99',
+            //                     weight: 1,
+            //                     fill: false,
+            //                 },
+            //             });
+            //             parent_geojson.addTo(mymap);
+            //             mymap.fitBounds(parent_geojson.getBounds());
+            //         });
+
+            // }
+
         })
         .catch((error) => {
             postcode_show();

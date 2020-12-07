@@ -10,7 +10,7 @@ if(window.postcodes && postcodes.length > 0){
 var mymap = L.map('postcode-map', {
     zoomSnap: 0.1
 }).setView(center, 9);
-var layer = new L.StamenTileLayer("toner").addTo(mymap);
+var layer = new L.StamenTileLayer("terrain").addTo(mymap);
 L.osGraticule({ showLabels: false, lineColor: '#ddd' }).addTo(mymap);
 
 var location_map = null;
@@ -69,7 +69,7 @@ if(geojson){
                     weight: 3,
                     fill: true,
                     fillColor: (geojson.features.length == 1 ? '#fff' : '#00449e'),
-                    fillOpacity: (geojson.features.length == 1 ? 0.95 : 0.2 ) 
+                    fillOpacity: (geojson.features.length == 1 ? 0.8 : 0.2 ) 
                 },
                 onEachFeature: (feature, layer) => {
                     layer.bindTooltip(

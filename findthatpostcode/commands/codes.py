@@ -126,7 +126,18 @@ def import_chd(url=CHD_URL, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
 
     areas = {}
 
-    with z.open('ChangeHistory.csv', 'r') as infile:
+    change_history = None
+    changes = None
+    equivalents = None
+    for f in z.namelist():
+        if f.lower().startswith("changehistory") and f.lower().endswith(".csv"):
+            change_history = f
+        elif f.lower().startswith("changes") and f.lower().endswith(".csv"):
+            changes = f
+        elif f.lower().startswith("equivalents") and f.lower().endswith(".csv"):
+            equivalents = f
+
+    with z.open(change_history, 'r') as infile:
         click.echo('Opening {}'.format(infile.name))
         reader = csv.DictReader(io.TextIOWrapper(infile, encoding))
         for k, area in tqdm.tqdm(enumerate(reader)):
@@ -160,7 +171,7 @@ def import_chd(url=CHD_URL, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
                 }
             }
 
-    with z.open('Changes.csv', 'r') as infile:
+    with z.open(changes, 'r') as infile:
         reader = csv.DictReader(io.TextIOWrapper(infile, encoding))
         click.echo('Opening {}'.format(infile.name))
         for k, area in tqdm.tqdm(enumerate(reader)):
@@ -178,7 +189,7 @@ def import_chd(url=CHD_URL, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
         "scottish_government": ["GEOGCDS", "GEOGNMS"],
         "welsh_government": ["GEOGCDWG", "GEOGNMWG", "GEOGNMWWG"],
     }
-    with z.open('Equivalents.csv', 'r') as infile:
+    with z.open(equivalents, 'r') as infile:
         reader = csv.DictReader(io.TextIOWrapper(infile, encoding))
         click.echo('Opening {}'.format(infile.name))
         for area in tqdm.tqdm(reader):

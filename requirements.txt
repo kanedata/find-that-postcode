@@ -22,7 +22,7 @@ MarkupSafe==1.1.1
 mccabe==0.6.1
 mock==3.0.5
 openpyxl==2.6.2
-py==1.4.33
+py==1.10.0
 pycodestyle==2.5.0
 pyflakes==2.1.1
 pytest==3.0.7

@@ -33,5 +33,5 @@ requests-mock==1.7.0
 Shapely==1.7.0
 six==1.13.0
 tqdm==4.40.2
-urllib3==1.25.7
+urllib3==1.26.5
 Werkzeug==0.16.0

@@ -24,6 +24,7 @@
 <div class="cf">
 
   <div class="fl w-third-l w-100 pr4 f5">
+    {% if result.attributes.location %}
     {% call info_block("Latitude and longitude") %}
     <code class="pa1">
       <a href='https://tools.wmflabs.org/geohack/geohack.php?params={{ result.attributes.location["lat"] }};{{ result.attributes.location["lon"] }}'>
@@ -31,6 +32,7 @@
       </a>
     </code>
     {% endcall %}
+    {% endif %}
 
     {% for i in key_area_types[0:1] %}
       <h2 class="header-font mt0 mb1">{{ i[0] }} areas</h2>
@@ -118,10 +120,10 @@
   <div class="fl w-third-l w-100 pr4 f5 mb3">
     <h2 class="header-font mt2 pt2 mb1 bt bw3 b--yellow">Technical details</h2>
     {% call info_block("7 character version of postcode") %}
-      <code>{{ result.attributes.pcd }}</code>
+      <code class="pa1 bg-light-gray code mr1 pre">{{ result.attributes.pcd }}</code>
     {% endcall %}
     {% call info_block("8 character version of postcode") %}
-      <code>{{ result.attributes.pcd2 }}</code>
+      <code class="pa1 bg-light-gray code mr1 pre">{{ result.attributes.pcd2 }}</code>
     {% endcall %}
     {% call info_block("Date introduced") %}
       {{ "{:%B %Y}".format(result.attributes.dointr) }}
@@ -137,11 +139,13 @@
     {% call info_block("Grid reference positional quality indicator") %}
       <code>{{result.attributes.osgrdind}}</code> - {{ other_codes.osgrdind[result.attributes.osgrdind] }}
     {% endcall %}
+    {% if result.attributes.oseast1m and result.attributes.osnrth1m %}
     {% call info_block("OS Easting/Northing") %}
       <code class="pa1">
         {{ result.attributes.oseast1m }}, {{ result.attributes.osnrth1m }}
       </code>
     {% endcall %}
+    {% endif %}
   </div>
 
 
@@ -157,10 +161,12 @@
 {% endblock %}
 
 {% block bodyscripts %}
+{% if result.attributes.location %}
 <script type="text/javascript">
   var postcodes = [{{ result.attributes.location|tojson }}];
   var show_postcode = true;
   var geojson = {{ url_for('areas.get_area_boundary', areacodes=result.get_area('laua').id)|tojson }};
 </script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/map.js') }}"></script>
+{% endif %}
 {% endblock %}

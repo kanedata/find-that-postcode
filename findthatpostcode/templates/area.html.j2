@@ -169,8 +169,8 @@
 {% if example_postcodes or result.attributes.has_boundary %}
 <script type="text/javascript">
   var postcodes = [
-    {% for p in example_postcodes %}{{ p.attributes.location|tojson }},
-    {% endfor %}];
+    {% for p in example_postcodes %}{% if p.attributes.location %}{{ p.attributes.location|tojson }},
+    {% endif %}{% endfor %}];
   var geojson = {{ url_for('areas.get_area_boundary', areacodes=result.id)|tojson }};
   {% if result.relationships.parent %}
   var parent_geojson = {{ url_for('areas.get_area_boundary', areacodes=result.relationships.parent.id)|tojson }};

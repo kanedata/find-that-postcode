@@ -15,8 +15,8 @@ GEOJSON_TYPES = {
 class Controller:
 
     template = None
-    es_index = 'geo'
-    es_type = '_doc'
+    es_index = "geo"
+    es_type = "_doc"
 
     def __init__(self, id, data=None):
         # main configuration
@@ -58,34 +58,52 @@ class Controller:
         hits in a search - this gets a consistent figure no matter the version
         """
         if isinstance(result["hits"]["total"], dict):
-            return result["hits"]["total"]['value']
+            return result["hits"]["total"]["value"]
         if isinstance(result["hits"]["total"], (float, int)):
             return result["hits"]["total"]
 
     def url(self, filetype=None, query_vars={}):
-        path = [self.url_slug, self.id.replace(" ", "+") + self.set_url_filetype(filetype)]
-        return urlunparse([
-            self.urlparts.scheme if self.urlparts else "",
-            self.urlparts.netloc if self.urlparts else "",
-            "/".join(path),
-            "",
-            self.get_query_string(query_vars),
-            ""
-        ])
+        path = [
+            self.url_slug,
+            self.id.replace(" ", "+") + self.set_url_filetype(filetype),
+        ]
+        return urlunparse(
+            [
+                self.urlparts.scheme if self.urlparts else "",
+                self.urlparts.netloc if self.urlparts else "",
+                "/".join(path),
+                "",
+                self.get_query_string(query_vars),
+                "",
+            ]
+        )
 
-    def relationship_url(self, relationship, related=True, filetype=None, query_vars={}):
+    def relationship_url(
+        self, relationship, related=True, filetype=None, query_vars={}
+    ):
         if related:
-            path = [self.url_slug, self.id.replace(" ", "+"), relationship + self.set_url_filetype(filetype)]
+            path = [
+                self.url_slug,
+                self.id.replace(" ", "+"),
+                relationship + self.set_url_filetype(filetype),
+            ]
         else:
-            path = [self.url_slug, self.id.replace(" ", "+"), "relationships", relationship + self.set_url_filetype(filetype)]
-        return urlunparse([
-            self.urlparts.scheme if self.urlparts else "",
-            self.urlparts.netloc if self.urlparts else "",
-            "/".join(path),
-            "",
-            self.get_query_string(query_vars),
-            ""
-        ])
+            path = [
+                self.url_slug,
+                self.id.replace(" ", "+"),
+                "relationships",
+                relationship + self.set_url_filetype(filetype),
+            ]
+        return urlunparse(
+            [
+                self.urlparts.scheme if self.urlparts else "",
+                self.urlparts.netloc if self.urlparts else "",
+                "/".join(path),
+                "",
+                self.get_query_string(query_vars),
+                "",
+            ]
+        )
 
     def set_url_filetype(self, filetype=None):
         if filetype:
@@ -102,7 +120,7 @@ class Controller:
                 {
                     "status": "404",
                     "title": "resource not found",
-                    "detail": "resource could not be found"
+                    "detail": "resource could not be found",
                 }
             ]
         return []
@@ -123,10 +141,7 @@ class Controller:
             return (json, included)
 
         json["attributes"] = self.attributes
-        json["links"] = {
-            "self": self.url(),
-            "html": self.url("html")
-        }
+        json["links"] = {"self": self.url(), "html": self.url("html")}
 
         # add relationship information
         if len(self.relationships) > 0:
@@ -136,12 +151,14 @@ class Controller:
             json["relationships"][i] = {
                 "links": {
                     "self": self.relationship_url(i, False),
-                    "related": self.relationship_url(i, True)
+                    "related": self.relationship_url(i, True),
                 },
-                "data": None
+                "data": None,
             }
             if isinstance(items, list):
-                json["relationships"][i]["data"] = [j.toJSON("identifer")[0] for j in items]
+                json["relationships"][i]["data"] = [
+                    j.toJSON("identifer")[0] for j in items
+                ]
                 if role != "embedded":
                     included += [j.toJSON("embedded")[0] for j in items]
             elif hasattr(items, "toJSON"):
@@ -156,21 +173,14 @@ class Controller:
         if not self.found:
             return {
                 "errors": [
-                    {
-                        "status": "404",
-                        "code": "not_found",
-                        "title": "Code not found"
-                    }
+                    {"status": "404", "code": "not_found", "title": "Code not found"}
                 ]
             }
 
         return {
             "data": json[0],
             "included": json[1],
-            "links": {
-                "self": self.url(),
-                "html": self.url("html")
-            }
+            "links": {"self": self.url(), "html": self.url("html")},
         }
 
     def get_es_version(self, es):
@@ -180,29 +190,29 @@ class Controller:
         return [int(v) for v in version_number.split(".")]
 
 
-class Pagination():
+class Pagination:
 
     default_size = 10
 
     def __init__(self, request, size=None):
         try:
-            page = int(request.values.get('p'))
+            page = int(request.values.get("p"))
         except (ValueError, TypeError):
             page = 1
         self.page = page if isinstance(page, int) else 1
         self.size = size if isinstance(size, int) else self.default_size
         self.from_ = self.get_from()
-        self.pagination = {
-            "next": None,
-            "prev": None,
-            "first": None,
-            "last": None
-        }
+        self.pagination = {"next": None, "prev": None, "first": None, "last": None}
 
     def page_query_vars(self, query_vars={}):
         if self.page and self.page > 1 and "p" not in query_vars:
             query_vars["p"] = self.page
-        if self.size and self.size and self.size != self.default_size and "size" not in query_vars:
+        if (
+            self.size
+            and self.size
+            and self.size != self.default_size
+            and "size" not in query_vars
+        ):
             query_vars["size"] = self.size
         return query_vars
 
@@ -237,12 +247,12 @@ class Pagination():
         if (self.page + 1) < self.max_page:
             self.pagination["last"] = {"p": self.max_page, **url_args}
 
-        self.pagination['current_page'] = self.page
-        self.pagination['min_page'] = self.min_page
-        self.pagination['max_page'] = self.max_page
-        self.pagination['max_item'] = self.total
-        self.pagination['start_item'] = self.from_ + 1
-        self.pagination['end_item'] = min([self.from_ + self.size, self.total])
+        self.pagination["current_page"] = self.page
+        self.pagination["min_page"] = self.min_page
+        self.pagination["max_page"] = self.max_page
+        self.pagination["max_item"] = self.total
+        self.pagination["start_item"] = self.from_ + 1
+        self.pagination["end_item"] = min([self.from_ + self.size, self.total])
         # page ranges
         # @TODO calculate page ranges
 

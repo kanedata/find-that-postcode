@@ -1,16 +1,15 @@
-from datetime import datetime
 import re
+from datetime import datetime
 
 from ..metadata import OAC11_CODE, RU11IND_CODES
+from . import areas, places
 from .controller import Controller
-from . import areas
-from . import places
 
 
 class Postcode(Controller):
 
-    es_index = 'geo_postcode'
-    url_slug = 'postcodes'
+    es_index = "geo_postcode"
+    url_slug = "postcodes"
     date_fields = ["dointr", "doterm"]
     not_area_fields = ["osgrdind", "usertype"]
 
@@ -21,7 +20,7 @@ class Postcode(Controller):
             self.relationships["nearest_places"] = places
 
     def __repr__(self):
-        return '<Postcode {}>'.format(self.id)
+        return "<Postcode {}>".format(self.id)
 
     @classmethod
     def get_from_es(cls, id, es, es_config=None):
@@ -41,7 +40,7 @@ class Postcode(Controller):
         pcareas = []
         postcode = data.get("_source")
         for k in list(postcode.keys()):
-            if isinstance(postcode[k], str) and re.match(r'[A-Z][0-9]{8}', postcode[k]):
+            if isinstance(postcode[k], str) and re.match(r"[A-Z][0-9]{8}", postcode[k]):
                 area = areas.Area.get_from_es(postcode[k], es, examples_count=0)
                 if area.found:
                     postcode[k + "_name"] = area.attributes.get("name")
@@ -81,24 +80,20 @@ class Postcode(Controller):
         if not location:
             return []
         query = {
-            "query": {
-                "match": {
-                    "descnm": {"query": "LOC"}
-                }
-            },
+            "query": {"match": {"descnm": {"query": "LOC"}}},
             "sort": [
                 {
                     "_geo_distance": {
                         "location": {
                             "lat": location.get("lat"),
-                            "lon": location.get("lon")
+                            "lon": location.get("lon"),
                         },
-                        "unit": "m"
+                        "unit": "m",
                     }
                 }
-            ]
+            ],
         }
-        example = es.search(index='geo_placename', body=query, size=examples_count)
+        example = es.search(index="geo_placename", body=query, size=examples_count)
         return [places.Place(e["_id"], e["_source"]) for e in example["hits"]["hits"]]
 
     def get_attribute(self, attr):
@@ -138,11 +133,11 @@ class Postcode(Controller):
         # check for blank/empty
         # put in all caps
         postcode = postcode.strip().upper()
-        if postcode == '':
+        if postcode == "":
             return None
 
         # replace any non alphanumeric characters
-        postcode = re.sub('[^0-9a-zA-Z]+', '', postcode)
+        postcode = re.sub("[^0-9a-zA-Z]+", "", postcode)
 
         # check for nonstandard codes
         if len(postcode) > 7:
@@ -162,7 +157,9 @@ class Postcode(Controller):
     def toJSON(self, role="top"):
         json = super().toJSON(role)
         for i in self.date_fields:
-            if json[0].get("attributes", {}).get(i) and isinstance(json[0]["attributes"][i], datetime):
+            if json[0].get("attributes", {}).get(i) and isinstance(
+                json[0]["attributes"][i], datetime
+            ):
                 json[0]["attributes"][i] = json[0]["attributes"][i].strftime("%Y-%m-%d")
 
         return json

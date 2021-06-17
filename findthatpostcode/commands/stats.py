@@ -5,24 +5,24 @@ import codecs
 import csv
 
 import click
-from flask import current_app
-from flask.cli import with_appcontext
 import requests
 import requests_cache
-from elasticsearch.helpers import bulk
 import tqdm
+from elasticsearch.helpers import bulk
+from flask import current_app
+from flask.cli import with_appcontext
 
 from .. import db
 from .codes import AREA_INDEX
 
-IMD2019_URL = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/845345/File_7_-_All_IoD2019_Scores__Ranks__Deciles_and_Population_Denominators_3.csv'
-IMD2015_URL = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/467774/File_7_ID_2015_All_ranks__deciles_and_scores_for_the_Indices_of_Deprivation__and_population_denominators.csv'
+IMD2019_URL = "https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/845345/File_7_-_All_IoD2019_Scores__Ranks__Deciles_and_Population_Denominators_3.csv"
+IMD2015_URL = "https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/467774/File_7_ID_2015_All_ranks__deciles_and_scores_for_the_Indices_of_Deprivation__and_population_denominators.csv"
 
 
 def parse_field(k, v):
     if not isinstance(v, str):
         return v
-    if v == '':
+    if v == "":
         return None
     if k.endswith("_decile") or k.endswith("_rank") or k.startswith("population_"):
         return int(v.split(".")[0])
@@ -98,9 +98,9 @@ IMD_FIELDS = {
 }
 
 
-@click.command('imd2019')
-@click.option('--es-index', default=AREA_INDEX)
-@click.option('--url', default=IMD2019_URL)
+@click.command("imd2019")
+@click.option("--es-index", default=AREA_INDEX)
+@click.option("--url", default=IMD2019_URL)
 @with_appcontext
 def import_imd2019(url=IMD2019_URL, es_index=AREA_INDEX):
 
@@ -111,10 +111,15 @@ def import_imd2019(url=IMD2019_URL, es_index=AREA_INDEX):
 
     r = requests.get(url, stream=True)
 
-    reader = csv.DictReader(codecs.iterdecode(r.iter_lines(), 'utf-8-sig'))
+    reader = csv.DictReader(codecs.iterdecode(r.iter_lines(), "utf-8-sig"))
     area_updates = []
     for k, area in tqdm.tqdm(enumerate(reader)):
-        area = {IMD_FIELDS.get(k.strip(), k.strip()): parse_field(IMD_FIELDS.get(k.strip(), k.strip()), v) for k, v in area.items()}
+        area = {
+            IMD_FIELDS.get(k.strip(), k.strip()): parse_field(
+                IMD_FIELDS.get(k.strip(), k.strip()), v
+            )
+            for k, v in area.items()
+        }
         area_update = {
             "_index": es_index,
             "_type": "_doc",
@@ -123,11 +128,17 @@ def import_imd2019(url=IMD2019_URL, es_index=AREA_INDEX):
             "doc": {
                 "stats": {
                     "imd2019": {k: v for k, v in area.items() if k.startswith("imd_")},
-                    "idaci2019": {k: v for k, v in area.items() if k.startswith("idaci_")},
-                    "idaopi2019": {k: v for k, v in area.items() if k.startswith("idaopi_")},
-                    "population2015": {k: v for k, v in area.items() if k.startswith("population_")},
+                    "idaci2019": {
+                        k: v for k, v in area.items() if k.startswith("idaci_")
+                    },
+                    "idaopi2019": {
+                        k: v for k, v in area.items() if k.startswith("idaopi_")
+                    },
+                    "population2015": {
+                        k: v for k, v in area.items() if k.startswith("population_")
+                    },
                 }
-            }
+            },
         }
         area_updates.append(area_update)
 
@@ -138,9 +149,9 @@ def import_imd2019(url=IMD2019_URL, es_index=AREA_INDEX):
     print("[elasticsearch] %s errors reported" % len(results[1]))
 
 
-@click.command('imd2015')
-@click.option('--es-index', default=AREA_INDEX)
-@click.option('--url', default=IMD2015_URL)
+@click.command("imd2015")
+@click.option("--es-index", default=AREA_INDEX)
+@click.option("--url", default=IMD2015_URL)
 @with_appcontext
 def import_imd2015(url=IMD2015_URL, es_index=AREA_INDEX):
 
@@ -151,10 +162,15 @@ def import_imd2015(url=IMD2015_URL, es_index=AREA_INDEX):
 
     r = requests.get(url, stream=True)
 
-    reader = csv.DictReader(codecs.iterdecode(r.iter_lines(), 'utf-8-sig'))
+    reader = csv.DictReader(codecs.iterdecode(r.iter_lines(), "utf-8-sig"))
     area_updates = []
     for k, area in tqdm.tqdm(enumerate(reader)):
-        area = {IMD_FIELDS.get(k.strip(), k.strip()): parse_field(IMD_FIELDS.get(k.strip(), k.strip()), v) for k, v in area.items()}
+        area = {
+            IMD_FIELDS.get(k.strip(), k.strip()): parse_field(
+                IMD_FIELDS.get(k.strip(), k.strip()), v
+            )
+            for k, v in area.items()
+        }
         area_update = {
             "_index": es_index,
             "_type": "_doc",
@@ -163,11 +179,17 @@ def import_imd2015(url=IMD2015_URL, es_index=AREA_INDEX):
             "doc": {
                 "stats": {
                     "imd2015": {k: v for k, v in area.items() if k.startswith("imd_")},
-                    "idaci2015": {k: v for k, v in area.items() if k.startswith("idaci_")},
-                    "idaopi2015": {k: v for k, v in area.items() if k.startswith("idaopi_")},
-                    "population2012": {k: v for k, v in area.items() if k.startswith("population_")},
+                    "idaci2015": {
+                        k: v for k, v in area.items() if k.startswith("idaci_")
+                    },
+                    "idaopi2015": {
+                        k: v for k, v in area.items() if k.startswith("idaopi_")
+                    },
+                    "population2012": {
+                        k: v for k, v in area.items() if k.startswith("population_")
+                    },
                 }
-            }
+            },
         }
         area_updates.append(area_update)
 

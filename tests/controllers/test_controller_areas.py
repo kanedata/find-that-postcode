@@ -1,28 +1,27 @@
 import types
 
-from tests.fixtures import MockElasticsearch
-
-from findthatpostcode.controllers.areas import Area, search_areas, get_all_areas
+from findthatpostcode.controllers.areas import Area, get_all_areas, search_areas
 from findthatpostcode.controllers.postcodes import Postcode
+from tests.fixtures import MockElasticsearch
 
 
 def test_area_class():
-    a = Area('testentity', {"code": "testentity", "name": "Test Entity"})
-    assert a.id == 'testentity'
+    a = Area("testentity", {"code": "testentity", "name": "Test Entity"})
+    assert a.id == "testentity"
     assert a.attributes["name"] == "Test Entity"
-    assert str(a) == '<Area testentity>'
+    assert str(a) == "<Area testentity>"
 
 
 def test_area_class_es():
 
     es = MockElasticsearch()
-    a = Area.get_from_es('S02000783', es)
+    a = Area.get_from_es("S02000783", es)
 
-    assert a.id == 'S02000783'
+    assert a.id == "S02000783"
     assert a.attributes["name"] == "Lower Bow & Larkfield, Fancy Farm, Mallard Bowl"
-    assert str(a) == '<Area S02000783>'
+    assert str(a) == "<Area S02000783>"
 
-    a = Area.get_from_es('E01020135', es)  # get an area with example postcodes
+    a = Area.get_from_es("E01020135", es)  # get an area with example postcodes
 
     assert len(a.relationships["example_postcodes"]) > 0
     assert isinstance(a.relationships["example_postcodes"][0], Postcode)

@@ -1,12 +1,14 @@
-from . import areas
-from . import areatypes
-from . import postcodes
-from . import points
-from . import places
-from . import reconcile
-from . import addtocsv
-from . import search
-from . import tools
+from . import (
+    addtocsv,
+    areas,
+    areatypes,
+    places,
+    points,
+    postcodes,
+    reconcile,
+    search,
+    tools,
+)
 
 
 def init_app(app):

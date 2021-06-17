@@ -1,22 +1,22 @@
 """
 Import commands for placenames
 """
-import zipfile
-import io
 import csv
+import io
+import zipfile
 
 import click
-from flask import current_app
-from flask.cli import with_appcontext
 import requests
 import requests_cache
 from elasticsearch.helpers import bulk
+from flask import current_app
+from flask.cli import with_appcontext
 
 from .. import db
 
-PLACENAMES_INDEX = 'geo_placename'
+PLACENAMES_INDEX = "geo_placename"
 
-PLACENAMES_URL = 'https://www.arcgis.com/sharing/rest/content/items/e8e725daf8944af6a336a9d183114697/data'
+PLACENAMES_URL = "https://www.arcgis.com/sharing/rest/content/items/e8e725daf8944af6a336a9d183114697/data"
 
 PLACE_TYPES = {
     "BUA": ["Built-up Area", "England and Wales"],
@@ -43,7 +43,7 @@ AREA_LOOKUP = [
     ("lad15cd", "laua", "lad15nm"),
     ("wd15cd", "ward", None),
     ("par15cd", "parish", None),
-    ("hlth12cd", "hlth", 'hlth12nm'),
+    ("hlth12cd", "hlth", "hlth12nm"),
     ("regd15cd", "rgd", "regd15nm"),
     ("rgn15cd", "rgn", "rgn15nm"),
     ("npark15cd", "park", "npark15nm"),
@@ -55,7 +55,7 @@ AREA_LOOKUP = [
     ("lad18cd", "laua", "lad18nm"),
     ("wd18cd", "ward", None),
     ("par18cd", "parish", None),
-    ("hlth12cd", "hlth", 'hlth12nm'),
+    ("hlth12cd", "hlth", "hlth12nm"),
     ("regd18cd", "rgd", "regd18nm"),
     ("rgn18cd", "rgn", "rgn18nm"),
     ("npark17cd", "park", "npark17nm"),
@@ -66,9 +66,9 @@ AREA_LOOKUP = [
 ]
 
 
-@click.command('placenames')
-@click.option('--es-index', default=PLACENAMES_INDEX)
-@click.option('--url', default=PLACENAMES_URL)
+@click.command("placenames")
+@click.option("--es-index", default=PLACENAMES_INDEX)
+@click.option("--url", default=PLACENAMES_URL)
 @with_appcontext
 def import_placenames(url=PLACENAMES_URL, es_index=PLACENAMES_INDEX):
 
@@ -87,8 +87,8 @@ def import_placenames(url=PLACENAMES_URL, es_index=PLACENAMES_INDEX):
 
         print("[placenames] Opening %s" % f.filename)
 
-        with z.open(f, 'r') as pccsv:
-            pccsv = io.TextIOWrapper(pccsv, encoding='latin1')
+        with z.open(f, "r") as pccsv:
+            pccsv = io.TextIOWrapper(pccsv, encoding="latin1")
             reader = csv.DictReader(pccsv)
             for i in reader:
                 record = {
@@ -125,7 +125,9 @@ def import_placenames(url=PLACENAMES_URL, es_index=PLACENAMES_INDEX):
                         if j[2] and j[2] in i:
                             del i[j[2]]
                 i["areas"] = areas
-                i["type"], i["country"] = PLACE_TYPES.get(i["descnm"], [i["descnm"], "United Kingdom"])
+                i["type"], i["country"] = PLACE_TYPES.get(
+                    i["descnm"], [i["descnm"], "United Kingdom"]
+                )
 
                 record["doc"] = i
                 placenames.append(record)
@@ -133,6 +135,9 @@ def import_placenames(url=PLACENAMES_URL, es_index=PLACENAMES_INDEX):
             print("[placenames] Processed %s placenames" % len(placenames))
             print("[elasticsearch] %s placenames to save" % len(placenames))
             results = bulk(es, placenames)
-            print("[elasticsearch] saved %s placenames to %s index" % (results[0], es_index))
+            print(
+                "[elasticsearch] saved %s placenames to %s index"
+                % (results[0], es_index)
+            )
             print("[elasticsearch] %s errors reported" % len(results[1]))
             placenames = []

@@ -1,14 +1,14 @@
 from urllib.parse import urlunparse
 
-from .controller import Controller
 from . import postcodes
+from .controller import Controller
 
 
 class Point(Controller):
 
-    es_index = 'geo_postcode'
-    url_slug = 'points'
-    template = 'postcode.html.j2'
+    es_index = "geo_postcode"
+    url_slug = "points"
+    template = "postcode.html.j2"
     max_distance = 10000
 
     def __init__(self, id, data=None, nearest_postcode=None):
@@ -17,31 +17,15 @@ class Point(Controller):
             self.relationships["nearest_postcode"] = nearest_postcode
 
     def __repr__(self):
-        return '<Point {}, {}>'.format(self.id[0], self.id[1])
+        return "<Point {}, {}>".format(self.id[0], self.id[1])
 
     @staticmethod
     def get_nearest_postcodes_query(lat, lon):
         return {
-            "query": {
-                "bool": {
-                    "must_not": {
-                        "exists": {
-                            "field": "doterm"
-                        }
-                    }
-                }
-            },
+            "query": {"bool": {"must_not": {"exists": {"field": "doterm"}}}},
             "sort": [
-                {
-                    "_geo_distance": {
-                        "location": {
-                            "lat": lat,
-                            "lon": lon
-                        },
-                        "unit": "m"
-                    }
-                }
-            ]
+                {"_geo_distance": {"location": {"lat": lat, "lon": lon}, "unit": "m"}}
+            ],
         }
 
     @classmethod
@@ -66,36 +50,44 @@ class Point(Controller):
         return cls(
             id,
             data={"distance_from_postcode": postcode["sort"][0]},
-            nearest_postcode=postcodes.Postcode.get_from_es(postcode["_id"], es)
+            nearest_postcode=postcodes.Postcode.get_from_es(postcode["_id"], es),
         )
 
     def get_by_id(self, lat, lon):
-        self.set_from_data({
-            "_id": "{},{}".format(lat, lon),
-            "_source": {
-                "lat": lat,
-                "lon": lon
-            }
-        })
+        self.set_from_data(
+            {"_id": "{},{}".format(lat, lon), "_source": {"lat": lat, "lon": lon}}
+        )
         query = self.get_nearest_postcodes_query(lat, lon)
-        result = self.es.search(index=self.config.get("es_index", "postcode"), body=query, size=1)
+        result = self.es.search(
+            index=self.config.get("es_index", "postcode"), body=query, size=1
+        )
         if result["hits"]["total"] > 0:
             postcode = result["hits"]["hits"][0]
-            self.relationships["nearest_postcode"] = postcodes.Postcode(self.config).set_from_data(postcode)
+            self.relationships["nearest_postcode"] = postcodes.Postcode(
+                self.config
+            ).set_from_data(postcode)
             self.attributes["distance_from_postcode"] = postcode["sort"][0]
 
     def topJSON(self):
 
         # check if postcode is too far away
         if self.attributes.get("distance_from_postcode") > self.max_distance:
-            return (400, {
-                "errors": [{
-                    "status": "400",
-                    "code": "point_outside_uk",
-                    "title": "Nearest postcode is more than 10km away",
-                    "detail": "Nearest postcode ({}) is more than 10km away ({:,.1f}km). Are you sure this point is in the UK?".format(self.postcode.id, (self.attributes.get("distance_from_postcode") / 1000))
-                }]
-            })
+            return (
+                400,
+                {
+                    "errors": [
+                        {
+                            "status": "400",
+                            "code": "point_outside_uk",
+                            "title": "Nearest postcode is more than 10km away",
+                            "detail": "Nearest postcode ({}) is more than 10km away ({:,.1f}km). Are you sure this point is in the UK?".format(
+                                self.postcode.id,
+                                (self.attributes.get("distance_from_postcode") / 1000),
+                            ),
+                        }
+                    ]
+                },
+            )
 
         json = super().topJSON()
         postcode_json = self.relationships["nearest_postcode"].toJSON()
@@ -103,26 +95,44 @@ class Point(Controller):
         return json
 
     def url(self, filetype=None, query_vars={}):
-        path = [self.url_slug, "{},{}".format(*self.id) + self.set_url_filetype(filetype)]
-        return urlunparse([
-            self.urlparts.scheme if self.urlparts else "",
-            self.urlparts.netloc if self.urlparts else "",
-            "/".join(path),
-            "",
-            self.get_query_string(query_vars),
-            ""
-        ])
+        path = [
+            self.url_slug,
+            "{},{}".format(*self.id) + self.set_url_filetype(filetype),
+        ]
+        return urlunparse(
+            [
+                self.urlparts.scheme if self.urlparts else "",
+                self.urlparts.netloc if self.urlparts else "",
+                "/".join(path),
+                "",
+                self.get_query_string(query_vars),
+                "",
+            ]
+        )
 
-    def relationship_url(self, relationship, related=True, filetype=None, query_vars={}):
+    def relationship_url(
+        self, relationship, related=True, filetype=None, query_vars={}
+    ):
         if related:
-            path = [self.url_slug, "{},{}".format(*self.id), relationship + self.set_url_filetype(filetype)]
+            path = [
+                self.url_slug,
+                "{},{}".format(*self.id),
+                relationship + self.set_url_filetype(filetype),
+            ]
         else:
-            path = [self.url_slug, "{},{}".format(*self.id), "relationships", relationship + self.set_url_filetype(filetype)]
-        return urlunparse([
-            self.urlparts.scheme if self.urlparts else "",
-            self.urlparts.netloc if self.urlparts else "",
-            "/".join(path),
-            "",
-            self.get_query_string(query_vars),
-            ""
-        ])
+            path = [
+                self.url_slug,
+                "{},{}".format(*self.id),
+                "relationships",
+                relationship + self.set_url_filetype(filetype),
+            ]
+        return urlunparse(
+            [
+                self.urlparts.scheme if self.urlparts else "",
+                self.urlparts.netloc if self.urlparts else "",
+                "/".join(path),
+                "",
+                self.get_query_string(query_vars),
+                "",
+            ]
+        )

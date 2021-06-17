@@ -1,15 +1,14 @@
 import re
 
+from . import areas, postcodes
 from .controller import Controller
-from . import postcodes
-from . import areas
 
 
 class Place(Controller):
 
-    es_index = 'geo_placename'
-    url_slug = 'places'
-    template = 'place.html.j2'
+    es_index = "geo_placename"
+    url_slug = "places"
+    template = "place.html.j2"
 
     def __init__(self, id, data=None, **kwargs):
         super().__init__(id)
@@ -21,7 +20,7 @@ class Place(Controller):
             self.attributes = self.process_attributes(data)
 
     def __repr__(self):
-        return '<Place {}>'.format(self.id)
+        return "<Place {}>".format(self.id)
 
     @classmethod
     def get_from_es(cls, id, es, es_config=None, examples_count=5, recursive=True):
@@ -42,21 +41,23 @@ class Place(Controller):
             "areas": [],
         }
         for k, v in data.get("_source", {}).get("areas", {}).items():
-            if isinstance(v, str) and re.match(r'[A-Z][0-9]{8}', v):
+            if isinstance(v, str) and re.match(r"[A-Z][0-9]{8}", v):
                 area = areas.Area.get_from_es(v, es, examples_count=0)
                 if area.found:
                     # data["_source"]["areas"][k + "_name"] = area.attributes.get("name")
                     relationships["areas"].append(area)
 
         if examples_count:
-            relationships["nearest_postcodes"] = cls.get_nearest_postcodes(data.get("_source", {}).get("location"), es, examples_count=examples_count)
-            relationships["nearest_places"] = cls.get_nearest_places(data.get("_source", {}).get("location"), es, examples_count=10)
+            relationships["nearest_postcodes"] = cls.get_nearest_postcodes(
+                data.get("_source", {}).get("location"),
+                es,
+                examples_count=examples_count,
+            )
+            relationships["nearest_places"] = cls.get_nearest_places(
+                data.get("_source", {}).get("location"), es, examples_count=10
+            )
 
-        return cls(
-            data.get("_id"),
-            data=data.get("_source"),
-            **relationships
-        )
+        return cls(data.get("_id"), data=data.get("_source"), **relationships)
 
     def process_attributes(self, data):
         data["name"] = data["place18nm"]
@@ -68,47 +69,43 @@ class Place(Controller):
         if not location:
             return []
         query = {
-            "query": {
-                "match_all": {}
-            },
+            "query": {"match_all": {}},
             "sort": [
                 {
                     "_geo_distance": {
                         "location": {
                             "lat": location.get("lat"),
-                            "lon": location.get("lon")
+                            "lon": location.get("lon"),
                         },
-                        "unit": "m"
+                        "unit": "m",
                     }
                 }
-            ]
+            ],
         }
-        example = es.search(index='geo_postcode', body=query, size=examples_count)
-        return [postcodes.Postcode(e["_id"], e["_source"]) for e in example["hits"]["hits"]]
+        example = es.search(index="geo_postcode", body=query, size=examples_count)
+        return [
+            postcodes.Postcode(e["_id"], e["_source"]) for e in example["hits"]["hits"]
+        ]
 
     @staticmethod
     def get_nearest_places(location, es, examples_count=10):
         if not location:
             return []
         query = {
-            "query": {
-                "match": {
-                    "descnm": {"query": "LOC"}
-                }
-            },
+            "query": {"match": {"descnm": {"query": "LOC"}}},
             "sort": [
                 {
                     "_geo_distance": {
                         "location": {
                             "lat": location.get("lat"),
-                            "lon": location.get("lon")
+                            "lon": location.get("lon"),
                         },
-                        "unit": "m"
+                        "unit": "m",
                     }
                 }
-            ]
+            ],
         }
-        example = es.search(index='geo_placename', body=query, size=examples_count)
+        example = es.search(index="geo_placename", body=query, size=examples_count)
         return [Place(e["_id"], e["_source"]) for e in example["hits"]["hits"]]
 
     def get_area(self, areatype):

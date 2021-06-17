@@ -1,0 +1,10 @@
+Flask
+Flask-Cors
+elasticsearch==7.8.1
+gunicorn
+requests
+requests-cache
+tqdm
+shapely
+python-dotenv
+dictlib

@@ -1,30 +1,30 @@
 """
 Import commands for the register of geographic codes and code history database
 """
-import zipfile
-import io
 import csv
 import datetime
 import hashlib
+import io
+import zipfile
 
 import click
-from flask import current_app
-from flask.cli import with_appcontext
 import requests
 import requests_cache
 from elasticsearch.helpers import bulk
+from flask import current_app
+from flask.cli import with_appcontext
 
 from .. import db
 
-PC_INDEX = 'geo_postcode'
+PC_INDEX = "geo_postcode"
 
-NSPL_URL = 'https://www.arcgis.com/sharing/rest/content/items/677cfc3ef56541999314efc795664ce9/data'
-ONSPD_URL = 'https://www.arcgis.com/sharing/rest/content/items/a644dd04d18f4592b7d36705f93270d8/data'
+NSPL_URL = "https://www.arcgis.com/sharing/rest/content/items/677cfc3ef56541999314efc795664ce9/data"
+ONSPD_URL = "https://www.arcgis.com/sharing/rest/content/items/a644dd04d18f4592b7d36705f93270d8/data"
 
 
-@click.command('nspl')
-@click.option('--es-index', default=PC_INDEX)
-@click.option('--url', default=NSPL_URL)
+@click.command("nspl")
+@click.option("--es-index", default=PC_INDEX)
+@click.option("--url", default=NSPL_URL)
 @with_appcontext
 def import_nspl(url=NSPL_URL, es_index=PC_INDEX):
 
@@ -38,13 +38,15 @@ def import_nspl(url=NSPL_URL, es_index=PC_INDEX):
     postcodes = []
 
     for f in z.filelist:
-        if not f.filename.endswith(".csv") or not f.filename.startswith("Data/multi_csv/NSPL_"):
+        if not f.filename.endswith(".csv") or not f.filename.startswith(
+            "Data/multi_csv/NSPL_"
+        ):
             continue
 
         print("[postcodes] Opening %s" % f.filename)
 
         pcount = 0
-        with z.open(f, 'r') as pccsv:
+        with z.open(f, "r") as pccsv:
             pccsv = io.TextIOWrapper(pccsv)
             reader = csv.DictReader(pccsv)
             for i in reader:
@@ -58,7 +60,12 @@ def import_nspl(url=NSPL_URL, es_index=PC_INDEX):
 
                 # null any blank fields (or ones with a dummy code in)
                 for k in i:
-                    if i[k] == "" or i[k] in ["E99999999", "S99999999", "W99999999", "N99999999"]:
+                    if i[k] == "" or i[k] in [
+                        "E99999999",
+                        "S99999999",
+                        "W99999999",
+                        "N99999999",
+                    ]:
                         i[k] = None
 
                 # date fields
@@ -81,7 +88,7 @@ def import_nspl(url=NSPL_URL, es_index=PC_INDEX):
                         i[j] = int(i[j])
 
                 # add postcode hash
-                i['hash'] = hashlib.md5(
+                i["hash"] = hashlib.md5(
                     i["pcds"].lower().replace(" ", "").encode()
                 ).hexdigest()
 
@@ -92,6 +99,9 @@ def import_nspl(url=NSPL_URL, es_index=PC_INDEX):
             print("[postcodes] Processed %s postcodes" % pcount)
             print("[elasticsearch] %s postcodes to save" % len(postcodes))
             results = bulk(es, postcodes)
-            print("[elasticsearch] saved %s postcodes to %s index" % (results[0], es_index))
+            print(
+                "[elasticsearch] saved %s postcodes to %s index"
+                % (results[0], es_index)
+            )
             print("[elasticsearch] %s errors reported" % len(results[1]))
             postcodes = []

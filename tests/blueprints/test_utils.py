@@ -6,4 +6,4 @@ from findthatpostcode.blueprints.utils import return_result
 
 def test_return_result_abort():
     with pytest.raises(InternalServerError):
-        return_result({}, filetype='html', template=None)
+        return_result({}, filetype="html", template=None)

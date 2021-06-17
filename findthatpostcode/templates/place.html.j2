@@ -26,7 +26,7 @@
       {% for key_area in i[1] %}
         {% set a = result.get_area(key_area) %}
         {% if a and a.relationships %}
-        {% call info_block(a.relationships.areatype.attributes.name) %}
+        {% call info_block(a.relationships.areatype.get_name(a.id)) %}
           {{ display_area(a, hide_areatype=true) }}
         {% endcall %}
         {% endif %}

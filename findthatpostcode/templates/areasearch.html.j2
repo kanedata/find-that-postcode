@@ -26,7 +26,7 @@
             {% if i.attributes.active==false %}
             <span class="red b">Inactive</span>
             {% endif %}
-            {{ i.relationships.areatype.attributes.name }}
+            {{ i.relationships.areatype.get_name(i.id) }}
           {% elif i.__class__.__name__=='Place' %} - Place{% endif %}
           </span>
         </li>

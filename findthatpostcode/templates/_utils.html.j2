@@ -18,11 +18,11 @@
     {% if area.relationships.areatype and not hide_areatype %}
     {% if area.attributes.name %}
     <a href="{{ url_for('areatypes.get_areatype', areacode=area.relationships.areatype.id, filetype='html') }}" class='gray f6 link underline-hover dim'>
-      ({{- area.relationships.areatype.attributes.name -}})
+      ({{- area.relationships.areatype.get_name(area.id) -}})
     </a>
     {% else %}
     <a href="{{ url_for('areatypes.get_areatype', areacode=area.relationships.areatype.id, filetype='html') }}" class='blue link underline-hover dim'>
-      {{- area.relationships.areatype.attributes.name -}}
+      {{- area.relationships.areatype.get_name(area.id) -}}
     </a>
     {% endif %}
     {% endif %}

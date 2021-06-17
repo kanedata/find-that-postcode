@@ -2,9 +2,9 @@
 
 {% set title = "{} - <code>{}</code>".format(result.attributes.name, result.id) %}
 {% if result.attributes.active %}
-{% set subtitle = result.relationships.areatype.attributes.name %}
+{% set subtitle = result.relationships.areatype.get_name(result.id) %}
 {% else %}
-{% set subtitle = "<span class='bg-red white pa2 mt2 dib'>INACTIVE</span> {}".format(result.relationships.areatype.attributes.name) %}
+{% set subtitle = "<span class='bg-red white pa2 mt2 dib'>INACTIVE</span> {}".format(result.relationships.areatype.get_name(result.id)) %}
 {% endif %}
 {% set example_postcodes = result.relationships.example_postcodes %}
 {% extends "base.html.j2" %}
@@ -120,7 +120,7 @@
       <a href="{{ url_for('areas.get_area', areacode=result.relationships.parent.id, filetype='html') }}" class="link blue underline-hover">
         {{- result.relationships.parent.attributes.name -}} 
       </a>
-      {{ result.relationships.parent.relationships.areatype.attributes.name }}
+      {{ result.relationships.parent.relationships.areatype.get_name(result.id) }}
     </p>
     {% endif %#}
     <br>

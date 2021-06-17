@@ -30,6 +30,16 @@ class Areatype(Controller):
             }
         return data
 
+    def get_name(self, country=None):
+        if isinstance(country, str):
+            country = country[0].upper()
+        if self.id.startswith("lsoa") and country=="S":
+            return "Data Zone"
+        if self.id.startswith("msoa") and country=="S":
+            return "Intermediate Zone"
+
+        return self.attributes.get("name")
+
     @classmethod
     def get_from_es(cls, id, es, es_config=None, full=False):
         if cls.areatypes.get(id):
@@ -86,5 +96,5 @@ def area_types_count(es, es_config=None):
     )
     return {
         i["key"]: i["doc_count"]
-        for i in result["aggregations"]["group_by_type"]["buckets"]
+        for i in result.get("aggregations", {}).get("group_by_type", {}).get("buckets", [])
     }

@@ -35,6 +35,8 @@ class Areatype(Controller):
             country = country[0].upper()
         if self.id.startswith("lsoa") and country=="S":
             return "Data Zone"
+        if self.id.startswith("lsoa") and country=="N":
+            return "Super Output Area"
         if self.id.startswith("msoa") and country=="S":
             return "Intermediate Zone"
 

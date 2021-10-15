@@ -13,6 +13,7 @@
 <div class="cf">
 
   <div class="fl w-third-l w-100 pr4 f5">
+    {% if result.attributes.location %}
     {% call info_block("Latitude and longitude") %}
     <code class="pa1">
       <a href='https://tools.wmflabs.org/geohack/geohack.php?params={{ result.attributes.location["lat"] }};{{ result.attributes.location["lon"] }}'>
@@ -20,6 +21,7 @@
       </a>
     </code>
     {% endcall %}
+    {% endif %}
 
     {% for i in key_area_types[0:1] %}
       <h2 class="header-font mt0 mb1">{{ i[0] }} areas</h2>
@@ -71,11 +73,13 @@
 
   <div class="fl w-third-l w-100 pr4 f5 mb3">
     <h2 class="header-font mt2 pt2 mb1 bt bw3 b--yellow">Technical details</h2>
+    {% if result.attributes.gridgb1e %}
     {% call info_block("OS Easting/Northing") %}
       <code class="pa1">
         {{ result.attributes.gridgb1e }}, {{ result.attributes.gridgb1n }}
       </code>
     {% endcall %}
+    {% endif %}
   </div>
 
 
@@ -85,8 +89,10 @@
 
 {% block bodyscripts %}
 <script type="text/javascript">
+  {% if result.attributes.location %}
   var postcodes = [{{ result.attributes.location|tojson }}];
   var show_postcode = true;
+  {% endif %}
   var geojson = {{ url_for('areas.get_area_boundary', areacodes=result.get_area('laua').id)|tojson }};
 </script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/map.js') }}"></script>

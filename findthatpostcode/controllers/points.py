@@ -68,26 +68,48 @@ class Point(Controller):
             ).set_from_data(postcode)
             self.attributes["distance_from_postcode"] = postcode["sort"][0]
 
+    def get_errors(self):
+        if self.attributes.get("distance_from_postcode") > self.max_distance:
+            self.found = False
+            return [
+                {
+                    "status": "400",
+                    "code": "point_outside_uk",
+                    "title": "Nearest postcode is more than 10km away",
+                    "detail": "Nearest postcode ({}) is more than 10km away ({:,.1f}km). Are you sure this point is in the UK?".format(
+                        self.relationships["nearest_postcode"].id,
+                        (self.attributes.get("distance_from_postcode") / 1000),
+                    ),
+                }
+            ]
+        if not self.found:
+            return [
+                {
+                    "status": "404",
+                    "title": "resource not found",
+                    "detail": "resource could not be found",
+                }
+            ]
+        return []
+
     def topJSON(self):
 
         # check if postcode is too far away
         if self.attributes.get("distance_from_postcode") > self.max_distance:
-            return (
-                400,
-                {
-                    "errors": [
-                        {
-                            "status": "400",
-                            "code": "point_outside_uk",
-                            "title": "Nearest postcode is more than 10km away",
-                            "detail": "Nearest postcode ({}) is more than 10km away ({:,.1f}km). Are you sure this point is in the UK?".format(
-                                self.postcode.id,
-                                (self.attributes.get("distance_from_postcode") / 1000),
-                            ),
-                        }
-                    ]
-                },
-            )
+            self.found = False
+            return {
+                "errors": [
+                    {
+                        "status": "400",
+                        "code": "point_outside_uk",
+                        "title": "Nearest postcode is more than 10km away",
+                        "detail": "Nearest postcode ({}) is more than 10km away ({:,.1f}km). Are you sure this point is in the UK?".format(
+                            self.relationships["nearest_postcode"].id,
+                            (self.attributes.get("distance_from_postcode") / 1000),
+                        ),
+                    }
+                ]
+            }
 
         json = super().topJSON()
         postcode_json = self.relationships["nearest_postcode"].toJSON()

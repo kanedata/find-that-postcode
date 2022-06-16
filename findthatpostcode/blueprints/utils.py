@@ -10,13 +10,19 @@ def return_result(result, filetype="json", template=None, **kwargs):
     status = 200 if result.found else 404
 
     if status != 200:
+        errors = result.get_errors()
+        if errors and errors[0].get("status"):
+            status = int(errors[0]["status"])
         if filetype in ("json", "geojson"):
             return abort(make_response(jsonify(message=result.topJSON()), status))
         elif filetype == "html":
             # @TODO: non-json response here
             return abort(
                 make_response(
-                    render_template("error.html.j2", result=result, **kwargs), status
+                    render_template(
+                        "error.html.j2", result=result, errors=errors, **kwargs
+                    ),
+                    status,
                 )
             )
 

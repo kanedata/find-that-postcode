@@ -1,3 +1,18 @@
 {% set title = 'Error' %}
 {% set subtitle = '{} {} not found'.format(result.__class__.__name__, result.id) %}
 {% extends 'base.html.j2' %}
+
+{% block content %}
+{% if errors %}
+{% for e in errors %}
+<div>
+    <h3>{{ e.title }}</h3>
+    <p>{{ e.detail }}</p>
+    <details>
+        <summary>Technical details</summary>
+        <pre>{{ e|tojson(indent=4) }}</pre>
+    </details>
+</div>
+{% endfor %}
+{% endif %}
+{% endblock %}

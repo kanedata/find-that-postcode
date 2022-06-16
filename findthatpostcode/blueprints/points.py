@@ -28,6 +28,9 @@ def get(latlon):
     lat, lon = latlon.split(",")
     es = get_db()
     result = Point.get_from_es((float(lat), float(lon)), es)
+    errors = result.get_errors()
+    if errors:
+        return_result(result, filetype, "postcode.html.j2")
     if filetype == "html":
         return return_result(
             result.relationships["nearest_postcode"],

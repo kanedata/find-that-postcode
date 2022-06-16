@@ -6,6 +6,7 @@ import csv
 import datetime
 import io
 import zipfile
+from collections import defaultdict
 
 import click
 import requests
@@ -142,6 +143,7 @@ def import_chd(url=CHD_URL, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
     r = requests.get(url, stream=True)
     z = zipfile.ZipFile(io.BytesIO(r.content))
 
+    areas_cache = defaultdict(list)
     areas = {}
 
     change_history = None
@@ -159,13 +161,8 @@ def import_chd(url=CHD_URL, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
         click.echo("Opening {}".format(infile.name))
         reader = csv.DictReader(io.TextIOWrapper(infile, encoding))
         for k, area in tqdm.tqdm(enumerate(reader)):
-            areas[area["GEOGCD"]] = {
-                "_index": es_index,
-                "_type": "_doc",
-                "_op_type": "update",
-                "_id": area["GEOGCD"],
-                "doc_as_upsert": True,
-                "doc": {
+            areas_cache[area["GEOGCD"]].append(
+                {
                     "code": area["GEOGCD"],
                     "name": area["GEOGNM"],
                     "name_welsh": area["GEOGNMW"] if area["GEOGNMW"] else None,
@@ -188,8 +185,35 @@ def import_chd(url=CHD_URL, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
                     "successor": [],
                     "equivalents": {},
                     "type": ENTITIES.get(area["ENTITYCD"]),
-                },
-            }
+                }
+            )
+
+    for area_code, area_history in tqdm.tqdm(areas_cache.items()):
+        if len(area_history) == 1:
+            area = area_history[0]
+            area["alternative_names"] = []
+            if area["name"]:
+                area["alternative_names"].append(area["name"])
+            if area["name_welsh"]:
+                area["alternative_names"].append(area["name_welsh"])
+        else:
+            area_history = sorted(area_history, key=lambda x: x["date_start"])
+            area = area_history[-1]
+            area["date_start"] = area_history[0]["date_start"]
+            area["alternative_names"] = []
+            for h in area_history:
+                if h["name"] and h["name"] not in area["alternative_names"]:
+                    area["alternative_names"].append(h["name"])
+                if h["name_welsh"] and h["name_welsh"] not in area["alternative_names"]:
+                    area["alternative_names"].append(h["name_welsh"])
+        areas[area_code] = {
+            "_index": es_index,
+            "_type": "_doc",
+            "_op_type": "update",
+            "_id": area_code,
+            "doc_as_upsert": True,
+            "doc": area,
+        }
 
     with z.open(changes, "r") as infile:
         reader = csv.DictReader(io.TextIOWrapper(infile, encoding))
@@ -242,10 +266,14 @@ def import_msoa_names(url=MSOA_URL, es_index=AREA_INDEX):
     reader = csv.DictReader(codecs.iterdecode(r.iter_lines(), "utf-8-sig"))
     area_updates = []
     for k, area in tqdm.tqdm(enumerate(reader)):
+        alt_names = [area["msoa11hclnm"]]
+        if area["msoa11hclnmw"]:
+            alt_names.append(area["msoa11hclnmw"])
         new_doc = {
             "doc": {
                 "name": area["msoa11hclnm"],
                 "name_welsh": area["msoa11hclnmw"] if area["msoa11hclnmw"] else None,
+                "alternative_names": alt_names,
             }
         }
         area_updates.append(

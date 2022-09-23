@@ -293,24 +293,24 @@ Dokku setup
 
 ```bash
 # create app
-dokku apps:create findthatpostcode
+dokku apps:create find-that-postcode
 
 # add permanent data storage
-dokku storage:mount findthatpostcode /var/lib/dokku/data/storage/findthatpostcode:/data
+dokku storage:mount find-that-postcode /var/lib/dokku/data/storage/find-that-postcode:/data
 
 # enable domain
-dokku domains:enable findthatpostcode
-dokku domains:add findthatpostcode postcodes.findthatcharity.uk
+dokku domains:enable find-that-postcode
+dokku domains:add find-that-postcode postcodes.findthatcharity.uk
 
 # elasticsearch
 sudo dokku plugin:install https://github.com/dokku/dokku-elasticsearch.git elasticsearch
-dokku elasticsearch:create findthatpostcode-es
-dokku elasticsearch:link findthatpostcode-es findthatpostcode
+dokku elasticsearch:create find-that-postcode-es
+dokku elasticsearch:link find-that-postcode-es find-that-postcode
 
 # SSL
 sudo dokku plugin:install https://github.com/dokku/dokku-letsencrypt.git
-dokku config:set --no-restart findthatpostcode DOKKU_LETSENCRYPT_EMAIL=your@email.tld
-dokku letsencrypt findthatpostcode
+dokku config:set --no-restart find-that-postcode DOKKU_LETSENCRYPT_EMAIL=your@email.tld
+dokku letsencrypt find-that-postcode
 dokku letsencrypt:cron-job --add
 ```
 
@@ -319,7 +319,7 @@ dokku letsencrypt:cron-job --add
 On local machine:
 
 ```bash
-git remote add dokku dokku@SERVER_HOST:findthatpostcode
+git remote add dokku dokku@SERVER_HOST:find-that-postcode
 git push dokku master
 ```
 
@@ -329,37 +329,37 @@ On Dokku server run:
 
 ```bash
 # setup and run import
-dokku config:set findthatpostcode FLASK_APP=findthatpostcode
-dokku run findthatpostcode flask init-db
-dokku run findthatpostcode flask import nspl
-dokku run findthatpostcode flask import rgc
-dokku run findthatpostcode flask import chd
-dokku run findthatpostcode flask import msoanames
-dokku run findthatpostcode flask import imd2019
-dokku run findthatpostcode flask import imd2015
-dokku run findthatpostcode flask import placenames
+dokku config:set find-that-postcode FLASK_APP=findthatpostcode
+dokku run find-that-postcode flask init-db
+dokku run find-that-postcode flask import nspl
+dokku run find-that-postcode flask import rgc
+dokku run find-that-postcode flask import chd
+dokku run find-that-postcode flask import msoanames
+dokku run find-that-postcode flask import imd2019
+dokku run find-that-postcode flask import imd2015
+dokku run find-that-postcode flask import placenames
 
 # import boundaries
-dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/7be6a3c1be3b4385951224d2f522470a_0.geojson
-dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/094f326b0b1247e3bcf1eb7236c24679_0.geojson
-dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/0de4288db3774cb78e45b8b74e9eab31_0.geojson
-dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/cec4f9cf783a47bab9295b2e513dd342_0.geojson
-dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/284d82f437554938b0d0fbb3c6522007_0.geojson
-dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/c3398f0560844f74b76ca4b4136eb6a3_2.geojson
-dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/20595dbf22534e20944c9cee42c665b3_0.geojson
-dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/d4d519d1d1a1455a9b82331228f77489_2.geojson
-dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/edcbf58c70004d0f8d44501d07c38fe9_0.geojson
-dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/f41bd8ff39ce4a2393c2f454006ea60a_0.geojson
-dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/282af275c1a24c2ea64ff9e05bdd7d7d_0.geojson
-dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/d3062ec5f03b49a7be631d71586cac8c_2.geojson
-dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/58b0dfa605d5459b80bf08082999b27c_0.geojson
-dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/c6bd4568af5947519cf266b80a94de2e_0.geojson
+dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/7be6a3c1be3b4385951224d2f522470a_0.geojson
+dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/094f326b0b1247e3bcf1eb7236c24679_0.geojson
+dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/0de4288db3774cb78e45b8b74e9eab31_0.geojson
+dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/cec4f9cf783a47bab9295b2e513dd342_0.geojson
+dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/284d82f437554938b0d0fbb3c6522007_0.geojson
+dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/c3398f0560844f74b76ca4b4136eb6a3_2.geojson
+dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/20595dbf22534e20944c9cee42c665b3_0.geojson
+dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/d4d519d1d1a1455a9b82331228f77489_2.geojson
+dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/edcbf58c70004d0f8d44501d07c38fe9_0.geojson
+dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/f41bd8ff39ce4a2393c2f454006ea60a_0.geojson
+dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/282af275c1a24c2ea64ff9e05bdd7d7d_0.geojson
+dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/d3062ec5f03b49a7be631d71586cac8c_2.geojson
+dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/58b0dfa605d5459b80bf08082999b27c_0.geojson
+dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/c6bd4568af5947519cf266b80a94de2e_0.geojson
 
 # large boundary files
-dokku run findthatpostcode flask import boundaries --code-field=par18cd https://opendata.arcgis.com/datasets/40b487621d814fcbb7c5ca8c816cb8ba_2.geojson
-dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/d2dce556b4604be49382d363a7cade72_0.geojson
-dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/e993add3f1944437bc91ec7c76100c63_0.geojson
-dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/29fdaa2efced40378ce8173b411aeb0e_2.geojson
-dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/f6684981be23404e83321077306fa837_0.geojson
-dokku run findthatpostcode flask import boundaries https://opendata.arcgis.com/datasets/1f021bb824ee4820b353b4b58fab6df5_0.geojson
+dokku run find-that-postcode flask import boundaries --code-field=par18cd https://opendata.arcgis.com/datasets/40b487621d814fcbb7c5ca8c816cb8ba_2.geojson
+dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/d2dce556b4604be49382d363a7cade72_0.geojson
+dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/e993add3f1944437bc91ec7c76100c63_0.geojson
+dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/29fdaa2efced40378ce8173b411aeb0e_2.geojson
+dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/f6684981be23404e83321077306fa837_0.geojson
+dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/1f021bb824ee4820b353b4b58fab6df5_0.geojson
 ```

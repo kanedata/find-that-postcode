@@ -1,6 +1,9 @@
 """
 Import commands for the register of geographic codes and code history database
 """
+import glob
+import os.path
+import json
 
 import click
 import requests
@@ -29,12 +32,21 @@ def import_boundaries(urls, examine=False, code_field=None, es_index=AREA_INDEX)
     es = db.get_db()
 
     for url in urls:
-        import_boundary(es, url, examine, es_index, code_field)
+        if url.startswith("http"):
+            import_boundary(es, url, examine, es_index, code_field)
+        else:
+            files = glob.glob(url, recursive=True)
+            for file in files:
+                import_boundary(es, file, examine, es_index, code_field)
 
 
 def import_boundary(es, url, examine=False, es_index=AREA_INDEX, code_field=None):
-    r = requests.get(url, stream=True)
-    boundaries = r.json()
+    if url.startswith("http"):
+        r = requests.get(url, stream=True)
+        boundaries = r.json()
+    elif os.path.isfile(url):
+        with open(url) as f:
+            boundaries = json.load(f)
     errors = []
 
     # find the code field for a boundary

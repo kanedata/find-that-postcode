@@ -19,8 +19,8 @@ from flask.cli import with_appcontext
 from .. import db
 from ..metadata import AREA_TYPES, ENTITIES
 
-RGC_URL = "https://www.arcgis.com/sharing/rest/content/items/32446721f6174feb8dc06510fa5e945f/data"
-CHD_URL = "https://www.arcgis.com/sharing/rest/content/items/a8807f0914234a52b00edecdc34428fa/data"
+RGC_URL = "https://www.arcgis.com/sharing/rest/content/items/e47368141e0a4d47bdf7b484314fd57d/data"
+CHD_URL = "https://www.arcgis.com/sharing/rest/content/items/2eae7e9d68de41218d9baf89341d2a13/data"
 MSOA_URL = "https://houseofcommonslibrary.github.io/msoanames/MSOA-Names-Latest.csv"
 ENTITY_INDEX = "geo_entity"
 AREA_INDEX = "geo_area"

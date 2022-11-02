@@ -18,7 +18,7 @@ from .. import db
 
 PC_INDEX = "geo_postcode"
 
-NSPL_URL = "https://www.arcgis.com/sharing/rest/content/items/677cfc3ef56541999314efc795664ce9/data"
+NSPL_URL = "https://www.arcgis.com/sharing/rest/content/items/5badf61d637349079552d4ebb8ed1aea/data"
 ONSPD_URL = "https://www.arcgis.com/sharing/rest/content/items/a644dd04d18f4592b7d36705f93270d8/data"
 
 

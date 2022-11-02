@@ -44,3 +44,4 @@ flask import boundaries "/data/boundaries/stp_202104_EN_BGC.geojson"
 flask import boundaries "/data/boundaries/wards_201112_EW_BGC.geojson"
 flask import boundaries "/data/boundaries/wards_201612_UK_BGC.geojson" --code-field=WD16CD
 flask import boundaries "/data/boundaries/wards_202205_UK_BGC_V2.geojson" --code-field=WD22CD
+flask import boundaries "/data/boundaries/wards_202205_UK_BGC_V3.geojson" --code-field=WD22CD

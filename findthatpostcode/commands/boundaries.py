@@ -2,8 +2,8 @@
 Import commands for the register of geographic codes and code history database
 """
 import glob
-import os.path
 import json
+import os.path
 
 import click
 import requests

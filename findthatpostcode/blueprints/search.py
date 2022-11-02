@@ -50,7 +50,7 @@ def search_index():
             url_for("postcodes.get_postcode", postcode=q, filetype="html"), code=303
         )
 
-    pagination = Pagination(request)
+    pagination = Pagination(request, size=25)
     areas = search_areas(
         q,
         get_db(),

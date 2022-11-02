@@ -257,7 +257,15 @@ def search_areas(q, es, pagination=None, es_config=None):
                         "weight": 3,
                         "filter": {
                             "terms": {
-                                "type": ["ctry", "region", "cty", "laua", "rgn", "LOC"]
+                                "type": [
+                                    "ctry",
+                                    "region",
+                                    "cty",
+                                    "laua",
+                                    "rgn",
+                                    "LOC",
+                                    "ward",
+                                ]
                             }
                         },
                     },
@@ -315,9 +323,24 @@ def search_areas(q, es, pagination=None, es_config=None):
     return_result = []
     for a in result.get("hits", {}).get("hits", []):
         if a["_index"] == "geo_placename":
-            return_result.append(places.Place(a["_id"], a["_source"]))
+            relationships = {}
+            if a["_source"].get("areas", {}).get("laua"):
+                relationships["areas"] = [
+                    Area.get_from_es(
+                        a["_source"]["areas"]["laua"],
+                        es,
+                        examples_count=0,
+                        recursive=False,
+                    )
+                ]
+            return_result.append(places.Place(a["_id"], a["_source"], **relationships))
         else:
-            return_result.append(Area(a["_id"], a["_source"]))
+            relationships = {}
+            if a["_source"].get("parent"):
+                relationships["parent"] = Area.get_from_es(
+                    a["_source"]["parent"], es, examples_count=0, recursive=False
+                )
+            return_result.append(Area(a["_id"], a["_source"], **relationships))
     total = result.get("hits", {}).get("total", 0)
     if isinstance(total, dict):
         total = total.get("value", 0)

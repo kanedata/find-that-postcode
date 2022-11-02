@@ -1,33 +1,59 @@
-{% from '_utils.html.j2' import input, display_area %}
+{% from '_utils.html.j2' import input, display_area, area_link %}
 {% from '_pagination.html.j2' import pagination %}
 
 {% set title = "Search" %}
 {% extends "base.html.j2" %}
 {% block content %}
-<section class="flex flex-wrap w-60-l w-100 center">
-  <div class="w-100 ph0 ph3-l pv3">
+<section class="flex flex-wrap w-60-l w-100">
+  <div class="w-100 ph0 pv3">
     {% include "_search.html.j2" %}
   </div>
 
 {% if q %}
-  <div class="columns">
+  <div class="w-100 ph0 pv3">
   {% if result %}
-    {% if result|length >= total %}
-    <h2 class="header-font mb0 mt4 pa0 f4">Showing all {{ "{:,.0f}".format(total) }} results for "{{ q }}"</h2>
-    {% else %}
-    <h2 class="header-font mb0 mt4 pa0 f4">Showing {{ "{:,.0f}".format(nav.start_item) }} to {{ "{:,.0f}".format(nav.end_item) }} of {{ "{:,.0f}".format(total) }} results for "{{ q }}"</h2>
-    {% endif %}
-    <ul class="">
+    <article class="message is-success pa2 bg-washed-green mb4 w-100">
+      <div class="message-body">
+        {% if result|length >= total %}
+        Showing all {{ "{:,.0f}".format(total) }} results for "{{ q }}"
+        {% else %}
+        Showing {{ "{:,.0f}".format(nav.start_item) }} to {{ "{:,.0f}".format(nav.end_item) }} of {{ "{:,.0f}".format(total) }}
+        results for "{{ q }}"
+        {% endif %}
+      </div>
+    </article>
+    <ul class="list pa0 ma0">
       {% for i, score in result %}
-        <li class="pa0 mv3">
-          {{ display_area(i, hide_areatype=true, div_class="di") }}
-          <span class="gray">
-          {% if i.relationships.areatype %} - 
+        <li class="pa0 mb4 content measure-wide">
+          <h3 class="title pa0 mb1 mt0 mh0">
+            <a href="{{ area_link(i) }}" class="dark-blue link underline-hover tracked-tight lh-copy normal">
+              {{- i.attributes.name -}}
+            </a>
+            {% if i.attributes.active==false %}
+            <span class="red tracked-tight lh-copy normal ml2">(Inactive)</span>
+            {% endif %}
+          </h3>
+          <h4 class="subtitle mt0 mb2 pa0 f4 mid-gray normal">
+          {% if i.relationships.areatype %}
             {% if i.attributes.active==false %}
             <span class="red b">Inactive</span>
             {% endif %}
             {{ i.relationships.areatype.get_name(i.id) }}
-          {% elif i.__class__.__name__=='Place' %} - {{i.attributes.type|default('Place', true) }}{% endif %}
+          {% elif i.__class__.__name__=='Place' %}{{i.attributes.type|default('Place', true) }}{% endif %}
+          {% if i.relationships.parent %}
+            in <a href="{{ url_for('areas.get_area', areacode=i.relationships.parent.id, filetype='html') }}" class="blue link underline-hover dim">
+              {{- i.relationships.parent.attributes.name -}}
+            </a>
+          {% elif i.relationships.areas %}
+            {% for j in i.relationships.areas %}
+            in <a href="{{ url_for('areas.get_area', areacode=j.id, filetype='html') }}" class="blue link underline-hover dim">
+              {{- j.attributes.name -}}
+            </a>
+            {% endfor %}
+          {% endif %}
+          </h4>
+          <span class='pa1 bg-light-gray mr1'>
+            <a href="{{ area_link(i) }}" class='near-black code link underline-hover'>{{ i.id }}</a>
           </span>
         </li>
       {% endfor %}
@@ -36,7 +62,11 @@
     {{ pagination(nav) }}
     </div>
     {% else %}
-    <h2 class="header-font mb0 mt4 pa0 f4">No results found</h2>
+    <article class="message is-error pa2 bg-washed-red mb4 w-100">
+      <div class="message-body">
+        No results found
+      </div>
+    </article>
     {% endif %}
   </div>
 {% endif %}

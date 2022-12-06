@@ -1,0 +1,205 @@
+{% from '_utils.html.j2' import info_block %}
+{% set title = 'Reduce GeoJSON file size' %}
+{% extends "base.html.j2" %}
+
+{% block content %}
+<div id="reduce-files">
+  <div class="w-100 w-40-l fl">
+    <div class="w-100 mb4 entry-content cf measure">
+      <p class="">This tool can reduce the file size of your GeoJSON files.</p>
+      <p class="">It works by rounding the latitude and longitude values in your file.
+        Values are often given to 10-20 decimal places, but accuracy of 5 decimal places is sufficient for most use cases.</p>
+      <p class="">Choose a file from your computer and then click "Reduce file size" to save the results.</p>
+      <p class="">
+        The tool only accept valid <a href="https://geojson.org/" target="_blank">GeoJSON</a>
+        files with a type of <code>FeatureCollection</code>.
+      </p>
+      <div class="content  pa3 bg-light-gray f5" id="privacy">
+        <h3 class="pa0 ma0 header-font">Privacy</h3>
+        <p class="">Your file will not leave your own computer and no data from it is sent to Find that Postcode.</p>
+      </div>
+    </div>
+    <div class="mb3" v-if="file">
+      <h3>Input file</h3>
+      <ul>
+      <li class="mb2"><strong>File name:</strong> <code><% file.name %></code></li>
+      <li v-if="file.geojson" class="mb2"><strong>Features in file:</strong> <% file.geojson.features.length %> features</li>
+      <li v-if="file.errors.length">
+        <strong>Errors:</strong>
+        <ul>
+          <li v-for="e in file.errors" class="red"><% e %></li>
+        </ul>
+      </li>
+      <li v-if="file.geojson" class="mb2"><strong>Maximum precision:</strong> <% precision %> decimal places.</li>
+      <li class="mb2"><strong>Original file size:</strong> <% file.size %> bytes</li>
+      <li v-if="file.geojson" class="mb2"><strong>Estimated reduction:</strong> <% estimatedReduction %>%</li>
+      </ul>
+    </div>
+    <template v-if="file && file.geojson">
+      <div class="mb3" v-if="file">
+        <label for="filename" class="b">File name</label><br>
+        <input type="text" v-model="filename" class="f6 f5-l input-reset ba b--black-20 near-black bg-white pa1 lh-solid w-100 pa2"/>
+      </div>
+      <button v-if="file" v-on:click.prevent="downloadReducedFile" class="button-reset bn pv3 ph4 b tc bg-animate bg-yellow dim near-black pointer br2-ns">
+        Reduce file size
+      </button>
+      <label for="file-to-reduce" class="button-reset bn pv2 ph3 b tc bg-animate bg-yellow dim near-black pointer br2-ns">
+        Choose another file
+        <input type="file" id="file-to-reduce" v-on:change="chooseFile" class="dn" accept=".geojson,.json,application/geo+json,application/json">
+      </label>
+    </template>
+    <template v-else>
+      <label for="file-to-reduce" class="button-reset bn pv2 ph3 b tc bg-animate bg-yellow dim near-black pointer br2-ns">
+        Choose file
+        <input type="file" id="file-to-reduce" v-on:change="chooseFile" class="dn" accept=".geojson,.json,application/geo+json,application/json">
+      </label>
+    </template>
+  </div>
+  <div class="w-100 w-60-l pl3 fl">
+    <l-map
+        v-if="result.features.length"
+        style="height: 500px; width: 100%"
+        :bounds="bounds"
+      >
+      <l-geo-json :geojson="result"></l-geo-json>
+      <l-tile-layer
+        url="https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg"
+        :attribution="attribution"
+      />
+    </l-map>
+  </div>
+</div>
+{% endblock %}
+
+{% block headscripts %}
+<link rel="stylesheet" href="//unpkg.com/leaflet/dist/leaflet.css" />
+{% endblock %}
+
+{% block bodyscripts %}
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script src="//unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="//unpkg.com/vue2-leaflet"></script>
+<script>
+// recursively round all coordinates in a javascript array
+function roundCoords(coords, precision) {
+  if (Array.isArray(coords)) {
+    return coords.map(function(c) {
+      return roundCoords(c, precision);
+    });
+  } else {
+    return parseFloat(coords.toFixed(precision));
+  }
+}
+
+Vue.component('l-map', window.Vue2Leaflet.LMap);
+Vue.component('l-tile-layer', window.Vue2Leaflet.LTileLayer);
+Vue.component('l-geo-json', window.Vue2Leaflet.LGeoJson);
+var app = new Vue({
+  delimiters: ["<%", "%>"],
+  el: '#reduce-files',
+  data: {
+    file: null,
+    result: {
+      type: "FeatureCollection",
+      features: [],
+    },
+    precision: 0,
+    max_precision: 5,
+    filename: 'mergedfile',
+    enableTooltip: true,
+    bounds: [[-90,-180],   [90,180]],
+    attribution:
+      'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
+  },
+  watch: {
+    'file': function(){
+      if((!this.file) || (!this.file.geojson)){
+        return
+      }
+      // go through GeoJSON features and get the precision of each coordinate
+      var precision = 0;
+      this.file.geojson.features.forEach((f)=>{
+        f.geometry.coordinates.forEach((c)=>{
+          if(c.length == 2){
+            var p = c[0].toString().split(".")[1];
+            if(p){
+              precision = Math.max(precision, p.length);
+            }
+            p = c[1].toString().split(".")[1];
+            if(p){
+              precision = Math.max(precision, p.length);
+            }
+          } else {
+            c.forEach((c2)=>{
+              var p = c2[0].toString().split(".")[1];
+              if(p){
+                precision = Math.max(precision, p.length);
+              }
+              p = c2[1].toString().split(".")[1];
+              if(p){
+                precision = Math.max(precision, p.length);
+              }
+            })
+          }
+        })
+      });
+      this.precision = precision;
+
+      // create a new GeoJSON object with the reduced precision
+      var result = Object.assign({}, this.file.geojson);
+      result.features = result.features.map((f)=>{
+        new_f = Object.assign({}, f);
+        new_f.geometry.coordinates = new_f.geometry.coordinates.map((c)=>{
+          return roundCoords(c, this.max_precision);
+        });
+        return new_f;
+      });
+
+      this.bounds = L.geoJSON(result).getBounds();
+      this.result = result;
+    }
+  },
+  // computed variable with the length of the new file
+  computed: {
+    newFileSize: function(){
+      return JSON.stringify(this.result).length;
+    },
+    oldFileSize: function(){
+      return JSON.stringify(this.file.geojson).length;
+    },
+    estimatedReduction: function(){
+      return Math.round(this.newFileSize / this.file.size * 100);
+    },
+  },
+  methods: {
+    chooseFile(ev){
+      const fileList = Array.from(ev.target.files).map((f)=>f.text());
+      Promise.all(fileList).then((results)=>{
+        results.forEach((f, i)=>{
+          var file = ev.target.files[i];
+          file.errors = [];
+          try {
+            file.geojson = JSON.parse(f);
+            if(file.geojson.type != "FeatureCollection"){
+              file.errors.push("No FeatureCollection found");
+            }
+          } catch(e){
+            file.errors.push("Could not parse JSON")
+          }
+          this.filename = file.name;
+          this.file = file;
+        });
+      })
+    },
+    downloadReducedFile(){
+      const blob = new Blob([JSON.stringify(this.result)], { type: 'application/geo+json' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = this.filename;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    },
+  }
+});
+</script>
+{% endblock %}

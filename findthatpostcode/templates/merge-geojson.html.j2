@@ -18,9 +18,9 @@
         <p class="">Your file will not leave your own computer and no data from it is sent to Find that Postcode.</p>
       </div>
     </div>
-    <table v-if="files.length" class="mt4 mb2">
+    <table v-if="files.length" class="mt4 mb2 w-100 table">
       <tr v-for="f, i in files">
-        <th class="pr3 pv2"><% f.name %></th>
+        <th class="pr3 pv2 mw4" style="overflow-wrap: break-word;"><% f.name %></th>
         <td class="pr3 pv2">
           <template v-if="f.geojson"><% f.geojson.features.length %> features</template>
           <template v-if="f.errors.length">
@@ -44,7 +44,7 @@
     <template v-if="files.length > 1">
       <div class="mb3">
         <label for="filename" class="b">File name</label><br>
-        <input type="text" v-model="filename" class="f6 f5-l input-reset ba b--black-20 near-black bg-white pa1 lh-solid"/>
+        <input type="text" v-model="filename" class="f6 f5-l input-reset ba b--black-20 near-black bg-white pa1 lh-solid w-100 pa2"/>
       </div>
       <button v-on:click.prevent="downloadMergedFile" class="button-reset bn pv3 ph4 b tc bg-animate bg-yellow dim near-black pointer br2-ns">
         Download merged file
@@ -97,8 +97,12 @@ var app = new Vue({
   },
   watch: {
     'files': function(){
+      console.log(this.files);
       if(this.files.length < 1){
-        this.result = {};
+        this.result = {
+          type: "FeatureCollection",
+          features: [],
+        };
         return
       }
       var result = Object.assign({}, this.files[0].geojson);

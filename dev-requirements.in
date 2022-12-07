@@ -1,7 +1,0 @@
--r requirements.txt
-black
-isort
-ElasticMock
-pytest
-requests-mock
-blinker

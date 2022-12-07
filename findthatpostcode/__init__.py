@@ -4,9 +4,9 @@ import os
 from flask import Flask, render_template
 from flask_cors import CORS
 
-from . import blueprints, commands, db
-from .controllers.areatypes import area_types_count
-from .metadata import AREA_TYPES, KEY_AREA_TYPES, OTHER_CODES
+from findthatpostcode import blueprints, commands, db
+from findthatpostcode.controllers.areatypes import area_types_count
+from findthatpostcode.metadata import AREA_TYPES, KEY_AREA_TYPES, OTHER_CODES
 
 
 def get_es_url(default):

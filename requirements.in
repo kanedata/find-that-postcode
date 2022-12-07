@@ -8,3 +8,9 @@ tqdm
 shapely
 python-dotenv
 dictlib
+black
+isort
+ElasticMock
+pytest
+requests-mock
+blinker

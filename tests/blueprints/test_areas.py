@@ -61,7 +61,7 @@ def test_area_geojson(client):
 
 def test_area_search(client):
     rv = client.get("/areas/search")
-    assert rv.headers["Location"] == "http://localhost/search/"
+    assert rv.headers["Location"] == "/search/"
     assert rv.status_code == 301
 
 

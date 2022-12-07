@@ -1,7 +1,10 @@
+import datetime
+
 import click
 from elasticsearch import Elasticsearch
 from flask import current_app, g
 from flask.cli import with_appcontext
+from sqlite_utils import Database
 
 INDEXES = {
     "geo_postcode": {
@@ -46,8 +49,30 @@ def init_db(reset=False):
         )
 
 
+def get_log_db():
+    if "log_db" not in g:
+        if current_app.config.get("LOGGING_DB"):
+            now = datetime.datetime.now()
+            g.log_db = Database(
+                current_app.config.get("LOGGING_DB").format(
+                    year=datetime.datetime.now().year,
+                    month=datetime.datetime.now().month,
+                    day=datetime.datetime.now().day,
+                )
+            )
+        else:
+            g.log_db = Database(memory=True)
+
+    return g.log_db
+
+
+def close_log_db(e=None):
+    g.pop("log_db", None)
+
+
 def init_app(app):
     app.teardown_appcontext(close_db)
+    app.teardown_appcontext(close_log_db)
     app.cli.add_command(init_db_command)
 
 

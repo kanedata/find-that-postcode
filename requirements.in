@@ -14,3 +14,5 @@ ElasticMock
 pytest
 requests-mock
 blinker
+sqlite-utils
+ua-parser

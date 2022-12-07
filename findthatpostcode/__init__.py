@@ -1,8 +1,9 @@
 import datetime
 import os
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_cors import CORS
+from ua_parser import user_agent_parser
 
 from findthatpostcode import blueprints, commands, db
 from findthatpostcode.controllers.areatypes import area_types_count
@@ -25,6 +26,7 @@ def create_app(test_config=None):
         SECRET_KEY="dev",
         ES_URL=get_es_url("http://localhost:9200"),
         ES_INDEX=os.environ.get("ES_INDEX", "postcodes"),
+        LOGGING_DB=os.environ.get("LOGGING_DB"),
     )
 
     if test_config is None:
@@ -65,5 +67,32 @@ def create_app(test_config=None):
         return render_template("about.html.j2")
 
     blueprints.init_app(app)
+
+    @app.after_request
+    def request_log(response):
+        ua = user_agent_parser.Parse(request.user_agent.string)
+        db.get_log_db()["logs"].insert(
+            {
+                "app": "findthatpostcode",
+                "timestamp": datetime.datetime.now().isoformat(),
+                "url": request.url,
+                "path": request.path,
+                "method": request.method,
+                "params": request.args.to_dict(),
+                "origin": request.origin,
+                "referrer": request.referrer,
+                # "remote_addr": request.remote_addr,  # we don't collect IP address
+                "endpoint": request.endpoint,
+                "view_args": request.view_args,
+                "user_agent_string": ua.get("string") if ua else None,
+                "user_agent": {k: v for k, v in ua.items() if k != "string"}
+                if ua
+                else None,
+                "status_code": response.status_code,
+                "response_size": response.content_length,
+                "content_type": response.mimetype,
+            },
+        )
+        return response
 
     return app

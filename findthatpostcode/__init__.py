@@ -1,7 +1,7 @@
 import datetime
 import os
 
-from flask import Flask, render_template, request
+from flask import Flask, make_response, render_template, render_template_string, request
 from flask_cors import CORS
 from ua_parser import user_agent_parser
 
@@ -61,6 +61,13 @@ def create_app(test_config=None):
     def index():
         ats = area_types_count(db.get_db())
         return render_template("index.html.j2", result=ats)
+
+    @app.route("/robots.txt")
+    def robots():
+        text = render_template("robots.txt")
+        response = make_response(text)
+        response.headers["Content-Type"] = "text/plain"
+        return response
 
     @app.route("/about")
     def about():

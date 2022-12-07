@@ -17,6 +17,7 @@ jobs:
         python-version-file: '.python-version'
     - name: Install dependencies
       run: |
+        sudo apt install -y libgeos-dev
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: isort

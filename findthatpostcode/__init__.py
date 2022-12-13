@@ -27,6 +27,7 @@ def create_app(test_config=None):
         ES_URL=get_es_url("http://localhost:9200"),
         ES_INDEX=os.environ.get("ES_INDEX", "postcodes"),
         LOGGING_DB=os.environ.get("LOGGING_DB"),
+        SERVER_NAME=os.environ.get("SERVER_NAME"),
     )
 
     if test_config is None:

@@ -78,6 +78,8 @@ def create_app(test_config=None):
     @app.after_request
     def request_log(response):
         ua = user_agent_parser.Parse(request.user_agent.string)
+        if request.endpoint == "static":
+            return response
         db.get_log_db()["logs"].insert(
             {
                 "app": "findthatpostcode",

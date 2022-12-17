@@ -1,6 +1,6 @@
 {% from '_utils.html.j2' import info_block, display_area, area_loop %}
 
-{% set title = "{} - <code>{}</code>".format(result.attributes.name, result.id) %}
+{% set title = "{} - <code>{}</code>".format(result.attributes.name|expand_commas, result.id) %}
 {% if result.attributes.active %}
 {% set subtitle = result.relationships.areatype.get_name(result.id) %}
 {% else %}

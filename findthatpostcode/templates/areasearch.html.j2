@@ -27,7 +27,7 @@
         <li class="pa0 mb4 content measure-wide">
           <h3 class="title pa0 mb1 mt0 mh0">
             <a href="{{ area_link(i) }}" class="dark-blue link underline-hover tracked-tight lh-copy normal">
-              {{- i.attributes.name -}}
+              {{- i.attributes.name|expand_commas -}}
             </a>
             {% if i.attributes.active==false %}
             <span class="red tracked-tight lh-copy normal ml2">(Inactive)</span>

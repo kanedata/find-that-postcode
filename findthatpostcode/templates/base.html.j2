@@ -10,6 +10,11 @@
     {% block headscripts %}
     {% endblock %}
     <title>{{ (title or default_title)|striptags }}</title>
+    <style>
+      body {
+        overflow-wrap: break-word;
+      }
+    </style>
   </head>
   <body class="home w-100 sans-serif near-black base-font bg-wavy">
     <header class="body header-font normal ph3 ph5-ns pt3 {% if frontpage %}pt5-ns pb5{% else %}pb4{% endif %} moon-gray">
@@ -29,7 +34,7 @@
       {% block header %}
       <header class="fl w-100 ph3 ph5-ns entry-content lh-copy f4">
         {% if (heading or title) not in [None, default_title] and (heading or title) %}
-        <h2 class="f2-ns mt4 mb0 f3 lh-solid normal">
+        <h2 class="f2-ns mt4 mb0 f3 lh-title normal">
           {{ (heading or title)|safe }}
         </h2>
         {% if subtitle %}

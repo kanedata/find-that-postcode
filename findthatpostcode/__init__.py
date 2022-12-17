@@ -1,5 +1,6 @@
 import datetime
 import os
+import re
 
 from flask import Flask, make_response, render_template, render_template_string, request
 from flask_cors import CORS
@@ -56,6 +57,10 @@ def create_app(test_config=None):
             other_codes=OTHER_CODES,
             area_types=AREA_TYPES,
         )
+
+    @app.template_filter()
+    def expand_commas(s):
+        return re.sub(r"\b,\b", ", ", s)
 
     # routes and blueprints
     @app.route("/")

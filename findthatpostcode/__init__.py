@@ -108,6 +108,7 @@ def create_app(test_config=None):
                 "content_type": response.mimetype,
             },
         )
+        db.close_log_db()
         return response
 
     return app

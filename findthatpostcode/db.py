@@ -67,7 +67,9 @@ def get_log_db():
 
 
 def close_log_db(e=None):
-    g.pop("log_db", None)
+    if "log_db" in g:
+        g.log_db.close()
+        g.pop("log_db", None)
 
 
 def init_app(app):

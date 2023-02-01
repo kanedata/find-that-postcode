@@ -98,7 +98,7 @@
       </ul>
     {% endcall %}
 
-    {% if result.relationships.areatype.id == "msoa11" %}
+    {% if result.relationships.areatype.id in ["msoa11", "msoa21"] %}
       <p class="mt4">
         The name of this area is from the <a class="link blue underline-hover" href="https://visual.parliament.uk/msoanames">MSOA Names</a> dataset created by the House of Commons Library (used under the <a class="link blue underline-hover" href="https://www.parliament.uk/site-information/copyright/open-parliament-licence/">Open Parliament Licence</a>).
       </p>

@@ -13,8 +13,8 @@ with open(
     ENTITIES = {e: k for k, v in AREA_TYPES.items() for e in v["entities"]}
 
 KEY_AREA_TYPES = [
-    ("Key", ["ctry", "rgn", "cty", "laua", "ward", "msoa11", "pcon"]),
-    ("Secondary", ["ttwa", "pfa", "lep", "lsoa11", "oa11", "npark"]),
+    ("Key", ["ctry", "rgn", "cty", "laua", "ward", "msoa21", "pcon"]),
+    ("Secondary", ["ttwa", "pfa", "lep", "lsoa21", "oa21", "npark"]),
     ("Health", ["ccg", "nhser", "hb", "lhb"]),
     ("Other", ["eer", "bua11", "buasd11", "wz11", "teclec"]),
 ]

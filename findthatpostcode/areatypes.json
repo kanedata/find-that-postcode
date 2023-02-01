@@ -602,6 +602,18 @@
         "full_name": "2011 Census Lower Layer Super Output Area (LSOA)/ Data Zone (DZ)/ SOA",
         "description": "The 2011 Census LSOA code for England and Wales, SOA code for Northern Ireland and DZ code for Scotland. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code. N.B. NI SOAs remain unchanged from 2001."
     },
+    "lsoa21": {
+        "entities": [
+            "E01",
+            "S01",
+            "W01"
+        ],
+        "status": "Current",
+        "theme": "Statistical Building Block",
+        "name": "Lower Super Output Area",
+        "full_name": "2021 Census Lower Layer Super Output Area (LSOA)/ Data Zone (DZ)/ SOA",
+        "description": "The 2021 Census LSOA code for England and Wales, SOA code for Northern Ireland and DZ code for Scotland. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code. N.B. NI SOAs remain unchanged from 2001."
+    },
     "mcty": {
         "entities": [
             "E11"
@@ -623,6 +635,18 @@
         "name": "Middle Super Output Area",
         "full_name": "Middle Layer Super Output Area (MSOA)/Intermediate Zone (IZ)",
         "description": "The 2011 Census MSOA code for England and Wales and IZ code for Scotland. Pseudo codes are included for Northern Ireland, Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."
+    },
+    "msoa21": {
+        "entities": [
+            "E02",
+            "S02",
+            "W02"
+        ],
+        "status": "Current",
+        "theme": "Statistical Building Block",
+        "name": "Middle Super Output Area",
+        "full_name": "Middle Layer Super Output Area (MSOA)/Intermediate Zone (IZ)",
+        "description": "The 2021 Census MSOA code for England and Wales and IZ code for Scotland. Pseudo codes are included for Northern Ireland, Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."
     },
     "naer": {
         "entities": [
@@ -788,6 +812,19 @@
         "name": "Output area",
         "full_name": "2011 Census Output Area (OA)/ Small Area (SA)",
         "description": "The 2011 Census OAs in GB and SAs in Northern Ireland were based on 2001 Census OAs, and they form the building bricks for defining higher level geographies. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no grid reference."
+    },
+    "oa21": {
+        "entities": [
+            "E00",
+            "N00",
+            "S00",
+            "W00"
+        ],
+        "status": "Current",
+        "theme": "Statistical Building Block",
+        "name": "Output area",
+        "full_name": "2021 Census Output Area (OA)/ Small Area (SA)",
+        "description": "The 2021 Census OAs in GB and SAs in Northern Ireland were based on 2001 Census OAs, and they form the building bricks for defining higher level geographies. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no grid reference."
     },
     "par": {
         "entities": [

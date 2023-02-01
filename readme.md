@@ -201,6 +201,7 @@ curl "http://localhost:9200/geo_postcode/_doc/SW1A+1AA?pretty"
     "osnrth1m": 179645,
     "buasd11": "E35000546",
     "lsoa11": "E01004736",
+    "lsoa21": "E01004736",
     "pcon": "E14000639",
     "pct": "E16000057",
     "nuts": "E05000644",
@@ -230,11 +231,13 @@ curl "http://localhost:9200/geo_postcode/_doc/SW1A+1AA?pretty"
     "teclec": "E24000014",
     "dointr": "1980-01-01T00:00:00",
     "oa11": "E00023938",
+    "oa21": "E00023938",
     "long": -0.141588,
     "pfa": "E23000001",
     "ru11ind": "A1",
     "hro": "E19000003",
     "msoa11": "E02000977",
+    "msoa21": "E02000977",
     "lep2": null,
     "doterm": null
   }

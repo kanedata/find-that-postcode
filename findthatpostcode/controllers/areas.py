@@ -292,8 +292,11 @@ def search_areas(q, es, pagination=None, es_config=None):
                                 "type": [
                                     "msoa11",
                                     "lsoa11",
+                                    "msoa21",
+                                    "lsoa21",
                                     "wz11",
                                     "oa11",
+                                    "oa21",
                                     "nuts",
                                     "ward",
                                 ]

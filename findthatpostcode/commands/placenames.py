@@ -16,7 +16,7 @@ from .. import db
 
 PLACENAMES_INDEX = "geo_placename"
 
-PLACENAMES_URL = "https://www.arcgis.com/sharing/rest/content/items/e8e725daf8944af6a336a9d183114697/data"
+PLACENAMES_URL = "https://www.arcgis.com/sharing/rest/content/items/8f8b561f256b40c3a6df71e400bb54f0/data"
 
 PLACE_TYPES = {
     "BUA": ["Built-up Area", "England and Wales"],

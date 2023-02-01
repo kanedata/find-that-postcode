@@ -50,6 +50,9 @@ class MockBoto3:
     def upload_fileobj(self, *args, **kwargs):
         pass
 
+    def close(self, *args, **kwargs):
+        pass
+
 
 class MockElasticsearch:
     def __init__(self, *args, **kwargs):

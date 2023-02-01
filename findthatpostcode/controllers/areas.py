@@ -2,8 +2,6 @@ import io
 import json
 from datetime import datetime
 
-import shapely.geometry
-import shapely.wkt
 from botocore.exceptions import ClientError
 from elasticsearch.helpers import scan
 from flask import current_app

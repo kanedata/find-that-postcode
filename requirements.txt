@@ -106,8 +106,6 @@ requests-mock==1.10.0
     # via -r requirements.in
 s3transfer==0.6.0
     # via boto3
-shapely==1.7.1
-    # via -r requirements.in
 six==1.16.0
     # via
     #   flask-cors

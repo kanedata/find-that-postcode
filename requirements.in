@@ -5,7 +5,6 @@ gunicorn
 requests
 requests-cache
 tqdm
-shapely
 python-dotenv
 dictlib
 black

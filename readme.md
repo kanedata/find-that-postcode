@@ -337,7 +337,8 @@ On Dokku server run:
 # setup and run import
 dokku config:set find-that-postcode FLASK_APP=findthatpostcode
 dokku run find-that-postcode flask init-db
-dokku run find-that-postcode flask import nspl
+dokku run find-that-postcode flask import nspl --year=2011
+dokku run find-that-postcode flask import nspl --year=2021
 dokku run find-that-postcode flask import rgc
 dokku run find-that-postcode flask import chd
 dokku run find-that-postcode flask import msoanames

@@ -298,9 +298,12 @@ dokku apps:create find-that-postcode
 # add permanent data storage
 dokku storage:mount find-that-postcode /var/lib/dokku/data/storage/find-that-postcode:/data
 
+# add the dokku-apt plugin (for installing libgeos)
+sudo dokku plugin:install https://github.com/dokku-community/dokku-apt apt
+
 # enable domain
 dokku domains:enable find-that-postcode
-dokku domains:add find-that-postcode postcodes.findthatcharity.uk
+dokku domains:add find-that-postcode findthatpostcode.uk
 
 # elasticsearch
 sudo dokku plugin:install https://github.com/dokku/dokku-elasticsearch.git elasticsearch
@@ -320,7 +323,7 @@ On local machine:
 
 ```bash
 git remote add dokku dokku@SERVER_HOST:find-that-postcode
-git push dokku master
+git push dokku main
 ```
 
 ### 3. Setup and run import

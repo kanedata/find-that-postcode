@@ -79,7 +79,7 @@
             "predecessor": [],
             "successor": [],
             "equivalents": {},
-            "type": "lsoa11",
+            "type": "lsoa21",
             "stats": {
                 "imd2015": {
                     "imd_education_adults_score": 0.385,

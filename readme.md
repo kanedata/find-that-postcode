@@ -35,6 +35,13 @@ a file called `.env` in the project directory, and add the following contents:
 ```bash
 FLASK_APP=findthatpostcode
 FLASK_ENV=development
+
+# S3 credentials for boundaries
+S3_REGION=XXXXXXXX
+S3_ENDPOINT=XXXXXXXX
+S3_ACCESS_ID=XXXXXXXX
+S3_SECRET_KEY=XXXXXXXX
+S3_BUCKET=XXXXXXXX
 ```
 
 ### 4. Create elasticsearch indexes
@@ -72,6 +79,8 @@ The URL of the files used can be customised with the `--url` parameter. Unfortun
 ONS geoportal doesn't provide a persistent URL to the latest data.
 
 ### 6. Import boundaries (optional)
+
+Boundaries are uploaded as individual area files to S3 storage. 
 
 Boundary files can be found on the [ONS Geoportal](http://geoportal.statistics.gov.uk/datasets?q=Latest_Boundaries&sort_by=name&sort_order=asc).
 Generally the "Generalised Clipped" versions should be used to minimise the file
@@ -201,6 +210,7 @@ curl "http://localhost:9200/geo_postcode/_doc/SW1A+1AA?pretty"
     "osnrth1m": 179645,
     "buasd11": "E35000546",
     "lsoa11": "E01004736",
+    "lsoa21": "E01004736",
     "pcon": "E14000639",
     "pct": "E16000057",
     "nuts": "E05000644",
@@ -230,11 +240,13 @@ curl "http://localhost:9200/geo_postcode/_doc/SW1A+1AA?pretty"
     "teclec": "E24000014",
     "dointr": "1980-01-01T00:00:00",
     "oa11": "E00023938",
+    "oa21": "E00023938",
     "long": -0.141588,
     "pfa": "E23000001",
     "ru11ind": "A1",
     "hro": "E19000003",
     "msoa11": "E02000977",
+    "msoa21": "E02000977",
     "lep2": null,
     "doterm": null
   }
@@ -298,9 +310,12 @@ dokku apps:create find-that-postcode
 # add permanent data storage
 dokku storage:mount find-that-postcode /var/lib/dokku/data/storage/find-that-postcode:/data
 
+# add the dokku-apt plugin (for installing libgeos)
+sudo dokku plugin:install https://github.com/dokku-community/dokku-apt apt
+
 # enable domain
 dokku domains:enable find-that-postcode
-dokku domains:add find-that-postcode postcodes.findthatcharity.uk
+dokku domains:add find-that-postcode findthatpostcode.uk
 
 # elasticsearch
 sudo dokku plugin:install https://github.com/dokku/dokku-elasticsearch.git elasticsearch
@@ -320,7 +335,7 @@ On local machine:
 
 ```bash
 git remote add dokku dokku@SERVER_HOST:find-that-postcode
-git push dokku master
+git push dokku main
 ```
 
 ### 3. Setup and run import
@@ -330,8 +345,14 @@ On Dokku server run:
 ```bash
 # setup and run import
 dokku config:set find-that-postcode FLASK_APP=findthatpostcode
+dokku config:set find-that-postcode S3_REGION=XXXXXXXX
+dokku config:set find-that-postcode S3_ENDPOINT=XXXXXXXX
+dokku config:set find-that-postcode S3_ACCESS_ID=XXXXXXXX
+dokku config:set find-that-postcode S3_SECRET_KEY=XXXXXXXX
+dokku config:set find-that-postcode S3_BUCKET=XXXXXXXX
 dokku run find-that-postcode flask init-db
-dokku run find-that-postcode flask import nspl
+dokku run find-that-postcode flask import nspl --year=2011
+dokku run find-that-postcode flask import nspl --year=2021
 dokku run find-that-postcode flask import rgc
 dokku run find-that-postcode flask import chd
 dokku run find-that-postcode flask import msoanames

@@ -1,4 +1,5 @@
 import copy
+import io
 import json
 import os
 from contextlib import contextmanager
@@ -16,9 +17,10 @@ for i in os.listdir(mock_data_dir):
 
 
 @contextmanager
-def db_set(app, db):
+def db_set(app, db, s3_client):
     def handler(sender, **kwargs):
         g.db = db
+        g.s3_client = s3_client
 
     with appcontext_pushed.connected_to(handler, app):
         yield
@@ -29,12 +31,27 @@ def client():
     app = findthatpostcode.create_app()
     app.config["TESTING"] = True
     db = MockElasticsearch()
+    s3_client = MockBoto3()
 
-    with db_set(app, db):
+    with db_set(app, db, s3_client):
         with app.test_client() as client:
             # with app.app_context():
             #     app.init_db()
             yield client
+
+
+class MockBoto3:
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def download_fileobj(self, bucket, filepath, fileobj, **kwargs):
+        fileobj.write(json.dumps(mock_data.get("geo_boundary")).encode("utf-8"))
+
+    def upload_fileobj(self, *args, **kwargs):
+        pass
+
+    def close(self, *args, **kwargs):
+        pass
 
 
 class MockElasticsearch:

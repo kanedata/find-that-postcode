@@ -1,5 +1,6 @@
 import datetime
 import os
+import re
 
 from flask import Flask, make_response, render_template, render_template_string, request
 from flask_cors import CORS
@@ -27,6 +28,12 @@ def create_app(test_config=None):
         ES_URL=get_es_url("http://localhost:9200"),
         ES_INDEX=os.environ.get("ES_INDEX", "postcodes"),
         LOGGING_DB=os.environ.get("LOGGING_DB"),
+        SERVER_NAME=os.environ.get("SERVER_NAME"),
+        S3_REGION=os.environ.get("S3_REGION"),
+        S3_ENDPOINT=os.environ.get("S3_ENDPOINT"),
+        S3_ACCESS_ID=os.environ.get("S3_ACCESS_ID"),
+        S3_SECRET_KEY=os.environ.get("S3_SECRET_KEY"),
+        S3_BUCKET=os.environ.get("S3_BUCKET", "geo-boundaries"),
     )
 
     if test_config is None:
@@ -56,6 +63,12 @@ def create_app(test_config=None):
             area_types=AREA_TYPES,
         )
 
+    @app.template_filter()
+    def expand_commas(s):
+        if not isinstance(s, str):
+            return s
+        return re.sub(r"\b,\b", ", ", s)
+
     # routes and blueprints
     @app.route("/")
     def index():
@@ -78,6 +91,8 @@ def create_app(test_config=None):
     @app.after_request
     def request_log(response):
         ua = user_agent_parser.Parse(request.user_agent.string)
+        if request.endpoint == "static":
+            return response
         db.get_log_db()["logs"].insert(
             {
                 "app": "findthatpostcode",
@@ -100,6 +115,7 @@ def create_app(test_config=None):
                 "content_type": response.mimetype,
             },
         )
+        db.close_log_db()
         return response
 
     return app

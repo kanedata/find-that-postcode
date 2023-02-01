@@ -10,6 +10,11 @@
     {% block headscripts %}
     {% endblock %}
     <title>{{ (title or default_title)|striptags }}</title>
+    <style>
+      body {
+        overflow-wrap: break-word;
+      }
+    </style>
   </head>
   <body class="home w-100 sans-serif near-black base-font bg-wavy">
     <header class="body header-font normal ph3 ph5-ns pt3 {% if frontpage %}pt5-ns pb5{% else %}pb4{% endif %} moon-gray">
@@ -29,7 +34,7 @@
       {% block header %}
       <header class="fl w-100 ph3 ph5-ns entry-content lh-copy f4">
         {% if (heading or title) not in [None, default_title] and (heading or title) %}
-        <h2 class="f2-ns mt4 mb0 f3 lh-solid normal">
+        <h2 class="f2-ns mt4 mb0 f3 lh-title normal">
           {{ (heading or title)|safe }}
         </h2>
         {% if subtitle %}
@@ -61,11 +66,12 @@
             | <a href="/about" class="link yellow underline-hover">About</a>
             | <a href="/about#data-sources" class="link yellow underline-hover">Data sources</a>
             | <a href="/about#privacy" class="link yellow underline-hover">Privacy</a>
+            | <a href="mailto:info@findthatpostcode.uk" class="link yellow underline-hover">Contact</a>
             | <a href="https://findthatcharity.uk/" target="_blank" class="link yellow underline-hover">Find that Charity</a>
         </p>
         <div class="mv2 pa0">
-          <a href="https://github.com/drkane/find-that-postcode" target="_blank" class="link yellow underline-hover"
-            title="View code on Github">Code</a> [<a href="https://github.com/drkane/find-that-postcode/blob/main/LICENSE"
+          <a href="https://github.com/kanedata/find-that-postcode" target="_blank" class="link yellow underline-hover"
+            title="View code on Github">Code</a> [<a href="https://github.com/kanedata/find-that-postcode/blob/main/LICENSE"
             target="_blank" class="link yellow underline-hover">MIT License</a>] |
           <a href="https://m.do.co/c/395b3c814647" target="_blank" class="link yellow underline-hover"
             title="DigitalOcean referral link">Powered by DigitalOcean</a>

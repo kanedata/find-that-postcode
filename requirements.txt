@@ -10,6 +10,12 @@ black==22.10.0
     # via -r requirements.in
 blinker==1.5
     # via -r requirements.in
+boto3==1.26.61
+    # via -r requirements.in
+botocore==1.29.61
+    # via
+    #   boto3
+    #   s3transfer
 certifi==2022.12.7
     # via
     #   elasticsearch
@@ -52,6 +58,10 @@ itsdangerous==2.0.1
     #   requests-cache
 jinja2==3.0.1
     # via flask
+jmespath==1.0.1
+    # via
+    #   boto3
+    #   botocore
 markupsafe==2.1.1
     # via
     #   jinja2
@@ -72,6 +82,7 @@ pytest==7.2.0
     # via -r requirements.in
 python-dateutil==2.8.2
     # via
+    #   botocore
     #   elasticmock
     #   sqlite-utils
 python-dotenv==0.17.1
@@ -85,8 +96,8 @@ requests-cache==0.6.4
     # via -r requirements.in
 requests-mock==1.10.0
     # via -r requirements.in
-shapely==1.7.1
-    # via -r requirements.in
+s3transfer==0.6.0
+    # via boto3
 six==1.16.0
     # via
     #   flask-cors
@@ -107,6 +118,7 @@ url-normalize==1.4.3
     # via requests-cache
 urllib3==1.26.5
     # via
+    #   botocore
     #   elasticsearch
     #   requests
 werkzeug==2.2.2

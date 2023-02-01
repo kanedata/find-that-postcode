@@ -24,33 +24,6 @@
             "predecessor": [],
             "successor": [],
             "equivalents": {},
-            "boundary": {
-                "type": "polygon",
-                "coordinates": [
-                    [
-                        [
-                            100.0,
-                            0.0
-                        ],
-                        [
-                            101.0,
-                            0.0
-                        ],
-                        [
-                            101.0,
-                            1.0
-                        ],
-                        [
-                            100.0,
-                            1.0
-                        ],
-                        [
-                            100.0,
-                            0.0
-                        ]
-                    ]
-                ]
-            },
             "type": null
         }
     },
@@ -79,7 +52,7 @@
             "predecessor": [],
             "successor": [],
             "equivalents": {},
-            "type": "lsoa11",
+            "type": "lsoa21",
             "stats": {
                 "imd2015": {
                     "imd_education_adults_score": 0.385,

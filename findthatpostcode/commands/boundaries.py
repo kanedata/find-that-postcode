@@ -2,15 +2,14 @@
 Import commands for the register of geographic codes and code history database
 """
 import glob
+import io
 import json
 import os.path
 
 import click
 import requests
 import requests_cache
-import shapely.geometry
 import tqdm
-from elasticsearch.helpers import bulk
 from flask import current_app
 from flask.cli import with_appcontext
 
@@ -22,30 +21,46 @@ from .codes import AREA_INDEX
 @click.option("--es-index", default=AREA_INDEX)
 @click.option("--code-field", default=None)
 @click.option("--examine/--no-examine", default=False)
+@click.option("--remove/--no-remove", default=False)
 @click.argument("urls", nargs=-1)
 @with_appcontext
-def import_boundaries(urls, examine=False, code_field=None, es_index=AREA_INDEX):
+def import_boundaries(
+    urls, examine=False, code_field=None, es_index=AREA_INDEX, remove=False
+):
+
+    if remove:
+        # update all instances of area to remove the "boundary" key
+        es = db.get_db()
+        es.update_by_query(
+            index=es_index,
+            body={
+                "script": 'ctx._source.remove("boundary")',
+                "query": {"exists": {"field": "boundary"}},
+            },
+        )
+        return
 
     if current_app.config["DEBUG"]:
         requests_cache.install_cache()
 
-    es = db.get_db()
+    # initialise the boto3 session
+    client = db.get_s3_client()
 
     for url in urls:
         if url.startswith("http"):
-            import_boundary(es, url, examine, es_index, code_field)
+            import_boundary(client, url, examine, code_field)
         else:
             files = glob.glob(url, recursive=True)
             for file in files:
-                import_boundary(es, file, examine, es_index, code_field)
+                import_boundary(client, file, examine, code_field)
 
 
-def import_boundary(es, url, examine=False, es_index=AREA_INDEX, code_field=None):
+def import_boundary(client, url, examine=False, code_field=None):
     if url.startswith("http"):
         r = requests.get(url, stream=True)
         boundaries = r.json()
     elif os.path.isfile(url):
-        with open(url) as f:
+        with open(url, encoding="latin1") as f:
             boundaries = json.load(f)
     errors = []
 
@@ -107,39 +122,17 @@ def import_boundary(es, url, examine=False, es_index=AREA_INDEX, code_field=None
     else:
         print("[%s] Opened file: [%s]" % (code, url))
         print("[%s] %s features to import" % (code, len(boundaries["features"])))
-        bulk_boundaries = []
+        boundary_count = 0
         errors = []
         for k, i in tqdm.tqdm(
             enumerate(boundaries["features"]), total=len(boundaries["features"])
         ):
-            shp = shapely.geometry.shape(i["geometry"]).buffer(0)
-            boundary = {
-                "_index": es_index,
-                "_type": "_doc",
-                "_op_type": "update",
-                "_id": i["properties"][code_field],
-                "doc": {
-                    "boundary": shp.wkt,
-                    "has_boundary": True,
-                },
-            }
-            bulk_boundaries.append(boundary)
-
-        # @TODO Log errors somewhere...
-        print("[boundaries] Processed %s boundaries" % len(bulk_boundaries))
-        print("[elasticsearch] %s boundaries to save" % len(bulk_boundaries))
-        results = bulk(es, bulk_boundaries, raise_on_error=False)
-        print(
-            "[elasticsearch] saved %s boundaries to %s index" % (results[0], es_index)
-        )
-        print("[elasticsearch] %s errors reported:" % len(results[1]))
-        for i in results[1]:
-            print(
-                " - {} {}".format(
-                    i.get("update", {}).get("_id", ""),
-                    i.get("update", {})
-                    .get("error", {})
-                    .get("caused_by", {})
-                    .get("type", ""),
-                )
+            area_code = i["properties"][code_field]
+            prefix = area_code[0:3]
+            client.upload_fileobj(
+                io.BytesIO(json.dumps(i).encode("utf-8")),
+                current_app.config["S3_BUCKET"],
+                "%s/%s.json" % (prefix, area_code),
             )
+            boundary_count += 1
+        print("[%s] %s boundaries imported" % (code, boundary_count))

@@ -19,9 +19,14 @@ from flask.cli import with_appcontext
 from .. import db
 from ..metadata import AREA_TYPES, ENTITIES
 
-RGC_URL = "https://www.arcgis.com/sharing/rest/content/items/e47368141e0a4d47bdf7b484314fd57d/data"
-CHD_URL = "https://www.arcgis.com/sharing/rest/content/items/2eae7e9d68de41218d9baf89341d2a13/data"
-MSOA_URL = "https://houseofcommonslibrary.github.io/msoanames/MSOA-Names-Latest.csv"
+RGC_URL = "https://www.arcgis.com/sharing/rest/content/items/ab6418e607fc416984539ef2c77d8495/data"
+CHD_URL = "https://www.arcgis.com/sharing/rest/content/items/908b216ed0db4333bd7ca056c1b5a364/data"
+MSOA_2011_URL = (
+    "https://houseofcommonslibrary.github.io/msoanames/MSOA-Names-Latest.csv"
+)
+MSOA_2021_URL = (
+    "https://houseofcommonslibrary.github.io/msoanames/MSOA-Names-Latest2.csv"
+)
 ENTITY_INDEX = "geo_entity"
 AREA_INDEX = "geo_area"
 DEFAULT_ENCODING = "latin1"
@@ -251,10 +256,10 @@ def import_chd(url=CHD_URL, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
 
 
 @click.command("msoanames")
-@click.option("--url", default=MSOA_URL)
+@click.option("--url", default=MSOA_2021_URL)
 @click.option("--es-index", default=AREA_INDEX)
 @with_appcontext
-def import_msoa_names(url=MSOA_URL, es_index=AREA_INDEX):
+def import_msoa_names(url=MSOA_2011_URL, es_index=AREA_INDEX):
 
     if current_app.config["DEBUG"]:
         requests_cache.install_cache()
@@ -264,15 +269,26 @@ def import_msoa_names(url=MSOA_URL, es_index=AREA_INDEX):
     r = requests.get(url, stream=True)
 
     reader = csv.DictReader(codecs.iterdecode(r.iter_lines(), "utf-8-sig"))
+    name_fields = {}
     area_updates = []
     for k, area in tqdm.tqdm(enumerate(reader)):
-        alt_names = [area["msoa11hclnm"]]
-        if area["msoa11hclnmw"]:
-            alt_names.append(area["msoa11hclnmw"])
+
+        if "msoa21cd" in area.keys():
+            areacode = area.get("msoa21cd")
+            name = area.get("msoa21hclnm")
+            name_welsh = area.get("msoa21hclnmw")
+        if "msoa11cd" in area.keys():
+            areacode = area.get("msoa11cd")
+            name = area.get("msoa11hclnm")
+            name_welsh = area.get("msoa11hclnmw")
+
+        alt_names = [name]
+        if name_welsh:
+            alt_names.append(name_welsh)
         new_doc = {
             "doc": {
-                "name": area["msoa11hclnm"],
-                "name_welsh": area["msoa11hclnmw"] if area["msoa11hclnmw"] else None,
+                "name": name,
+                "name_welsh": name_welsh if name_welsh else None,
                 "alternative_names": alt_names,
             }
         }
@@ -281,7 +297,8 @@ def import_msoa_names(url=MSOA_URL, es_index=AREA_INDEX):
                 "_index": es_index,
                 "_type": "_doc",
                 "_op_type": "update",
-                "_id": area["msoa11cd"],
+                "_id": areacode,
+                "doc_as_upsert": True,
                 **new_doc,
             }
         )

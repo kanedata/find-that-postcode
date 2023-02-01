@@ -60,7 +60,7 @@ def import_boundary(client, url, examine=False, code_field=None):
         r = requests.get(url, stream=True)
         boundaries = r.json()
     elif os.path.isfile(url):
-        with open(url) as f:
+        with open(url, encoding="latin1") as f:
             boundaries = json.load(f)
     errors = []
 

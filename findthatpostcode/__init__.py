@@ -60,6 +60,8 @@ def create_app(test_config=None):
 
     @app.template_filter()
     def expand_commas(s):
+        if not isinstance(s, str):
+            return s
         return re.sub(r"\b,\b", ", ", s)
 
     # routes and blueprints

@@ -298,6 +298,7 @@ def import_msoa_names(url=MSOA_2011_URL, es_index=AREA_INDEX):
                 "_type": "_doc",
                 "_op_type": "update",
                 "_id": areacode,
+                "doc_as_upsert": True,
                 **new_doc,
             }
         )

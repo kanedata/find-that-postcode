@@ -90,18 +90,37 @@ def import_placenames(url=PLACENAMES_URL, es_index=PLACENAMES_INDEX):
         with z.open(f, "r") as pccsv:
             pccsv = io.TextIOWrapper(pccsv, encoding="latin1")
             reader = csv.DictReader(pccsv)
+            place_code = None
+            place_name = None
             for i in reader:
+
+                # get the names of the name and code fields
+                if not place_code or not place_name:
+                    for key in i.keys():
+                        if key.startswith("place") and key.endswith("cd"):
+                            place_code = key
+                        if key.startswith("place") and key.endswith("nm"):
+                            place_name = key
+
                 record = {
                     "_index": es_index,
                     "_type": "_doc",
                     "_op_type": "update",
-                    "_id": i["place18cd"],
+                    "_id": i[place_code],
                     "doc_as_upsert": True,
                 }
 
                 for k in i:
                     if i[k] == "":
                         i[k] = None
+
+                # set the name
+                i["name"] = i[place_name]
+                del i[place_name]
+
+                # set splitind
+                if "splitind" in i:
+                    i["splitind"] = i["splitind"] == "1"
 
                 # population count
                 if i.get("popcnt"):

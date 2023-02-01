@@ -18,21 +18,22 @@ from .. import db
 
 PC_INDEX = "geo_postcode"
 
-NSPL_2011_URL = "https://www.arcgis.com/sharing/rest/content/items/3685e7b7261b4d6a9fc55d8d1d5054b2/data"
-NSPL_2021_URL = "https://www.arcgis.com/sharing/rest/content/items/5922269bd3254db7835511f33181ebd3/data"
+NSPL_URL = {
+    2011: "https://www.arcgis.com/sharing/rest/content/items/3685e7b7261b4d6a9fc55d8d1d5054b2/data",
+    2021: "https://www.arcgis.com/sharing/rest/content/items/5922269bd3254db7835511f33181ebd3/data",
+}
+DEFAULT_YEAR = 2021
 
 
 @click.command("nspl")
 @click.option("--es-index", default=PC_INDEX)
-@click.option("--url", default=NSPL_2021_URL)
-@click.options("--year", default=2011)
+@click.option("--url", default=None)
+@click.option("--year", default=DEFAULT_YEAR, type=int)
 @with_appcontext
-def import_nspl(url=NSPL_2021_URL, es_index=PC_INDEX, year=2011):
+def import_nspl(url=None, es_index=PC_INDEX, year=DEFAULT_YEAR):
 
-    if year == 2021 and url == NSPL_2011_URL:
-        url = NSPL_2021_URL
-    if year == 2011 and url == NSPL_2021_URL:
-        url = NSPL_2011_URL
+    if not url:
+        url = NSPL_URL[year]
 
     if current_app.config["DEBUG"]:
         requests_cache.install_cache()
@@ -45,7 +46,7 @@ def import_nspl(url=NSPL_2021_URL, es_index=PC_INDEX, year=2011):
 
     for f in z.filelist:
         if not f.filename.endswith(".csv") or not f.filename.startswith(
-            "Data/multi_csv/NSPL_"
+            "Data/multi_csv/NSPL"
         ):
             continue
 

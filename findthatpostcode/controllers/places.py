@@ -60,8 +60,12 @@ class Place(Controller):
         return cls(data.get("_id"), data=data.get("_source"), **relationships)
 
     def process_attributes(self, data):
-        data["name"] = data["place18nm"]
-        del data["place18nm"]
+        if "name" not in data:
+            for k in data.keys():
+                if k.startswith("place") and k.endswith("nm"):
+                    data["name"] = data[k]
+                    del data[k]
+                    break
         return data
 
     @staticmethod

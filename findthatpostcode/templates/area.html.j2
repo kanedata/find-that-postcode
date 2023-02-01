@@ -16,7 +16,7 @@
 {% block content %}
 <div class="cf">
   <div class="fl w-third-l w-100 pr4 f5">
-    {% if result.attributes.has_boundary %}
+    {% if result.has_boundary %}
     <div class="mb3">
       <a href="{{ url_for('areas.get_area_boundary', areacodes=result.id) }}" class="link blue underline-hover">Boundary (geoJSON)</a>
     </div>
@@ -107,7 +107,7 @@
   </div>
   
   <div class="fl w-two-thirds-l w-100">
-    {% if result.attributes.has_boundary or example_postcodes %}
+    {% if result.has_boundary or example_postcodes %}
     <figure class="ma0 w-70 fl">
       <div id="postcode-map" style="height:500px;"></div>
     </figure>
@@ -166,12 +166,12 @@
 {% endblock %}
 
 {% block bodyscripts %}
-{% if example_postcodes or result.attributes.has_boundary %}
+{% if example_postcodes or result.has_boundary %}
 <script type="text/javascript">
   var postcodes = [
     {% for p in example_postcodes %}{% if p.attributes.location %}{{ p.attributes.location|tojson }},
     {% endif %}{% endfor %}];
-  {% if result.attributes.has_boundary %}
+  {% if result.has_boundary %}
   var geojson = {{ url_for('areas.get_area_boundary', areacodes=result.id)|tojson }};
   {% else %}
   var geojson = null;

@@ -1,0 +1,41 @@
+{
+    "type": "Feature",
+    "properties": {
+        "objectid": 2,
+        "lac18cd": "E32000002",
+        "lac18nm": "Bexley and Bromley",
+        "bng_e": 542298,
+        "bng_n": 169001,
+        "long": 0.044324,
+        "lat": 51.402191,
+        "st_areashape": 210722870.6567116,
+        "st_lengthshape": 106214.18230301901
+    },
+    "geometry": {
+        "type": "polygon",
+        "coordinates": [
+            [
+                [
+                    100.0,
+                    0.0
+                ],
+                [
+                    101.0,
+                    0.0
+                ],
+                [
+                    101.0,
+                    1.0
+                ],
+                [
+                    100.0,
+                    1.0
+                ],
+                [
+                    100.0,
+                    0.0
+                ]
+            ]
+        ]
+    }
+}

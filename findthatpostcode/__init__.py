@@ -29,6 +29,11 @@ def create_app(test_config=None):
         ES_INDEX=os.environ.get("ES_INDEX", "postcodes"),
         LOGGING_DB=os.environ.get("LOGGING_DB"),
         SERVER_NAME=os.environ.get("SERVER_NAME"),
+        S3_REGION=os.environ.get("S3_REGION"),
+        S3_ENDPOINT=os.environ.get("S3_ENDPOINT"),
+        S3_ACCESS_ID=os.environ.get("S3_ACCESS_ID"),
+        S3_SECRET_KEY=os.environ.get("S3_SECRET_KEY"),
+        S3_BUCKET=os.environ.get("S3_BUCKET", "geo-boundaries"),
     )
 
     if test_config is None:

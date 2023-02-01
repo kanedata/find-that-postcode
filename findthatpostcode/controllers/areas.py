@@ -1,9 +1,14 @@
+import io
+import json
 from datetime import datetime
 
 import shapely.geometry
 import shapely.wkt
+from botocore.exceptions import ClientError
 from elasticsearch.helpers import scan
+from flask import current_app
 
+from ..db import get_s3_client
 from . import areatypes, places, postcodes
 from .controller import GEOJSON_TYPES, Controller, Pagination
 
@@ -23,7 +28,7 @@ class Area(Controller):
         self.relationships["predecessor"] = kwargs.get("predecessor")
         self.relationships["successor"] = kwargs.get("successor")
         self.relationships["children"] = kwargs.get("children")
-        self.boundary = kwargs.get("boundary")
+        self._boundary = None
         if data:
             self.found = True
             self.attributes = self.process_attributes(data)
@@ -44,12 +49,11 @@ class Area(Controller):
             doc_type=es_config.get("es_type", cls.es_type),
             id=cls.parse_id(id),
             ignore=[404],
-            _source_excludes=([] if boundary else ["boundary"]),
+            _source_excludes=(["boundary"]),
         )
         relationships = {
             "areatype": {},
             "example_postcodes": [],
-            "boundary": data.get("_source", {}).get("boundary"),
         }
         if data["found"]:
             if data["_source"].get("type"):
@@ -97,10 +101,6 @@ class Area(Controller):
             self.relationships["areatype"] = areatypes.Areatype(data.get("type"))
         if "type" in data:
             del data["type"]
-        if "boundary" in data:
-            if not self.boundary:
-                self.boundary = data["boundary"]
-            del data["boundary"]
 
         # turn dates into dates
         for i in self.date_fields:
@@ -127,37 +127,6 @@ class Area(Controller):
             }
         }
         example = es.search(index="geo_postcode", body=query, size=examples_count)
-
-        # if len(example["hits"]["hits"]) == 0:
-        #     query = {
-        #         "query": {
-        #             "function_score": {
-        #                 "query": {
-        #                     "bool": {
-        #                         "must_not": {
-        #                             "exists": {
-        #                                 "field": "doterm"
-        #                             }
-        #                         },
-        #                         "filter": {
-        #                             "geo_shape": {
-        #                                 "location": {
-        #                                     "indexed_shape": {
-        #                                         "index": "geo_area",
-        #                                         "id": areacode,
-        #                                         "path": "boundary"
-        #                                     }
-        #                                 }
-        #                             }
-        #                         }
-        #                     }
-        #                 },
-        #                 "random_score": {}
-        #             }
-        #         }
-        #     }
-        #     example = es.search(index='geo_postcode',
-        #                         body=query, size=examples_count)
 
         return [
             postcodes.Postcode(e["_id"], e["_source"]) for e in example["hits"]["hits"]
@@ -202,22 +171,45 @@ class Area(Controller):
             },
         }
 
+    @property
+    def boundary(self):
+        if self._boundary is None:
+            self._boundary = self._get_boundary()
+        return self._boundary
+
+    @property
+    def has_boundary(self):
+        if self._boundary is None:
+            self._boundary = self._get_boundary()
+        return self._boundary is not None
+
+    def _get_boundary(self):
+        client = get_s3_client()
+        buffer = io.BytesIO()
+        area_code = self.id
+        prefix = self.id[0:3]
+        try:
+            client.download_fileobj(
+                current_app.config["S3_BUCKET"],
+                "%s/%s.json" % (prefix, area_code),
+                buffer,
+            )
+            boundary = json.loads(buffer.getvalue().decode("utf-8"))
+            return boundary.get("geometry")
+        except ClientError:
+            None
+
     def topJSON(self):
         json = super().topJSON()
         if self.found:
             # @TODO need to check whether boundary data actually exists before applying this
-            if json["data"]["attributes"].get("has_boundary"):
+            if self.has_boundary:
                 json["links"]["geojson"] = self.url(filetype="geojson")
         return json
 
     def geoJSON(self):
         if not self.boundary:
             return (404, "boundary not found")
-
-        if not isinstance(self.boundary, dict):
-            # assume boundary is a WKT string if not a dictionary
-            s = shapely.wkt.loads(self.boundary)
-            self.boundary = shapely.geometry.mapping(s)
 
         return (
             200,

@@ -35,6 +35,13 @@ a file called `.env` in the project directory, and add the following contents:
 ```bash
 FLASK_APP=findthatpostcode
 FLASK_ENV=development
+
+# S3 credentials for boundaries
+S3_REGION=XXXXXXXX
+S3_ENDPOINT=XXXXXXXX
+S3_ACCESS_ID=XXXXXXXX
+S3_SECRET_KEY=XXXXXXXX
+S3_BUCKET=XXXXXXXX
 ```
 
 ### 4. Create elasticsearch indexes
@@ -72,6 +79,8 @@ The URL of the files used can be customised with the `--url` parameter. Unfortun
 ONS geoportal doesn't provide a persistent URL to the latest data.
 
 ### 6. Import boundaries (optional)
+
+Boundaries are uploaded as individual area files to S3 storage. 
 
 Boundary files can be found on the [ONS Geoportal](http://geoportal.statistics.gov.uk/datasets?q=Latest_Boundaries&sort_by=name&sort_order=asc).
 Generally the "Generalised Clipped" versions should be used to minimise the file
@@ -336,6 +345,11 @@ On Dokku server run:
 ```bash
 # setup and run import
 dokku config:set find-that-postcode FLASK_APP=findthatpostcode
+dokku config:set find-that-postcode S3_REGION=XXXXXXXX
+dokku config:set find-that-postcode S3_ENDPOINT=XXXXXXXX
+dokku config:set find-that-postcode S3_ACCESS_ID=XXXXXXXX
+dokku config:set find-that-postcode S3_SECRET_KEY=XXXXXXXX
+dokku config:set find-that-postcode S3_BUCKET=XXXXXXXX
 dokku run find-that-postcode flask init-db
 dokku run find-that-postcode flask import nspl --year=2011
 dokku run find-that-postcode flask import nspl --year=2021

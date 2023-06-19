@@ -2,7 +2,7 @@ import datetime
 import os
 import re
 
-from flask import Flask, make_response, render_template, render_template_string, request
+from flask import Flask, make_response, render_template, request
 from flask_cors import CORS
 from ua_parser import user_agent_parser
 
@@ -12,7 +12,6 @@ from findthatpostcode.metadata import AREA_TYPES, KEY_AREA_TYPES, OTHER_CODES
 
 
 def get_es_url(default):
-
     potential_env_vars = ["ELASTICSEARCH_URL", "ES_URL", "BONSAI_URL"]
     for e_v in potential_env_vars:
         if os.environ.get(e_v):
@@ -34,6 +33,7 @@ def create_app(test_config=None):
         S3_ACCESS_ID=os.environ.get("S3_ACCESS_ID"),
         S3_SECRET_KEY=os.environ.get("S3_SECRET_KEY"),
         S3_BUCKET=os.environ.get("S3_BUCKET", "geo-boundaries"),
+        ETHICAL_ADS_PUBLISHER=os.environ.get("ETHICAL_ADS_PUBLISHER"),
     )
 
     if test_config is None:
@@ -61,6 +61,7 @@ def create_app(test_config=None):
             key_area_types=KEY_AREA_TYPES,
             other_codes=OTHER_CODES,
             area_types=AREA_TYPES,
+            ethical_ads_publisher=app.config.get("ETHICAL_ADS_PUBLISHER"),
         )
 
     @app.template_filter()

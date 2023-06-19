@@ -1,8 +1,8 @@
 {% from '_utils.html.j2' import info_block, display_area, area_loop %}
 
 {% if point %}
-  {% set title = 'Point {:,.5f}, {:,.5f}'.format(*point.id) %}
-  {% set subtitle = 'Closest postcode to point {0:,.5f}, {1:,.5f} is <a href="{2}">{3}</a>.<br>Centre of {3} is {4:,.1f} meters away.'.format(
+{% set title = 'Point {:,.5f}, {:,.5f}'.format(*point.id) %}
+{% set subtitle = 'Closest postcode to point {0:,.5f}, {1:,.5f} is <a href="{2}">{3}</a>.<br>Centre of {3} is {4:,.1f} meters away.'.format(
     point.id[0],
     point.id[1],
     url_for('postcodes.get_postcode', postcode=result.id, filetype='html'),
@@ -10,8 +10,8 @@
     point.attributes.distance_from_postcode
   ) %}
 {% else %}
-  {% set title = 'Postcode <code>{}</code>'.format(result.id) %}
-  {% set subtitle = 'No longer used' if result.attributes.doterm else '' %}
+{% set title = 'Postcode <code>{}</code>'.format(result.id) %}
+{% set subtitle = 'No longer used' if result.attributes.doterm else '' %}
 {% endif %}
 
 {% extends 'base.html.j2' %}
@@ -31,35 +31,46 @@
         {{ result.attributes.location.lat }}, {{ result.attributes.location.lon }}
       </a>
     </code>
+    <p class=""><strong>Important note</strong>: This location is sourced from ONS data and is intended for statistical
+      purposes. It
+      should not be used for navigation.</p>
     {% endcall %}
     {% endif %}
 
     {% for i in key_area_types[0:1] %}
-      <h2 class="header-font mt0 mb1">{{ i[0] }} areas</h2>
-      {% for key_area in i[1] %}
-        {% set a = result.get_area(key_area) %}
-        {% if a %}
-        {% call info_block(a.relationships.areatype.get_name(a.id)) %}
-          {{ display_area(a, hide_areatype=true) }}
-        {% endcall %}
-        {% endif %}
-      {% endfor %}
+    <h2 class="header-font mt0 mb1">{{ i[0] }} areas</h2>
+    {% for key_area in i[1] %}
+    {% set a = result.get_area(key_area) %}
+    {% if a %}
+    {% call info_block(a.relationships.areatype.get_name(a.id)) %}
+    {{ display_area(a, hide_areatype=true) }}
+    {% endcall %}
+    {% endif %}
+    {% endfor %}
     {% endfor %}
 
   </div>
 
   {% if result.attributes.location %}
   <div class="fl w-two-thirds-l w-100">
-    <figure class="ma0 pa0"><div id="postcode-map" style="height:500px;"></div></figure>
-    {% if result.get_area('laua') %}
+    <figure class="ma0 pa0">
+      <div id="postcode-map" style="height:500px;"></div>
+    </figure>
     <p class="f5 b mt0 mb1 w-100">
-      Location within 
-      <a href="{{ url_for('areas.get_area', areacode=result.get_area('laua').id, filetype='html') }}" class="link blue underline-hover">
-        {{- result.get_area('laua').attributes.name -}} 
+      {% if result.get_area('laua') %}
+      Approximate location within
+      <a href="{{ url_for('areas.get_area', areacode=result.get_area('laua').id, filetype='html') }}"
+        class="link blue underline-hover">
+        {{- result.get_area('laua').attributes.name -}}
       </a>
       Local Authority
+      {% else %}
+      Approximate location.
+      {% endif %}
     </p>
-    {% endif %}
+    <p class="f7">This location is sourced from ONS data and is intended for statistical purposes. It should not be used
+      for
+      navigation</p>
   </div>
   {% endif %}
 </div>
@@ -78,15 +89,15 @@
     <h2 class="header-font mt2 pt2 mb1 bt bw3 b--yellow">Area classifications</h2>
     {% if result.attributes.oac11 %}
     {% call info_block("Output area classification") %}
-      {{ result.attributes.oac11.supergroup }} &gt; <code class="code fr">{{ result.attributes.oac11.code[0] }}</code><br>
-      {{ result.attributes.oac11.group }} &gt; <code class="code fr">{{ result.attributes.oac11.code[0:2] }}</code><br>
-      {{ result.attributes.oac11.subgroup }} <code class="code fr">{{ result.attributes.oac11.code }}</code>
+    {{ result.attributes.oac11.supergroup }} &gt; <code class="code fr">{{ result.attributes.oac11.code[0] }}</code><br>
+    {{ result.attributes.oac11.group }} &gt; <code class="code fr">{{ result.attributes.oac11.code[0:2] }}</code><br>
+    {{ result.attributes.oac11.subgroup }} <code class="code fr">{{ result.attributes.oac11.code }}</code>
     {% endcall %}
     {% endif %}
-    
+
     {% if result.attributes.ru11ind %}
     {% call info_block("Rural/urban classification") %}
-      {{ result.attributes.ru11ind.description }}  <code class="code fr">{{ result.attributes.ru11ind.code }}</code>
+    {{ result.attributes.ru11ind.description }} <code class="code fr">{{ result.attributes.ru11ind.code }}</code>
     {% endcall %}
     {% endif %}
 
@@ -94,56 +105,63 @@
     {% set rank = a.attributes.stats.imd2019.imd_rank %}
     {% set total = other_codes.imd[result.attributes.ctry] %}
     {% call info_block("Index of multiple deprivation (2019)") %}
-        <p><strong>{{ "{:,.0f}".format(rank) }}</strong> out of {{ "{:,.0f}".format(total) }} lower super output areas in {{ result.attributes.ctry_name }} (where 1 is the most deprived LSOA).</p>
-        <p><strong>{{ "{:.0%}".format( rank|float / total|float ) }}</strong> of LSOAs in {{ result.attributes.ctry_name }} are more deprived than this one.</p>
-        {% if a.attributes.stats.imd2015 %}
-        <p>In <strong>2015</strong> {{ "{:.0%}".format( a.attributes.stats.imd2015.imd_rank|float / total|float ) }}</strong> of LSOAs in {{ result.attributes.ctry.name }} were more deprived than this one.</p>
-        {% endif %}
+    <p><strong>{{ "{:,.0f}".format(rank) }}</strong> out of {{ "{:,.0f}".format(total) }} lower super output areas in
+      {{ result.attributes.ctry_name }} (where 1 is the most deprived LSOA).</p>
+    <p><strong>{{ "{:.0%}".format( rank|float / total|float ) }}</strong> of LSOAs in {{ result.attributes.ctry_name }}
+      are more deprived than this one.</p>
+    {% if a.attributes.stats.imd2015 %}
+    <p>In <strong>2015</strong>
+      {{ "{:.0%}".format( a.attributes.stats.imd2015.imd_rank|float / total|float ) }}</strong> of LSOAs in
+      {{ result.attributes.ctry.name }} were more deprived than this one.</p>
+    {% endif %}
     {% endcall %}
     {% endfor %}
   </div>
 
   {% for i in key_area_types[1:] %}
   <div class="fl w-third-l w-100 pr4 f5 mb3">
-      <h2 class="header-font mt2 pt2 mb1 bt bw3 b--yellow">{{ i[0] }} areas</h2>
-      {% for key_area in i[1] %}
-        {% set a = result.get_area(key_area) %}
-        {% if a %}
-        {% call info_block(a.relationships.areatype.get_name(a.id)) %}
-          {{ display_area(a, hide_areatype=true) }}
-        {% endcall %}
-        {% endif %}
-      {% endfor %}
-    </div>
+    <h2 class="header-font mt2 pt2 mb1 bt bw3 b--yellow">{{ i[0] }} areas</h2>
+    {% for key_area in i[1] %}
+    {% set a = result.get_area(key_area) %}
+    {% if a %}
+    {% call info_block(a.relationships.areatype.get_name(a.id)) %}
+    {{ display_area(a, hide_areatype=true) }}
+    {% endcall %}
+    {% endif %}
+    {% endfor %}
+  </div>
   {% endfor %}
 
   <div class="fl w-third-l w-100 pr4 f5 mb3">
     <h2 class="header-font mt2 pt2 mb1 bt bw3 b--yellow">Technical details</h2>
     {% call info_block("7 character version of postcode") %}
-      <code class="pa1 bg-light-gray code mr1 pre">{{ result.attributes.pcd }}</code>
+    <code class="pa1 bg-light-gray code mr1 pre">{{ result.attributes.pcd }}</code>
     {% endcall %}
     {% call info_block("8 character version of postcode") %}
-      <code class="pa1 bg-light-gray code mr1 pre">{{ result.attributes.pcd2 }}</code>
+    <code class="pa1 bg-light-gray code mr1 pre">{{ result.attributes.pcd2 }}</code>
     {% endcall %}
     {% call info_block("Date introduced") %}
-      {{ "{:%B %Y}".format(result.attributes.dointr) }}
+    {{ "{:%B %Y}".format(result.attributes.dointr) }}
     {% endcall %}
     {% if result.attributes.doterm %}
     {% call info_block("Date terminated") %}
-      {{ "{:%B %Y}".format(result.attributes.doterm) }}
+    {{ "{:%B %Y}".format(result.attributes.doterm) }}
     {% endcall %}
     {% endif %}
     {% call info_block("Postcode user type") %}
-      <code>{{result.attributes.usertype }}</code> - {{ other_codes.usertype[result.attributes.usertype] }}
+    <code>{{result.attributes.usertype }}</code> - {{ other_codes.usertype[result.attributes.usertype] }}
     {% endcall %}
     {% call info_block("Grid reference positional quality indicator") %}
-      <code>{{result.attributes.osgrdind}}</code> - {{ other_codes.osgrdind[result.attributes.osgrdind] }}
+    <code>{{result.attributes.osgrdind}}</code> - {{ other_codes.osgrdind[result.attributes.osgrdind] }}
     {% endcall %}
     {% if result.attributes.oseast1m and result.attributes.osnrth1m %}
     {% call info_block("OS Easting/Northing") %}
-      <code class="pa1">
+    <code class="pa1">
         {{ result.attributes.oseast1m }}, {{ result.attributes.osnrth1m }}
       </code>
+    <p class=""><strong>Important note</strong>: This location is sourced from ONS data and is intended for statistical
+      purposes. It
+      should not be used for navigation.</p>
     {% endcall %}
     {% endif %}
   </div>
@@ -153,9 +171,10 @@
 </div>
 {% if result.id.startswith("BT") %}
 <p class="f5 gray i">
-  Northern Ireland postcodes are included based on the 
-  <a href="https://www.ons.gov.uk/methodology/geography/licences" class='link blue underline-hover'>Northern Ireland End User Licence</a>.
-  The licence covers internal use of the data. Commercial use may require additional permission. 
+  Northern Ireland postcodes are included based on the
+  <a href="https://www.ons.gov.uk/methodology/geography/licences" class='link blue underline-hover'>Northern Ireland End
+    User Licence</a>.
+  The licence covers internal use of the data. Commercial use may require additional permission.
 </p>
 {% endif %}
 {% endblock %}
@@ -163,9 +182,9 @@
 {% block bodyscripts %}
 {% if result.attributes.location %}
 <script type="text/javascript">
-  var postcodes = [{{ result.attributes.location|tojson }}];
+  var postcodes = [{{ result.attributes.location | tojson }}];
   var show_postcode = true;
-  var geojson = {{ url_for('areas.get_area_boundary', areacodes=result.get_area('laua').id)|tojson }};
+  var geojson = {{ url_for('areas.get_area_boundary', areacodes = result.get_area('laua').id) | tojson }};
 </script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/map.js') }}"></script>
 {% endif %}

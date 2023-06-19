@@ -4,7 +4,6 @@ from . import boundaries, codes, placenames, postcodes, stats
 
 
 def init_app(app):
-
     import_cli = AppGroup("import")
     import_cli.add_command(codes.import_chd)
     import_cli.add_command(codes.import_rgc)
@@ -16,3 +15,8 @@ def init_app(app):
     import_cli.add_command(placenames.import_placenames)
 
     app.cli.add_command(import_cli)
+
+    check_cli = AppGroup("check")
+    check_cli.add_command(boundaries.check_boundaries)
+
+    app.cli.add_command(check_cli)

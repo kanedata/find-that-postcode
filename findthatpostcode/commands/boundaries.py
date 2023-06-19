@@ -1,15 +1,19 @@
 """
 Import commands for the register of geographic codes and code history database
 """
+import csv
 import glob
 import io
 import json
 import os.path
+from collections import defaultdict
 
 import click
 import requests
 import requests_cache
 import tqdm
+from boto3 import session
+from elasticsearch.helpers import scan
 from flask import current_app
 from flask.cli import with_appcontext
 
@@ -27,7 +31,6 @@ from .codes import AREA_INDEX
 def import_boundaries(
     urls, examine=False, code_field=None, es_index=AREA_INDEX, remove=False
 ):
-
     if remove:
         # update all instances of area to remove the "boundary" key
         es = db.get_db()
@@ -136,3 +139,79 @@ def import_boundary(client, url, examine=False, code_field=None):
             )
             boundary_count += 1
         print("[%s] %s boundaries imported" % (code, boundary_count))
+
+
+@click.command("boundaries")
+@click.option("--es-index", default=AREA_INDEX)
+@with_appcontext
+def check_boundaries(es_index=AREA_INDEX):
+    # Get list of all areas from ES
+    es = db.get_db()
+
+    areas = defaultdict(dict)
+    area_search = scan(
+        es,
+        query={
+            "query": {"match_all": {}},
+        },
+        index=es_index,
+        _source_includes=["active"],
+    )
+
+    for area in tqdm.tqdm(area_search):
+        prefix = area["_id"][0:3]
+        areas[prefix][area["_id"]] = {
+            "boundary": False,
+            "active": area["_source"]["active"],
+        }
+
+    # Get list of all boundaries from S3
+    s3_session = session.Session()
+    s3_client = s3_session.client(
+        "s3",
+        region_name=current_app.config["S3_REGION"],
+        endpoint_url=current_app.config["S3_ENDPOINT"].replace(
+            current_app.config["S3_BUCKET"] + ".", ""
+        ),
+        aws_access_key_id=current_app.config["S3_ACCESS_ID"],
+        aws_secret_access_key=current_app.config["S3_SECRET_KEY"],
+    )
+    paginator = s3_client.get_paginator("list_objects_v2")
+    page_iterator = paginator.paginate(Bucket=current_app.config["S3_BUCKET"])
+    for page in tqdm.tqdm(page_iterator):
+        for obj in page["Contents"]:
+            if obj["Key"].endswith(".json"):
+                bucket, prefix, code = obj["Key"].replace(".json", "").split("/")
+                if prefix in areas and code in areas[prefix]:
+                    areas[prefix][code]["boundary"] = True
+
+    # Check that all areas have a boundary
+    with open("boundaries.csv", "w") as f:
+        writer = csv.DictWriter(
+            f,
+            fieldnames=[
+                "prefix",
+                "total_areas",
+                "total_with_boundary",
+                "total_active",
+                "total_active_with_boundary",
+            ],
+        )
+        writer.writeheader()
+        for prefix, area_list in areas.items():
+            row = {
+                "prefix": prefix,
+                "total_areas": 0,
+                "total_with_boundary": 0,
+                "total_active": 0,
+                "total_active_with_boundary": 0,
+            }
+            for i in area_list.values():
+                row["total_areas"] += 1
+                if i["boundary"]:
+                    row["total_with_boundary"] += 1
+                if i["active"]:
+                    row["total_active"] += 1
+                if i["boundary"] and i["active"]:
+                    row["total_active_with_boundary"] += 1
+            writer.writerow(row)

@@ -29,7 +29,7 @@ MSOA_2021_URL = (
 )
 ENTITY_INDEX = "geo_entity"
 AREA_INDEX = "geo_area"
-DEFAULT_ENCODING = "latin1"
+DEFAULT_ENCODING = "utf-8-sig"
 
 
 def process_date(value, date_format="%d/%m/%Y"):

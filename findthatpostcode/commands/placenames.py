@@ -16,7 +16,7 @@ from .. import db
 
 PLACENAMES_INDEX = "geo_placename"
 
-PLACENAMES_URL = "https://www.arcgis.com/sharing/rest/content/items/8f8b561f256b40c3a6df71e400bb54f0/data"
+PLACENAMES_URL = "https://www.arcgis.com/sharing/rest/content/items/6cb9092a37da4b5ea1b5f8b054c343aa/data"
 
 PLACE_TYPES = {
     "BUA": ["Built-up Area", "England and Wales"],
@@ -71,7 +71,6 @@ AREA_LOOKUP = [
 @click.option("--url", default=PLACENAMES_URL)
 @with_appcontext
 def import_placenames(url=PLACENAMES_URL, es_index=PLACENAMES_INDEX):
-
     if current_app.config["DEBUG"]:
         requests_cache.install_cache()
 
@@ -93,7 +92,6 @@ def import_placenames(url=PLACENAMES_URL, es_index=PLACENAMES_INDEX):
             place_code = None
             place_name = None
             for i in reader:
-
                 # get the names of the name and code fields
                 if not place_code or not place_name:
                     for key in i.keys():

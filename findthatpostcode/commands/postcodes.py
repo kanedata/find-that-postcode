@@ -19,8 +19,8 @@ from .. import db
 PC_INDEX = "geo_postcode"
 
 NSPL_URL = {
-    2011: "https://www.arcgis.com/sharing/rest/content/items/3685e7b7261b4d6a9fc55d8d1d5054b2/data",
-    2021: "https://www.arcgis.com/sharing/rest/content/items/5922269bd3254db7835511f33181ebd3/data",
+    2011: "https://www.arcgis.com/sharing/rest/content/items/782899bd01934a8099ae8516cc021f68/data",
+    2021: "https://www.arcgis.com/sharing/rest/content/items/b86748732a054592bcf0218e86a43870/data",
 }
 DEFAULT_YEAR = 2021
 
@@ -31,7 +31,6 @@ DEFAULT_YEAR = 2021
 @click.option("--year", default=DEFAULT_YEAR, type=int)
 @with_appcontext
 def import_nspl(url=None, es_index=PC_INDEX, year=DEFAULT_YEAR):
-
     if not url:
         url = NSPL_URL[year]
 

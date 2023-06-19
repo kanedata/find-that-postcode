@@ -17,10 +17,10 @@ from flask import current_app
 from flask.cli import with_appcontext
 
 from .. import db
-from ..metadata import AREA_TYPES, ENTITIES
+from ..metadata import ENTITIES
 
-RGC_URL = "https://www.arcgis.com/sharing/rest/content/items/ab6418e607fc416984539ef2c77d8495/data"
-CHD_URL = "https://www.arcgis.com/sharing/rest/content/items/908b216ed0db4333bd7ca056c1b5a364/data"
+RGC_URL = "https://www.arcgis.com/sharing/rest/content/items/34f4b9d554324bc494dc406dca58001a/data"
+CHD_URL = "https://www.arcgis.com/sharing/rest/content/items/393a031178684c69973d0e416a862890/data"
 MSOA_2011_URL = (
     "https://houseofcommonslibrary.github.io/msoanames/MSOA-Names-Latest.csv"
 )
@@ -61,7 +61,6 @@ def process_float(value):
 @click.option("--es-index", default=ENTITY_INDEX)
 @with_appcontext
 def import_rgc(url=RGC_URL, es_index=ENTITY_INDEX):
-
     if current_app.config["DEBUG"]:
         requests_cache.install_cache()
 
@@ -76,7 +75,6 @@ def import_rgc(url=RGC_URL, es_index=ENTITY_INDEX):
             reader = csv.DictReader(io.TextIOWrapper(infile, "utf-8-sig"))
             entities = []
             for entity in reader:
-
                 # tidy up a couple of records
                 entity["Related entity codes"] = (
                     entity["Related entity codes"].replace("n/a", "").split(", ")
@@ -139,7 +137,6 @@ def import_rgc(url=RGC_URL, es_index=ENTITY_INDEX):
 @click.option("--encoding", default=DEFAULT_ENCODING)
 @with_appcontext
 def import_chd(url=CHD_URL, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
-
     if current_app.config["DEBUG"]:
         requests_cache.install_cache()
 
@@ -260,7 +257,6 @@ def import_chd(url=CHD_URL, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
 @click.option("--es-index", default=AREA_INDEX)
 @with_appcontext
 def import_msoa_names(url=MSOA_2011_URL, es_index=AREA_INDEX):
-
     if current_app.config["DEBUG"]:
         requests_cache.install_cache()
 
@@ -269,10 +265,8 @@ def import_msoa_names(url=MSOA_2011_URL, es_index=AREA_INDEX):
     r = requests.get(url, stream=True)
 
     reader = csv.DictReader(codecs.iterdecode(r.iter_lines(), "utf-8-sig"))
-    name_fields = {}
     area_updates = []
     for k, area in tqdm.tqdm(enumerate(reader)):
-
         if "msoa21cd" in area.keys():
             areacode = area.get("msoa21cd")
             name = area.get("msoa21hclnm")

@@ -4,10 +4,10 @@
 
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://unpkg.com/tachyons@4.9.1/css/tachyons.min.css" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Archivo:400,700|Raleway:400,700">
-  <link rel="stylesheet" href="https://dkane.net/theme/css/style.css" />
-  <link rel="stylesheet" href="https://dkane.net/theme/css/pygment.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tachyons.min.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/fonts.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}" />
   {% if ethical_ads_publisher %}
   <script async src="https://media.ethicalads.io/media/client/ethicalads.min.js"></script>
   {% endif %}
@@ -57,9 +57,10 @@
   </main>
 
   {% if ethical_ads_publisher %}
-  <aside class="bg-near-white w-100 ph3 ph5-ns db pv4 flex">
+  <aside class="bg-near-white w-100 ph3 db pv4 flex" id="ad-sidebar">
     <div class="center">
-      <div class="horizontal" id="footer-ad-1" data-ea-publisher="{{ ethical_ads_publisher }}" data-ea-type="image">
+      <div class="vertical raised ea-sticky-ad" id="footer-ad-1" data-ea-publisher="{{ ethical_ads_publisher }}"
+        data-ea-type="image">
       </div>
     </div>
   </aside>

@@ -1,0 +1,42 @@
+body {
+    display: grid;
+    grid-template-columns: 1fr max-content;
+}
+
+body>header {
+    grid-column: 1 / 3;
+    grid-row: 1;
+}
+
+body>main {
+    grid-column: 1 / 3;
+    grid-row: 2;
+}
+
+body>aside {
+    grid-column: 1 / 3;
+    grid-row: 3;
+}
+
+body>footer {
+    grid-column: 1 / 3;
+    grid-row: 4;
+}
+
+@media screen and (min-width: 60em) {
+    body>main {
+        grid-column: 1 / 2;
+        grid-row: 2 / 3;
+    }
+
+    body>aside {
+        grid-column: 2 / 3;
+        grid-row: 2 / 3;
+    }
+}
+
+.ea-sticky-ad {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}

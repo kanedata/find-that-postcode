@@ -1,5 +1,5 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.6.0/leaflet.css" integrity="sha256-SHMGCYmST46SoyGgo4YR/9AlK1vf3ff84Aq9yK4hdqM=" crossorigin="anonymous" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.6.0/leaflet.js" integrity="sha256-fNoRrwkP2GuYPbNSJmMJOCyfRB2DhPQe0rGTgzRsyso=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet.css' )}}" />
+<script src="{{ url_for('static', filename='js/leaflet.min.js' )}}"></script>
 <script type="text/javascript" src="https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js?v1.3.0"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/L.OSGraticule.js') }}"></script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/leaflet.snogylop@0.4.0/src/leaflet.snogylop.min.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/leaflet.snogylop.min.js' )}}"></script>

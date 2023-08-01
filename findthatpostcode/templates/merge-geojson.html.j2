@@ -7,7 +7,8 @@
   <div class="w-100 w-40-l fl">
     <div class="w-100 mb4 entry-content cf">
       <p class="measure">This tool can combine two or more GeoJSON files into one merged file.</p>
-      <p class="measure">Choose two or more files from your computer and then click "Download merged file" to save the results.</p>
+      <p class="measure">Choose two or more files from your computer and then click "Download merged file" to save the
+        results.</p>
       <p class="measure">
         The tool only accept valid <a href="https://geojson.org/" target="_blank">GeoJSON</a>
         files with a type of <code>FeatureCollection</code>. All features will be merged into
@@ -30,118 +31,120 @@
           </template>
         </td>
         <td class="pr3 pv2">
-          <button v-on:click.prevent="files.splice(i, 1)" class="button-reset bn pv2 ph3 b tc bg-animate bg-washed-red dim near-black pointer br2-ns">Remove file</button>
+          <button v-on:click.prevent="files.splice(i, 1)"
+            class="button-reset bn pv2 ph3 b tc bg-animate bg-washed-red dim near-black pointer br2-ns">Remove
+            file</button>
         </td>
       </tr>
     </table>
     <label for="files-to-merge" class="button-reset bn pv2 ph3 b tc bg-animate bg-yellow dim near-black pointer br2-ns">
       + Add file
-      <input type="file" id="files-to-merge" v-on:change="addFiles" multiple class="dn" accept=".geojson,.json,application/geo+json,application/json">
+      <input type="file" id="files-to-merge" v-on:change="addFiles" multiple class="dn"
+        accept=".geojson,.json,application/geo+json,application/json">
     </label>
     <p v-if="files.length==1" class="mv4">Add more files to create a merged GeoJSON file..</p>
-    <p v-else-if="result.features" class="mv4">Merged GeoJSON file will have <% result.features.length %> features from <% files.length %> files.</p>
+    <p v-else-if="result.features" class="mv4">Merged GeoJSON file will have <% result.features.length %> features from
+      <% files.length %> files.</p>
     <p v-else class="mv4">Add two or more GeoJSON files to merge</p>
     <template v-if="files.length > 1">
       <div class="mb3">
         <label for="filename" class="b">File name</label><br>
-        <input type="text" v-model="filename" class="f6 f5-l input-reset ba b--black-20 near-black bg-white pa1 lh-solid w-100 pa2"/>
+        <input type="text" v-model="filename"
+          class="f6 f5-l input-reset ba b--black-20 near-black bg-white pa1 lh-solid w-100 pa2" />
       </div>
-      <button v-on:click.prevent="downloadMergedFile" class="button-reset bn pv3 ph4 b tc bg-animate bg-yellow dim near-black pointer br2-ns">
+      <button v-on:click.prevent="downloadMergedFile"
+        class="button-reset bn pv3 ph4 b tc bg-animate bg-yellow dim near-black pointer br2-ns">
         Download merged file
       </button>
     </template>
-    <button v-if="files.length" v-on:click.prevent="clearFiles" class="button-reset bn pv3 ph4 b tc bg-animate bg-washed-red dim near-black pointer br2-ns">Remove all files</button>
+    <button v-if="files.length" v-on:click.prevent="clearFiles"
+      class="button-reset bn pv3 ph4 b tc bg-animate bg-washed-red dim near-black pointer br2-ns">Remove all
+      files</button>
   </div>
   <div class="w-100 w-60-l pl3 fl">
-    <l-map
-        v-if="result.features.length"
-        style="height: 500px; width: 100%"
-        :bounds="bounds"
-      >
+    <l-map v-if="result.features.length" style="height: 500px; width: 100%" :bounds="bounds">
       <l-geo-json :geojson="result"></l-geo-json>
-      <l-tile-layer
-        url="https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg"
-        :attribution="attribution"
-      />
+      <l-tile-layer url="https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png"
+        :attribution="attribution" />
     </l-map>
   </div>
 </div>
 {% endblock %}
 
 {% block headscripts %}
-<link rel="stylesheet" href="//unpkg.com/leaflet/dist/leaflet.css" />
+<link rel="stylesheet" href="{{ url_for('static', filename='lib/leaflet/leaflet.css' )}}" />
 {% endblock %}
 
 {% block bodyscripts %}
 <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-<script src="//unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="{{ url_for('static', filename='lib/leaflet/leaflet.js' )}}"></script>
 <script src="//unpkg.com/vue2-leaflet"></script>
 <script>
-Vue.component('l-map', window.Vue2Leaflet.LMap);
-Vue.component('l-tile-layer', window.Vue2Leaflet.LTileLayer);
-Vue.component('l-geo-json', window.Vue2Leaflet.LGeoJson);
-var app = new Vue({
-  delimiters: ["<%", "%>"],
-  el: '#merge-files',
-  data: {
-    files: [],
-    result: {
-      type: "FeatureCollection",
-      features: [],
+  Vue.component('l-map', window.Vue2Leaflet.LMap);
+  Vue.component('l-tile-layer', window.Vue2Leaflet.LTileLayer);
+  Vue.component('l-geo-json', window.Vue2Leaflet.LGeoJson);
+  var app = new Vue({
+    delimiters: ["<%", "%>"],
+    el: '#merge-files',
+    data: {
+      files: [],
+      result: {
+        type: "FeatureCollection",
+        features: [],
+      },
+      filename: 'mergedfile',
+      enableTooltip: true,
+      bounds: [[-90, -180], [90, 180]],
+      attribution:
+        '&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> <a href="https://www.stamen.com/" target="_blank">&copy; Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/about" target="_blank">OpenStreetMap</a> contributors',
     },
-    filename: 'mergedfile',
-    enableTooltip: true,
-    bounds: [[-90,-180],   [90,180]],
-    attribution:
-      'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
-  },
-  watch: {
-    'files': function(){
-      console.log(this.files);
-      if(this.files.length < 1){
-        this.result = {
-          type: "FeatureCollection",
-          features: [],
-        };
-        return
+    watch: {
+      'files': function () {
+        console.log(this.files);
+        if (this.files.length < 1) {
+          this.result = {
+            type: "FeatureCollection",
+            features: [],
+          };
+          return
+        }
+        var result = Object.assign({}, this.files[0].geojson);
+        result.features = this.files.filter((f) => f.geojson.features).map((f) => f.geojson.features).flat(1);
+        this.bounds = L.geoJSON(result).getBounds();
+        this.result = result;
       }
-      var result = Object.assign({}, this.files[0].geojson);
-      result.features = this.files.filter((f) => f.geojson.features).map((f) => f.geojson.features).flat(1);
-      this.bounds = L.geoJSON(result).getBounds();
-      this.result = result;
-    }
-  },
-  methods: {
-    addFiles(ev){
-      const fileList = Array.from(ev.target.files).map((f)=>f.text());
-      Promise.all(fileList).then((results)=>{
-        results.forEach((f, i)=>{
-          var file = ev.target.files[i];
-          file.errors = [];
-          try {
-            file.geojson = JSON.parse(f);
-            if(file.geojson.type != "FeatureCollection"){
-              file.errors.push("No FeatureCollection found");
+    },
+    methods: {
+      addFiles(ev) {
+        const fileList = Array.from(ev.target.files).map((f) => f.text());
+        Promise.all(fileList).then((results) => {
+          results.forEach((f, i) => {
+            var file = ev.target.files[i];
+            file.errors = [];
+            try {
+              file.geojson = JSON.parse(f);
+              if (file.geojson.type != "FeatureCollection") {
+                file.errors.push("No FeatureCollection found");
+              }
+            } catch (e) {
+              file.errors.push("Could not convert JSON file")
             }
-          } catch(e){
-            file.errors.push("Could not convert JSON file")
-          }
-          this.files.push(file);
-        });
-      })
-    },
-    downloadMergedFile(){
-      const blob = new Blob([JSON.stringify(this.result)], { type: 'application/geo+json' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = this.filename + '.geojson';
-      link.click();
-      URL.revokeObjectURL(link.href);
-    },
-    clearFiles(){
-      this.files = [];
-    },
-  }
-});
+            this.files.push(file);
+          });
+        })
+      },
+      downloadMergedFile() {
+        const blob = new Blob([JSON.stringify(this.result)], { type: 'application/geo+json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = this.filename + '.geojson';
+        link.click();
+        URL.revokeObjectURL(link.href);
+      },
+      clearFiles() {
+        this.files = [];
+      },
+    }
+  });
 </script>
 {% endblock %}

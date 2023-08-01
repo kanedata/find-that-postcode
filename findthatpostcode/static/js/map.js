@@ -3,18 +3,20 @@ const UK_BOUNDS = [
     [49.86, -8.65]
 ]
 var center = [53.825564, -2.421976];
-if(window.postcodes && postcodes.length > 0){
+if (window.postcodes && postcodes.length > 0) {
     center = [postcodes[0]["lat"], postcodes[0]["lon"]];
 }
 
 var mymap = L.map('postcode-map', {
     zoomSnap: 0.1
 }).setView(center, 9);
-var layer = new L.StamenTileLayer("terrain").addTo(mymap);
+var layer = new L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> <a href="https://www.stamen.com/" target="_blank">&copy; Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/about" target="_blank">OpenStreetMap</a> contributors',
+}).addTo(mymap);
 L.osGraticule({ showLabels: false, lineColor: '#ddd' }).addTo(mymap);
 
 var location_map = null;
-if(document.getElementById('location-map')){
+if (document.getElementById('location-map')) {
     location_map = L.map('location-map', {
         zoomControl: false,
         attributionControl: false,
@@ -23,16 +25,18 @@ if(document.getElementById('location-map')){
         dragging: false,
         scrollWheelZoom: false,
     });
-    new L.StamenTileLayer("toner").addTo(location_map);
+    new L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> <a href="https://www.stamen.com/" target="_blank">&copy; Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/about" target="_blank">OpenStreetMap</a> contributors',
+    }).addTo(location_map);
     location_map.fitBounds(UK_BOUNDS);
     location_map.setMinZoom(location_map.getZoom());
     location_map.setMaxZoom(location_map.getZoom());
 }
 
-if(window.postcodes){
+if (window.postcodes) {
     var markers = L.featureGroup();
-    for (const postcode of postcodes){
-        var marker = L.circleMarker([postcode['lat'], postcode['lon']], { 
+    for (const postcode of postcodes) {
+        var marker = L.circleMarker([postcode['lat'], postcode['lon']], {
             radius: 5,
             fillOpacity: 0.8
         }).addTo(markers);
@@ -51,7 +55,7 @@ var postcode_show = function () {
     }
 }
 
-if(geojson){
+if (geojson) {
     fetch(geojson)
         .then(function (response) {
             if (response.status !== 200) {
@@ -69,7 +73,7 @@ if(geojson){
                     weight: 3,
                     fill: true,
                     fillColor: (geojson.features.length == 1 ? '#fff' : '#00449e'),
-                    fillOpacity: (geojson.features.length == 1 ? 0.8 : 0.2 ) 
+                    fillOpacity: (geojson.features.length == 1 ? 0.8 : 0.2)
                 },
                 onEachFeature: (feature, layer) => {
                     layer.bindTooltip(
@@ -86,7 +90,7 @@ if(geojson){
             postcode_show();
             mymap.fitBounds(boundary_json.getBounds());
 
-            if(location_map){
+            if (location_map) {
                 boundary_json.eachLayer((layer) => {
                     L.marker(layer.getBounds().getCenter()).addTo(location_map);
                 });

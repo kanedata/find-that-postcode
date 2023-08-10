@@ -10,7 +10,11 @@ if (window.postcodes && postcodes.length > 0) {
 var mymap = L.map('postcode-map', {
     zoomSnap: 0.1
 }).setView(center, 9);
-var layer = new L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png', {
+// var layer = new L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png', {
+//     attribution: '&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> <a href="https://www.stamen.com/" target="_blank">&copy; Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/about" target="_blank">OpenStreetMap</a> contributors',
+// }).addTo(mymap);
+var layer = L.maplibreGL({
+    style: 'https://tiles.stadiamaps.com/styles/alidade_smooth.json',
     attribution: '&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> <a href="https://www.stamen.com/" target="_blank">&copy; Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/about" target="_blank">OpenStreetMap</a> contributors',
 }).addTo(mymap);
 L.osGraticule({ showLabels: false, lineColor: '#ddd' }).addTo(mymap);
@@ -25,8 +29,8 @@ if (document.getElementById('location-map')) {
         dragging: false,
         scrollWheelZoom: false,
     });
-    new L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> <a href="https://www.stamen.com/" target="_blank">&copy; Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/about" target="_blank">OpenStreetMap</a> contributors',
+    var layer = L.maplibreGL({
+        style: 'https://tiles.stadiamaps.com/styles/alidade_smooth.json',
     }).addTo(location_map);
     location_map.fitBounds(UK_BOUNDS);
     location_map.setMinZoom(location_map.getZoom());
@@ -40,12 +44,6 @@ if (window.postcodes) {
             radius: 5,
             fillOpacity: 0.8
         }).addTo(markers);
-        // marker.bindPopup(
-        //     "<a href=\"/postcodes/{{ postcode.id }}.html\">{{ postcode.id }}</a>",
-        //     {
-        //         autoClose: false
-        //     }
-        // ).openPopup();
     }
 }
 
@@ -88,37 +86,15 @@ if (geojson) {
             });
             boundary_json.addTo(mymap);
             postcode_show();
-            mymap.fitBounds(boundary_json.getBounds());
+            mymap.fitBounds(boundary_json.getBounds(), {
+                padding: [20, 20]
+            });
 
             if (location_map) {
                 boundary_json.eachLayer((layer) => {
                     L.marker(layer.getBounds().getCenter()).addTo(location_map);
                 });
             }
-
-            // if(typeof parent_geojson !== 'undefined'){
-            //     fetch(parent_geojson)
-            //         .then(function (response) {
-            //             if (response.status !== 200) {
-            //                 throw new Error("Not 200 response")
-            //             } else {
-            //                 return response.json();
-            //             }
-            //         })
-            //         .then(function (geojson) {
-            //             var parent_geojson = L.geoJSON(geojson, {
-            //                 style: {
-            //                     stroke: true,
-            //                     color: '#00449e99',
-            //                     weight: 1,
-            //                     fill: false,
-            //                 },
-            //             });
-            //             parent_geojson.addTo(mymap);
-            //             mymap.fitBounds(parent_geojson.getBounds());
-            //         });
-
-            // }
 
         })
         .catch((error) => {

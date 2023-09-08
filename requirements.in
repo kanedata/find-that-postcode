@@ -16,3 +16,4 @@ blinker
 sqlite-utils
 ua-parser
 boto3
+sentry-sdk[flask]

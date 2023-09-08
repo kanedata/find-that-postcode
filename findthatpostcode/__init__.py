@@ -2,8 +2,10 @@ import datetime
 import os
 import re
 
+import sentry_sdk
 from flask import Flask, make_response, render_template, request
 from flask_cors import CORS
+from sentry_sdk.integrations.flask import FlaskIntegration
 from ua_parser import user_agent_parser
 
 from findthatpostcode import blueprints, commands, db
@@ -20,6 +22,17 @@ def get_es_url(default):
 
 
 def create_app(test_config=None):
+    if os.environ.get("SENTRY_DSN"):
+        sentry_sdk.init(
+            dsn=os.environ.get("SENTRY_DSN"),
+            integrations=[FlaskIntegration()],
+            environment=(
+                "development" if os.environ.get("FLASK_DEBUG") else "production"
+            ),
+            traces_sample_rate=0.005,
+            profiles_sample_rate=0.005,
+        )
+
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(

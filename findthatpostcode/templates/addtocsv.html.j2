@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block content %}
-<form action="" method="post" enctype="multipart/form-data" class="w-100 w-70-l fl-l pr3-l">
+<form action="" method="post" enctype="multipart/form-data" class="w-100 w-70-l fl-l pr3-l" autocomplete="off">
   <div class="w-100 mb4 entry-content cf">
     <p class="measure">Add geographical data to a CSV file by looking it up from a postcode column</p>
     <p class="measure">The file should be separated by commas (<code>,</code>) - not semicolons or tabs)
@@ -81,20 +81,22 @@
           <tbody>
             <tr>
               <th class="tl ph2">Basic fields</th>
-              <th class="tl ph2">Code <input type="checkbox" id="select_all_codes" title="Select all code fields" />
+              <th class="tl ph2">Code <input type="checkbox" autocomplete="off" id="select_all_codes"
+                  title="Select all code fields" />
               </th>
-              <th class="tl ph2">Name <input type="checkbox" id="select_all_names" title="Select all name fields" />
+              <th class="tl ph2">Name <input type="checkbox" autocomplete="off" id="select_all_names"
+                  title="Select all name fields" />
               </th>
             </tr>
             {% for b in basic_fields %}
             <tr>
               <td class="ph2">{{b[1]}}</td>
-              <td class="ph2 tc"><input type="checkbox" name="fields" value="{{b[0]}}" {% if b[0] in default_fields %}
-                  checked="checked" {% endif %}></td>
+              <td class="ph2 tc"><input type="checkbox" autocomplete="off" name="fields" value="{{b[0]}}"
+                  {% if b[0] in default_fields %} checked="checked" {% endif %}></td>
               <td class="ph2 tc">
                 {% if b[2] %}
-                <input type="checkbox" name="fields" value="{{b[0]}}_name" {% if '%s_name' % b[0] in default_fields %}
-                  checked="checked" {% endif %}>
+                <input type="checkbox" autocomplete="off" name="fields" value="{{b[0]}}_name"
+                  {% if '%s_name' % b[0] in default_fields %} checked="checked" {% endif %}>
                 {% endif %}
               </td>
             </tr>
@@ -107,8 +109,8 @@
             {% for b in stats_fields %}
             <tr>
               <td class="ph2">{{b[1]}}</td>
-              <td class="ph2 tc"><input type="checkbox" name="fields" value="{{b[0]}}" {% if b[0] in default_fields %}
-                  checked="checked" {% endif %}></td>
+              <td class="ph2 tc"><input type="checkbox" autocomplete="off" name="fields" value="{{b[0]}}"
+                  {% if b[0] in default_fields %} checked="checked" {% endif %}></td>
               <td class="ph2 tc">
               </td>
             </tr>
@@ -127,9 +129,9 @@
                 <small> [{{ "{:,.0f}".format(result.get(area)) }}]</small>
                 {% endif %}
               </td>
-              <td class="ph2 tc"><input type="checkbox" name="fields" value="{{area}}" {% if area in default_fields %}
-                  checked="checked" {% endif %}></td>
-              <td class="ph2 tc"><input type="checkbox" name="fields" value="{{area}}_name"
+              <td class="ph2 tc"><input type="checkbox" autocomplete="off" name="fields" value="{{area}}"
+                  {% if area in default_fields %} checked="checked" {% endif %}></td>
+              <td class="ph2 tc"><input type="checkbox" autocomplete="off" name="fields" value="{{area}}_name"
                   {% if "%s_name" % area in default_fields %} checked="checked" {% endif %}></td>
             </tr>
             {% endfor %}

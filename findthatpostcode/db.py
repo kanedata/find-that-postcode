@@ -53,7 +53,7 @@ def init_db(reset=False):
 def get_log_db():
     if "log_db" not in g:
         if current_app.config.get("LOGGING_DB"):
-            now = datetime.datetime.now()
+            datetime.datetime.now()
             g.log_db = Database(
                 current_app.config.get("LOGGING_DB").format(
                     year=datetime.datetime.now().year,

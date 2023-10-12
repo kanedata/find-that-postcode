@@ -8,11 +8,10 @@ from flask import current_app
 
 from ..db import get_s3_client
 from . import areatypes, places, postcodes
-from .controller import GEOJSON_TYPES, Controller, Pagination
+from .controller import GEOJSON_TYPES, Controller
 
 
 class Area(Controller):
-
     es_index = "geo_area"
     url_slug = "areas"
     template = "area.html.j2"
@@ -200,7 +199,8 @@ class Area(Controller):
     def topJSON(self):
         json = super().topJSON()
         if self.found:
-            # @TODO need to check whether boundary data actually exists before applying this
+            # @TODO need to check whether boundary data
+            # actually exists before applying this
             if self.has_boundary:
                 json["links"]["geojson"] = self.url(filetype="geojson")
         return json

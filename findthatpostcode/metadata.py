@@ -23,13 +23,22 @@ OTHER_CODES = {
     "osgrdind": [
         "",  # no code 0
         "within the building of the matched address closest to the postcode mean",
-        "as for status value 1, except by visual inspection of Landline maps (Scotland only)",
+        (
+            "as for status value 1, except by visual "
+            "inspection of Landline maps (Scotland only)"
+        ),
         "approximate to within 50 metres",
-        "postcode unit mean (mean of matched addresses with the same postcode, but not snapped to a building)",
+        (
+            "postcode unit mean (mean of matched addresses "
+            "with the same postcode, but not snapped to a building)"
+        ),
         "imputed by ONS, by reference to surrounding postcode grid references",
         "postcode sector mean, (mainly PO Boxes)",
         "",  # code 7 missing
-        "postcode terminated prior to Gridlink(R) initiative, last known ONS postcode grid reference",
+        (
+            "postcode terminated prior to Gridlink(R) initiative, "
+            "last known ONS postcode grid reference"
+        ),
         "no grid reference available",
     ],
     "usertype": ["Small user", "Large user"],
@@ -77,7 +86,12 @@ STATS_FIELDS = [
         False,
         "stats.imd2015.imd_decile",
     ),
-    # ("popn", "Total population (2015)", False, "stats.population2015.population_total"),
+    # (
+    #   "popn",
+    #   "Total population (2015)",
+    #   False,
+    #   "stats.population2015.population_total"
+    # ),
 ]
 
 # "Supergroup", "Group", "Subgroup"],

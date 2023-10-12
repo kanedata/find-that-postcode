@@ -40,61 +40,128 @@ IMD_FIELDS = {
     "Local Authority District name (2013)": "la_name",
     "Index of Multiple Deprivation (IMD) Score": "imd_score",
     "Index of Multiple Deprivation (IMD) Rank (where 1 is most deprived)": "imd_rank",
-    "Index of Multiple Deprivation (IMD) Decile (where 1 is most deprived 10% of LSOAs)": "imd_decile",
+    (
+        "Index of Multiple Deprivation (IMD) Decile "
+        "(where 1 is most deprived 10% of LSOAs)"
+    ): "imd_decile",
     "Income Score (rate)": "imd_income_score",
     "Income Rank (where 1 is most deprived)": "imd_income_rank",
     "Income Decile (where 1 is most deprived 10% of LSOAs)": "imd_income_decile",
     "Employment Score (rate)": "imd_employment_score",
     "Employment Rank (where 1 is most deprived)": "imd_employment_rank",
-    "Employment Decile (where 1 is most deprived 10% of LSOAs)": "imd_employment_decile",
+    (
+        "Employment Decile " "(where 1 is most deprived 10% of LSOAs)"
+    ): "imd_employment_decile",
     "Education, Skills and Training Score": "imd_education_score",
-    "Education, Skills and Training Rank (where 1 is most deprived)": "imd_education_rank",
-    "Education, Skills and Training Decile (where 1 is most deprived 10% of LSOAs)": "imd_education_decile",
+    (
+        "Education, Skills and Training Rank " "(where 1 is most deprived)"
+    ): "imd_education_rank",
+    (
+        "Education, Skills and Training Decile "
+        "(where 1 is most deprived 10% of LSOAs)"
+    ): "imd_education_decile",
     "Health Deprivation and Disability Score": "imd_health_score",
-    "Health Deprivation and Disability Rank (where 1 is most deprived)": "imd_health_rank",
-    "Health Deprivation and Disability Decile (where 1 is most deprived 10% of LSOAs)": "imd_health_decile",
+    (
+        "Health Deprivation and Disability Rank " "(where 1 is most deprived)"
+    ): "imd_health_rank",
+    (
+        "Health Deprivation and Disability Decile "
+        "(where 1 is most deprived 10% of LSOAs)"
+    ): "imd_health_decile",
     "Crime Score": "imd_crime_score",
     "Crime Rank (where 1 is most deprived)": "imd_crime_rank",
     "Crime Decile (where 1 is most deprived 10% of LSOAs)": "imd_crime_decile",
     "Barriers to Housing and Services Score": "imd_housing_score",
-    "Barriers to Housing and Services Rank (where 1 is most deprived)": "imd_housing_rank",
-    "Barriers to Housing and Services Decile (where 1 is most deprived 10% of LSOAs)": "imd_housing_decile",
+    (
+        "Barriers to Housing and Services Rank " "(where 1 is most deprived)"
+    ): "imd_housing_rank",
+    (
+        "Barriers to Housing and Services Decile "
+        "(where 1 is most deprived 10% of LSOAs)"
+    ): "imd_housing_decile",
     "Living Environment Score": "imd_environment_score",
     "Living Environment Rank (where 1 is most deprived)": "imd_environment_rank",
-    "Living Environment Decile (where 1 is most deprived 10% of LSOAs)": "imd_environment_decile",
+    (
+        "Living Environment Decile " "(where 1 is most deprived 10% of LSOAs)"
+    ): "imd_environment_decile",
     "Income Deprivation Affecting Children Index (IDACI) Score (rate)": "idaci_score",
-    "Income Deprivation Affecting Children Index (IDACI) Rank (where 1 is most deprived)": "idaci_rank",
-    "Income Deprivation Affecting Children Index (IDACI) Decile (where 1 is most deprived 10% of LSOAs)": "idaci_decile",
+    (
+        "Income Deprivation Affecting Children Index (IDACI) Rank "
+        "(where 1 is most deprived)"
+    ): "idaci_rank",
+    (
+        "Income Deprivation Affecting Children Index (IDACI) Decile "
+        "(where 1 is most deprived 10% of LSOAs)"
+    ): "idaci_decile",
     "Income Deprivation Affecting Older People (IDAOPI) Score (rate)": "idaopi_score",
-    "Income Deprivation Affecting Older People (IDAOPI) Rank (where 1 is most deprived)": "idaopi_rank",
-    "Income Deprivation Affecting Older People (IDAOPI) Decile (where 1 is most deprived 10% of LSOAs)": "idaopi_decile",
+    (
+        "Income Deprivation Affecting Older People (IDAOPI) Rank "
+        "(where 1 is most deprived)"
+    ): "idaopi_rank",
+    (
+        "Income Deprivation Affecting Older People (IDAOPI) Decile "
+        "(where 1 is most deprived 10% of LSOAs)"
+    ): "idaopi_decile",
     "Children and Young People Sub-domain Score": "imd_education_children_score",
-    "Children and Young People Sub-domain Rank (where 1 is most deprived)": "imd_education_children_rank",
-    "Children and Young People Sub-domain Decile (where 1 is most deprived 10% of LSOAs)": "imd_education_children_decile",
+    (
+        "Children and Young People Sub-domain Rank " "(where 1 is most deprived)"
+    ): "imd_education_children_rank",
+    (
+        "Children and Young People Sub-domain Decile "
+        "(where 1 is most deprived 10% of LSOAs)"
+    ): "imd_education_children_decile",
     "Adult Skills Sub-domain Score": "imd_education_adults_score",
-    "Adult Skills Sub-domain Rank (where 1 is most deprived)": "imd_education_adults_rank",
-    "Adult Skills Sub-domain Decile (where 1 is most deprived 10% of LSOAs)": "imd_education_adults_decile",
+    (
+        "Adult Skills Sub-domain Rank " "(where 1 is most deprived)"
+    ): "imd_education_adults_rank",
+    (
+        "Adult Skills Sub-domain Decile " "(where 1 is most deprived 10% of LSOAs)"
+    ): "imd_education_adults_decile",
     "Geographical Barriers Sub-domain Score": "imd_housing_geographical_score",
-    "Geographical Barriers Sub-domain Rank (where 1 is most deprived)": "imd_housing_geographical_rank",
-    "Geographical Barriers Sub-domain Decile (where 1 is most deprived 10% of LSOAs)": "imd_housing_geographical_decile",
+    (
+        "Geographical Barriers Sub-domain Rank " "(where 1 is most deprived)"
+    ): "imd_housing_geographical_rank",
+    (
+        "Geographical Barriers Sub-domain Decile "
+        "(where 1 is most deprived 10% of LSOAs)"
+    ): "imd_housing_geographical_decile",
     "Wider Barriers Sub-domain Score": "imd_housing_wider_score",
-    "Wider Barriers Sub-domain Rank (where 1 is most deprived)": "imd_housing_wider_rank",
-    "Wider Barriers Sub-domain Decile (where 1 is most deprived 10% of LSOAs)": "imd_housing_wider_decile",
+    (
+        "Wider Barriers Sub-domain Rank (where 1 is most deprived)"
+    ): "imd_housing_wider_rank",
+    (
+        "Wider Barriers Sub-domain Decile (where 1 is most deprived 10% of LSOAs)"
+    ): "imd_housing_wider_decile",
     "Indoors Sub-domain Score": "imd_environment_indoors_score",
-    "Indoors Sub-domain Rank (where 1 is most deprived)": "imd_environment_indoors_rank",
-    "Indoors Sub-domain Decile (where 1 is most deprived 10% of LSOAs)": "imd_environment_indoors_decile",
+    (
+        "Indoors Sub-domain Rank " "(where 1 is most deprived)"
+    ): "imd_environment_indoors_rank",
+    (
+        "Indoors Sub-domain Decile " "(where 1 is most deprived 10% of LSOAs)"
+    ): "imd_environment_indoors_decile",
     "Outdoors Sub-domain Score": "imd_environment_outdoors_score",
-    "Outdoors Sub-domain Rank (where 1 is most deprived)": "imd_environment_outdoors_rank",
-    "Outdoors Sub-domain Decile (where 1 is most deprived 10% of LSOAs)": "imd_environment_outdoors_rank",
+    (
+        "Outdoors Sub-domain Rank " "(where 1 is most deprived)"
+    ): "imd_environment_outdoors_rank",
+    (
+        "Outdoors Sub-domain Decile " "(where 1 is most deprived 10% of LSOAs)"
+    ): "imd_environment_outdoors_rank",
     "Total population: mid 2015 (excluding prisoners)": "population_total",
     "Dependent Children aged 0-15: mid 2015 (excluding prisoners)": "population_0_15",
     "Population aged 16-59: mid 2015 (excluding prisoners)": "population_16_59",
-    "Older population aged 60 and over: mid 2015 (excluding prisoners)": "population_60_plus",
+    (
+        "Older population aged 60 and over: mid 2015 " "(excluding prisoners)"
+    ): "population_60_plus",
     "Total population: mid 2012 (excluding prisoners)": "population_total",
     "Dependent Children aged 0-15: mid 2012 (excluding prisoners)": "population_0_15",
     "Population aged 16-59: mid 2012 (excluding prisoners)": "population_16_59",
-    "Older population aged 60 and over: mid 2012 (excluding prisoners)": "population_60_plus",
-    "Working age population 18-59/64: for use with Employment Deprivation Domain (excluding prisoners)": "population_workingage",
+    (
+        "Older population aged 60 and over: mid 2012 " "(excluding prisoners)"
+    ): "population_60_plus",
+    (
+        "Working age population 18-59/64: for use with Employment Deprivation Domain "
+        "(excluding prisoners)"
+    ): "population_workingage",
 }
 
 
@@ -103,7 +170,6 @@ IMD_FIELDS = {
 @click.option("--url", default=IMD2019_URL)
 @with_appcontext
 def import_imd2019(url=IMD2019_URL, es_index=AREA_INDEX):
-
     if current_app.config["DEBUG"]:
         requests_cache.install_cache()
 
@@ -154,7 +220,6 @@ def import_imd2019(url=IMD2019_URL, es_index=AREA_INDEX):
 @click.option("--url", default=IMD2015_URL)
 @with_appcontext
 def import_imd2015(url=IMD2015_URL, es_index=AREA_INDEX):
-
     if current_app.config["DEBUG"]:
         requests_cache.install_cache()
 

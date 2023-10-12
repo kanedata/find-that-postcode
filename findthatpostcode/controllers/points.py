@@ -5,7 +5,6 @@ from .controller import Controller
 
 
 class Point(Controller):
-
     es_index = "geo_postcode"
     url_slug = "points"
     template = "postcode.html.j2"
@@ -76,7 +75,10 @@ class Point(Controller):
                     "status": "400",
                     "code": "point_outside_uk",
                     "title": "Nearest postcode is more than 10km away",
-                    "detail": "Nearest postcode ({}) is more than 10km away ({:,.1f}km). Are you sure this point is in the UK?".format(
+                    "detail": (
+                        "Nearest postcode ({}) is more than 10km away ({:,.1f}km). "
+                        "Are you sure this point is in the UK?"
+                    ).format(
                         self.relationships["nearest_postcode"].id,
                         (self.attributes.get("distance_from_postcode") / 1000),
                     ),
@@ -93,7 +95,6 @@ class Point(Controller):
         return []
 
     def topJSON(self):
-
         # check if postcode is too far away
         if self.attributes.get("distance_from_postcode") > self.max_distance:
             self.found = False
@@ -103,7 +104,10 @@ class Point(Controller):
                         "status": "400",
                         "code": "point_outside_uk",
                         "title": "Nearest postcode is more than 10km away",
-                        "detail": "Nearest postcode ({}) is more than 10km away ({:,.1f}km). Are you sure this point is in the UK?".format(
+                        "detail": (
+                            "Nearest postcode ({}) is more than 10km away ({:,.1f}km). "
+                            "Are you sure this point is in the UK?"
+                        ).format(
                             self.relationships["nearest_postcode"].id,
                             (self.attributes.get("distance_from_postcode") / 1000),
                         ),

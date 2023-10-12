@@ -8,7 +8,7 @@ tqdm
 python-dotenv
 dictlib
 black
-isort
+ruff
 ElasticMock
 pytest
 requests-mock

@@ -4,16 +4,19 @@ from urllib.parse import urlencode, urlunparse
 GEOJSON_TYPES = {
     "point": "Point",  # A single geographic coordinate.
     "linestring": "LineString",  # An arbitrary line given two or more points.
-    "polygon": "Polygon",  # A closed polygon whose first and last point must match, thus requiring n + 1 vertices to create an n-sided polygon and a minimum of 4 vertices.
+    "polygon": "Polygon",  # A closed polygon whose first and last point must match,
+    # requiring n+1 vertices to create an n-sided
+    # polygon and a minimum of 4 vertices.
     "multipoint": "MultiPoint",  # An array of unconnected, but likely related points.
     "multilinestring": "MultiLineString",  # An array of separate linestrings.
     "multipolygon": "MultiPolygon",  # An array of separate polygons.
-    "geometrycollection": "GeometryCollection",  # A GeoJSON shape similar to the multi* shapes except that multiple types can coexist (e.g., a Point and a LineString).
+    "geometrycollection": "GeometryCollection",  # A GeoJSON shape similar to the
+    # multi* shapes except that multiple types can coexist
+    # (e.g., a Point and a LineString).
 }
 
 
 class Controller:
-
     template = None
     es_index = "geo"
     es_type = "_doc"
@@ -191,7 +194,6 @@ class Controller:
 
 
 class Pagination:
-
     default_size = 10
 
     def __init__(self, request, size=None):

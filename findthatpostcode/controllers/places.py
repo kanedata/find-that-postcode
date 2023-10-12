@@ -5,7 +5,6 @@ from .controller import Controller
 
 
 class Place(Controller):
-
     es_index = "geo_placename"
     url_slug = "places"
     template = "place.html.j2"
@@ -44,7 +43,8 @@ class Place(Controller):
             if isinstance(v, str) and re.match(r"[A-Z][0-9]{8}", v):
                 area = areas.Area.get_from_es(v, es, examples_count=0)
                 if area.found:
-                    # data["_source"]["areas"][k + "_name"] = area.attributes.get("name")
+                    # data["_source"]["areas"][k + "_name"] =
+                    # area.attributes.get("name")
                     relationships["areas"].append(area)
 
         if examples_count:

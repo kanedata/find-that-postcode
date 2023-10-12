@@ -3,8 +3,10 @@
 {% extends "base.html.j2" %}
 
 {% block headscripts %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.1.0/papaparse.min.js" integrity="sha256-Fh801SO9gqegfUdkDxyzXzIUPWzO/Vatqj8uN+5xcL4=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/core.min.js" integrity="sha256-hV6Ff1ZbnLObO8BWHPZs1oA3aPZkX4bnnEKO4nX1sm0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.1.0/papaparse.min.js"
+  integrity="sha256-Fh801SO9gqegfUdkDxyzXzIUPWzO/Vatqj8uN+5xcL4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/core.min.js"
+  integrity="sha256-hV6Ff1ZbnLObO8BWHPZs1oA3aPZkX4bnnEKO4nX1sm0=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/md5.min.js"></script>
 {% endblock %}
 
@@ -13,14 +15,14 @@
   <div class="w-100 mb4 entry-content cf">
     <p class="measure">Add geographical data to a CSV file by looking it up from a postcode column</p>
     <p class="measure">The file should be separated by commas (<code>,</code>) - not semicolons or tabs)
-    and the first row should contain the column names.</p>
+      and the first row should contain the column names.</p>
     <a class="dn-l link underline blue f5" href="#privacy">See important note on privacy below</a>
   </div>
   <div class="w-100 b--light-gray ba bw1 br3 mb4">
 
     <div class="w-100 pa2 b--light-gray bb bw1 stage" id="stage-select-file">
       <h3 class="pa0 ma0 dib">
-        Step 1: 
+        Step 1:
         <span class="normal">Select CSV file</span>
       </h3>
       <span class="fr contents-top">
@@ -51,7 +53,7 @@
 
     <div class="w-100 pa2 b--light-gray bb bw1 stage" id="stage-select-postcode-field">
       <h3 class="pa0 ma0 dib">
-        Step 2: 
+        Step 2:
         <span class="normal">Select postcode field</span>
       </h3>
       <span class="fr contents-top">
@@ -68,35 +70,31 @@
 
     <div class="w-100 pa2 b--light-gray bb bw1 stage" id="stage-select-fields">
       <h3 class="pa0 ma0 dib">
-        Step 3: 
+        Step 3:
         <span class="normal">Select data to add</span>
       </h3>
       <span class="fr contents-top">
         <span class="dib code pa1 bg-light-gray" id="fields_to_add"></span>
       </span>
       <div class="contents mv4">
-        <table class="table">
+        <table class="table" data-default-fields='{{ default_fields|tojson }}'>
           <tbody>
             <tr>
               <th class="tl ph2">Basic fields</th>
-              <th class="tl ph2">Code <input type="checkbox" id="select_all_codes" title="Select all code fields" /></th>
-              <th class="tl ph2">Name <input type="checkbox" id="select_all_names" title="Select all name fields" /></th>
+              <th class="tl ph2">Code <input type="checkbox" id="select_all_codes" title="Select all code fields" />
+              </th>
+              <th class="tl ph2">Name <input type="checkbox" id="select_all_names" title="Select all name fields" />
+              </th>
             </tr>
             {% for b in basic_fields %}
             <tr>
               <td class="ph2">{{b[1]}}</td>
-              <td class="ph2 tc"><input type="checkbox" name="fields" value="{{b[0]}}"
-                {% if b[0] in default_fields %}
-                checked="checked"
-                {% endif %}
-                ></td>
+              <td class="ph2 tc"><input type="checkbox" name="fields" value="{{b[0]}}" {% if b[0] in default_fields %}
+                  checked="checked" {% endif %}></td>
               <td class="ph2 tc">
                 {% if b[2] %}
-                <input type="checkbox" name="fields" value="{{b[0]}}_name"
-                  {% if '%s_name' % b[0] in default_fields %}
-                  checked="checked"
-                  {% endif %}
-                >
+                <input type="checkbox" name="fields" value="{{b[0]}}_name" {% if '%s_name' % b[0] in default_fields %}
+                  checked="checked" {% endif %}>
                 {% endif %}
               </td>
             </tr>
@@ -109,16 +107,13 @@
             {% for b in stats_fields %}
             <tr>
               <td class="ph2">{{b[1]}}</td>
-              <td class="ph2 tc"><input type="checkbox" name="fields" value="{{b[0]}}"
-                {% if b[0] in default_fields %}
-                checked="checked"
-                {% endif %}
-                ></td>
+              <td class="ph2 tc"><input type="checkbox" name="fields" value="{{b[0]}}" {% if b[0] in default_fields %}
+                  checked="checked" {% endif %}></td>
               <td class="ph2 tc">
               </td>
             </tr>
             {% endfor %}
-          {% for i in key_area_types %}
+            {% for i in key_area_types %}
             <tr>
               <th class="tl ph2">{{ i[0] }} areas</th>
               <th class="tl ph2"></th>
@@ -132,29 +127,25 @@
                 <small> [{{ "{:,.0f}".format(result.get(area)) }}]</small>
                 {% endif %}
               </td>
-              <td class="ph2 tc"><input type="checkbox" name="fields" value="{{area}}"
-                {% if area in default_fields %}
-                checked="checked"
-                {% endif %}
-                ></td>
+              <td class="ph2 tc"><input type="checkbox" name="fields" value="{{area}}" {% if area in default_fields %}
+                  checked="checked" {% endif %}></td>
               <td class="ph2 tc"><input type="checkbox" name="fields" value="{{area}}_name"
-                {% if "%s_name" % area in default_fields %}
-                checked="checked"
-                {% endif %}
-                ></td>
+                  {% if "%s_name" % area in default_fields %} checked="checked" {% endif %}></td>
             </tr>
             {% endfor %}
-          {% endfor %}
+            {% endfor %}
           </tbody>
         </table>
       </div>
-      
+
       <div class="contents mv4">
-        <input class="button-reset bn pv3 ph4 b tc bg-animate bg-yellow dim near-black pointer br2-ns ml4-l" type="submit" value="Add data to CSV" id='fetch_postcodes' />
+        <input class="button-reset bn pv3 ph4 b tc bg-animate bg-yellow dim near-black pointer br2-ns ml4-l"
+          type="submit" value="Add data to CSV" id='fetch_postcodes' />
         <div id="result" class="dn">
           <p class="pa0 mv3 mh2" id="result-text">Creating file…</p>
           <div id="progress-bar" class="bg-light-blue h2 mt4 mh2">
-            <div class="progress-bar-inner bg-blue h2 ph3 pv1 f6 tr white" style="width:0%;" id="progress-bar-inner"></div>
+            <div class="progress-bar-inner bg-blue h2 ph3 pv1 f6 tr white" style="width:0%;" id="progress-bar-inner">
+            </div>
           </div>
         </div>
       </div>
@@ -176,7 +167,8 @@
     and all postcodes that match this code are sent back to the browser to be matched.
   </p>
   <p>
-    This provides some level of privacy protection, but in some circumstances it could still be possible to make a reasonable guess
+    This provides some level of privacy protection, but in some circumstances it could still be possible to make a
+    reasonable guess
     as to the postcodes used in the file by looking at the codes requested.
   </p>
   <p class="b">Therefore it is recommended
@@ -187,7 +179,7 @@
 
 {% block bodyscripts %}
 <script>
-var hash_url = {{ url_for('postcodes.multi_hash', _external=true)|tojson }};
+  var hash_url = {{ url_for('postcodes.multi_hash', _external = true) | tojson }};
 </script>
 <script src="{{ url_for('static', filename='js/csv.js') }}"></script>
 {% endblock %}

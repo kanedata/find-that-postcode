@@ -1,4 +1,4 @@
-from flask import Blueprint, make_response, render_template, request
+from flask import Blueprint, render_template
 
 bp = Blueprint("tools", __name__, url_prefix="/tools")
 

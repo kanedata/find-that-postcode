@@ -1,5 +1,3 @@
-
-
 def test_point_json(client):
     rv = client.get("/points/51.501,-0.2936")
     point_json = rv.get_json()

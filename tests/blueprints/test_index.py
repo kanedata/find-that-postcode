@@ -1,5 +1,3 @@
-
-
 def test_index(client):
     rv = client.get("/")
     content = rv.data.decode("utf8")

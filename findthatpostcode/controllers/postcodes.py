@@ -7,7 +7,6 @@ from .controller import Controller
 
 
 class Postcode(Controller):
-
     es_index = "geo_postcode"
     url_slug = "postcodes"
     date_fields = ["dointr", "doterm"]
@@ -50,7 +49,6 @@ class Postcode(Controller):
         return cls(data.get("_id"), data.get("_source"), pcareas, places)
 
     def process_attributes(self, postcode):
-
         # turn dates into dates
         for i in self.date_fields:
             if postcode.get(i) and not isinstance(postcode[i], datetime):

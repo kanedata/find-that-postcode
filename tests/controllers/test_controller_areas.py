@@ -13,7 +13,6 @@ def test_area_class():
 
 
 def test_area_class_es():
-
     es = MockElasticsearch()
     a = Area.get_from_es("S02000783", es)
 
@@ -28,7 +27,6 @@ def test_area_class_es():
 
 
 def test_search_areas():
-
     es = MockElasticsearch()
     a = search_areas("test", es)
 
@@ -39,7 +37,6 @@ def test_search_areas():
 
 
 def test_get_all_areas():
-
     es = MockElasticsearch()
     a = get_all_areas(es)
 

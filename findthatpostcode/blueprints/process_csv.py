@@ -16,7 +16,6 @@ def process_csv(
     fields=["lat", "long", "cty"],
     es_config=None,
 ):
-
     if not es_config:
         es_config = {}
 

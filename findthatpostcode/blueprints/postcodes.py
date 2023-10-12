@@ -42,7 +42,6 @@ def multi_hash():
 
 
 def get_postcode_by_hash(hashes, fields):
-
     es = get_db()
 
     if not isinstance(hashes, list):
@@ -98,7 +97,6 @@ def get_postcode_by_hash(hashes, fields):
         return {i[0]: dig_get(lsoas[lsoa], i[3]) for i in stats}
 
     if results:
-
         if stats:
             lsoas = {
                 i["_id"]: i["_source"]

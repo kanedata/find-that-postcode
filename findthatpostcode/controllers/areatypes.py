@@ -5,7 +5,6 @@ from . import areas
 
 
 class Areatype(Controller):
-
     es_index = "geo_entity"
     url_slug = "areatypes"
     areatypes = AREA_TYPES

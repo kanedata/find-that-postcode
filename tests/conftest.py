@@ -74,7 +74,6 @@ class MockElasticsearch:
         return result
 
     def search(self, **kwargs):
-
         index = kwargs.get("index").split(",")
 
         # get some specific queries used in the data

@@ -47,7 +47,6 @@ def recon_query(q, es):
 @jsonp
 @cors
 def reconcile():
-
     service_spec = {
         "name": current_app.name,
         "identifierSpace": "http://rdf.freebase.com/ns/type.object.id",

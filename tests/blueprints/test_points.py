@@ -1,4 +1,3 @@
-from tests.fixtures import client
 
 
 def test_point_json(client):

@@ -1,8 +1,6 @@
 import json
 from urllib.parse import urlencode
 
-from tests.fixtures import client
-
 
 def test_reconcile_spec(client):
     rv = client.get("/reconcile")
@@ -15,7 +13,12 @@ def test_reconcile_spec(client):
     # assert isinstance(spec.get("extend", {}).get("property_settings"), list)
     # assert "name" in spec.get("extend", {}).get("property_settings", [])[0]
     # assert "label" in spec.get("extend", {}).get("property_settings", [])[0]
-    # assert spec.get("extend", {}).get("property_settings", [])[0]["type"] in ["number", "text", "checkbox", "select"]
+    # assert spec.get(
+    #   "extend", {}
+    # ).get(
+    #   "property_settings",
+    #   []
+    # )[0]["type"] in ["number", "text", "checkbox", "select"]
 
 
 # def test_reconcile_properties(client):

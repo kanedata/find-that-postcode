@@ -2,7 +2,7 @@ import types
 
 from findthatpostcode.controllers.areas import Area, get_all_areas, search_areas
 from findthatpostcode.controllers.postcodes import Postcode
-from tests.fixtures import MockElasticsearch
+from tests.conftest import MockElasticsearch
 
 
 def test_area_class():

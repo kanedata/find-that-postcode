@@ -1,6 +1,5 @@
 import html
 
-from tests.fixtures import client
 
 AREATYPE_CODE = "lsoa11"
 

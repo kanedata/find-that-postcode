@@ -1,5 +1,5 @@
 from findthatpostcode.controllers.postcodes import Postcode
-from tests.fixtures import MockElasticsearch
+from tests.conftest import MockElasticsearch
 
 
 def test_postcode_class():
@@ -10,7 +10,6 @@ def test_postcode_class():
 
 
 def test_postcode_class_es():
-
     es = MockElasticsearch()
     a = Postcode.get_from_es("EX36 4AT", es)
 

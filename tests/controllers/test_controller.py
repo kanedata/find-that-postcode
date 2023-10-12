@@ -1,5 +1,5 @@
 from findthatpostcode.controllers.controller import Controller
-from tests.fixtures import MockElasticsearch
+from tests.conftest import MockElasticsearch
 
 
 def test_controller_class():
@@ -27,7 +27,6 @@ def test_controller_class():
 
 
 def test_controller_fetch():
-
     es = MockElasticsearch()
 
     a = Controller.get_from_es(

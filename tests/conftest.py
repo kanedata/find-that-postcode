@@ -1,5 +1,4 @@
 import copy
-import io
 import json
 import os
 from contextlib import contextmanager

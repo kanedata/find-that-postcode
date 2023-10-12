@@ -1,6 +1,4 @@
-import html
 
-from tests.fixtures import client
 
 AREA_CODE = "S02000783"
 AREA_NAME = "Lower Bow & Larkfield, Fancy Farm, Mallard Bowl"

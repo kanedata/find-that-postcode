@@ -1,5 +1,5 @@
 from findthatpostcode.controllers.points import Point
-from tests.fixtures import MockElasticsearch
+from tests.conftest import MockElasticsearch
 
 
 def test_point_class():
@@ -10,7 +10,6 @@ def test_point_class():
 
 
 def test_point_class_es():
-
     es = MockElasticsearch()
     a = Point.get_from_es((100, -100), es)
 

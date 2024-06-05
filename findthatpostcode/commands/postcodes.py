@@ -1,6 +1,7 @@
 """
 Import commands for the register of geographic codes and code history database
 """
+
 import csv
 import datetime
 import hashlib
@@ -19,8 +20,8 @@ from .. import db
 PC_INDEX = "geo_postcode"
 
 NSPL_URL = {
-    2011: "https://www.arcgis.com/sharing/rest/content/items/782899bd01934a8099ae8516cc021f68/data",
-    2021: "https://www.arcgis.com/sharing/rest/content/items/b86748732a054592bcf0218e86a43870/data",
+    2011: "https://www.arcgis.com/sharing/rest/content/items/521edce4159a451a932539b7fc786322/data",
+    2021: "https://www.arcgis.com/sharing/rest/content/items/f7464f3658ba439ba577651b32014cfe/data",
 }
 DEFAULT_YEAR = 2021
 

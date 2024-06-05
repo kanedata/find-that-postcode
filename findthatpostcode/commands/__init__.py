@@ -1,6 +1,6 @@
 from flask.cli import AppGroup
 
-from . import boundaries, codes, placenames, postcodes, stats
+from . import boundaries, codes, new_pcon, placenames, postcodes, stats
 
 
 def init_app(app):
@@ -13,6 +13,7 @@ def init_app(app):
     import_cli.add_command(stats.import_imd2019)
     import_cli.add_command(stats.import_imd2015)
     import_cli.add_command(placenames.import_placenames)
+    import_cli.add_command(new_pcon.import_new_pcon)
 
     app.cli.add_command(import_cli)
 

@@ -1,6 +1,7 @@
 """
 Import commands for the register of geographic codes and code history database
 """
+
 import csv
 import glob
 import io
@@ -16,6 +17,10 @@ from boto3 import session
 from elasticsearch.helpers import scan
 from flask import current_app
 from flask.cli import with_appcontext
+from pyproj import Transformer
+from shapely import to_geojson
+from shapely.geometry import shape
+from shapely.ops import transform
 
 from .. import db
 from .codes import AREA_INDEX
@@ -66,6 +71,11 @@ def import_boundary(client, url, examine=False, code_field=None):
         with open(url, encoding="latin1") as f:
             boundaries = json.load(f)
     errors = []
+
+    # Check the CRS
+    transformer = None
+    if boundaries.get("crs", {}).get("properties", {}).get("name") == "EPSG:27700":
+        transformer = Transformer.from_crs("EPSG:27700", "EPSG:4326", always_xy=True)
 
     # find the code field for a boundary
     if len(boundaries.get("features", [])) == 0:
@@ -132,6 +142,18 @@ def import_boundary(client, url, examine=False, code_field=None):
         ):
             area_code = i["properties"][code_field]
             prefix = area_code[0:3]
+            if transformer:
+                # create a shapely object from the geometry
+                geometry = shape(i["geometry"])
+                i["geometry"] = json.loads(
+                    to_geojson(
+                        transform(
+                            transformer.transform,
+                            geometry,
+                        )
+                    )
+                )
+
             client.upload_fileobj(
                 io.BytesIO(json.dumps(i).encode("utf-8")),
                 current_app.config["S3_BUCKET"],

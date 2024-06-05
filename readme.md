@@ -121,9 +121,6 @@ flask import boundaries "https://opendata.arcgis.com/datasets/094f326b0b1247e3bc
 
 You can add more than one URL to each import script.
 
-These imports will also take a while, and add significantly to the size of the
-elasticsearch index. It may increase in size to over 5GB.
-
 ### 7. Import placenames (optional)
 
 A further related dataset is placenames. The [ONS has a list of these](http://geoportal.statistics.gov.uk/datasets/a6c138d17ac54532b0ca8ee693922f10_0)

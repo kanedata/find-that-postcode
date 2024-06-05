@@ -7,7 +7,6 @@ requests-cache
 tqdm
 python-dotenv
 dictlib
-black
 ruff
 ElasticMock
 pytest
@@ -17,3 +16,5 @@ sqlite-utils
 ua-parser
 boto3
 sentry-sdk[flask]
+pyproj
+shapely

@@ -19,8 +19,8 @@ from flask.cli import with_appcontext
 from .. import db
 from ..metadata import ENTITIES
 
-RGC_URL = "https://www.arcgis.com/sharing/rest/content/items/34f4b9d554324bc494dc406dca58001a/data"
-CHD_URL = "https://www.arcgis.com/sharing/rest/content/items/393a031178684c69973d0e416a862890/data"
+RGC_URL = "https://www.arcgis.com/sharing/rest/content/items/2219f72d5b8042c496e47488efd04b16/data"
+CHD_URL = "https://www.arcgis.com/sharing/rest/content/items/3acc892515aa49a8885c2deb734ebd3d/data"
 MSOA_2011_URL = (
     "https://houseofcommonslibrary.github.io/msoanames/MSOA-Names-Latest.csv"
 )

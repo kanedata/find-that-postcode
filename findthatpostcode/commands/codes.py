@@ -1,6 +1,7 @@
 """
 Import commands for the register of geographic codes and code history database
 """
+
 import codecs
 import csv
 import datetime

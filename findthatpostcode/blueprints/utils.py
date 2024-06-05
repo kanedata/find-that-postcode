@@ -58,12 +58,12 @@ def cors(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
         response = func(*args, **kwargs)
-        response.headers[
-            "Access-Control-Allow-Methods"
-        ] = "GET, POST, PUT, DELETE, OPTIONS"
-        response.headers[
-            "Access-Control-Allow-Headers"
-        ] = "Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token"
+        response.headers["Access-Control-Allow-Methods"] = (
+            "GET, POST, PUT, DELETE, OPTIONS"
+        )
+        response.headers["Access-Control-Allow-Headers"] = (
+            "Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token"
+        )
         response.headers["Access-Control-Allow-Origin"] = "*"
         return response
 

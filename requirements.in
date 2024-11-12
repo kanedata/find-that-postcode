@@ -18,3 +18,5 @@ boto3
 sentry-sdk[flask]
 pyproj
 shapely
+numpy<2
+Flask-Limiter

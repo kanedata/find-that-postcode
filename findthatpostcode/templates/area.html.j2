@@ -18,94 +18,100 @@
   <div class="fl w-third-l w-100 pr4 f5">
     {% if result.has_boundary %}
     <div class="mb3">
-      <a href="{{ url_for('areas.get_area_boundary', areacodes=result.id) }}" class="link blue underline-hover">Boundary (geoJSON)</a>
+      <a href="{{ url_for('areas.get_area_boundary', areacodes=result.id) }}" class="link blue underline-hover">Boundary
+        (geoJSON)</a>
     </div>
     {% endif %}
-    
+
     {% if result.relationships.successor %}
     {% call info_block("Successor area") %}
-      {{ area_loop(result.relationships.successor, result.id)}}
+    {{ area_loop(result.relationships.successor, result.id)}}
     {% endcall %}
     {% endif %}
 
     {% if example_postcodes %}
     {% call info_block("Example postcodes") %}
-      <ul class="list pa0 ma0">
-        {% for i in example_postcodes[0:5] %}
-        <li class="dib">
-          <code class="pa1 code mr2">
+    <ul class="list pa0 ma0">
+      {% for i in example_postcodes[0:5] %}
+      <li class="dib">
+        <code class="pa1 code mr2">
           <a href='/postcodes/{{ i["id"] }}.html' class='near-black link underline-hover'>{{ i.id }}</a>
           </code>
-        </li>
-        {% endfor %}
-      </ul>
+      </li>
+      {% endfor %}
+    </ul>
     {% endcall %}
     {% endif %}
-    
+
     {% if result.relationships.parent %}
     {% call info_block("Parent area") %}
-      {{ display_area(result.relationships.parent) }}
+    {{ display_area(result.relationships.parent) }}
     {% endcall %}
     {% endif %}
-    
+
     {% if result.relationships.predecessor %}
     {% call info_block("Predecessor area") %}
-      {{ area_loop(result.relationships.predecessor, result.id)}}
+    {{ area_loop(result.relationships.predecessor, result.id)}}
     {% endcall %}
     {% endif %}
 
 
 
     {% call info_block("Start date") %}
-        {{ "{:%B %Y}".format(result.attributes.date_start) }}
+    {{ "{:%B %Y}".format(result.attributes.date_start) }}
     {% endcall %}
 
     {% if result.attributes.date_end %}
     {% call info_block("End date") %}
-        {{ "{:%B %Y}".format(result.attributes.date_end) }}
+    {{ "{:%B %Y}".format(result.attributes.date_end) }}
     {% endcall %}
     {% endif %}
 
     {% if result.attributes.owner %}
     {% call info_block("Owner") %}
-        {{ result.attributes.owner}}
+    {{ result.attributes.owner}}
     {% endcall %}
     {% endif %}
 
     {% if result.attributes.equivalents %}
     {% call info_block("Equivalent codes") %}
-          <ul class="list ma0 pa0">
-          {% for k, v in result.attributes.equivalents.items() %}
-            <li><strong>{{ k }}</strong>: <code class="pv1 ph2 bg-light-gray code">{{ v }}</code></li>
-          {% endfor %}
-          </ul>
+    <ul class="list ma0 pa0">
+      {% for k, v in result.attributes.equivalents.items() %}
+      <li><strong>{{ k }}</strong>: <code class="pv1 ph2 bg-light-gray code">{{ v }}</code></li>
+      {% endfor %}
+    </ul>
     {% endcall %}
     {% endif %}
 
     {% if result.attributes.statutory_instrument_title %}
     {% call info_block("Statutory instrument") %}
-          {{ result.attributes.statutory_instrument_title}}
-          {% if result.attributes.statutory_instrument_id %}
-          ({{result.attributes.statutory_instrument_id}})
-          {% endif %}
+    {{ result.attributes.statutory_instrument_title}}
+    {% if result.attributes.statutory_instrument_id %}
+    ({{result.attributes.statutory_instrument_id}})
+    {% endif %}
     {% endcall %}
     {% endif %}
-    
+
     {% call info_block("External links") %}
-      <ul class="list pa0 ma0">
-        <li><a href="http://statistics.data.gov.uk/doc/statistical-geography/{{ result.id }}">ONS Geography Linked data</a></li>
-        <li><a href="https://mapit.mysociety.org/area/{{ result.id }}.html">MapIt (mySociety)</a></li>
-      </ul>
+    <ul class="list pa0 ma0">
+      <li><a href="http://statistics.data.gov.uk/doc/statistical-geography/{{ result.id }}">ONS Geography Linked
+          data</a></li>
+      <li><a href="https://mapit.mysociety.org/area/{{ result.id }}.html">MapIt (mySociety)</a></li>
+    </ul>
     {% endcall %}
 
     {% if result.relationships.areatype.id in ["msoa11", "msoa21"] %}
-      <p class="mt4">
-        The name of this area is from the <a class="link blue underline-hover" href="https://houseofcommonslibrary.github.io/msoanames/">MSOA Names</a> dataset created by the House of Commons Library (used under the <a class="link blue underline-hover" href="https://www.parliament.uk/site-information/copyright/open-parliament-licence/">Open Parliament Licence</a>).
-      </p>
+    <p class="mt4">
+      The name of this area is from the <a class="link blue underline-hover"
+        href="https://houseofcommonslibrary.github.io/msoanames/">MSOA Names</a> dataset created by the House of Commons
+      Library (used under the <a class="link blue underline-hover"
+        href="https://www.parliament.uk/site-information/copyright/open-parliament-licence/">Open Parliament
+        Licence</a>).
+    </p>
     {% endif %}
-    
+
   </div>
-  
+
   <div class="fl w-two-thirds-l w-100">
     {% if result.has_boundary or example_postcodes %}
     <figure class="ma0 w-70 fl">
@@ -126,31 +132,32 @@
     <br>
     {% endif %}
 
-    
-    
+
+
     {% if result.relationships.children and result.attributes.child_count %}
     {% call info_block("Child areas - {} areas".format(result.attributes.child_count)) %}
-      {% set selected = child if child else result.attributes.child_counts.keys()|list|first %}
-      <ul class="list pa0 ma0 db w-100 cf bw2 b--light-gray bb" id="children">
+    {% set selected = child if child else result.attributes.child_counts.keys()|list|first %}
+    <ul class="list pa0 ma0 db w-100 cf bw2 b--light-gray bb" id="children">
       {% for k, v in result.attributes.child_counts.items() %}
-        <li class="db fl mr3 {% if k == selected %}bw2 b--light-gray bt bl br bg-white{% else %}bg-near-white{% endif %}" style="margin-bottom: -0.25rem;">
-          <a class="b f5 i pv2 ph3 db {% if k == selected %}{% else %}{% endif %} near-black link glow" 
-             href="{{ url_for('areas.get_area', areacode=result.id, filetype='html', child=k, _anchor='children') }}">
-            {{ area_types[k].name }}<br>
-            <span class="normal">{{ "{:,.0f}".format(v) }} areas<span>
-          </a>
-        </li>
+      <li class="db fl mr3 {% if k == selected %}bw2 b--light-gray bt bl br bg-white{% else %}bg-near-white{% endif %}"
+        style="margin-bottom: -0.25rem;">
+        <a class="b f5 i pv2 ph3 db {% if k == selected %}{% else %}{% endif %} near-black link glow"
+          href="{{ url_for('areas.get_area', areacode=result.id, filetype='html', child=k, _anchor='children') }}">
+          {{ area_types[k].name }}<br>
+          <span class="normal">{{ "{:,.0f}".format(v) }} areas<span>
+        </a>
+      </li>
       {% endfor %}
-      </ul>
-      <div class="pa3 f5">
-        <p>
-          <a class="link blue underline-hover"
-             href="{{ url_for('areas.get_area_children_boundary', areacode=result.id, areatype=selected)}}">
-            Boundaries (GeoJSON)
-          </a>
-        </p>
-        {{ area_loop(result.relationships.children[selected]|sort(attribute="id"), result.id)}}
-      </div>
+    </ul>
+    <div class="pa3 f5">
+      <p>
+        <a class="link blue underline-hover"
+          href="{{ url_for('areas.get_area_children_boundary', areacode=result.id, areatype=selected)}}">
+          Boundaries (GeoJSON)
+        </a>
+      </p>
+      {{ area_loop(result.relationships.children[selected]|sort(attribute="id"), result.id)}}
+    </div>
     {% endcall %}
     {% endif %}
   </div>
@@ -158,9 +165,10 @@
 
 {% if example_postcodes and example_postcodes[0].id.startswith("BT") %}
 <p class="f5 gray i">
-  Northern Ireland postcodes are included based on the 
-  <a href="https://www.ons.gov.uk/methodology/geography/licences" class='link blue underline-hover'>Northern Ireland End User Licence</a>.
-  The licence covers internal use of the data. Commercial use may require additional permission. 
+  Northern Ireland postcodes are included based on the
+  <a href="https://www.ons.gov.uk/methodology/geography/licences" class='link blue underline-hover'>Northern Ireland End
+    User Licence</a>.
+  The licence covers internal use of the data. Commercial use may require additional permission.
 </p>
 {% endif %}
 {% endblock %}
@@ -169,15 +177,15 @@
 {% if example_postcodes or result.has_boundary %}
 <script type="text/javascript">
   var postcodes = [
-    {% for p in example_postcodes %}{% if p.attributes.location %}{{ p.attributes.location|tojson }},
-    {% endif %}{% endfor %}];
+    {% for p in example_postcodes %}{% if p.attributes.location %} { { p.attributes.location | tojson } },
+  {% endif %} {% endfor %}];
   {% if result.has_boundary %}
-  var geojson = {{ url_for('areas.get_area_boundary', areacodes=result.id)|tojson }};
+  var geojson = {{ url_for('areas.get_area_boundary', areacodes = result.id) | tojson }};
   {% else %}
   var geojson = null;
   {% endif %}
   {% if result.relationships.parent %}
-  var parent_geojson = {{ url_for('areas.get_area_boundary', areacodes=result.relationships.parent.id)|tojson }};
+  var parent_geojson = {{ url_for('areas.get_area_boundary', areacodes = result.relationships.parent.id) | tojson }};
   {% endif %}
 </script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/map.js') }}"></script>

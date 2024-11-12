@@ -10,6 +10,7 @@ from ua_parser import user_agent_parser
 
 from findthatpostcode import blueprints, commands, db
 from findthatpostcode.controllers.areatypes import area_types_count
+from findthatpostcode.limiter import limiter
 from findthatpostcode.metadata import AREA_TYPES, KEY_AREA_TYPES, OTHER_CODES
 
 
@@ -64,6 +65,7 @@ def create_app(test_config=None):
 
     db.init_app(app)
     commands.init_app(app)
+    limiter.init_app(app)
     CORS(app)
 
     # template helpers
@@ -85,11 +87,13 @@ def create_app(test_config=None):
 
     # routes and blueprints
     @app.route("/")
+    @limiter.exempt
     def index():
         ats = area_types_count(db.get_db())
         return render_template("index.html.j2", result=ats)
 
     @app.route("/robots.txt")
+    @limiter.exempt
     def robots():
         text = render_template("robots.txt")
         response = make_response(text)
@@ -97,6 +101,7 @@ def create_app(test_config=None):
         return response
 
     @app.route("/about")
+    @limiter.exempt
     def about():
         return render_template("about.html.j2")
 

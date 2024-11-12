@@ -1,4 +1,5 @@
 % rebase("base.html.j2", title='Point error')
 <div class="content">
-This point ({{point["lat"]}}, {{point["lon"]}}) is {{ "{:,.0f}".format(point["distance"] / 1000)}} km away from the nearest postcode ({{postcode}}). Are you sure it's in the UK?
+    This point ({{point["lat"]}}, {{point["lon"]}}) is {{ "{:,.0f}".format(point["distance"] / 1000)}} km away from the
+    nearest postcode ({{postcode}}). Are you sure it's in the UK?
 </div>

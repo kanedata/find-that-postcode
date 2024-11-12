@@ -1,22 +1,24 @@
 <div class="flex-l">
 
-{% for i in key_area_types %}
+  {% for i in key_area_types %}
   <div class="w-100 w-25-l pr0 pr3-l pv3">
     <nav class="">
       <h3 class="f3-ns f4 header-font ma0 normal">{{ i[0] }} areas</h3>
       <ul class="list pl0">
-      {% for j in i[1] %}
+        {% for j in i[1] %}
         {% set areatype = area_types.get(j) %}
         <li class="pb2">
-          <a href="{{ url_for('areatypes.get_areatype', areacode=j, filetype='html') }}" class="underline dark-blue f4">{{ areatype["name"] }}</a>
+          <a href="{{ url_for('areatypes.get_areatype', areacode=j, filetype='html') }}"
+            class="underline dark-blue f4">{{ areatype["name"] }}</a>
           {% if result.get and result.get(j) %}
-          <small class="gray no-underline fr"> ({{ "{:,.0f}".format(result.get(j)) }}{% if loop.index0==0 %} areas{% endif %})</small>
+          <small class="gray no-underline fr"> ({{ "{:,.0f}".format(result.get(j)) }}{% if loop.index0==0 %}
+            areas{% endif %})</small>
           {% endif %}
         </li>
-      {% endfor %}
+        {% endfor %}
       </ul>
     </nav>
   </div>
-{% endfor %}
+  {% endfor %}
 
 </div>

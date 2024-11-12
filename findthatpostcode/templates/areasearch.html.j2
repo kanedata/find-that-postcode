@@ -9,57 +9,60 @@
     {% include "_search.html.j2" %}
   </div>
 
-{% if q %}
+  {% if q %}
   <div class="w-100 ph0 pv3">
-  {% if result %}
+    {% if result %}
     <article class="message is-success pa2 bg-washed-green mb4 w-100">
       <div class="message-body">
         {% if result|length >= total %}
         Showing all {{ "{:,.0f}".format(total) }} results for "{{ q }}"
         {% else %}
-        Showing {{ "{:,.0f}".format(nav.start_item) }} to {{ "{:,.0f}".format(nav.end_item) }} of {{ "{:,.0f}".format(total) }}
+        Showing {{ "{:,.0f}".format(nav.start_item) }} to {{ "{:,.0f}".format(nav.end_item) }} of
+        {{ "{:,.0f}".format(total) }}
         results for "{{ q }}"
         {% endif %}
       </div>
     </article>
     <ul class="list pa0 ma0">
       {% for i, score in result %}
-        <li class="pa0 mb4 content measure-wide">
-          <h3 class="title pa0 mb1 mt0 mh0">
-            <a href="{{ area_link(i) }}" class="dark-blue link underline-hover tracked-tight lh-copy normal">
-              {{- i.attributes.name|expand_commas -}}
-            </a>
-            {% if i.attributes.active==false %}
-            <span class="red tracked-tight lh-copy normal ml2">(Inactive)</span>
-            {% endif %}
-          </h3>
-          <h4 class="subtitle mt0 mb2 pa0 f4 mid-gray normal">
+      <li class="pa0 mb4 content measure-wide">
+        <h3 class="title pa0 mb1 mt0 mh0">
+          <a href="{{ area_link(i) }}" class="dark-blue link underline-hover tracked-tight lh-copy normal">
+            {{- i.attributes.name|expand_commas -}}
+          </a>
+          {% if i.attributes.active==false %}
+          <span class="red tracked-tight lh-copy normal ml2">(Inactive)</span>
+          {% endif %}
+        </h3>
+        <h4 class="subtitle mt0 mb2 pa0 f4 mid-gray normal">
           {% if i.relationships.areatype %}
-            {% if i.attributes.active==false %}
-            <span class="red b">Inactive</span>
-            {% endif %}
-            {{ i.relationships.areatype.get_name(i.id) }}
+          {% if i.attributes.active==false %}
+          <span class="red b">Inactive</span>
+          {% endif %}
+          {{ i.relationships.areatype.get_name(i.id) }}
           {% elif i.__class__.__name__=='Place' %}{{i.attributes.type|default('Place', true) }}{% endif %}
           {% if i.relationships.parent %}
-            in <a href="{{ url_for('areas.get_area', areacode=i.relationships.parent.id, filetype='html') }}" class="blue link underline-hover dim">
-              {{- i.relationships.parent.attributes.name -}}
-            </a>
+          in <a href="{{ url_for('areas.get_area', areacode=i.relationships.parent.id, filetype='html') }}"
+            class="blue link underline-hover dim">
+            {{- i.relationships.parent.attributes.name -}}
+          </a>
           {% elif i.relationships.areas %}
-            {% for j in i.relationships.areas %}
-            in <a href="{{ url_for('areas.get_area', areacode=j.id, filetype='html') }}" class="blue link underline-hover dim">
-              {{- j.attributes.name -}}
-            </a>
-            {% endfor %}
+          {% for j in i.relationships.areas %}
+          in <a href="{{ url_for('areas.get_area', areacode=j.id, filetype='html') }}"
+            class="blue link underline-hover dim">
+            {{- j.attributes.name -}}
+          </a>
+          {% endfor %}
           {% endif %}
-          </h4>
-          <span class='pa1 bg-light-gray mr1'>
-            <a href="{{ area_link(i) }}" class='near-black code link underline-hover'>{{ i.id }}</a>
-          </span>
-        </li>
+        </h4>
+        <span class='pa1 bg-light-gray mr1'>
+          <a href="{{ area_link(i) }}" class='near-black code link underline-hover'>{{ i.id }}</a>
+        </span>
+      </li>
       {% endfor %}
     </ul>
     <div class="f5 mt4">
-    {{ pagination(nav) }}
+      {{ pagination(nav) }}
     </div>
     {% else %}
     <article class="message is-error pa2 bg-washed-red mb4 w-100">
@@ -69,7 +72,7 @@
     </article>
     {% endif %}
   </div>
-{% endif %}
+  {% endif %}
 
 </section>
 {% endblock %}

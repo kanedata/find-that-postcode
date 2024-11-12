@@ -5,7 +5,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 RATE_LIMIT_EXEMPT_HEADER = "X-RateLimit-Exempt"
-RATE_LIMIT_EXEMPT_KEYS = os.environ.get("RATE_LIMIT_EXEMPT_KEYS", "").split(";")
+RATE_LIMIT_EXEMPT_KEYS = os.environ.get("RATE_LIMIT_EXEMPT_KEYS", "").split(",")
 
 
 def exempt_if_header():

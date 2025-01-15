@@ -106,7 +106,15 @@ def get_area(areacode, filetype="json"):
         return jsonify(r)
 
     return return_result(
-        result, filetype, "area.html.j2", child=request.values.get("child")
+        result,
+        filetype,
+        "area.html.j2",
+        child=request.values.get("child"),
+        example_postcode_json=[
+            p.attributes.get("location")
+            for p in result.relationships["example_postcodes"]
+            if p.attributes.get("location")
+        ],
     )
 
 

@@ -10,12 +10,12 @@ if (window.postcodes && postcodes.length > 0) {
 var mymap = L.map('postcode-map', {
     zoomSnap: 0.1
 }).setView(center, 9);
-// var layer = new L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png', {
-//     attribution: '&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> <a href="https://www.stamen.com/" target="_blank">&copy; Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/about" target="_blank">OpenStreetMap</a> contributors',
-// }).addTo(mymap);
 var layer = L.maplibreGL({
-    style: 'https://tiles.stadiamaps.com/styles/alidade_smooth.json',
-    attribution: '&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> <a href="https://www.stamen.com/" target="_blank">&copy; Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/about" target="_blank">OpenStreetMap</a> contributors',
+    style: 'https://tiles.openfreemap.org/styles/positron',
+    attribution: `
+    <a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> 
+    <a href="https://www.openmaptiles.org/" target="_blank">&copy; OpenMapTiles</a> 
+    Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>`,
 }).addTo(mymap);
 L.osGraticule({ showLabels: false, lineColor: '#ddd' }).addTo(mymap);
 
@@ -30,7 +30,7 @@ if (document.getElementById('location-map')) {
         scrollWheelZoom: false,
     });
     var layer = L.maplibreGL({
-        style: 'https://tiles.stadiamaps.com/styles/alidade_smooth.json',
+        style: 'https://tiles.openfreemap.org/styles/positron',
     }).addTo(location_map);
     location_map.fitBounds(UK_BOUNDS);
     location_map.setMinZoom(location_map.getZoom());

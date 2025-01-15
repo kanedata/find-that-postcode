@@ -53,8 +53,11 @@
 
   {% if result.attributes.location %}
   <div class="fl w-two-thirds-l w-100">
-    <figure class="ma0 pa0">
+    <figure class="ma0 w-70 fl">
       <div id="postcode-map" style="height:500px;"></div>
+    </figure>
+    <figure class="ma0 w-30 fl">
+      <div id="location-map" style="height:500px;"></div>
     </figure>
     <p class="f5 b mt0 mb1 w-100">
       {% if result.get_area('laua') %}

@@ -3,10 +3,9 @@ import os
 import re
 
 import sentry_sdk
-from flask import Flask, make_response, render_template, request
+from flask import Flask, make_response, render_template
 from flask_cors import CORS
 from sentry_sdk.integrations.flask import FlaskIntegration
-from ua_parser import user_agent_parser
 
 from findthatpostcode import blueprints, commands, db
 from findthatpostcode.controllers.areatypes import area_types_count
@@ -106,35 +105,5 @@ def create_app(test_config=None):
         return render_template("about.html.j2")
 
     blueprints.init_app(app)
-
-    @app.after_request
-    def request_log(response):
-        ua = user_agent_parser.Parse(request.user_agent.string)
-        if request.endpoint == "static":
-            return response
-        db.get_log_db()["logs"].insert(
-            {
-                "app": "findthatpostcode",
-                "timestamp": datetime.datetime.now().isoformat(),
-                "url": request.url,
-                "path": request.path,
-                "method": request.method,
-                "params": request.args.to_dict(),
-                "origin": request.origin,
-                "referrer": request.referrer,
-                # "remote_addr": request.remote_addr,  # we don't collect IP address
-                "endpoint": request.endpoint,
-                "view_args": request.view_args,
-                "user_agent_string": ua.get("string") if ua else None,
-                "user_agent": {k: v for k, v in ua.items() if k != "string"}
-                if ua
-                else None,
-                "status_code": response.status_code,
-                "response_size": response.content_length,
-                "content_type": response.mimetype,
-            },
-        )
-        db.close_log_db()
-        return response
 
     return app

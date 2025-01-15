@@ -174,11 +174,13 @@
 {% endblock %}
 
 {% block bodyscripts %}
-{% if example_postcodes or result.has_boundary %}
+{% if example_postcode_json or result.has_boundary %}
 <script type="text/javascript">
-  var postcodes = [
-    {% for p in example_postcodes %}{% if p.attributes.location %} { { p.attributes.location | tojson } },
-  {% endif %} {% endfor %}];
+  {% if example_postcode_json %}
+  var postcodes = {{ example_postcode_json | tojson }};
+  {% else %}
+  var postcodes = null;
+  {% endif %}
   {% if result.has_boundary %}
   var geojson = {{ url_for('areas.get_area_boundary', areacodes = result.id) | tojson }};
   {% else %}

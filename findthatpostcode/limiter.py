@@ -16,7 +16,7 @@ def exempt_if_header():
 
 limiter = Limiter(
     get_remote_address,
-    default_limits=["2 per minute"],
+    default_limits=["2 per second"],
     application_limits=["20000 per day"],
     storage_uri="memory://",
     headers_enabled=True,

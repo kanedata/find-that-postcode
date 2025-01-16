@@ -64,8 +64,8 @@
     </template>
   </div>
   <div class="w-100 w-60-l pl3 fl">
-    <l-map ref="resultMap" style="height: 500px; width: 100%" :bounds="bounds"
-      :style="{ opacity: result.features.length ? 1 : 0 }">
+    <l-map v-if="result.features.length" ref="resultMap" style="height: 500px; width: 100%" :bounds="bounds"
+      @ready="loadMapTiles">
       <l-geo-json :geojson="result"></l-geo-json>
     </l-map>
   </div>
@@ -201,9 +201,7 @@
         link.click();
         URL.revokeObjectURL(link.href);
       },
-    },
-    mounted() {
-      this.$nextTick(() => {
+      loadMapTiles() {
         L.maplibreGL({
           style: 'https://tiles.openfreemap.org/styles/positron',
           attribution: `
@@ -211,7 +209,7 @@
             <a href="https://www.openmaptiles.org/" target="_blank">&copy; OpenMapTiles</a> 
             Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>`,
         }).addTo(this.$refs.resultMap.mapObject);
-      });
+      },
     },
   });
 </script>

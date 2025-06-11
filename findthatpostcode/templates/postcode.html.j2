@@ -112,6 +112,7 @@
     {% endif %}
 
     {% for a in result.relationships.areas if a.attributes.stats and a.attributes.stats.imd2019 %}
+    {% if loop.first %}
     {% set rank = a.attributes.stats.imd2019.imd_rank %}
     {% set total = other_codes.imd[result.attributes.ctry] %}
     {% call info_block("Index of multiple deprivation (2019)") %}
@@ -125,6 +126,7 @@
       {{ result.attributes.ctry.name }} were more deprived than this one.</p>
     {% endif %}
     {% endcall %}
+    {% endif %}
     {% endfor %}
   </div>
 

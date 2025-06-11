@@ -21,7 +21,7 @@ PC_INDEX = "geo_postcode"
 
 NSPL_URL = {
     2011: "https://www.arcgis.com/sharing/rest/content/items/521edce4159a451a932539b7fc786322/data",
-    2021: "https://www.arcgis.com/sharing/rest/content/items/f7464f3658ba439ba577651b32014cfe/data",
+    2021: "https://www.arcgis.com/sharing/rest/content/items/077631e063eb4e1ab43575d01381ec33/data",
 }
 DEFAULT_YEAR = 2021
 

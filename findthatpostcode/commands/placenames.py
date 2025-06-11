@@ -17,7 +17,7 @@ from .. import db
 
 PLACENAMES_INDEX = "geo_placename"
 
-PLACENAMES_URL = "https://www.arcgis.com/sharing/rest/content/items/6cb9092a37da4b5ea1b5f8b054c343aa/data"
+PLACENAMES_URL = "https://www.arcgis.com/sharing/rest/content/items/208d9884575647c29f0dd5a1184e711a/data"
 
 PLACE_TYPES = {
     "BUA": ["Built-up Area", "England and Wales"],
@@ -40,6 +40,8 @@ PLACE_TYPES = {
 }
 
 AREA_LOOKUP = [
+    ("bua11cd", "bua11", None),
+    ("bua22cd", "bua22", None),
     ("cty15cd", "cty", "cty15nm"),
     ("lad15cd", "laua", "lad15nm"),
     ("wd15cd", "ward", None),
@@ -48,7 +50,6 @@ AREA_LOOKUP = [
     ("regd15cd", "rgd", "regd15nm"),
     ("rgn15cd", "rgn", "rgn15nm"),
     ("npark15cd", "park", "npark15nm"),
-    ("bua11cd", "bua11", None),
     ("pcon15cd", "pcon", "pcon15nm"),
     ("eer15cd", "eer", "eer15nm"),
     ("pfa15cd", "pfa", "pfa15nm"),
@@ -56,14 +57,23 @@ AREA_LOOKUP = [
     ("lad18cd", "laua", "lad18nm"),
     ("wd18cd", "ward", None),
     ("par18cd", "parish", None),
-    ("hlth12cd", "hlth", "hlth12nm"),
     ("regd18cd", "rgd", "regd18nm"),
     ("rgn18cd", "rgn", "rgn18nm"),
     ("npark17cd", "park", "npark17nm"),
-    ("bua11cd", "bua11", None),
     ("pcon18cd", "pcon", "pcon18nm"),
     ("eer18cd", "eer", "eer18nm"),
     ("pfa18cd", "pfa", "pfa18nm"),
+    ("cty23cd", "cty", "cty23nm"),
+    ("lad23cd", "laua", "lad23nm"),
+    ("wd23cd", "ward", None),
+    ("par23cd", "parish", None),
+    ("hlth23cd", "hlth", "hlth23nm"),
+    ("regd23cd", "rgd", "regd23nm"),
+    ("rgn23cd", "rgn", "rgn23nm"),
+    ("npark23cd", "park", "npark23nm"),
+    ("pcon23cd", "pcon", "pcon23nm"),
+    ("eer23cd", "eer", "eer23nm"),
+    ("pfa23cd", "pfa", "pfa23nm"),
 ]
 
 
@@ -92,10 +102,10 @@ def import_placenames(url=PLACENAMES_URL, es_index=PLACENAMES_INDEX):
             reader = csv.DictReader(pccsv)
             place_code = None
             place_name = None
-            for i in reader:
+            for row in reader:
                 # get the names of the name and code fields
                 if not place_code or not place_name:
-                    for key in i.keys():
+                    for key in row.keys():
                         if key.startswith("place") and key.endswith("cd"):
                             place_code = key
                         if key.startswith("place") and key.endswith("nm"):
@@ -105,49 +115,49 @@ def import_placenames(url=PLACENAMES_URL, es_index=PLACENAMES_INDEX):
                     "_index": es_index,
                     "_type": "_doc",
                     "_op_type": "update",
-                    "_id": i[place_code],
+                    "_id": row[place_code],
                     "doc_as_upsert": True,
                 }
 
-                for k in i:
-                    if i[k] == "":
-                        i[k] = None
+                for k in row:
+                    if row[k] == "":
+                        row[k] = None
 
                 # set the name
-                i["name"] = i[place_name]
-                del i[place_name]
+                row["name"] = row[place_name]
+                del row[place_name]
 
                 # set splitind
-                if "splitind" in i:
-                    i["splitind"] = i["splitind"] == "1"
+                if "splitind" in row:
+                    row["splitind"] = row["splitind"] == "1"
 
                 # population count
-                if i.get("popcnt"):
-                    i["popcnt"] = int(i["popcnt"])
+                if row.get("popcnt"):
+                    row["popcnt"] = int(row["popcnt"])
 
                 # latitude and longitude
                 for j in ["lat", "long"]:
-                    if i[j]:
-                        i[j] = float(i[j])
-                        if i[j] == 99.999999 or i[j] == 0:
-                            i[j] = None
-                if i["lat"] and i["long"]:
-                    i["location"] = {"lat": i["lat"], "lon": i["long"]}
+                    if row[j]:
+                        row[j] = float(row[j])
+                        if row[j] == 99.999999 or row[j] == 0:
+                            row[j] = None
+                if row["lat"] and row["long"]:
+                    row["location"] = {"lat": row["lat"], "lon": row["long"]}
 
                 # get areas
                 areas = {}
                 for j in AREA_LOOKUP:
-                    if j[0] in i:
-                        areas[j[1]] = i[j[0]]
-                        del i[j[0]]
-                        if j[2] and j[2] in i:
-                            del i[j[2]]
-                i["areas"] = areas
-                i["type"], i["country"] = PLACE_TYPES.get(
-                    i["descnm"], [i["descnm"], "United Kingdom"]
+                    if j[0] in row:
+                        areas[j[1]] = row[j[0]]
+                        del row[j[0]]
+                        if j[2] and j[2] in row:
+                            del row[j[2]]
+                row["areas"] = areas
+                row["type"], row["country"] = PLACE_TYPES.get(
+                    row["descnm"], [row["descnm"], "United Kingdom"]
                 )
 
-                record["doc"] = i
+                record["doc"] = row
                 placenames.append(record)
 
             print("[placenames] Processed %s placenames" % len(placenames))

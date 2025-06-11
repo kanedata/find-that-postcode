@@ -15,7 +15,7 @@ with open(
 KEY_AREA_TYPES = [
     ("Key", ["ctry", "rgn", "cty", "laua", "ward", "msoa21", "pcon"]),
     ("Secondary", ["ttwa", "pfa", "lep", "lsoa21", "oa21", "npark"]),
-    ("Health", ["ccg", "nhser", "hb", "lhb"]),
+    ("Health", ["ccg", "nhser", "hb", "lhb", "icb"]),
     ("Other", ["eer", "bua11", "buasd11", "wz11", "teclec"]),
 ]
 
@@ -60,6 +60,7 @@ BASIC_UPLOAD_FIELDS = [
     ("pcds", "Standardised postcode", False),
     ("oac11", "2011 Output Area Classification (OAC)", True),
     ("ru11ind", "2011 Census rural-urban classification", True),
+    ("ruc21", "2021 Census rural-urban classification", True),
 ]
 STATS_FIELDS = [
     (
@@ -330,4 +331,13 @@ RU11IND_CODES = {
     "6": "Accessible Rural",
     "7": "Remote Rural",
     "8": "Very Remote Rural",
+}
+
+RUC21_CODES = {
+    "RLF1": "Larger rural: Further from a major town or city",  # Rural
+    "RLN1": "Larger rural: Nearer to a major town or city",  # Rural
+    "RSF1": "Smaller rural: Further from a major town or city",  # Rural
+    "RSN1": "Smaller rural: Nearer to a major town or city",  # Rural
+    "UF1": "Urban: Further from a major town or city",  # Urban
+    "UN1": "Urban: Nearer to a major town or city",  # Urban
 }

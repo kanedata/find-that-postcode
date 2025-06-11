@@ -98,9 +98,16 @@
     {% endcall %}
     {% endif %}
 
-    {% if result.attributes.ru11ind %}
+    {% if result.attributes.ru11ind or result.attributes.ruc21 %}
     {% call info_block("Rural/urban classification") %}
-    {{ result.attributes.ru11ind.description }} <code class="code fr">{{ result.attributes.ru11ind.code }}</code>
+    {% if result.attributes.ruc21 %}
+    {{ result.attributes.ruc21.description }} (2021)
+    <code class="code fr">{{ result.attributes.ruc21.code }}</code><br>
+    {% endif %}
+    {% if result.attributes.ru11ind %}
+    {{ result.attributes.ru11ind.description }} (2011)
+    <code class="code fr">{{ result.attributes.ru11ind.code }}</code>
+    {% endif %}
     {% endcall %}
     {% endif %}
 

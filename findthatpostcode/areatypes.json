@@ -1,1319 +1,1002 @@
 {
-    "agricreg": {
-        "entities": [
-            "W29"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Agricultural Regions",
-        "full_name": "Agricultural Regions",
-        "description": null
-    },
-    "agricsmall": {
-        "entities": [
-            "W30"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Agricultural Small Areas",
-        "full_name": "Agricultural Small Areas",
-        "description": null
-    },
-    "brma": {
-        "entities": [
-            "S33"
-        ],
-        "status": "Current",
-        "theme": "Housing and Regeneration",
-        "name": "Broad Rental Market Areas",
-        "full_name": "Broad Rental Market Areas",
-        "description": null
-    },
-    "bua11": {
-        "entities": [
-            "E34",
-            "K05",
-            "W37"
-        ],
-        "status": "Current",
-        "theme": "Census",
-        "name": "Built-up Area",
-        "full_name": "Built-up Area (BUA)",
-        "description": "The code for the BUAs in England and Wales. Pseudo codes are included for those OAs not classed as 'built-up' and cross-border codes are included for areas straddling the English/Welsh border. Pseudo codes are also included for Scotland, Northern Ireland, Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."
-    },
-    "buasd11": {
-        "entities": [
-            "E35",
-            "K06",
-            "W38"
-        ],
-        "status": "Current",
-        "theme": "Census",
-        "name": "Built-up Area Sub-division (BUASD)",
-        "full_name": "Built-up Area Sub-division",
-        "description": "The code for the BUASDs in England and Wales. Pseudo codes are included for those OAs not classed as 'built-up' and cross-border codes are included for areas straddling the English/Welsh border. Pseudo codes are also included for Scotland, Northern Ireland, Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code"
-    },
-    "cal": {
-        "entities": [
-            "E56"
-        ],
-        "status": "Current",
-        "theme": "Health",
-        "name": "Cancer Alliances",
-        "full_name": "Cancer Alliances",
-        "description": null
-    },
-    "cannet": {
-        "entities": [
-            "E21",
-            "W13"
-        ],
-        "status": "Current",
-        "theme": "Health",
-        "name": "Cancer Networks",
-        "full_name": "Cancer Networks",
-        "description": null
-    },
-    "canreg": {
-        "entities": [
-            "E20",
-            "W12"
-        ],
-        "status": "Current",
-        "theme": "Health",
-        "name": "Cancer Registries",
-        "full_name": "Cancer Registries",
-        "description": null
-    },
-    "cauth": {
-        "entities": [
-            "E47"
-        ],
-        "status": "Current",
-        "theme": "Administrative",
-        "name": "Combined Authorities",
-        "full_name": "Combined Authorities",
-        "description": null
-    },
-    "ccg": {
-        "entities": [
-            "E38"
-        ],
-        "status": "Current",
-        "theme": "Health",
-        "name": "Clinical Commissioning Group",
-        "full_name": "Clinical Commissioning Group (CCG)/Local Health Board (LHB)/Community Health Partnership (CHP)/ Local Commissioning Group (LCG)/Primary Healthcare Directorate (PHD)",
-        "description": "The code for the CCG areas in England, LHBs in Wales, CHPs in Scotland, LCG in Northern Ireland and PHD in the Isle of Man. A pseudo code is included for Channel Islands. The field will be blank for postcodes in England or Wales with no OA code."
-    },
-    "cdc": {
-        "entities": [
-            "S28"
-        ],
-        "status": "Current",
-        "theme": "Census",
-        "name": "Census Detailed Characteristics",
-        "full_name": "Census Detailed Characteristics",
-        "description": null
-    },
-    "ced": {
-        "entities": [
-            "E58"
-        ],
-        "status": "Current",
-        "theme": "Electoral",
-        "name": "County Electoral Divisions",
-        "full_name": "County Electoral Divisions",
-        "description": null
-    },
-    "cfa": {
-        "entities": [
-            "W33"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Communities First Areas",
-        "full_name": "Communities First Areas",
-        "description": null
-    },
-    "chcp": {
-        "entities": [
-            "S26"
-        ],
-        "status": "Archived",
-        "theme": "Health",
-        "name": "Community Health Partnerships sub-areas",
-        "full_name": "Community Health Partnerships sub-areas",
-        "description": null
-    },
-    "chp": {
-        "entities": [
-            "S03"
-        ],
-        "status": "Archived",
-        "theme": "Health",
-        "name": "Community Health Partnerships",
-        "full_name": "Community Health Partnerships",
-        "description": null
-    },
-    "cja": {
-        "entities": [
-            "S25"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Community Justice Authorities",
-        "full_name": "Community Justice Authorities",
-        "description": null
-    },
-    "clc": {
-        "entities": [
-            "S29"
-        ],
-        "status": "Current",
-        "theme": "Census",
-        "name": "Census Local Characteristics",
-        "full_name": "Census Local Characteristics",
-        "description": null
-    },
-    "cmcty": {
-        "entities": [
-            "E42"
-        ],
-        "status": "Current",
-        "theme": "Census",
-        "name": "Census Merged Counties",
-        "full_name": "Census Merged Counties",
-        "description": null
-    },
-    "cmlad": {
-        "entities": [
-            "E41",
-            "W40"
-        ],
-        "status": "Current",
-        "theme": "Census",
-        "name": "Census Merged Local Authority Districts",
-        "full_name": "Census Merged Local Authority Districts",
-        "description": null
-    },
-    "cmwd": {
-        "entities": [
-            "E36",
-            "W39"
-        ],
-        "status": "Current",
-        "theme": "Census",
-        "name": "Census Merged Wards",
-        "full_name": "Census Merged Wards",
-        "description": null
-    },
-    "com": {
-        "entities": [
-            "W04"
-        ],
-        "status": "Current",
-        "theme": "Administrative",
-        "name": "Communities",
-        "full_name": "Communities",
-        "description": null
-    },
-    "creg": {
-        "entities": [
-            "W42"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "City Regions",
-        "full_name": "City Regions",
-        "description": null
-    },
-    "csp": {
-        "entities": [
-            "E22",
-            "W14"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Community Safety Partnerships",
-        "full_name": "Community Safety Partnerships",
-        "description": null
-    },
-    "ct": {
-        "entities": [
-            "E17"
-        ],
-        "status": "Archived",
-        "theme": "Health",
-        "name": "Care Trusts",
-        "full_name": "Care Trusts",
-        "description": null
-    },
-    "ctry": {
-        "entities": [
-            "E92",
-            "K02",
-            "K03",
-            "K04",
-            "L93",
-            "M83",
-            "N92",
-            "S92",
-            "W92"
-        ],
-        "status": "Current",
-        "theme": "Administrative",
-        "name": "Country",
-        "full_name": "Country",
-        "description": "The code for the appropriate country (i.e. one of the four constituent countries of the UK or Crown dependencies - the Channel Islands or the Isle of Man) to which each postcode is assigned."
-    },
-    "cty": {
-        "entities": [
-            "E10"
-        ],
-        "status": "Current",
-        "theme": "Administrative",
-        "name": "County",
-        "full_name": "County",
-        "description": "The current county to which the postcode has been assigned. Pseudo codes are included for English UAs, Wales, Scotland, Northern Ireland, Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."
-    },
-    "cty1961": {
-        "entities": [
-            "J05"
-        ],
-        "status": "Current",
-        "theme": "Census",
-        "name": "1961 Census Counties",
-        "full_name": "1961 Census Counties",
-        "description": null
-    },
-    "cvp": {
-        "entities": [
-            "S35"
-        ],
-        "status": "Archived",
-        "theme": "Administrative",
-        "name": "Civil Parish",
-        "full_name": "Civil Parish",
-        "description": null
-    },
-    "dc": {
-        "entities": [
-            "E51"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Development Corporations",
-        "full_name": "Development Corporations",
-        "description": null
-    },
-    "dcells": {
-        "entities": [
-            "W16"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Department for Children, Education, Lifelong Learning and Skills, WG",
-        "full_name": "Department for Children, Education, Lifelong Learning and Skills, WG",
-        "description": null
-    },
-    "dea": {
-        "entities": [
-            "N10"
-        ],
-        "status": "Current",
-        "theme": "Electoral",
-        "name": "District Electoral Areas",
-        "full_name": "District Electoral Areas",
-        "description": null
-    },
-    "eer": {
-        "entities": [
-            "E15",
-            "N07",
-            "S15",
-            "W08"
-        ],
-        "status": "Current",
-        "theme": "Electoral",
-        "name": "European Electoral Region",
-        "full_name": "European Electoral Region (EER)",
-        "description": "The European Electoral Region code for each postcode. A pseudo code is included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code"
-    },
-    "er": {
-        "entities": [
-            "S09"
-        ],
-        "status": "Current",
-        "theme": "Economic",
-        "name": "Enterprise Regions",
-        "full_name": "Enterprise Regions",
-        "description": null
-    },
-    "ez": {
-        "entities": [
-            "E49"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Enterprise Zones",
-        "full_name": "Enterprise Zones",
-        "description": null
-    },
-    "fra": {
-        "entities": [
-            "E31",
-            "W25"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Fire and Rescue Authorities",
-        "full_name": "Fire and Rescue Authorities",
-        "description": null
-    },
-    "gla": {
-        "entities": [
-            "E61"
-        ],
-        "status": "Current",
-        "theme": "Administrative",
-        "name": "Greater London Authority",
-        "full_name": "Greater London Authority",
-        "description": null
-    },
-    "hb": {
-        "entities": [
-            "S08"
-        ],
-        "status": "Current",
-        "theme": "Health",
-        "name": "Health Board areas",
-        "full_name": "Health Board areas",
-        "description": null
-    },
-    "hia": {
-        "entities": [
-            "S37"
-        ],
-        "status": "Current",
-        "theme": "Health",
-        "name": "Integration Authorities",
-        "full_name": "Integration Authorities",
-        "description": null
-    },
-    "hie": {
-        "entities": [
-            "S24"
-        ],
-        "status": "Current",
-        "theme": "Economic",
-        "name": "Highlands and Islands Enterprise",
-        "full_name": "Highlands and Islands Enterprise",
-        "description": null
-    },
-    "ics": {
-        "entities": [
-            "E59"
-        ],
-        "status": "Current",
-        "theme": "Health",
-        "name": "Integrated Care Systems",
-        "full_name": "Integrated Care Systems",
-        "description": null
-    },
-    "iol": {
-        "entities": [
-            "E13"
-        ],
-        "status": "Current",
-        "theme": "Statistical Building Block",
-        "name": "Inner and Outer London",
-        "full_name": "Inner and Outer London",
-        "description": null
-    },
-    "isdt": {
-        "entities": [
-            "S27"
-        ],
-        "status": "Current",
-        "theme": "Health",
-        "name": "ISD Health Board of Treatment",
-        "full_name": "ISD Health Board of Treatment",
-        "description": null
-    },
-    "islg": {
-        "entities": [
-            "S36"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Island Groups",
-        "full_name": "Island Groups",
-        "description": null
-    },
-    "lac": {
-        "entities": [
-            "E32"
-        ],
-        "status": "Current",
-        "theme": "Electoral",
-        "name": "London Assembly Constituencies",
-        "full_name": "London Assembly Constituencies",
-        "description": null
-    },
-    "lad1961": {
-        "entities": [
-            "J04"
-        ],
-        "status": "Current",
-        "theme": "Census",
-        "name": "1961 Census Districts",
-        "full_name": "1961 Census Districts",
-        "description": null
-    },
-    "lau1": {
-        "entities": [
-            "S30"
-        ],
-        "status": "Current",
-        "theme": "Administrative",
-        "name": "Local Administrative Units 1",
-        "full_name": "Local Administrative Units 1",
-        "description": null
-    },
-    "lau2": {
-        "entities": [
-            "S31"
-        ],
-        "status": "Current",
-        "theme": "Administrative",
-        "name": "Local Administrative Units 2",
-        "full_name": "Local Administrative Units 2",
-        "description": null
-    },
-    "laua": {
-        "entities": [
-            "E06",
-            "E07",
-            "E08",
-            "E09",
-            "N09",
-            "S12",
-            "W06"
-        ],
-        "status": "Current",
-        "theme": "Administrative",
-        "name": "Local Authority",
-        "full_name": "Local Authority District (LAD)/unitary authority (UA)/metropolitan district (MD)/London borough (LB)/ council area (CA)/district council area (DCA)",
-        "description": "The current district/UA to which the postcode has been assigned. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."
-    },
-    "lep": {
-        "entities": [
-            "E37"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Local Enterprise Partnership",
-        "full_name": "Local Enterprise Partnership (LEP)",
-        "description": "The primary LEP code for each English postcode. Pseudo codes are included for the rest of the UK. The field will otherwise be blank for postcodes with no OA code."
-    },
-    "lepnop": {
-        "entities": [
-            "E53"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "LEP - non overlapping part ",
-        "full_name": "LEP - non overlapping part ",
-        "description": null
-    },
-    "lepop": {
-        "entities": [
-            "E52"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "LEP - overlapping part",
-        "full_name": "LEP - overlapping part",
-        "description": null
-    },
-    "lhb": {
-        "entities": [
-            "W11"
-        ],
-        "status": "Current",
-        "theme": "Health",
-        "name": "Local Health Boards",
-        "full_name": "Local Health Boards",
-        "description": null
-    },
-    "llsc": {
-        "entities": [
-            "E24"
-        ],
-        "status": "Archived",
-        "theme": "Other",
-        "name": "Local Learning and Skills Council areas",
-        "full_name": "Local Learning and Skills Council areas",
-        "description": null
-    },
-    "loc": {
-        "entities": [
-            "S19"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Localities",
-        "full_name": "Localities",
-        "description": null
-    },
-    "lpa": {
-        "entities": [
-            "E60",
-            "N13",
-            "S44",
-            "W43"
-        ],
-        "status": "Current",
-        "theme": "Administrative",
-        "name": "Local Planning Authorities",
-        "full_name": "Local Planning Authorities",
-        "description": null
-    },
-    "lrf": {
-        "entities": [
-            "E48",
-            "W41"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Local Resilience Forums",
-        "full_name": "Local Resilience Forums",
-        "description": null
-    },
-    "lsoa11": {
-        "entities": [
-            "E01",
-            "S01",
-            "W01"
-        ],
-        "status": "Current",
-        "theme": "Statistical Building Block",
-        "name": "Lower Super Output Area",
-        "full_name": "2011 Census Lower Layer Super Output Area (LSOA)/ Data Zone (DZ)/ SOA",
-        "description": "The 2011 Census LSOA code for England and Wales, SOA code for Northern Ireland and DZ code for Scotland. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code. N.B. NI SOAs remain unchanged from 2001."
-    },
-    "lsoa21": {
-        "entities": [
-            "E01",
-            "S01",
-            "W01"
-        ],
-        "status": "Current",
-        "theme": "Statistical Building Block",
-        "name": "Lower Super Output Area",
-        "full_name": "2021 Census Lower Layer Super Output Area (LSOA)/ Data Zone (DZ)/ SOA",
-        "description": "The 2021 Census LSOA code for England and Wales, SOA code for Northern Ireland and DZ code for Scotland. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code. N.B. NI SOAs remain unchanged from 2001."
-    },
-    "mcty": {
-        "entities": [
-            "E11"
-        ],
-        "status": "Current",
-        "theme": "Administrative",
-        "name": "Metropolitan Counties",
-        "full_name": "Metropolitan Counties",
-        "description": null
-    },
-    "msoa11": {
-        "entities": [
-            "E02",
-            "S02",
-            "W02"
-        ],
-        "status": "Current",
-        "theme": "Statistical Building Block",
-        "name": "Middle Super Output Area",
-        "full_name": "Middle Layer Super Output Area (MSOA)/Intermediate Zone (IZ)",
-        "description": "The 2011 Census MSOA code for England and Wales and IZ code for Scotland. Pseudo codes are included for Northern Ireland, Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."
-    },
-    "msoa21": {
-        "entities": [
-            "E02",
-            "S02",
-            "W02"
-        ],
-        "status": "Current",
-        "theme": "Statistical Building Block",
-        "name": "Middle Super Output Area",
-        "full_name": "Middle Layer Super Output Area (MSOA)/Intermediate Zone (IZ)",
-        "description": "The 2021 Census MSOA code for England and Wales and IZ code for Scotland. Pseudo codes are included for Northern Ireland, Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."
-    },
-    "naer": {
-        "entities": [
-            "W19"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "National Assembly Economic Regions",
-        "full_name": "National Assembly Economic Regions",
-        "description": null
-    },
-    "nawc": {
-        "entities": [
-            "W09"
-        ],
-        "status": "Current",
-        "theme": "Electoral",
-        "name": "National Assembly for Wales Constituencies",
-        "full_name": "National Assembly for Wales Constituencies",
-        "description": null
-    },
-    "nawer": {
-        "entities": [
-            "W10"
-        ],
-        "status": "Current",
-        "theme": "Electoral",
-        "name": "National Assembly for Wales Electoral Regions",
-        "full_name": "National Assembly for Wales Electoral Regions",
-        "description": null
-    },
-    "ncp": {
-        "entities": [
-            "E43"
-        ],
-        "status": "Current",
-        "theme": "Census",
-        "name": "Non-Civil Parished Areas",
-        "full_name": "Non-Civil Parished Areas",
-        "description": null
-    },
-    "ncv": {
-        "entities": [
-            "E57"
-        ],
-        "status": "Archived",
-        "theme": "Health",
-        "name": "National Cancer Vanguards",
-        "full_name": "National Cancer Vanguards",
-        "description": null
-    },
-    "ndc": {
-        "entities": [
-            "E27"
-        ],
-        "status": "Archived",
-        "theme": "Other",
-        "name": "New Deal for Communities",
-        "full_name": "New Deal for Communities",
-        "description": null
-    },
-    "nhser": {
-        "entities": [
-            "E40"
-        ],
-        "status": "Current",
-        "theme": "Health",
-        "name": "NHS England Regions",
-        "full_name": "NHS England Regions",
-        "description": null
-    },
-    "nhsrlo": {
-        "entities": [
-            "E39"
-        ],
-        "status": "Current",
-        "theme": "Health",
-        "name": "NHS England (Region, Local Office)",
-        "full_name": "NHS England (Region, Local Office)",
-        "description": null
-    },
-    "nifrs": {
-        "entities": [
-            "N31"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Northern Ireland Fire and Rescue Service",
-        "full_name": "Northern Ireland Fire and Rescue Service",
-        "description": null
-    },
-    "nifrsa": {
-        "entities": [
-            "N32"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Northern Ireland Fire and Rescue Service Areas",
-        "full_name": "Northern Ireland Fire and Rescue Service Areas",
-        "description": null
-    },
-    "nifrsd": {
-        "entities": [
-            "N33"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Northern Ireland Fire and Rescue Service Districts",
-        "full_name": "Northern Ireland Fire and Rescue Service Districts",
-        "description": null
-    },
-    "noncfa": {
-        "entities": [
-            "W34"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Non-Communities First Areas",
-        "full_name": "Non-Communities First Areas",
-        "description": null
-    },
-    "nonnpark": {
-        "entities": [
-            "W31"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Non-National Park Area",
-        "full_name": "Non-National Park Area",
-        "description": null
-    },
-    "nonsra": {
-        "entities": [
-            "W32"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Non-Strategic Regeneration Area",
-        "full_name": "Non-Strategic Regeneration Area",
-        "description": null
-    },
-    "npark": {
-        "entities": [
-            "E26",
-            "S21",
-            "W18"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "National Parks",
-        "full_name": "National Parks",
-        "description": null
-    },
-    "oa11": {
-        "entities": [
-            "E00",
-            "N00",
-            "S00",
-            "W00"
-        ],
-        "status": "Current",
-        "theme": "Statistical Building Block",
-        "name": "Output area",
-        "full_name": "2011 Census Output Area (OA)/ Small Area (SA)",
-        "description": "The 2011 Census OAs in GB and SAs in Northern Ireland were based on 2001 Census OAs, and they form the building bricks for defining higher level geographies. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no grid reference."
-    },
-    "oa21": {
-        "entities": [
-            "E00",
-            "N00",
-            "S00",
-            "W00"
-        ],
-        "status": "Current",
-        "theme": "Statistical Building Block",
-        "name": "Output area",
-        "full_name": "2021 Census Output Area (OA)/ Small Area (SA)",
-        "description": "The 2021 Census OAs in GB and SAs in Northern Ireland were based on 2001 Census OAs, and they form the building bricks for defining higher level geographies. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no grid reference."
-    },
-    "par": {
-        "entities": [
-            "E04"
-        ],
-        "status": "Current",
-        "theme": "Administrative",
-        "name": "Civil Parishes",
-        "full_name": "Civil Parishes",
-        "description": null
-    },
-    "par1961": {
-        "entities": [
-            "J02"
-        ],
-        "status": "Current",
-        "theme": "Census",
-        "name": "1961 Census Parishes",
-        "full_name": "1961 Census Parishes",
-        "description": null
-    },
-    "pcon": {
-        "entities": [
-            "E14",
-            "N06",
-            "S14",
-            "W07"
-        ],
-        "status": "Current",
-        "theme": "Electoral",
-        "name": "Westminster parliamentary constituency",
-        "full_name": "Westminster parliamentary constituency",
-        "description": "The Westminster parliamentary constituency code for each postcode. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."
-    },
-    "pct": {
-        "entities": [
-            "E16"
-        ],
-        "status": "Archived",
-        "theme": "Health",
-        "name": "Primary Care Trust",
-        "full_name": "Primary Care Trust (PCT)/ Care Trust/Care Trust Plus (CT)/ Local Health Board (LHB)/Community Health Partnership (CHP)/ Local Commissioning Group (LCG)/Primary Healthcare Directorate (PHD)",
-        "description": "The code for the PCT/CT areas in England, LHBs in Wales, CHPs in Scotland, LCG in Northern Ireland and PHD in the Isle of Man. A pseudo code is included for Channel Islands. The field will otherwise be blank for postcodes with no OA code."
-    },
-    "pfa": {
-        "entities": [
-            "E23",
-            "N23",
-            "S23",
-            "W15"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Police Force Area",
-        "full_name": "Police Force Area (PFA)",
-        "description": "The PFA code for each postcode. A single PFA covers each of Scotland and Northern Ireland (not coded). A pseudo code is included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."
-    },
-    "pfd": {
-        "entities": [
-            "N24"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Police Force Districts",
-        "full_name": "Police Force Districts",
-        "description": null
-    },
-    "phd": {
-        "entities": [
-            "M01"
-        ],
-        "status": "Current",
-        "theme": "Health",
-        "name": "Primary Healthcare Directorate",
-        "full_name": "Primary Healthcare Directorate",
-        "description": null
-    },
-    "phec": {
-        "entities": [
-            "E45"
-        ],
-        "status": "Current",
-        "theme": "Health",
-        "name": "Public Health England Centres",
-        "full_name": "Public Health England Centres",
-        "description": null
-    },
-    "phereg": {
-        "entities": [
-            "E46"
-        ],
-        "status": "Current",
-        "theme": "Health",
-        "name": "Public Health England Regions",
-        "full_name": "Public Health England Regions",
-        "description": null
-    },
-    "pscreg": {
-        "entities": [
-            "W36"
-        ],
-        "status": "Current",
-        "theme": "Administrative",
-        "name": "Footprint Regions for Public Service Collaboration",
-        "full_name": "Footprint Regions for Public Service Collaboration",
-        "description": null
-    },
-    "psha": {
-        "entities": [
-            "E19"
-        ],
-        "status": "Archived",
-        "theme": "Health",
-        "name": "Pan Strategic Health Authorities",
-        "full_name": "Pan Strategic Health Authorities",
-        "description": null
-    },
-    "pua": {
-        "entities": [
-            "E25"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Primary Urban Areas",
-        "full_name": "Primary Urban Areas",
-        "description": null
-    },
-    "regd": {
-        "entities": [
-            "E28",
-            "W20"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Registration Districts",
-        "full_name": "Registration Districts",
-        "description": null
-    },
-    "regsd": {
-        "entities": [
-            "E29",
-            "W21"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Registration Sub-district",
-        "full_name": "Registration Sub-district",
-        "description": null
-    },
-    "rgn": {
-        "entities": [
-            "E12"
-        ],
-        "status": "Current",
-        "theme": "Administrative",
-        "name": "Region",
-        "full_name": "Region (former GOR)",
-        "description": "The region code for each postcode. Pseudo codes are included for Wales, Scotland, Northern Ireland, Channel Island and Isle of Man. The field will otherwise be blank for postcodes with no OA code."
-    },
-    "roac": {
-        "entities": [
-            "S05"
-        ],
-        "status": "Current",
-        "theme": "Housing and Regeneration",
-        "name": "Regeneration Outcome Areas - Community Planning Partnerships",
-        "full_name": "Regeneration Outcome Areas - Community Planning Partnerships",
-        "description": null
-    },
-    "roal": {
-        "entities": [
-            "S06"
-        ],
-        "status": "Current",
-        "theme": "Housing and Regeneration",
-        "name": "Regeneration Outcome Areas - Local Areas",
-        "full_name": "Regeneration Outcome Areas - Local Areas",
-        "description": null
-    },
-    "roas": {
-        "entities": [
-            "S04"
-        ],
-        "status": "Current",
-        "theme": "Housing and Regeneration",
-        "name": "Regeneration Outcome Agreement Areas - Scotland",
-        "full_name": "Regeneration Outcome Agreement Areas - Scotland",
-        "description": null
-    },
-    "rtp": {
-        "entities": [
-            "S07"
-        ],
-        "status": "Current",
-        "theme": "Transport",
-        "name": "Regional Transport Partnerships",
-        "full_name": "Regional Transport Partnerships",
-        "description": null
-    },
-    "scn": {
-        "entities": [
-            "E55"
-        ],
-        "status": "Current",
-        "theme": "Health",
-        "name": "Strategic Clinical Networks",
-        "full_name": "Strategic Clinical Networks",
-        "description": null
-    },
-    "sdpa": {
-        "entities": [
-            "S11"
-        ],
-        "status": "Current",
-        "theme": "Administrative",
-        "name": "Strategic Development Plan Areas",
-        "full_name": "Strategic Development Plan Areas",
-        "description": null
-    },
-    "sett": {
-        "entities": [
-            "S20"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Settlements",
-        "full_name": "Settlements",
-        "description": null
-    },
-    "sett2015": {
-        "entities": [
-            "N11"
-        ],
-        "status": "Current",
-        "theme": "Census",
-        "name": "Settlement 2015",
-        "full_name": "Settlement 2015",
-        "description": null
-    },
-    "sfrlso": {
-        "entities": [
-            "S39"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Scottish Fire and Rescue Local Senior Officer Areas",
-        "full_name": "Scottish Fire and Rescue Local Senior Officer Areas",
-        "description": null
-    },
-    "sfrs": {
-        "entities": [
-            "S38"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Scottish Fire and Rescue Service",
-        "full_name": "Scottish Fire and Rescue Service",
-        "description": null
-    },
-    "sfrsda": {
-        "entities": [
-            "S40"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Scottish Fire and Rescue Service Delivery Areas",
-        "full_name": "Scottish Fire and Rescue Service Delivery Areas",
-        "description": null
-    },
-    "sha": {
-        "entities": [
-            "E18",
-            "L00",
-            "M00"
-        ],
-        "status": "Current",
-        "theme": "Health",
-        "name": "Strategic Health Authorities",
-        "full_name": "Strategic Health Authorities",
-        "description": null
-    },
-    "slrp": {
-        "entities": [
-            "S42"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Scottish Local Resilience Partnerships",
-        "full_name": "Scottish Local Resilience Partnerships",
-        "description": null
-    },
-    "smr": {
-        "entities": [
-            "S41"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Scottish Marine Regions",
-        "full_name": "Scottish Marine Regions",
-        "description": null
-    },
-    "spa": {
-        "entities": [
-            "W23"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Spatial Plan Areas",
-        "full_name": "Spatial Plan Areas",
-        "description": null
-    },
-    "spc": {
-        "entities": [
-            "S16"
-        ],
-        "status": "Current",
-        "theme": "Electoral",
-        "name": "Scottish Parliamentary Constituencies ",
-        "full_name": "Scottish Parliamentary Constituencies ",
-        "description": null
-    },
-    "spd": {
-        "entities": [
-            "S32"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Scottish Police Divisions",
-        "full_name": "Scottish Police Divisions",
-        "description": null
-    },
-    "spr": {
-        "entities": [
-            "S17"
-        ],
-        "status": "Current",
-        "theme": "Electoral",
-        "name": "Scottish Parliamentary Regions",
-        "full_name": "Scottish Parliamentary Regions",
-        "description": null
-    },
-    "spsa": {
-        "entities": [
-            "W24"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Spatial Plan Sub-areas",
-        "full_name": "Spatial Plan Sub-areas",
-        "description": null
-    },
-    "sra": {
-        "entities": [
-            "W26"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Strategic Regeneration Areas",
-        "full_name": "Strategic Regeneration Areas",
-        "description": null
-    },
-    "srasub": {
-        "entities": [
-            "W27"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Strategic Regeneration Sub-areas",
-        "full_name": "Strategic Regeneration Sub-areas",
-        "description": null
-    },
-    "srrp": {
-        "entities": [
-            "S43"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Scottish Regional Resilience Partnerships",
-        "full_name": "Scottish Regional Resilience Partnerships",
-        "description": null
-    },
-    "stp": {
-        "entities": [
-            "E54"
-        ],
-        "status": "Current",
-        "theme": "Health",
-        "name": "Sustainability and Transformation Partnerships",
-        "full_name": "Sustainability and Transformation Partnerships",
-        "description": null
-    },
-    "tca": {
-        "entities": [
-            "W28"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Transport Consortia Areas",
-        "full_name": "Transport Consortia Areas",
-        "description": null
-    },
-    "tcity": {
-        "entities": [
-            "J01"
-        ],
-        "status": "Current",
-        "theme": "Experimental",
-        "name": "Major Towns and Cities",
-        "full_name": "Major Towns and Cities",
-        "description": null
-    },
-    "ttwa": {
-        "entities": [
-            "E30",
-            "K01",
-            "N12",
-            "S22",
-            "W22"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Travel to Work Area",
-        "full_name": "Travel to Work Area (TTWA)",
-        "description": "The TTWA code for the postcode. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."
-    },
-    "urc": {
-        "entities": [
-            "S10"
-        ],
-        "status": "Current",
-        "theme": "Economic",
-        "name": "Urban Regeneration Companies",
-        "full_name": "Urban Regeneration Companies",
-        "description": null
-    },
-    "usoa": {
-        "entities": [
-            "W03"
-        ],
-        "status": "Current",
-        "theme": "Statistical Building Block",
-        "name": "Super Output Areas, Upper Layer",
-        "full_name": "Super Output Areas, Upper Layer",
-        "description": null
-    },
-    "wa": {
-        "entities": [
-            "E50"
-        ],
-        "status": "Current",
-        "theme": "Other",
-        "name": "Waste Authorities",
-        "full_name": "Waste Authorities",
-        "description": null
-    },
-    "ward": {
-        "entities": [
-            "E05",
-            "N08",
-            "S13",
-            "W05"
-        ],
-        "status": "Current",
-        "theme": "Administrative/Electoral",
-        "name": "Ward",
-        "full_name": "(Electoral) ward/division",
-        "description": "The current administrative/electoral area to which the postcode has been assigned. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."
-    },
-    "ward1961": {
-        "entities": [
-            "J03"
-        ],
-        "status": "Current",
-        "theme": "Census",
-        "name": "1961 Census Wards",
-        "full_name": "1961 Census Wards",
-        "description": null
-    },
-    "wz11": {
-        "entities": [
-            "E33",
-            "N19",
-            "S34",
-            "W35"
-        ],
-        "status": "Current",
-        "theme": "Census",
-        "name": "Workplace Zone",
-        "full_name": "2011 Census Workplace Zone",
-        "description": "The UK WZ code. Pseudo codes are included for Channel Islands and Isle of Man. The field will be blank for UK postcodes with no grid reference."
-    }
+  "agricreg": {
+    "entities": ["W29"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Agricultural Regions",
+    "full_name": "Agricultural Regions",
+    "description": null
+  },
+  "agricsmall": {
+    "entities": ["W30"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Agricultural Small Areas",
+    "full_name": "Agricultural Small Areas",
+    "description": null
+  },
+  "brma": {
+    "entities": ["S33"],
+    "status": "Current",
+    "theme": "Housing and Regeneration",
+    "name": "Broad Rental Market Areas",
+    "full_name": "Broad Rental Market Areas",
+    "description": null
+  },
+  "bua11": {
+    "entities": ["E34", "K05", "W37"],
+    "status": "Current",
+    "theme": "Census",
+    "name": "Built-up Area",
+    "full_name": "Built-up Area (BUA)",
+    "description": "The code for the BUAs in England and Wales. Pseudo codes are included for those OAs not classed as 'built-up' and cross-border codes are included for areas straddling the English/Welsh border. Pseudo codes are also included for Scotland, Northern Ireland, Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."
+  },
+  "buasd11": {
+    "entities": ["E35", "K06", "W38"],
+    "status": "Current",
+    "theme": "Census",
+    "name": "Built-up Area Sub-division (BUASD)",
+    "full_name": "Built-up Area Sub-division",
+    "description": "The code for the BUASDs in England and Wales. Pseudo codes are included for those OAs not classed as 'built-up' and cross-border codes are included for areas straddling the English/Welsh border. Pseudo codes are also included for Scotland, Northern Ireland, Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code"
+  },
+  "cal": {
+    "entities": ["E56"],
+    "status": "Current",
+    "theme": "Health",
+    "name": "Cancer Alliances",
+    "full_name": "Cancer Alliances",
+    "description": null
+  },
+  "cannet": {
+    "entities": ["E21", "W13"],
+    "status": "Current",
+    "theme": "Health",
+    "name": "Cancer Networks",
+    "full_name": "Cancer Networks",
+    "description": null
+  },
+  "canreg": {
+    "entities": ["E20", "W12"],
+    "status": "Current",
+    "theme": "Health",
+    "name": "Cancer Registries",
+    "full_name": "Cancer Registries",
+    "description": null
+  },
+  "cauth": {
+    "entities": ["E47"],
+    "status": "Current",
+    "theme": "Administrative",
+    "name": "Combined Authorities",
+    "full_name": "Combined Authorities",
+    "description": null
+  },
+  "ccg": {
+    "entities": ["E38"],
+    "status": "Current",
+    "theme": "Health",
+    "name": "Clinical Commissioning Group",
+    "full_name": "Clinical Commissioning Group (CCG)/Local Health Board (LHB)/Community Health Partnership (CHP)/ Local Commissioning Group (LCG)/Primary Healthcare Directorate (PHD)",
+    "description": "The code for the CCG areas in England, LHBs in Wales, CHPs in Scotland, LCG in Northern Ireland and PHD in the Isle of Man. A pseudo code is included for Channel Islands. The field will be blank for postcodes in England or Wales with no OA code."
+  },
+  "cdc": {
+    "entities": ["S28"],
+    "status": "Current",
+    "theme": "Census",
+    "name": "Census Detailed Characteristics",
+    "full_name": "Census Detailed Characteristics",
+    "description": null
+  },
+  "ced": {
+    "entities": ["E58"],
+    "status": "Current",
+    "theme": "Electoral",
+    "name": "County Electoral Divisions",
+    "full_name": "County Electoral Divisions",
+    "description": null
+  },
+  "cfa": {
+    "entities": ["W33"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Communities First Areas",
+    "full_name": "Communities First Areas",
+    "description": null
+  },
+  "chcp": {
+    "entities": ["S26"],
+    "status": "Archived",
+    "theme": "Health",
+    "name": "Community Health Partnerships sub-areas",
+    "full_name": "Community Health Partnerships sub-areas",
+    "description": null
+  },
+  "chp": {
+    "entities": ["S03"],
+    "status": "Archived",
+    "theme": "Health",
+    "name": "Community Health Partnerships",
+    "full_name": "Community Health Partnerships",
+    "description": null
+  },
+  "cja": {
+    "entities": ["S25"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Community Justice Authorities",
+    "full_name": "Community Justice Authorities",
+    "description": null
+  },
+  "clc": {
+    "entities": ["S29"],
+    "status": "Current",
+    "theme": "Census",
+    "name": "Census Local Characteristics",
+    "full_name": "Census Local Characteristics",
+    "description": null
+  },
+  "cmcty": {
+    "entities": ["E42"],
+    "status": "Current",
+    "theme": "Census",
+    "name": "Census Merged Counties",
+    "full_name": "Census Merged Counties",
+    "description": null
+  },
+  "cmlad": {
+    "entities": ["E41", "W40"],
+    "status": "Current",
+    "theme": "Census",
+    "name": "Census Merged Local Authority Districts",
+    "full_name": "Census Merged Local Authority Districts",
+    "description": null
+  },
+  "cmwd": {
+    "entities": ["E36", "W39"],
+    "status": "Current",
+    "theme": "Census",
+    "name": "Census Merged Wards",
+    "full_name": "Census Merged Wards",
+    "description": null
+  },
+  "com": {
+    "entities": ["W04"],
+    "status": "Current",
+    "theme": "Administrative",
+    "name": "Communities",
+    "full_name": "Communities",
+    "description": null
+  },
+  "creg": {
+    "entities": ["W42"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "City Regions",
+    "full_name": "City Regions",
+    "description": null
+  },
+  "csp": {
+    "entities": ["E22", "W14"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Community Safety Partnerships",
+    "full_name": "Community Safety Partnerships",
+    "description": null
+  },
+  "ct": {
+    "entities": ["E17"],
+    "status": "Archived",
+    "theme": "Health",
+    "name": "Care Trusts",
+    "full_name": "Care Trusts",
+    "description": null
+  },
+  "ctry": {
+    "entities": ["E92", "K02", "K03", "K04", "L93", "M83", "N92", "S92", "W92"],
+    "status": "Current",
+    "theme": "Administrative",
+    "name": "Country",
+    "full_name": "Country",
+    "description": "The code for the appropriate country (i.e. one of the four constituent countries of the UK or Crown dependencies - the Channel Islands or the Isle of Man) to which each postcode is assigned."
+  },
+  "cty": {
+    "entities": ["E10"],
+    "status": "Current",
+    "theme": "Administrative",
+    "name": "County",
+    "full_name": "County",
+    "description": "The current county to which the postcode has been assigned. Pseudo codes are included for English UAs, Wales, Scotland, Northern Ireland, Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."
+  },
+  "cty1961": {
+    "entities": ["J05"],
+    "status": "Current",
+    "theme": "Census",
+    "name": "1961 Census Counties",
+    "full_name": "1961 Census Counties",
+    "description": null
+  },
+  "cvp": {
+    "entities": ["S35"],
+    "status": "Archived",
+    "theme": "Administrative",
+    "name": "Civil Parish",
+    "full_name": "Civil Parish",
+    "description": null
+  },
+  "dc": {
+    "entities": ["E51"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Development Corporations",
+    "full_name": "Development Corporations",
+    "description": null
+  },
+  "dcells": {
+    "entities": ["W16"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Department for Children, Education, Lifelong Learning and Skills, WG",
+    "full_name": "Department for Children, Education, Lifelong Learning and Skills, WG",
+    "description": null
+  },
+  "dea": {
+    "entities": ["N10"],
+    "status": "Current",
+    "theme": "Electoral",
+    "name": "District Electoral Areas",
+    "full_name": "District Electoral Areas",
+    "description": null
+  },
+  "eer": {
+    "entities": ["E15", "N07", "S15", "W08"],
+    "status": "Current",
+    "theme": "Electoral",
+    "name": "European Electoral Region",
+    "full_name": "European Electoral Region (EER)",
+    "description": "The European Electoral Region code for each postcode. A pseudo code is included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code"
+  },
+  "er": {
+    "entities": ["S09"],
+    "status": "Current",
+    "theme": "Economic",
+    "name": "Enterprise Regions",
+    "full_name": "Enterprise Regions",
+    "description": null
+  },
+  "ez": {
+    "entities": ["E49"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Enterprise Zones",
+    "full_name": "Enterprise Zones",
+    "description": null
+  },
+  "fra": {
+    "entities": ["E31", "W25"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Fire and Rescue Authorities",
+    "full_name": "Fire and Rescue Authorities",
+    "description": null
+  },
+  "gla": {
+    "entities": ["E61"],
+    "status": "Current",
+    "theme": "Administrative",
+    "name": "Greater London Authority",
+    "full_name": "Greater London Authority",
+    "description": null
+  },
+  "hb": {
+    "entities": ["S08"],
+    "status": "Current",
+    "theme": "Health",
+    "name": "Health Board areas",
+    "full_name": "Health Board areas",
+    "description": null
+  },
+  "hia": {
+    "entities": ["S37"],
+    "status": "Current",
+    "theme": "Health",
+    "name": "Integration Authorities",
+    "full_name": "Integration Authorities",
+    "description": null
+  },
+  "hie": {
+    "entities": ["S24"],
+    "status": "Current",
+    "theme": "Economic",
+    "name": "Highlands and Islands Enterprise",
+    "full_name": "Highlands and Islands Enterprise",
+    "description": null
+  },
+  "icb": {
+    "entities": ["E54"],
+    "status": "Current",
+    "theme": "Health",
+    "name": "Integrated Care Board",
+    "full_name": "Integrated Care Board (ICB)",
+    "description": "The code for the ICB areas in England. A pseudo code is included for Channel Islands. The field will be blank for postcodes in England with no OA code."
+  },
+  "ics": {
+    "entities": ["E59"],
+    "status": "Current",
+    "theme": "Health",
+    "name": "Integrated Care Systems",
+    "full_name": "Integrated Care Systems",
+    "description": null
+  },
+  "iol": {
+    "entities": ["E13"],
+    "status": "Current",
+    "theme": "Statistical Building Block",
+    "name": "Inner and Outer London",
+    "full_name": "Inner and Outer London",
+    "description": null
+  },
+  "isdt": {
+    "entities": ["S27"],
+    "status": "Current",
+    "theme": "Health",
+    "name": "ISD Health Board of Treatment",
+    "full_name": "ISD Health Board of Treatment",
+    "description": null
+  },
+  "islg": {
+    "entities": ["S36"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Island Groups",
+    "full_name": "Island Groups",
+    "description": null
+  },
+  "lac": {
+    "entities": ["E32"],
+    "status": "Current",
+    "theme": "Electoral",
+    "name": "London Assembly Constituencies",
+    "full_name": "London Assembly Constituencies",
+    "description": null
+  },
+  "lad1961": {
+    "entities": ["J04"],
+    "status": "Current",
+    "theme": "Census",
+    "name": "1961 Census Districts",
+    "full_name": "1961 Census Districts",
+    "description": null
+  },
+  "lau1": {
+    "entities": ["S30"],
+    "status": "Current",
+    "theme": "Administrative",
+    "name": "Local Administrative Units 1",
+    "full_name": "Local Administrative Units 1",
+    "description": null
+  },
+  "lau2": {
+    "entities": ["S31"],
+    "status": "Current",
+    "theme": "Administrative",
+    "name": "Local Administrative Units 2",
+    "full_name": "Local Administrative Units 2",
+    "description": null
+  },
+  "laua": {
+    "entities": ["E06", "E07", "E08", "E09", "N09", "S12", "W06"],
+    "status": "Current",
+    "theme": "Administrative",
+    "name": "Local Authority",
+    "full_name": "Local Authority District (LAD)/unitary authority (UA)/metropolitan district (MD)/London borough (LB)/ council area (CA)/district council area (DCA)",
+    "description": "The current district/UA to which the postcode has been assigned. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."
+  },
+  "lep": {
+    "entities": ["E37"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Local Enterprise Partnership",
+    "full_name": "Local Enterprise Partnership (LEP)",
+    "description": "The primary LEP code for each English postcode. Pseudo codes are included for the rest of the UK. The field will otherwise be blank for postcodes with no OA code."
+  },
+  "lepnop": {
+    "entities": ["E53"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "LEP - non overlapping part ",
+    "full_name": "LEP - non overlapping part ",
+    "description": null
+  },
+  "lepop": {
+    "entities": ["E52"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "LEP - overlapping part",
+    "full_name": "LEP - overlapping part",
+    "description": null
+  },
+  "lhb": {
+    "entities": ["W11"],
+    "status": "Current",
+    "theme": "Health",
+    "name": "Local Health Boards",
+    "full_name": "Local Health Boards",
+    "description": null
+  },
+  "llsc": {
+    "entities": ["E24"],
+    "status": "Archived",
+    "theme": "Other",
+    "name": "Local Learning and Skills Council areas",
+    "full_name": "Local Learning and Skills Council areas",
+    "description": null
+  },
+  "loc": {
+    "entities": ["S19"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Localities",
+    "full_name": "Localities",
+    "description": null
+  },
+  "lpa": {
+    "entities": ["E60", "N13", "S44", "W43"],
+    "status": "Current",
+    "theme": "Administrative",
+    "name": "Local Planning Authorities",
+    "full_name": "Local Planning Authorities",
+    "description": null
+  },
+  "lrf": {
+    "entities": ["E48", "W41"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Local Resilience Forums",
+    "full_name": "Local Resilience Forums",
+    "description": null
+  },
+  "lsoa11": {
+    "entities": ["E01", "S01", "W01"],
+    "status": "Current",
+    "theme": "Statistical Building Block",
+    "name": "Lower Super Output Area",
+    "full_name": "2011 Census Lower Layer Super Output Area (LSOA)/ Data Zone (DZ)/ SOA",
+    "description": "The 2011 Census LSOA code for England and Wales, SOA code for Northern Ireland and DZ code for Scotland. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code. N.B. NI SOAs remain unchanged from 2001."
+  },
+  "lsoa21": {
+    "entities": ["E01", "S01", "W01"],
+    "status": "Current",
+    "theme": "Statistical Building Block",
+    "name": "Lower Super Output Area",
+    "full_name": "2021 Census Lower Layer Super Output Area (LSOA)/ Data Zone (DZ)/ SOA",
+    "description": "The 2021 Census LSOA code for England and Wales, SOA code for Northern Ireland and DZ code for Scotland. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code. N.B. NI SOAs remain unchanged from 2001."
+  },
+  "mcty": {
+    "entities": ["E11"],
+    "status": "Current",
+    "theme": "Administrative",
+    "name": "Metropolitan Counties",
+    "full_name": "Metropolitan Counties",
+    "description": null
+  },
+  "msoa11": {
+    "entities": ["E02", "S02", "W02"],
+    "status": "Current",
+    "theme": "Statistical Building Block",
+    "name": "Middle Super Output Area",
+    "full_name": "Middle Layer Super Output Area (MSOA)/Intermediate Zone (IZ)",
+    "description": "The 2011 Census MSOA code for England and Wales and IZ code for Scotland. Pseudo codes are included for Northern Ireland, Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."
+  },
+  "msoa21": {
+    "entities": ["E02", "S02", "W02"],
+    "status": "Current",
+    "theme": "Statistical Building Block",
+    "name": "Middle Super Output Area",
+    "full_name": "Middle Layer Super Output Area (MSOA)/Intermediate Zone (IZ)",
+    "description": "The 2021 Census MSOA code for England and Wales and IZ code for Scotland. Pseudo codes are included for Northern Ireland, Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."
+  },
+  "naer": {
+    "entities": ["W19"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "National Assembly Economic Regions",
+    "full_name": "National Assembly Economic Regions",
+    "description": null
+  },
+  "nawc": {
+    "entities": ["W09"],
+    "status": "Current",
+    "theme": "Electoral",
+    "name": "National Assembly for Wales Constituencies",
+    "full_name": "National Assembly for Wales Constituencies",
+    "description": null
+  },
+  "nawer": {
+    "entities": ["W10"],
+    "status": "Current",
+    "theme": "Electoral",
+    "name": "National Assembly for Wales Electoral Regions",
+    "full_name": "National Assembly for Wales Electoral Regions",
+    "description": null
+  },
+  "ncp": {
+    "entities": ["E43"],
+    "status": "Current",
+    "theme": "Census",
+    "name": "Non-Civil Parished Areas",
+    "full_name": "Non-Civil Parished Areas",
+    "description": null
+  },
+  "ncv": {
+    "entities": ["E57"],
+    "status": "Archived",
+    "theme": "Health",
+    "name": "National Cancer Vanguards",
+    "full_name": "National Cancer Vanguards",
+    "description": null
+  },
+  "ndc": {
+    "entities": ["E27"],
+    "status": "Archived",
+    "theme": "Other",
+    "name": "New Deal for Communities",
+    "full_name": "New Deal for Communities",
+    "description": null
+  },
+  "nhser": {
+    "entities": ["E40"],
+    "status": "Current",
+    "theme": "Health",
+    "name": "NHS England Regions",
+    "full_name": "NHS England Regions",
+    "description": null
+  },
+  "nhsrlo": {
+    "entities": ["E39"],
+    "status": "Current",
+    "theme": "Health",
+    "name": "NHS England (Region, Local Office)",
+    "full_name": "NHS England (Region, Local Office)",
+    "description": null
+  },
+  "nifrs": {
+    "entities": ["N31"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Northern Ireland Fire and Rescue Service",
+    "full_name": "Northern Ireland Fire and Rescue Service",
+    "description": null
+  },
+  "nifrsa": {
+    "entities": ["N32"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Northern Ireland Fire and Rescue Service Areas",
+    "full_name": "Northern Ireland Fire and Rescue Service Areas",
+    "description": null
+  },
+  "nifrsd": {
+    "entities": ["N33"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Northern Ireland Fire and Rescue Service Districts",
+    "full_name": "Northern Ireland Fire and Rescue Service Districts",
+    "description": null
+  },
+  "noncfa": {
+    "entities": ["W34"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Non-Communities First Areas",
+    "full_name": "Non-Communities First Areas",
+    "description": null
+  },
+  "nonnpark": {
+    "entities": ["W31"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Non-National Park Area",
+    "full_name": "Non-National Park Area",
+    "description": null
+  },
+  "nonsra": {
+    "entities": ["W32"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Non-Strategic Regeneration Area",
+    "full_name": "Non-Strategic Regeneration Area",
+    "description": null
+  },
+  "npark": {
+    "entities": ["E26", "S21", "W18"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "National Parks",
+    "full_name": "National Parks",
+    "description": null
+  },
+  "oa11": {
+    "entities": ["E00", "N00", "S00", "W00"],
+    "status": "Current",
+    "theme": "Statistical Building Block",
+    "name": "Output area",
+    "full_name": "2011 Census Output Area (OA)/ Small Area (SA)",
+    "description": "The 2011 Census OAs in GB and SAs in Northern Ireland were based on 2001 Census OAs, and they form the building bricks for defining higher level geographies. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no grid reference."
+  },
+  "oa21": {
+    "entities": ["E00", "N00", "S00", "W00"],
+    "status": "Current",
+    "theme": "Statistical Building Block",
+    "name": "Output area",
+    "full_name": "2021 Census Output Area (OA)/ Small Area (SA)",
+    "description": "The 2021 Census OAs in GB and SAs in Northern Ireland were based on 2001 Census OAs, and they form the building bricks for defining higher level geographies. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no grid reference."
+  },
+  "par": {
+    "entities": ["E04"],
+    "status": "Current",
+    "theme": "Administrative",
+    "name": "Civil Parishes",
+    "full_name": "Civil Parishes",
+    "description": null
+  },
+  "par1961": {
+    "entities": ["J02"],
+    "status": "Current",
+    "theme": "Census",
+    "name": "1961 Census Parishes",
+    "full_name": "1961 Census Parishes",
+    "description": null
+  },
+  "pcon": {
+    "entities": ["E14", "N06", "S14", "W07"],
+    "status": "Current",
+    "theme": "Electoral",
+    "name": "Westminster parliamentary constituency",
+    "full_name": "Westminster parliamentary constituency",
+    "description": "The Westminster parliamentary constituency code for each postcode. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."
+  },
+  "pct": {
+    "entities": ["E16"],
+    "status": "Archived",
+    "theme": "Health",
+    "name": "Primary Care Trust",
+    "full_name": "Primary Care Trust (PCT)/ Care Trust/Care Trust Plus (CT)/ Local Health Board (LHB)/Community Health Partnership (CHP)/ Local Commissioning Group (LCG)/Primary Healthcare Directorate (PHD)",
+    "description": "The code for the PCT/CT areas in England, LHBs in Wales, CHPs in Scotland, LCG in Northern Ireland and PHD in the Isle of Man. A pseudo code is included for Channel Islands. The field will otherwise be blank for postcodes with no OA code."
+  },
+  "pfa": {
+    "entities": ["E23", "N23", "S23", "W15"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Police Force Area",
+    "full_name": "Police Force Area (PFA)",
+    "description": "The PFA code for each postcode. A single PFA covers each of Scotland and Northern Ireland (not coded). A pseudo code is included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."
+  },
+  "pfd": {
+    "entities": ["N24"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Police Force Districts",
+    "full_name": "Police Force Districts",
+    "description": null
+  },
+  "phd": {
+    "entities": ["M01"],
+    "status": "Current",
+    "theme": "Health",
+    "name": "Primary Healthcare Directorate",
+    "full_name": "Primary Healthcare Directorate",
+    "description": null
+  },
+  "phec": {
+    "entities": ["E45"],
+    "status": "Current",
+    "theme": "Health",
+    "name": "Public Health England Centres",
+    "full_name": "Public Health England Centres",
+    "description": null
+  },
+  "phereg": {
+    "entities": ["E46"],
+    "status": "Current",
+    "theme": "Health",
+    "name": "Public Health England Regions",
+    "full_name": "Public Health England Regions",
+    "description": null
+  },
+  "pscreg": {
+    "entities": ["W36"],
+    "status": "Current",
+    "theme": "Administrative",
+    "name": "Footprint Regions for Public Service Collaboration",
+    "full_name": "Footprint Regions for Public Service Collaboration",
+    "description": null
+  },
+  "psha": {
+    "entities": ["E19"],
+    "status": "Archived",
+    "theme": "Health",
+    "name": "Pan Strategic Health Authorities",
+    "full_name": "Pan Strategic Health Authorities",
+    "description": null
+  },
+  "pua": {
+    "entities": ["E25"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Primary Urban Areas",
+    "full_name": "Primary Urban Areas",
+    "description": null
+  },
+  "regd": {
+    "entities": ["E28", "W20"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Registration Districts",
+    "full_name": "Registration Districts",
+    "description": null
+  },
+  "regsd": {
+    "entities": ["E29", "W21"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Registration Sub-district",
+    "full_name": "Registration Sub-district",
+    "description": null
+  },
+  "rgn": {
+    "entities": ["E12"],
+    "status": "Current",
+    "theme": "Administrative",
+    "name": "Region",
+    "full_name": "Region (former GOR)",
+    "description": "The region code for each postcode. Pseudo codes are included for Wales, Scotland, Northern Ireland, Channel Island and Isle of Man. The field will otherwise be blank for postcodes with no OA code."
+  },
+  "roac": {
+    "entities": ["S05"],
+    "status": "Current",
+    "theme": "Housing and Regeneration",
+    "name": "Regeneration Outcome Areas - Community Planning Partnerships",
+    "full_name": "Regeneration Outcome Areas - Community Planning Partnerships",
+    "description": null
+  },
+  "roal": {
+    "entities": ["S06"],
+    "status": "Current",
+    "theme": "Housing and Regeneration",
+    "name": "Regeneration Outcome Areas - Local Areas",
+    "full_name": "Regeneration Outcome Areas - Local Areas",
+    "description": null
+  },
+  "roas": {
+    "entities": ["S04"],
+    "status": "Current",
+    "theme": "Housing and Regeneration",
+    "name": "Regeneration Outcome Agreement Areas - Scotland",
+    "full_name": "Regeneration Outcome Agreement Areas - Scotland",
+    "description": null
+  },
+  "rtp": {
+    "entities": ["S07"],
+    "status": "Current",
+    "theme": "Transport",
+    "name": "Regional Transport Partnerships",
+    "full_name": "Regional Transport Partnerships",
+    "description": null
+  },
+  "scn": {
+    "entities": ["E55"],
+    "status": "Current",
+    "theme": "Health",
+    "name": "Strategic Clinical Networks",
+    "full_name": "Strategic Clinical Networks",
+    "description": null
+  },
+  "sdpa": {
+    "entities": ["S11"],
+    "status": "Current",
+    "theme": "Administrative",
+    "name": "Strategic Development Plan Areas",
+    "full_name": "Strategic Development Plan Areas",
+    "description": null
+  },
+  "sett": {
+    "entities": ["S20"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Settlements",
+    "full_name": "Settlements",
+    "description": null
+  },
+  "sett2015": {
+    "entities": ["N11"],
+    "status": "Current",
+    "theme": "Census",
+    "name": "Settlement 2015",
+    "full_name": "Settlement 2015",
+    "description": null
+  },
+  "sfrlso": {
+    "entities": ["S39"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Scottish Fire and Rescue Local Senior Officer Areas",
+    "full_name": "Scottish Fire and Rescue Local Senior Officer Areas",
+    "description": null
+  },
+  "sfrs": {
+    "entities": ["S38"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Scottish Fire and Rescue Service",
+    "full_name": "Scottish Fire and Rescue Service",
+    "description": null
+  },
+  "sfrsda": {
+    "entities": ["S40"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Scottish Fire and Rescue Service Delivery Areas",
+    "full_name": "Scottish Fire and Rescue Service Delivery Areas",
+    "description": null
+  },
+  "sha": {
+    "entities": ["E18", "L00", "M00"],
+    "status": "Current",
+    "theme": "Health",
+    "name": "Strategic Health Authorities",
+    "full_name": "Strategic Health Authorities",
+    "description": null
+  },
+  "slrp": {
+    "entities": ["S42"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Scottish Local Resilience Partnerships",
+    "full_name": "Scottish Local Resilience Partnerships",
+    "description": null
+  },
+  "smr": {
+    "entities": ["S41"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Scottish Marine Regions",
+    "full_name": "Scottish Marine Regions",
+    "description": null
+  },
+  "spa": {
+    "entities": ["W23"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Spatial Plan Areas",
+    "full_name": "Spatial Plan Areas",
+    "description": null
+  },
+  "spc": {
+    "entities": ["S16"],
+    "status": "Current",
+    "theme": "Electoral",
+    "name": "Scottish Parliamentary Constituencies ",
+    "full_name": "Scottish Parliamentary Constituencies ",
+    "description": null
+  },
+  "spd": {
+    "entities": ["S32"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Scottish Police Divisions",
+    "full_name": "Scottish Police Divisions",
+    "description": null
+  },
+  "spr": {
+    "entities": ["S17"],
+    "status": "Current",
+    "theme": "Electoral",
+    "name": "Scottish Parliamentary Regions",
+    "full_name": "Scottish Parliamentary Regions",
+    "description": null
+  },
+  "spsa": {
+    "entities": ["W24"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Spatial Plan Sub-areas",
+    "full_name": "Spatial Plan Sub-areas",
+    "description": null
+  },
+  "sra": {
+    "entities": ["W26"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Strategic Regeneration Areas",
+    "full_name": "Strategic Regeneration Areas",
+    "description": null
+  },
+  "srasub": {
+    "entities": ["W27"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Strategic Regeneration Sub-areas",
+    "full_name": "Strategic Regeneration Sub-areas",
+    "description": null
+  },
+  "srrp": {
+    "entities": ["S43"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Scottish Regional Resilience Partnerships",
+    "full_name": "Scottish Regional Resilience Partnerships",
+    "description": null
+  },
+  "tca": {
+    "entities": ["W28"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Transport Consortia Areas",
+    "full_name": "Transport Consortia Areas",
+    "description": null
+  },
+  "tcity": {
+    "entities": ["J01"],
+    "status": "Current",
+    "theme": "Experimental",
+    "name": "Major Towns and Cities",
+    "full_name": "Major Towns and Cities",
+    "description": null
+  },
+  "ttwa": {
+    "entities": ["E30", "K01", "N12", "S22", "W22"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Travel to Work Area",
+    "full_name": "Travel to Work Area (TTWA)",
+    "description": "The TTWA code for the postcode. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."
+  },
+  "urc": {
+    "entities": ["S10"],
+    "status": "Current",
+    "theme": "Economic",
+    "name": "Urban Regeneration Companies",
+    "full_name": "Urban Regeneration Companies",
+    "description": null
+  },
+  "usoa": {
+    "entities": ["W03"],
+    "status": "Current",
+    "theme": "Statistical Building Block",
+    "name": "Super Output Areas, Upper Layer",
+    "full_name": "Super Output Areas, Upper Layer",
+    "description": null
+  },
+  "wa": {
+    "entities": ["E50"],
+    "status": "Current",
+    "theme": "Other",
+    "name": "Waste Authorities",
+    "full_name": "Waste Authorities",
+    "description": null
+  },
+  "ward": {
+    "entities": ["E05", "N08", "S13", "W05"],
+    "status": "Current",
+    "theme": "Administrative/Electoral",
+    "name": "Ward",
+    "full_name": "(Electoral) ward/division",
+    "description": "The current administrative/electoral area to which the postcode has been assigned. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code."
+  },
+  "ward1961": {
+    "entities": ["J03"],
+    "status": "Current",
+    "theme": "Census",
+    "name": "1961 Census Wards",
+    "full_name": "1961 Census Wards",
+    "description": null
+  },
+  "wz11": {
+    "entities": ["E33", "N19", "S34", "W35"],
+    "status": "Current",
+    "theme": "Census",
+    "name": "Workplace Zone",
+    "full_name": "2011 Census Workplace Zone",
+    "description": "The UK WZ code. Pseudo codes are included for Channel Islands and Isle of Man. The field will be blank for UK postcodes with no grid reference."
+  }
 }

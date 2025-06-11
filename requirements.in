@@ -20,3 +20,4 @@ pyproj
 shapely
 numpy<2
 Flask-Limiter
+openpyxl

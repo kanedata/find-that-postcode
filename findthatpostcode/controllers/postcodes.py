@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 
-from ..metadata import OAC11_CODE, RU11IND_CODES
+from ..metadata import OAC11_CODE, RU11IND_CODES, RUC21_CODES
 from . import areas, places
 from .controller import Controller
 
@@ -69,6 +69,12 @@ class Postcode(Controller):
             postcode["ru11ind"] = {
                 "code": postcode["ru11ind"],
                 "description": RU11IND_CODES.get(postcode["ru11ind"]),
+            }
+
+        if RUC21_CODES.get(postcode.get("ruc21")):
+            postcode["ruc21"] = {
+                "code": postcode["ruc21"],
+                "description": RUC21_CODES.get(postcode["ruc21"]),
             }
 
         return postcode

@@ -1,12 +1,10 @@
-Find that Postcode
-=======================
+# Find that Postcode
 
 This project creates an elasticsearch index based on the UK postcode file, and
 runs a webserver on top of it for making queries. It's like a more lightweight
 and less sophisticated version of [MapIt](https://mapit.mysociety.org.uk/).
 
-Setup
------
+## Setup
 
 ### 1. Setup elasticsearch
 
@@ -75,12 +73,12 @@ flask import chd
 flask import msoanames # imports the names for MSOAs from House of Commons Library
 ```
 
-The URL of the files used can be customised with the `--url` parameter. Unfortunately the 
+The URL of the files used can be customised with the `--url` parameter. Unfortunately the
 ONS geoportal doesn't provide a persistent URL to the latest data.
 
 ### 6. Import boundaries (optional)
 
-Boundaries are uploaded as individual area files to S3 storage. 
+Boundaries are uploaded as individual area files to S3 storage.
 
 Boundary files can be found on the [ONS Geoportal](http://geoportal.statistics.gov.uk/datasets?q=Latest_Boundaries&sort_by=name&sort_order=asc).
 Generally the "Generalised Clipped" versions should be used to minimise the file
@@ -151,8 +149,7 @@ The `--url` parameter can be used to customise the URL used to get the data.
 python -m pytest tests
 ```
 
-Using the data
---------------
+## Using the data
 
 ### Run the server
 
@@ -176,7 +173,7 @@ The server has a number of possible uses:
 - `/areas/E09000033.html` gives information about an area, including example postcodes.
 - `/areas/search.html?q=Winchester` finds any areas containing a search query.
 - `/areatypes/laua.html` gives information about a type of area, including lists of
-example codes.
+  example codes.
 - `/areatypes.html` lists all the possible area types.
 - `/points/53.490911,-2.095804.html` gives details of the postcode closest to the
   latitude, longitude point. If it's more than 10km from the nearest postcode it's
@@ -241,6 +238,7 @@ curl "http://localhost:9200/geo_postcode/_doc/SW1A+1AA?pretty"
     "long": -0.141588,
     "pfa": "E23000001",
     "ru11ind": "A1",
+    "ruc21": "UN1",
     "hro": "E19000003",
     "msoa11": "E02000977",
     "msoa21": "E02000977",
@@ -280,25 +278,20 @@ curl "http://localhost:9200/geo_area/_doc/E00046056?pretty"
     "areaihect": 0,
     "arealhect": 3.75,
     "sort_order": "E00046056",
-    "predecessor": [
-        "00CNFN0006"
-    ],
+    "predecessor": ["00CNFN0006"],
     "successor": [],
     "equivalents": {
-        "ons": "00CNFN0006"
+      "ons": "00CNFN0006"
     }
   }
 }
 ```
 
-Todo / future features
-----------------------
+## Todo / future features
 
 - Find areas containing a point
 
-
-Dokku setup
-----------
+## Dokku setup
 
 ```bash
 # create app

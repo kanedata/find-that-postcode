@@ -16,12 +16,13 @@ import tqdm
 from elasticsearch.helpers import bulk
 from flask import current_app
 from flask.cli import with_appcontext
+from openpyxl import load_workbook
 
 from .. import db
 from ..metadata import ENTITIES
 
-RGC_URL = "https://www.arcgis.com/sharing/rest/content/items/2219f72d5b8042c496e47488efd04b16/data"
-CHD_URL = "https://www.arcgis.com/sharing/rest/content/items/3acc892515aa49a8885c2deb734ebd3d/data"
+RGC_URL = "https://www.arcgis.com/sharing/rest/content/items/7e1775db6a064a7e9c5ef860f0bf8daa/data"
+CHD_URL = "https://www.arcgis.com/sharing/rest/content/items/5676b8d2432a4beeae61195abb778274/data"
 MSOA_2011_URL = (
     "https://houseofcommonslibrary.github.io/msoanames/MSOA-Names-Latest.csv"
 )
@@ -36,6 +37,8 @@ DEFAULT_ENCODING = "utf-8-sig"
 def process_date(value, date_format="%d/%m/%Y"):
     if value in ["", "n/a"]:
         return None
+    if isinstance(value, datetime.datetime):
+        return value
     return datetime.datetime.strptime(value, date_format)
 
 
@@ -70,16 +73,34 @@ def import_rgc(url=RGC_URL, es_index=ENTITY_INDEX):
     r = requests.get(url, stream=True)
     z = zipfile.ZipFile(io.BytesIO(r.content))
     for f in z.namelist():
-        if not f.endswith(".csv"):
+        if not f.endswith(".xlsx"):
+            print(f"[entities] Skipping {f}")
             continue
         with z.open(f, "r") as infile:
-            reader = csv.DictReader(io.TextIOWrapper(infile, "utf-8-sig"))
+            wb = load_workbook(
+                io.BytesIO(infile.read()), read_only=True, data_only=True
+            )
+            sheet = wb.active
             entities = []
-            for entity in reader:
+            headers = []
+            for row in sheet.iter_rows(values_only=True):
+                if not headers:
+                    headers = [h.strip() if h else None for h in row]
+                    continue
+
+                entity = dict(zip(headers, row))
+                if not entity["Entity code"]:
+                    continue
+
+                print(entity)
+
                 # tidy up a couple of records
-                entity["Related entity codes"] = (
-                    entity["Related entity codes"].replace("n/a", "").split(", ")
-                )
+                if entity["Related entity codes"]:
+                    entity["Related entity codes"] = (
+                        entity["Related entity codes"].replace("n/a", "").split(", ")
+                    )
+                else:
+                    entity["Related entity codes"] = []
 
                 entities.append(
                     {

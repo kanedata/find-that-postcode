@@ -4,15 +4,14 @@ import tempfile
 
 from flask import Blueprint, make_response, render_template, request
 
-from findthatpostcode.controllers.areatypes import area_types_count
+from findthatpostcode.blueprints.process_csv import process_csv
+from findthatpostcode.controllers.areas import area_types_count
 from findthatpostcode.db import get_db
 from findthatpostcode.metadata import (
     BASIC_UPLOAD_FIELDS,
     DEFAULT_UPLOAD_FIELDS,
     STATS_FIELDS,
 )
-
-from .process_csv import process_csv
 
 bp = Blueprint("addtocsv", __name__, url_prefix="/addtocsv")
 

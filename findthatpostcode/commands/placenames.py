@@ -13,11 +13,11 @@ from elasticsearch.helpers import bulk
 from flask import current_app
 from flask.cli import with_appcontext
 
-from .. import db
+from findthatpostcode import db
+from findthatpostcode.commands.utils import get_latest_geoportal_url
 
 PLACENAMES_INDEX = "geo_placename"
-
-PLACENAMES_URL = "https://www.arcgis.com/sharing/rest/content/items/208d9884575647c29f0dd5a1184e711a/data"
+PRD_IPN = "PRD_IPN"
 
 PLACE_TYPES = {
     "BUA": ["Built-up Area", "England and Wales"],
@@ -79,11 +79,14 @@ AREA_LOOKUP = [
 
 @click.command("placenames")
 @click.option("--es-index", default=PLACENAMES_INDEX)
-@click.option("--url", default=PLACENAMES_URL)
+@click.option("--url", default=None)
 @with_appcontext
-def import_placenames(url=PLACENAMES_URL, es_index=PLACENAMES_INDEX):
+def import_placenames(url=None, es_index=PLACENAMES_INDEX):
     if current_app.config["DEBUG"]:
         requests_cache.install_cache()
+
+    if not url:
+        url = get_latest_geoportal_url(PRD_IPN)
 
     es = db.get_db()
 

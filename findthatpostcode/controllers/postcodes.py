@@ -1,9 +1,10 @@
 import re
 from datetime import datetime
 
-from ..metadata import OAC11_CODE, RU11IND_CODES, RUC21_CODES
-from . import areas, places
-from .controller import Controller
+from findthatpostcode.controllers.areas import Area
+from findthatpostcode.controllers.controller import Controller
+from findthatpostcode.controllers.places import Place
+from findthatpostcode.metadata import OAC11_CODE, RU11IND_CODES, RUC21_CODES
 
 
 class Postcode(Controller):
@@ -40,7 +41,7 @@ class Postcode(Controller):
         postcode = data.get("_source")
         for k in list(postcode.keys()):
             if isinstance(postcode[k], str) and re.match(r"[A-Z][0-9]{8}", postcode[k]):
-                area = areas.Area.get_from_es(postcode[k], es, examples_count=0)
+                area = Area.get_from_es(postcode[k], es, examples_count=0)
                 if area.found:
                     postcode[k + "_name"] = area.attributes.get("name")
                     pcareas.append(area)
@@ -98,7 +99,7 @@ class Postcode(Controller):
             ],
         }
         example = es.search(index="geo_placename", body=query, size=examples_count)
-        return [places.Place(e["_id"], e["_source"]) for e in example["hits"]["hits"]]
+        return [Place(e["_id"], e["_source"]) for e in example["hits"]["hits"]]
 
     def get_attribute(self, attr):
         """

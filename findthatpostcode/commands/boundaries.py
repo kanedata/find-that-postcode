@@ -22,8 +22,8 @@ from shapely import to_geojson
 from shapely.geometry import shape
 from shapely.ops import transform
 
-from .. import db
-from .codes import AREA_INDEX
+from findthatpostcode import db
+from findthatpostcode.commands.codes import AREA_INDEX
 
 
 @click.command("boundaries")

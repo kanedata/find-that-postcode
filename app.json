@@ -1,7 +1,13 @@
 {
-    "formation": {
-        "web": {
-            "quantity": 4
-        }
+  "formation": {
+    "web": {
+      "quantity": 4
     }
+  },
+  "cron": [
+    {
+      "command": "sh ./update_monthly.sh",
+      "schedule": "5 4 20 * *"
+    }
+  ]
 }

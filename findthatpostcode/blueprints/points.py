@@ -1,9 +1,8 @@
 from flask import Blueprint, redirect, request, url_for
 
+from findthatpostcode.blueprints.utils import return_result
 from findthatpostcode.controllers.points import Point
 from findthatpostcode.db import get_db
-
-from .utils import return_result
 
 bp = Blueprint("points", __name__, url_prefix="/points")
 

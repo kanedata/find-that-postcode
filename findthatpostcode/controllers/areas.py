@@ -6,9 +6,100 @@ from botocore.exceptions import ClientError
 from elasticsearch.helpers import scan
 from flask import current_app
 
-from ..db import get_s3_client
-from . import areatypes, places, postcodes
-from .controller import GEOJSON_TYPES, Controller
+from findthatpostcode.controllers.controller import GEOJSON_TYPES, Controller
+from findthatpostcode.controllers.places import Place
+from findthatpostcode.db import get_s3_client
+from findthatpostcode.metadata import AREA_TYPES
+
+
+class Areatype(Controller):
+    es_index = "geo_entity"
+    url_slug = "areatypes"
+    areatypes = AREA_TYPES
+
+    def __init__(self, id, data=None):
+        if not data:
+            data = self.areatypes.get(id)
+        super().__init__(id, data)
+
+    def __repr__(self):
+        return "<AreaType {}>".format(self.id)
+
+    def process_attributes(self, data):
+        if isinstance(data, (list, tuple)):
+            return {
+                "code": data[0],
+                "entities": data[1],
+                "name": data[2],
+                "full_name": data[3],
+                "description": data[4],
+                "abbreviation": data[0],
+            }
+        return data
+
+    def get_name(self, country=None):
+        if isinstance(country, str):
+            country = country[0].upper()
+        if self.id.startswith("lsoa") and country == "S":
+            return "Data Zone"
+        if self.id.startswith("lsoa") and country == "N":
+            return "Super Output Area"
+        if self.id.startswith("msoa") and country == "S":
+            return "Intermediate Zone"
+
+        return self.attributes.get("name")
+
+    @classmethod
+    def get_from_es(cls, id, es, es_config=None, full=False):
+        if cls.areatypes.get(id):
+            return cls(id)
+        return super().get_from_es(id, es, es_config=es_config)
+
+    def get_areas(self, es, es_config=None, pagination=None):
+        query = {
+            "query": {
+                "function_score": {
+                    "query": {"match": {"type": self.id}},
+                    "random_score": {},
+                }
+            }
+        }
+        search_params = dict(
+            index="geo_area",
+            body=query,
+            sort="_id:asc",
+        )
+        if pagination:
+            search_params["from_"] = pagination.from_
+            search_params["size"] = pagination.size
+        example = es.search(**search_params)
+        self.relationships["areas"] = [
+            Area(e["_id"], e["_source"]) for e in example["hits"]["hits"]
+        ]
+        self.attributes["count_areas"] = self.get_total_from_es(example)
+
+
+def area_types_count(es, es_config=None):
+    if not es_config:
+        es_config = {}
+
+    # fetch counts per entity
+    query = {
+        "size": 0,
+        "aggs": {"group_by_type": {"terms": {"field": "type.keyword", "size": 100}}},
+    }
+    result = es.search(
+        index=es_config.get("es_index", Area.es_index),
+        body=query,
+        ignore=[404],
+        _source_includes=[],
+    )
+    return {
+        i["key"]: i["doc_count"]
+        for i in result.get("aggregations", {})
+        .get("group_by_type", {})
+        .get("buckets", [])
+    }
 
 
 class Area(Controller):
@@ -54,11 +145,9 @@ class Area(Controller):
         }
         if data["found"]:
             if data["_source"].get("type"):
-                relationships["areatype"] = areatypes.Areatype(
-                    data["_source"].get("type")
-                )
+                relationships["areatype"] = Areatype(data["_source"].get("type"))
             elif data["_source"].get("entity"):
-                relationships["areatype"] = areatypes.Areatype.get_from_es(
+                relationships["areatype"] = Areatype.get_from_es(
                     data["_source"].get("entity"), es
                 )
 
@@ -95,7 +184,7 @@ class Area(Controller):
 
     def process_attributes(self, data):
         if not self.relationships.get("areatype") and data.get("type"):
-            self.relationships["areatype"] = areatypes.Areatype(data.get("type"))
+            self.relationships["areatype"] = Areatype(data.get("type"))
         if "type" in data:
             del data["type"]
 
@@ -110,6 +199,8 @@ class Area(Controller):
 
     @staticmethod
     def get_example_postcodes(areacode, es, examples_count=5):
+        from findthatpostcode.controllers.postcodes import Postcode
+
         query = {
             "query": {
                 "function_score": {
@@ -125,9 +216,7 @@ class Area(Controller):
         }
         example = es.search(index="geo_postcode", body=query, size=examples_count)
 
-        return [
-            postcodes.Postcode(e["_id"], e["_source"]) for e in example["hits"]["hits"]
-        ]
+        return [Postcode(e["_id"], e["_source"]) for e in example["hits"]["hits"]]
 
     @staticmethod
     def get_children(areacode, es):
@@ -326,7 +415,7 @@ def search_areas(q, es, pagination=None, es_config=None):
                         recursive=False,
                     )
                 ]
-            return_result.append(places.Place(a["_id"], a["_source"], **relationships))
+            return_result.append(Place(a["_id"], a["_source"], **relationships))
         else:
             relationships = {}
             if a["_source"].get("parent"):

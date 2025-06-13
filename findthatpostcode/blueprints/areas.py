@@ -13,10 +13,9 @@ from flask import (
     url_for,
 )
 
+from findthatpostcode.blueprints.utils import return_result
 from findthatpostcode.controllers.areas import Area, get_all_areas
 from findthatpostcode.db import get_db
-
-from .utils import return_result
 
 bp = Blueprint("areas", __name__, url_prefix="/areas")
 

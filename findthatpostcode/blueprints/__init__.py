@@ -1,4 +1,4 @@
-from . import (
+from findthatpostcode.blueprints import (
     addtocsv,
     areas,
     areatypes,

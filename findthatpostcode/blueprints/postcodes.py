@@ -2,11 +2,10 @@ from dictlib import dig_get
 from elasticsearch.helpers import scan
 from flask import Blueprint, abort, jsonify, redirect, request, url_for
 
+from findthatpostcode.blueprints.utils import return_result
 from findthatpostcode.controllers.postcodes import Postcode
 from findthatpostcode.db import get_db
 from findthatpostcode.metadata import STATS_FIELDS
-
-from .utils import return_result
 
 bp = Blueprint("postcodes", __name__, url_prefix="/postcodes")
 

@@ -15,25 +15,20 @@ from elasticsearch.helpers import bulk
 from flask import current_app
 from flask.cli import with_appcontext
 
-from .. import db
+from findthatpostcode import db
+from findthatpostcode.commands.utils import get_latest_geoportal_url
 
 PC_INDEX = "geo_postcode"
-
-NSPL_URL = {
-    2011: "https://www.arcgis.com/sharing/rest/content/items/521edce4159a451a932539b7fc786322/data",
-    2021: "https://www.arcgis.com/sharing/rest/content/items/077631e063eb4e1ab43575d01381ec33/data",
-}
-DEFAULT_YEAR = 2021
+PRD_NSPL = "PRD_NSPL"
 
 
 @click.command("nspl")
 @click.option("--es-index", default=PC_INDEX)
 @click.option("--url", default=None)
-@click.option("--year", default=DEFAULT_YEAR, type=int)
 @with_appcontext
-def import_nspl(url=None, es_index=PC_INDEX, year=DEFAULT_YEAR):
+def import_nspl(url=None, es_index=PC_INDEX):
     if not url:
-        url = NSPL_URL[year]
+        url = get_latest_geoportal_url(PRD_NSPL)
 
     if current_app.config["DEBUG"]:
         requests_cache.install_cache()

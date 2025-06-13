@@ -1,4 +1,4 @@
-from findthatpostcode.controllers.areatypes import Areatype
+from findthatpostcode.controllers.areas import Areatype
 
 
 def test_areatype_class():

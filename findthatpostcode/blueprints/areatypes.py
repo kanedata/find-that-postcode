@@ -1,12 +1,10 @@
 from flask import Blueprint, render_template, request, url_for
 
 from findthatpostcode.blueprints.areas import areas_csv
-from findthatpostcode.controllers.areas import get_all_areas
-from findthatpostcode.controllers.areatypes import Areatype, area_types_count
+from findthatpostcode.blueprints.utils import return_result
+from findthatpostcode.controllers.areas import Areatype, area_types_count, get_all_areas
 from findthatpostcode.controllers.controller import Pagination
 from findthatpostcode.db import get_db
-
-from .utils import return_result
 
 bp = Blueprint("areatypes", __name__, url_prefix="/areatypes")
 

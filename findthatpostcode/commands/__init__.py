@@ -1,6 +1,13 @@
 from flask.cli import AppGroup
 
-from . import boundaries, codes, new_pcon, placenames, postcodes, stats
+from findthatpostcode.commands import (
+    boundaries,
+    codes,
+    new_pcon,
+    placenames,
+    postcodes,
+    stats,
+)
 
 
 def init_app(app):

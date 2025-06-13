@@ -1,7 +1,6 @@
 import re
 
-from . import areas, postcodes
-from .controller import Controller
+from findthatpostcode.controllers.controller import Controller
 
 
 class Place(Controller):
@@ -23,6 +22,8 @@ class Place(Controller):
 
     @classmethod
     def get_from_es(cls, id, es, es_config=None, examples_count=5, recursive=True):
+        from findthatpostcode.controllers.areas import Area
+
         if not es_config:
             es_config = {}
 
@@ -41,7 +42,7 @@ class Place(Controller):
         }
         for k, v in data.get("_source", {}).get("areas", {}).items():
             if isinstance(v, str) and re.match(r"[A-Z][0-9]{8}", v):
-                area = areas.Area.get_from_es(v, es, examples_count=0)
+                area = Area.get_from_es(v, es, examples_count=0)
                 if area.found:
                     # data["_source"]["areas"][k + "_name"] =
                     # area.attributes.get("name")
@@ -70,6 +71,8 @@ class Place(Controller):
 
     @staticmethod
     def get_nearest_postcodes(location, es, examples_count=5):
+        from findthatpostcode.controllers.postcodes import Postcode
+
         if not location:
             return []
         query = {
@@ -87,9 +90,7 @@ class Place(Controller):
             ],
         }
         example = es.search(index="geo_postcode", body=query, size=examples_count)
-        return [
-            postcodes.Postcode(e["_id"], e["_source"]) for e in example["hits"]["hits"]
-        ]
+        return [Postcode(e["_id"], e["_source"]) for e in example["hits"]["hits"]]
 
     @staticmethod
     def get_nearest_places(location, es, examples_count=10):

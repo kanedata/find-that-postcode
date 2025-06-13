@@ -8,7 +8,7 @@ from flask_cors import CORS
 from sentry_sdk.integrations.flask import FlaskIntegration
 
 from findthatpostcode import blueprints, commands, db
-from findthatpostcode.controllers.areatypes import area_types_count
+from findthatpostcode.controllers.areas import area_types_count
 from findthatpostcode.metadata import AREA_TYPES, KEY_AREA_TYPES, OTHER_CODES
 
 

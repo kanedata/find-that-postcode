@@ -13,8 +13,8 @@ from elasticsearch.helpers import bulk
 from flask import current_app
 from flask.cli import with_appcontext
 
-from .. import db
-from .codes import AREA_INDEX
+from findthatpostcode import db
+from findthatpostcode.commands.codes import AREA_INDEX
 
 IMD2019_URL = "https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/845345/File_7_-_All_IoD2019_Scores__Ranks__Deciles_and_Population_Denominators_3.csv"
 IMD2015_URL = "https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/467774/File_7_ID_2015_All_ranks__deciles_and_scores_for_the_Indices_of_Deprivation__and_population_denominators.csv"
@@ -51,19 +51,18 @@ IMD_FIELDS = {
     "Employment Score (rate)": "imd_employment_score",
     "Employment Rank (where 1 is most deprived)": "imd_employment_rank",
     (
-        "Employment Decile " "(where 1 is most deprived 10% of LSOAs)"
+        "Employment Decile (where 1 is most deprived 10% of LSOAs)"
     ): "imd_employment_decile",
     "Education, Skills and Training Score": "imd_education_score",
     (
-        "Education, Skills and Training Rank " "(where 1 is most deprived)"
+        "Education, Skills and Training Rank (where 1 is most deprived)"
     ): "imd_education_rank",
     (
-        "Education, Skills and Training Decile "
-        "(where 1 is most deprived 10% of LSOAs)"
+        "Education, Skills and Training Decile (where 1 is most deprived 10% of LSOAs)"
     ): "imd_education_decile",
     "Health Deprivation and Disability Score": "imd_health_score",
     (
-        "Health Deprivation and Disability Rank " "(where 1 is most deprived)"
+        "Health Deprivation and Disability Rank (where 1 is most deprived)"
     ): "imd_health_rank",
     (
         "Health Deprivation and Disability Decile "
@@ -74,7 +73,7 @@ IMD_FIELDS = {
     "Crime Decile (where 1 is most deprived 10% of LSOAs)": "imd_crime_decile",
     "Barriers to Housing and Services Score": "imd_housing_score",
     (
-        "Barriers to Housing and Services Rank " "(where 1 is most deprived)"
+        "Barriers to Housing and Services Rank (where 1 is most deprived)"
     ): "imd_housing_rank",
     (
         "Barriers to Housing and Services Decile "
@@ -83,7 +82,7 @@ IMD_FIELDS = {
     "Living Environment Score": "imd_environment_score",
     "Living Environment Rank (where 1 is most deprived)": "imd_environment_rank",
     (
-        "Living Environment Decile " "(where 1 is most deprived 10% of LSOAs)"
+        "Living Environment Decile (where 1 is most deprived 10% of LSOAs)"
     ): "imd_environment_decile",
     "Income Deprivation Affecting Children Index (IDACI) Score (rate)": "idaci_score",
     (
@@ -105,7 +104,7 @@ IMD_FIELDS = {
     ): "idaopi_decile",
     "Children and Young People Sub-domain Score": "imd_education_children_score",
     (
-        "Children and Young People Sub-domain Rank " "(where 1 is most deprived)"
+        "Children and Young People Sub-domain Rank (where 1 is most deprived)"
     ): "imd_education_children_rank",
     (
         "Children and Young People Sub-domain Decile "
@@ -113,14 +112,14 @@ IMD_FIELDS = {
     ): "imd_education_children_decile",
     "Adult Skills Sub-domain Score": "imd_education_adults_score",
     (
-        "Adult Skills Sub-domain Rank " "(where 1 is most deprived)"
+        "Adult Skills Sub-domain Rank (where 1 is most deprived)"
     ): "imd_education_adults_rank",
     (
-        "Adult Skills Sub-domain Decile " "(where 1 is most deprived 10% of LSOAs)"
+        "Adult Skills Sub-domain Decile (where 1 is most deprived 10% of LSOAs)"
     ): "imd_education_adults_decile",
     "Geographical Barriers Sub-domain Score": "imd_housing_geographical_score",
     (
-        "Geographical Barriers Sub-domain Rank " "(where 1 is most deprived)"
+        "Geographical Barriers Sub-domain Rank (where 1 is most deprived)"
     ): "imd_housing_geographical_rank",
     (
         "Geographical Barriers Sub-domain Decile "
@@ -135,29 +134,29 @@ IMD_FIELDS = {
     ): "imd_housing_wider_decile",
     "Indoors Sub-domain Score": "imd_environment_indoors_score",
     (
-        "Indoors Sub-domain Rank " "(where 1 is most deprived)"
+        "Indoors Sub-domain Rank (where 1 is most deprived)"
     ): "imd_environment_indoors_rank",
     (
-        "Indoors Sub-domain Decile " "(where 1 is most deprived 10% of LSOAs)"
+        "Indoors Sub-domain Decile (where 1 is most deprived 10% of LSOAs)"
     ): "imd_environment_indoors_decile",
     "Outdoors Sub-domain Score": "imd_environment_outdoors_score",
     (
-        "Outdoors Sub-domain Rank " "(where 1 is most deprived)"
+        "Outdoors Sub-domain Rank (where 1 is most deprived)"
     ): "imd_environment_outdoors_rank",
     (
-        "Outdoors Sub-domain Decile " "(where 1 is most deprived 10% of LSOAs)"
+        "Outdoors Sub-domain Decile (where 1 is most deprived 10% of LSOAs)"
     ): "imd_environment_outdoors_rank",
     "Total population: mid 2015 (excluding prisoners)": "population_total",
     "Dependent Children aged 0-15: mid 2015 (excluding prisoners)": "population_0_15",
     "Population aged 16-59: mid 2015 (excluding prisoners)": "population_16_59",
     (
-        "Older population aged 60 and over: mid 2015 " "(excluding prisoners)"
+        "Older population aged 60 and over: mid 2015 (excluding prisoners)"
     ): "population_60_plus",
     "Total population: mid 2012 (excluding prisoners)": "population_total",
     "Dependent Children aged 0-15: mid 2012 (excluding prisoners)": "population_0_15",
     "Population aged 16-59: mid 2012 (excluding prisoners)": "population_16_59",
     (
-        "Older population aged 60 and over: mid 2012 " "(excluding prisoners)"
+        "Older population aged 60 and over: mid 2012 (excluding prisoners)"
     ): "population_60_plus",
     (
         "Working age population 18-59/64: for use with Employment Deprivation Domain "

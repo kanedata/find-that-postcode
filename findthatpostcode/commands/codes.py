@@ -18,11 +18,12 @@ from flask import current_app
 from flask.cli import with_appcontext
 from openpyxl import load_workbook
 
-from .. import db
-from ..metadata import ENTITIES
+from findthatpostcode import db
+from findthatpostcode.commands.utils import get_latest_geoportal_url
+from findthatpostcode.metadata import ENTITIES
 
-RGC_URL = "https://www.arcgis.com/sharing/rest/content/items/7e1775db6a064a7e9c5ef860f0bf8daa/data"
-CHD_URL = "https://www.arcgis.com/sharing/rest/content/items/5676b8d2432a4beeae61195abb778274/data"
+PRD_RGC = "PRD_RGC"
+PRD_CHD = "PRD_CHD"
 MSOA_2011_URL = (
     "https://houseofcommonslibrary.github.io/msoanames/MSOA-Names-Latest.csv"
 )
@@ -61,14 +62,17 @@ def process_float(value):
 
 
 @click.command("rgc")
-@click.option("--url", default=RGC_URL)
+@click.option("--url", default=None)
 @click.option("--es-index", default=ENTITY_INDEX)
 @with_appcontext
-def import_rgc(url=RGC_URL, es_index=ENTITY_INDEX):
+def import_rgc(url=None, es_index=ENTITY_INDEX):
     if current_app.config["DEBUG"]:
         requests_cache.install_cache()
 
     es = db.get_db()
+
+    if not url:
+        url = get_latest_geoportal_url(PRD_RGC)
 
     r = requests.get(url, stream=True)
     z = zipfile.ZipFile(io.BytesIO(r.content))
@@ -91,8 +95,6 @@ def import_rgc(url=RGC_URL, es_index=ENTITY_INDEX):
                 entity = dict(zip(headers, row))
                 if not entity["Entity code"]:
                     continue
-
-                print(entity)
 
                 # tidy up a couple of records
                 if entity["Related entity codes"]:
@@ -154,13 +156,16 @@ def import_rgc(url=RGC_URL, es_index=ENTITY_INDEX):
 
 
 @click.command("chd")
-@click.option("--url", default=CHD_URL)
+@click.option("--url", default=None)
 @click.option("--es-index", default=AREA_INDEX)
 @click.option("--encoding", default=DEFAULT_ENCODING)
 @with_appcontext
-def import_chd(url=CHD_URL, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
+def import_chd(url=None, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
     if current_app.config["DEBUG"]:
         requests_cache.install_cache()
+
+    if not url:
+        url = get_latest_geoportal_url(PRD_CHD)
 
     es = db.get_db()
 

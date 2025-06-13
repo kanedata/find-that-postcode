@@ -1,7 +1,7 @@
 from urllib.parse import urlunparse
 
-from . import postcodes
-from .controller import Controller
+from findthatpostcode.controllers.controller import Controller
+from findthatpostcode.controllers.postcodes import Postcode
 
 
 class Point(Controller):
@@ -49,7 +49,7 @@ class Point(Controller):
         return cls(
             id,
             data={"distance_from_postcode": postcode["sort"][0]},
-            nearest_postcode=postcodes.Postcode.get_from_es(postcode["_id"], es),
+            nearest_postcode=Postcode.get_from_es(postcode["_id"], es),
         )
 
     def get_by_id(self, lat, lon):
@@ -62,7 +62,7 @@ class Point(Controller):
         )
         if result["hits"]["total"] > 0:
             postcode = result["hits"]["hits"][0]
-            self.relationships["nearest_postcode"] = postcodes.Postcode(
+            self.relationships["nearest_postcode"] = Postcode(
                 self.config
             ).set_from_data(postcode)
             self.attributes["distance_from_postcode"] = postcode["sort"][0]

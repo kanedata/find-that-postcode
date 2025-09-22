@@ -53,14 +53,11 @@ Run the following to import the data and save postcodes to the
 elasticsearch index:
 
 ```bash
-flask import nspl --url https://example.com/url-to-nspl
+flask import nspl
 ```
 
-Replace `https://example.com/url-to-nspl` with the URL to the latest NSPL file.
-This file can be found through a search on the [ONS Geoportal](https://geoportal.statistics.gov.uk/search?collection=Dataset&sort=-modified&tags=PRD_NSPL). On the page for the file copy the link shown in the
-"Download" button on the right hand side.
-
-This will then run the import process. It takes a while to run as there are over
+This will then run the import process, fetching the latest version of the
+right file. It takes a while to run as there are over
 2.5 million postcodes. The data will be around 1.3 GB in size on the disk.
 
 ### 6. Import area codes

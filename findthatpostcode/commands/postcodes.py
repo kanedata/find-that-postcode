@@ -84,6 +84,40 @@ def import_nspl(url=None, es_index=PC_INDEX):
                 if i["lat"] and i["long"]:
                     i["location"] = {"lat": i["lat"], "lon": i["long"]}
 
+                rename_fields = {
+                    "east1m": "oseast1m",
+                    "north1m": "osnrth1m",
+                    "usrtypind": "usertype",
+                    "gridind": "osgrdind",
+                    "oa21cd": "oa21",
+                    "cty25cd": "cty",
+                    "ced25cd": "ced",
+                    "lad25cd": "lad",
+                    "wd25cd": "wd",
+                    "nhser24cd": "nhser",
+                    "ctry25cd": "ctry",
+                    "rgn25cd": "rgn",
+                    "pcon24cd": "pcon",
+                    "ttwa15cd": "ttwa",
+                    "itl25cd": "itl",
+                    "npark16cd": "park",
+                    "lsoa21cd": "lsoa21",
+                    "msoa21cd": "msoa21",
+                    "wz11cd": "wz11",
+                    "sicbl24cd": "sicbl",
+                    "bua24cd": "bua24",
+                    "ruc21ind": "ruc21",
+                    "oac11ind": "oac11",
+                    "lep21cd1": "lep1",
+                    "lep21cd2": "lep2",
+                    "pfa23cd": "pfa",
+                    "imd20ind": "imd",
+                    "icb23cd": "icb",
+                }
+                for old, new in rename_fields.items():
+                    if old in i:
+                        i[new] = i.pop(old)
+
                 # integer fields
                 for j in ["oseast1m", "osnrth1m", "usertype", "osgrdind", "imd"]:
                     if i[j]:

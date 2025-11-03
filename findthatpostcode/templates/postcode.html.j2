@@ -111,18 +111,26 @@
     {% endcall %}
     {% endif %}
 
-    {% for a in result.relationships.areas if a.attributes.stats and a.attributes.stats.imd2019 %}
+    {% for a in result.relationships.areas if a.attributes.stats and a.attributes.stats.imd2025 %}
     {% if loop.first %}
-    {% set rank = a.attributes.stats.imd2019.imd_rank %}
-    {% set total = other_codes.imd[result.attributes.ctry] %}
-    {% call info_block("Index of multiple deprivation (2019)") %}
-    <p><strong>{{ "{:,.0f}".format(rank) }}</strong> out of {{ "{:,.0f}".format(total) }} lower super output areas in
+    {% set rank = a.attributes.stats.imd2025.imd_rank %}
+    {% set total_25 = other_codes.imd[result.attributes.ctry + "-imd2025"] %}
+    {% set total_19 = other_codes.imd[result.attributes.ctry + "-imd2019"] %}
+    {% set total_15 = other_codes.imd[result.attributes.ctry + "-imd2015"] %}
+    {% call info_block("Index of multiple deprivation (2025)") %}
+    <p><strong>{{ "{:,.0f}".format(rank) }}</strong> out of {{ "{:,.0f}".format(total_25) }} lower super output areas in
       {{ result.attributes.ctry_name }} (where 1 is the most deprived LSOA).</p>
-    <p><strong>{{ "{:.0%}".format( rank|float / total|float ) }}</strong> of LSOAs in {{ result.attributes.ctry_name }}
+    <p><strong>{{ "{:.0%}".format( rank|float / total_25|float ) }}</strong> of LSOAs in
+      {{ result.attributes.ctry_name }}
       are more deprived than this one.</p>
+    {% if a.attributes.stats.imd2019 %}
+    <p>In <strong>2019</strong>
+      {{ "{:.0%}".format( a.attributes.stats.imd2019.imd_rank|float / total_19|float ) }}</strong> of LSOAs in
+      {{ result.attributes.ctry.name }} were more deprived than this one.</p>
+    {% endif %}
     {% if a.attributes.stats.imd2015 %}
     <p>In <strong>2015</strong>
-      {{ "{:.0%}".format( a.attributes.stats.imd2015.imd_rank|float / total|float ) }}</strong> of LSOAs in
+      {{ "{:.0%}".format( a.attributes.stats.imd2015.imd_rank|float / total_15|float ) }}</strong> of LSOAs in
       {{ result.attributes.ctry.name }} were more deprived than this one.</p>
     {% endif %}
     {% endcall %}

@@ -17,6 +17,7 @@ def init_app(app):
     import_cli.add_command(codes.import_msoa_names)
     import_cli.add_command(boundaries.import_boundaries)
     import_cli.add_command(postcodes.import_nspl)
+    import_cli.add_command(stats.import_imd2025)
     import_cli.add_command(stats.import_imd2019)
     import_cli.add_command(stats.import_imd2015)
     import_cli.add_command(placenames.import_placenames)

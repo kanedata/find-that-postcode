@@ -43,12 +43,24 @@ OTHER_CODES = {
     ],
     "usertype": ["Small user", "Large user"],
     "imd": {
-        "E92000001": 32844,
-        "W92000004": 1909,
-        "S92000003": 6976,
-        "N92000002": None,
-        "L93000001": None,
-        "M83000003": None,
+        "E92000001-imd2025": 33755,
+        "W92000004-imd2025": 1909,
+        "S92000003-imd2025": 6976,
+        "N92000002-imd2025": None,
+        "L93000001-imd2025": None,
+        "M83000003-imd2025": None,
+        "E92000001-imd2019": 32844,
+        "W92000004-imd2019": 1909,
+        "S92000003-imd2019": 6976,
+        "N92000002-imd2019": None,
+        "L93000001-imd2019": None,
+        "M83000003-imd2019": None,
+        "E92000001-imd2015": 32844,
+        "W92000004-imd2015": 1909,
+        "S92000003-imd2015": 6976,
+        "N92000002-imd2015": None,
+        "L93000001-imd2015": None,
+        "M83000003-imd2015": None,
     },
 }
 
@@ -63,6 +75,18 @@ BASIC_UPLOAD_FIELDS = [
     ("ruc21", "2021 Census rural-urban classification", True),
 ]
 STATS_FIELDS = [
+    (
+        "imd2025_rank",
+        "Index of multiple deprivation (2025) rank",
+        False,
+        "stats.imd2025.imd_rank",
+    ),
+    (
+        "imd2025_decile",
+        "Index of multiple deprivation (2025) decile",
+        False,
+        "stats.imd2025.imd_decile",
+    ),
     (
         "imd2019_rank",
         "Index of multiple deprivation (2019) rank",

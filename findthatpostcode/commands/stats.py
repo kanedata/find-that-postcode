@@ -16,6 +16,7 @@ from flask.cli import with_appcontext
 from findthatpostcode import db
 from findthatpostcode.commands.codes import AREA_INDEX
 
+IMD2025_URL = "https://assets.publishing.service.gov.uk/media/68ff5daabcb10f6bf9bef911/File_7_IoD2025_All_Ranks_Scores_Deciles_Population_Denominators.csv"
 IMD2019_URL = "https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/845345/File_7_-_All_IoD2019_Scores__Ranks__Deciles_and_Population_Denominators_3.csv"
 IMD2015_URL = "https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/467774/File_7_ID_2015_All_ranks__deciles_and_scores_for_the_Indices_of_Deprivation__and_population_denominators.csv"
 
@@ -35,6 +36,10 @@ def parse_field(k, v):
 IMD_FIELDS = {
     "LSOA code (2011)": "lsoa_code",
     "LSOA name (2011)": "lsoa_name",
+    "LSOA code (2021)": "lsoa_code",
+    "LSOA name (2021)": "lsoa_name",
+    "Local Authority District code (2024)": "la_code",
+    "Local Authority District name (2024)": "la_name",
     "Local Authority District code (2019)": "la_code",
     "Local Authority District name (2019)": "la_name",
     "Local Authority District code (2013)": "la_code",
@@ -162,7 +167,61 @@ IMD_FIELDS = {
         "Working age population 18-59/64: for use with Employment Deprivation Domain "
         "(excluding prisoners)"
     ): "population_workingage",
+    "Total population: mid 2022": "population_total",
+    "Dependent Children aged 0-15: mid 2022": "population_0_15",
+    "Older population aged 60 and over: mid 2022": "population_60_plus",
+    "Working age population 18-66 (for use with Employment Deprivation Domain): mid 2022": "population_workingage",
 }
+
+
+@click.command("imd2025")
+@click.option("--es-index", default=AREA_INDEX)
+@click.option("--url", default=IMD2025_URL)
+@with_appcontext
+def import_imd2025(url=IMD2025_URL, es_index=AREA_INDEX):
+    if current_app.config["DEBUG"]:
+        requests_cache.install_cache()
+
+    es = db.get_db()
+
+    r = requests.get(url, stream=True)
+
+    reader = csv.DictReader(codecs.iterdecode(r.iter_lines(), "utf-8-sig"))
+    area_updates = []
+    for k, area in tqdm.tqdm(enumerate(reader)):
+        area = {
+            IMD_FIELDS.get(k.strip(), k.strip()): parse_field(
+                IMD_FIELDS.get(k.strip(), k.strip()), v
+            )
+            for k, v in area.items()
+        }
+        area_update = {
+            "_index": es_index,
+            "_type": "_doc",
+            "_op_type": "update",
+            "_id": area["lsoa_code"],
+            "doc": {
+                "stats": {
+                    "imd2025": {k: v for k, v in area.items() if k.startswith("imd_")},
+                    "idaci2025": {
+                        k: v for k, v in area.items() if k.startswith("idaci_")
+                    },
+                    "idaopi2025": {
+                        k: v for k, v in area.items() if k.startswith("idaopi_")
+                    },
+                    "population2022": {
+                        k: v for k, v in area.items() if k.startswith("population_")
+                    },
+                }
+            },
+        }
+        area_updates.append(area_update)
+
+    print("[imd2025] Processed %s areas" % len(area_updates))
+    print("[elasticsearch] %s areas to save" % len(area_updates))
+    results = bulk(es, area_updates)
+    print("[elasticsearch] saved %s areas to %s index" % (results[0], es_index))
+    print("[elasticsearch] %s errors reported" % len(results[1]))
 
 
 @click.command("imd2019")

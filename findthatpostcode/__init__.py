@@ -9,7 +9,12 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 
 from findthatpostcode import blueprints, commands, db
 from findthatpostcode.controllers.areas import area_types_count
-from findthatpostcode.metadata import AREA_TYPES, KEY_AREA_TYPES, OTHER_CODES
+from findthatpostcode.metadata import (
+    AREA_TYPES,
+    KEY_AREA_TYPES,
+    OTHER_CODES,
+    STATS_FIELDS,
+)
 
 
 def get_es_url(default):
@@ -74,6 +79,7 @@ def create_app(test_config=None):
             other_codes=OTHER_CODES,
             area_types=AREA_TYPES,
             ethical_ads_publisher=app.config.get("ETHICAL_ADS_PUBLISHER"),
+            stats_fields=STATS_FIELDS,
         )
 
     @app.template_filter()

@@ -195,6 +195,20 @@ class Area(Controller):
                     data[i] = datetime.strptime(data[i][0:10], "%Y-%m-%d")
                 except ValueError:
                     continue
+
+        if self.id.startswith("E"):
+            data["ctry"] = "E92000001"
+            data["ctry_name"] = "England"
+        elif self.id.startswith("W"):
+            data["ctry"] = "W92000004"
+            data["ctry_name"] = "Wales"
+        elif self.id.startswith("S"):
+            data["ctry"] = "S92000003"
+            data["ctry_name"] = "Scotland"
+        elif self.id.startswith("N"):
+            data["ctry"] = "N92000002"
+            data["ctry_name"] = "Northern Ireland"
+
         return data
 
     @staticmethod

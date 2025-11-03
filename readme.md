@@ -134,6 +134,7 @@ Statistics can be added to areas, using ONS data. The available statistics are
 added to LSOAs, but could also be added to other areas.
 
 ```bash
+flask import imd2025
 flask import imd2019
 flask import imd2015
 ```
@@ -340,6 +341,7 @@ dokku run find-that-postcode flask import nspl --year=2021
 dokku run find-that-postcode flask import rgc
 dokku run find-that-postcode flask import chd
 dokku run find-that-postcode flask import msoanames
+dokku run find-that-postcode flask import imd2025
 dokku run find-that-postcode flask import imd2019
 dokku run find-that-postcode flask import imd2015
 dokku run find-that-postcode flask import placenames

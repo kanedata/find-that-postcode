@@ -33,6 +33,7 @@ def test_postcode_html(client):
     content = rv.data.decode("utf8")
     assert "EX36 4AT" in content
     assert "E01020135" in content
+    assert "E01020122" not in content
 
 
 def test_postcode_missing_html(client):

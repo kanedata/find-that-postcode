@@ -1,7 +1,6 @@
 import html
 
-
-AREATYPE_CODE = "lsoa11"
+AREATYPE_CODE = "lsoa21"
 
 
 def test_areatype_json(client):
@@ -11,9 +10,9 @@ def test_areatype_json(client):
     assert rv.headers["Access-Control-Allow-Origin"] == "*"
     assert (
         data.get("data", {}).get("attributes", {}).get("full_name")
-        == "2011 Census Lower Layer Super Output Area (LSOA)/ Data Zone (DZ)/ SOA"
+        == "2021 Census Lower Layer Super Output Area (LSOA)/ Data Zone (DZ)/ SOA"
     )
-    assert len(data.get("included", [])) == 8
+    assert len(data.get("included", [])) == 9
 
 
 def test_areatype_json_missing(client):

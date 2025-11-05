@@ -122,6 +122,12 @@ class Postcode(Controller):
         """
         Get the area for this postcode based on the type
         """
+        area_id = self.attributes.get(areatype)
+        if area_id:
+            for a in self.relationships["areas"]:
+                if a.id == area_id:
+                    return a
+
         for a in self.relationships["areas"]:
             if a.relationships["areatype"].id == areatype:
                 return a

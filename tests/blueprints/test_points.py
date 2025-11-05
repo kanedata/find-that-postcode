@@ -27,6 +27,7 @@ def test_point_html(client):
     content = rv.data.decode("utf8")
     assert "EX36 4AT" in content
     assert "E01020135" in content
+    assert "E01020122" not in content
     assert "69.0" in content
 
 

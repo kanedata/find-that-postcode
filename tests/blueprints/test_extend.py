@@ -32,7 +32,7 @@ def test_reconcile_spec(client):
 
 
 extend_q = {
-    "extend": json.dumps({"ids": ["EX36 4AT"], "properties": [{"id": "lsoa11"}]})
+    "extend": json.dumps({"ids": ["EX36 4AT"], "properties": [{"id": "lsoa21"}]})
 }
 
 
@@ -42,7 +42,8 @@ def test_reconcile_extend(client):
     assert rv.headers["Access-Control-Allow-Origin"] == "*"
     assert "meta" in result
     assert "EX36 4AT" in result["rows"]
-    assert result["rows"]["EX36 4AT"]["lsoa11"] == "E01020135"
+    assert "lsoa11" not in result["rows"]["EX36 4AT"]
+    assert result["rows"]["EX36 4AT"]["lsoa21"] == "E01020135"
 
 
 def test_reconcile_extend_jsonp(client):
@@ -54,7 +55,8 @@ def test_reconcile_extend_jsonp(client):
     result = json.loads(data[len(extend_q["callback"]) + 1 : -1])
     assert "meta" in result
     assert "EX36 4AT" in result["rows"]
-    assert result["rows"]["EX36 4AT"]["lsoa11"] == "E01020135"
+    assert "lsoa11" not in result["rows"]["EX36 4AT"]
+    assert result["rows"]["EX36 4AT"]["lsoa21"] == "E01020135"
 
 
 def test_reconcile_extend_post(client):
@@ -63,7 +65,8 @@ def test_reconcile_extend_post(client):
     assert rv.headers["Access-Control-Allow-Origin"] == "*"
     assert "meta" in result
     assert "EX36 4AT" in result["rows"]
-    assert result["rows"]["EX36 4AT"]["lsoa11"] == "E01020135"
+    assert "lsoa11" not in result["rows"]["EX36 4AT"]
+    assert result["rows"]["EX36 4AT"]["lsoa21"] == "E01020135"
 
 
 def test_reconcile_extend_post_jsonp(client):
@@ -74,7 +77,8 @@ def test_reconcile_extend_post_jsonp(client):
     result = json.loads(data[len("testCallback") + 1 : -1])
     assert "meta" in result
     assert "EX36 4AT" in result["rows"]
-    assert result["rows"]["EX36 4AT"]["lsoa11"] == "E01020135"
+    assert "lsoa11" not in result["rows"]["EX36 4AT"]
+    assert result["rows"]["EX36 4AT"]["lsoa21"] == "E01020135"
 
 
 recon_q = {

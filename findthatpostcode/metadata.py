@@ -14,9 +14,9 @@ with open(
 
 KEY_AREA_TYPES = [
     ("Key", ["ctry", "rgn", "cty", "laua", "ward", "msoa21", "pcon"]),
-    ("Secondary", ["ttwa", "pfa", "lep", "lsoa21", "oa21", "npark"]),
+    ("Secondary", ["ttwa", "pfa", "lsoa21", "oa21", "npark"]),
     ("Health", ["ccg", "nhser", "hb", "lhb", "icb"]),
-    ("Other", ["eer", "bua11", "buasd11", "wz11", "teclec"]),
+    ("Other / inactive", ["lep", "eer", "bua11", "buasd11", "wz11", "teclec"]),
 ]
 
 OTHER_CODES = {

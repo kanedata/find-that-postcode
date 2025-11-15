@@ -11,8 +11,8 @@ var stages = [
 function hide_stage(stage, show_top) {
     var stage_el = document.getElementById('stage-' + stage);
     Array.from(stage_el.getElementsByClassName('contents'))
-         .forEach(i => i.classList.add("dn"));
-    if(show_top){
+        .forEach(i => i.classList.add("dn"));
+    if (show_top) {
         Array.from(stage_el.getElementsByClassName('contents-top'))
             .forEach(i => i.classList.remove("dn"));
     } else {
@@ -29,10 +29,10 @@ function show_stage(stage) {
         .forEach(i => i.classList.add("dn"));
 }
 
-function set_stage(stage){
+function set_stage(stage) {
     current_stage = stage;
     var previous_stages = stages.slice(0, stages.indexOf(stage));
-    var next_stages = stages.slice(stages.indexOf(stage)+1);
+    var next_stages = stages.slice(stages.indexOf(stage) + 1);
 
     previous_stages.forEach(s => hide_stage(s, true));
     next_stages.forEach(s => hide_stage(s, false));
@@ -41,7 +41,7 @@ function set_stage(stage){
 
 function clean_postcode(pc) {
     if (typeof pc === 'string' || pc instanceof String) {
-        pc = pc.toUpperCase().replace(/[^A-Z0-9]/, '');
+        pc = pc.toUpperCase().replace(/[^A-Z0-9]/gi, '');
         return pc.slice(0, -3) + " " + pc.slice(-3);
     }
     return pc;
@@ -49,7 +49,7 @@ function clean_postcode(pc) {
 
 function hash_postcode(pc, length) {
     length = length || DEFAULT_HASH_LENGTH;
-    pc = pc.toLowerCase().replace(/[^a-z0-9]/, '');
+    pc = pc.toLowerCase().replace(/[^a-z0-9]/gi, '');
     var pchash = CryptoJS.MD5(pc);
     return pchash.toString(CryptoJS.enc.Hex).slice(0, length);
 }
@@ -73,7 +73,7 @@ function update_fields_list(results, div) {
         var li = document.createElement('li');
         li.classList.add('mb2');
         var label = document.createElement('label');
-        label.setAttribute('for', "field-"+f_slug);
+        label.setAttribute('for', "field-" + f_slug);
         label.classList.add('pointer');
         var span = document.createElement('span');
         span.innerText = f;
@@ -82,7 +82,7 @@ function update_fields_list(results, div) {
         radio.setAttribute('type', 'radio');
         radio.setAttribute('name', 'postcode_field');
         radio.setAttribute('value', f);
-        radio.setAttribute('id', "field-"+f_slug);
+        radio.setAttribute('id', "field-" + f_slug);
         radio.classList.add('dn');
 
         if (f_slug.includes("postcode") | f_slug.includes("postal-code")) {
@@ -97,7 +97,7 @@ function update_fields_list(results, div) {
                 set_stage('select-fields');
             }
         }
-        
+
         var field_ul = document.createElement('ul');
         field_ul.classList.add('list', 'pa0', 'ma0');
         let values_seen = []
@@ -108,7 +108,7 @@ function update_fields_list(results, div) {
                 field_li.appendChild(document.createTextNode('"' + r[f] + '"'));
                 values_seen.push(r[f]);
             }
-            if(values_seen.length >= 5){
+            if (values_seen.length >= 5) {
                 break;
             }
         }
@@ -131,7 +131,7 @@ function get_results(hashes, fields_to_add) {
         return formData;
     });
     var rows_done = 0;
-    return Promise.all(formDatas.map(formData => 
+    return Promise.all(formDatas.map(formData =>
         fetch(hash_url, {
             method: 'POST',
             body: formData,
@@ -145,9 +145,9 @@ function get_results(hashes, fields_to_add) {
                 document.getElementById("progress-bar-inner").style.width = percent_done;
                 return Object.fromEntries(
                     data.data.map(i => [
-                        i["id"], 
+                        i["id"],
                         Object.fromEntries(
-                            Object.entries(i).filter(v => v[0]!="id")
+                            Object.entries(i).filter(v => v[0] != "id")
                         )
                     ])
                 );
@@ -156,31 +156,31 @@ function get_results(hashes, fields_to_add) {
                 console.log('Error: ', error)
             })
     ))
-    .then(data => Object.assign({}, ...data))
+        .then(data => Object.assign({}, ...data))
 }
 
-function parse_fields_to_add(fields){
+function parse_fields_to_add(fields) {
 
-    if(fields.includes("latlng")){
+    if (fields.includes("latlng")) {
         fields.splice(fields.indexOf("latlng"), 1, "lat", "long");
     }
 
-    if(fields.includes("estnrth")){
+    if (fields.includes("estnrth")) {
         fields.splice(fields.indexOf("estnrth"), 1, "oseast1m", "osnrth1m");
     }
 
-    if(fields.includes("lep")){
+    if (fields.includes("lep")) {
         fields.splice(fields.indexOf("lep"), 1, "lep1", "lep2");
     }
 
-    if(fields.includes("lep_name")){
+    if (fields.includes("lep_name")) {
         fields.splice(fields.indexOf("lep_name"), 1, "lep1_name", "lep2_name");
     }
     return fields;
 }
 
 function openSaveFileDialog(data, filename, mimetype) {
-// from: https://github.com/mholt/PapaParse/issues/175#issuecomment-395978144
+    // from: https://github.com/mholt/PapaParse/issues/175#issuecomment-395978144
 
     if (!data) return;
 
@@ -208,11 +208,11 @@ function openSaveFileDialog(data, filename, mimetype) {
 
 }
 
-function create_new_file(results, new_data, column_name, fields_to_add){
+function create_new_file(results, new_data, column_name, fields_to_add) {
     return Papa.unparse({
         fields: results.meta.fields.concat(fields_to_add),
         data: results.data.map(row => Object.assign(
-            row, 
+            row,
             new_data[clean_postcode(row[column_name])]
         ))
     });
@@ -223,14 +223,14 @@ function click_download(results, filename) {
 
     var hashes = new Set(
         Array.from(results.data)
-             .filter(r => r[column_name])
-             .map(r => hash_postcode(r[column_name])
-        )
+            .filter(r => r[column_name])
+            .map(r => hash_postcode(r[column_name])
+            )
     );
     var fields_to_add = parse_fields_to_add(
         Array.from(document.getElementsByName("fields"))
-             .filter(i => i.checked)
-             .map(i => i.value)
+            .filter(i => i.checked)
+            .map(i => i.value)
     );
     document.getElementById("result").classList.remove("dn");
 
@@ -246,11 +246,11 @@ function click_download(results, filename) {
 }
 
 document.addEventListener('DOMContentLoaded', function (event) {
-    document.getElementById('reset-select-postcode-field').onclick = function(ev){
+    document.getElementById('reset-select-postcode-field').onclick = function (ev) {
         ev.preventDefault();
         set_stage('select-postcode-field');
     }
-    document.getElementById('reset-select-file').onclick = function(ev){
+    document.getElementById('reset-select-file').onclick = function (ev) {
         ev.preventDefault();
         set_stage('select-file');
     }
@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
                     var preview = document.getElementById('csvpreview');
                     // update_fields_table(results, preview.getElementsByTagName('table')[0]);
                     update_fields_list(results, preview);
-                    document.getElementById("fetch_postcodes").onclick = function(ev){
+                    document.getElementById("fetch_postcodes").onclick = function (ev) {
                         ev.preventDefault();
                         click_download(results, file.files[0].name);
                     }

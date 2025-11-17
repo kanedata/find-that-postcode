@@ -43,6 +43,14 @@ def process_date(value, date_format="%d/%m/%Y"):
     return datetime.datetime.strptime(value, date_format)
 
 
+def process_str(value):
+    if value in ["", "n/a"]:
+        return None
+    if not isinstance(value, str):
+        return value
+    return value.strip()
+
+
 def process_int(value):
     if value in ["", "n/a"]:
         return None
@@ -202,7 +210,7 @@ def import_chd(url=None, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
                     "date_start": process_date(area["OPER_DATE"][0:10], "%d/%m/%Y"),
                     "date_end": process_date(area["TERM_DATE"][0:10], "%d/%m/%Y"),
                     "parent": area["PARENTCD"] if area["PARENTCD"] else None,
-                    "entity": area["ENTITYCD"],
+                    "entity": process_str(area["ENTITYCD"]),
                     "owner": area["OWNER"],
                     "active": area["STATUS"] == "live",
                     "areaehect": process_float(area["AREAEHECT"]),
@@ -213,7 +221,7 @@ def import_chd(url=None, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
                     "predecessor": [],
                     "successor": [],
                     "equivalents": {},
-                    "type": ENTITIES.get(area["ENTITYCD"]),
+                    "type": ENTITIES.get(process_str(area["ENTITYCD"])),
                 }
             )
 

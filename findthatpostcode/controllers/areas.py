@@ -18,6 +18,7 @@ class Areatype(Controller):
     areatypes = AREA_TYPES
 
     def __init__(self, id, data=None):
+        id = id.strip()
         if not data:
             data = self.areatypes.get(id)
         super().__init__(id, data)
@@ -51,6 +52,7 @@ class Areatype(Controller):
 
     @classmethod
     def get_from_es(cls, id, es, es_config=None, full=False):
+        id = id.strip()
         if cls.areatypes.get(id):
             return cls(id)
         return super().get_from_es(id, es, es_config=es_config)

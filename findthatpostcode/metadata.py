@@ -1,6 +1,8 @@
 import json
 import os
 
+from findthatpostcode.utils import Field
+
 with open(
     os.path.join(os.path.dirname(os.path.realpath(__file__)), "areatypes.json")
 ) as a:
@@ -67,55 +69,55 @@ OTHER_CODES = {
 
 DEFAULT_UPLOAD_FIELDS = ["latlng", "laua", "laua_name", "rgn", "rgn_name"]
 BASIC_UPLOAD_FIELDS = [
-    ("latlng", "Latitude / Longitude", False),
-    ("estnrth", "OS Easting / Northing", False),
-    ("pcds", "Standardised postcode", False),
-    ("oac11", "2011 Output Area Classification (OAC)", True),
-    ("ru11ind", "2011 Census rural-urban classification", True),
-    ("ruc21", "2021 Census rural-urban classification", True),
+    Field(id="latlng", name="Latitude / Longitude", has_name=False),
+    Field(id="estnrth", name="OS Easting / Northing", has_name=False),
+    Field(id="pcds", name="Standardised postcode", has_name=False),
+    Field(id="oac11", name="2011 Output Area Classification (OAC)", has_name=True),
+    Field(id="ru11ind", name="2011 Census rural-urban classification", has_name=True),
+    Field(id="ruc21", name="2021 Census rural-urban classification", has_name=True),
 ]
 STATS_FIELDS = [
-    (
-        "imd2025_rank",
-        "Index of multiple deprivation (2025) rank",
-        False,
-        "stats.imd2025.imd_rank",
+    Field(
+        id="imd2025_rank",
+        name="Index of multiple deprivation (2025) rank",
+        location="stats.imd2025.imd_rank",
+        area="lsoa21",
     ),
-    (
-        "imd2025_decile",
-        "Index of multiple deprivation (2025) decile",
-        False,
-        "stats.imd2025.imd_decile",
+    Field(
+        id="imd2025_decile",
+        name="Index of multiple deprivation (2025) decile",
+        location="stats.imd2025.imd_decile",
+        area="lsoa21",
     ),
-    (
-        "imd2019_rank",
-        "Index of multiple deprivation (2019) rank",
-        False,
-        "stats.imd2019.imd_rank",
+    Field(
+        id="imd2019_rank",
+        name="Index of multiple deprivation (2019) rank",
+        location="stats.imd2019.imd_rank",
+        area="lsoa11",
     ),
-    (
-        "imd2019_decile",
-        "Index of multiple deprivation (2019) decile",
-        False,
-        "stats.imd2019.imd_decile",
+    Field(
+        id="imd2019_decile",
+        name="Index of multiple deprivation (2019) decile",
+        location="stats.imd2019.imd_decile",
+        area="lsoa11",
     ),
-    (
-        "imd2015_rank",
-        "Index of multiple deprivation (2015) rank",
-        False,
-        "stats.imd2015.imd_rank",
+    Field(
+        id="imd2015_rank",
+        name="Index of multiple deprivation (2015) rank",
+        location="stats.imd2015.imd_rank",
+        area="lsoa11",
     ),
-    (
-        "imd2015_decile",
-        "Index of multiple deprivation (2015) decile",
-        False,
-        "stats.imd2015.imd_decile",
+    Field(
+        id="imd2015_decile",
+        name="Index of multiple deprivation (2015) decile",
+        location="stats.imd2015.imd_decile",
+        area="lsoa11",
     ),
-    # (
-    #   "popn",
-    #   "Total population (2015)",
-    #   False,
-    #   "stats.population2015.population_total"
+    # Field(
+    #   id="popn2015",
+    #   name="Total population (2015)",
+    #   location="stats.population2015.population_total",
+    #   area="lsoa11",
     # ),
 ]
 

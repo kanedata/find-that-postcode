@@ -111,31 +111,26 @@
     {% endcall %}
     {% endif %}
 
-    {% for a in result.relationships.areas if a.attributes.stats and a.attributes.stats.imd2025 %}
-    {% if loop.first %}
-    {% set rank = a.attributes.stats.imd2025.imd_rank %}
-    {% set total_25 = other_codes.imd[result.attributes.ctry + "-imd2025"] %}
-    {% set total_19 = other_codes.imd[result.attributes.ctry + "-imd2019"] %}
-    {% set total_15 = other_codes.imd[result.attributes.ctry + "-imd2015"] %}
+    {% if stats.imd2025_rank is not none %}
     {% call info_block("Index of multiple deprivation (2025)") %}
-    <p><strong>{{ "{:,.0f}".format(rank) }}</strong> out of {{ "{:,.0f}".format(total_25) }} lower super output areas in
+    <p><strong>{{ "{:,.0f}".format(stats.imd2025_rank) }}</strong> out of {{ "{:,.0f}".format(stats.imd2025_total) }}
+      lower super output areas in
       {{ result.attributes.ctry_name }} (where 1 is the most deprived LSOA).</p>
-    <p><strong>{{ "{:.0%}".format( rank|float / total_25|float ) }}</strong> of LSOAs in
+    <p><strong>{{ "{:.0%}".format( stats.imd2025_rank|float / stats.imd2025_total|float ) }}</strong> of LSOAs in
       {{ result.attributes.ctry_name }}
       are more deprived than this one.</p>
-    {% if a.attributes.stats.imd2019 %}
+    {% if stats.imd2019_rank %}
     <p>In <strong>2019</strong>
-      {{ "{:.0%}".format( a.attributes.stats.imd2019.imd_rank|float / total_19|float ) }}</strong> of LSOAs in
+      {{ "{:.0%}".format( stats.imd2019_rank|float / stats.imd2019_total|float ) }}</strong> of LSOAs in
       {{ result.attributes.ctry.name }} were more deprived than this one.</p>
     {% endif %}
-    {% if a.attributes.stats.imd2015 %}
+    {% if stats.imd2015_rank %}
     <p>In <strong>2015</strong>
-      {{ "{:.0%}".format( a.attributes.stats.imd2015.imd_rank|float / total_15|float ) }}</strong> of LSOAs in
+      {{ "{:.0%}".format( stats.imd2015_rank|float / stats.imd2015_total|float ) }}</strong> of LSOAs in
       {{ result.attributes.ctry.name }} were more deprived than this one.</p>
     {% endif %}
     {% endcall %}
     {% endif %}
-    {% endfor %}
   </div>
 
   {% for i in key_area_types[1:] %}

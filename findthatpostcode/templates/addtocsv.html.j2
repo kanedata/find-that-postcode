@@ -90,13 +90,13 @@
             </tr>
             {% for b in basic_fields %}
             <tr>
-              <td class="ph2">{{b[1]}}</td>
-              <td class="ph2 tc"><input type="checkbox" autocomplete="off" name="fields" value="{{b[0]}}"
-                  {% if b[0] in default_fields %} checked="checked" {% endif %}></td>
+              <td class="ph2">{{ b.name }}</td>
+              <td class="ph2 tc"><input type="checkbox" autocomplete="off" name="fields" value="{{ b.id }}"
+                  {% if b.id in default_fields %} checked="checked" {% endif %}></td>
               <td class="ph2 tc">
-                {% if b[2] %}
-                <input type="checkbox" autocomplete="off" name="fields" value="{{b[0]}}_name"
-                  {% if '%s_name' % b[0] in default_fields %} checked="checked" {% endif %}>
+                {% if b.has_name %}
+                <input type="checkbox" autocomplete="off" name="fields" value="{{ b.id }}_name"
+                  {% if (b.id + '_name') in default_fields %} checked="checked" {% endif %}>
                 {% endif %}
               </td>
             </tr>
@@ -108,9 +108,9 @@
             </tr>
             {% for b in stats_fields %}
             <tr>
-              <td class="ph2">{{b[1]}}</td>
-              <td class="ph2 tc"><input type="checkbox" autocomplete="off" name="fields" value="{{b[0]}}"
-                  {% if b[0] in default_fields %} checked="checked" {% endif %}></td>
+              <td class="ph2">{{ b.name }}</td>
+              <td class="ph2 tc"><input type="checkbox" autocomplete="off" name="fields" value="{{ b.id }}"
+                  {% if b.id in default_fields %} checked="checked" {% endif %}></td>
               <td class="ph2 tc">
               </td>
             </tr>

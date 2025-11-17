@@ -1,10 +1,18 @@
 import re
 from datetime import datetime
 
+from dictlib import dig_get
+
 from findthatpostcode.controllers.areas import Area
 from findthatpostcode.controllers.controller import Controller
 from findthatpostcode.controllers.places import Place
-from findthatpostcode.metadata import OAC11_CODE, RU11IND_CODES, RUC21_CODES
+from findthatpostcode.metadata import (
+    OAC11_CODE,
+    OTHER_CODES,
+    RU11IND_CODES,
+    RUC21_CODES,
+    STATS_FIELDS,
+)
 
 
 class Postcode(Controller):
@@ -174,3 +182,19 @@ class Postcode(Controller):
                 json[0]["attributes"][i] = json[0]["attributes"][i].strftime("%Y-%m-%d")
 
         return json
+
+    def get_stats(self):
+        stats_block = {}
+        for field in STATS_FIELDS:
+            field_type = field.id.removesuffix("_rank").removesuffix("_decile")
+            if self.attributes.get("ctry") is not None:
+                stats_block[f"{field_type}_total"] = OTHER_CODES.get("imd", {}).get(
+                    f"{self.attributes['ctry']}-{field_type}"
+                )
+            if self.found and field.area in self.attributes:
+                lsoa_code = self.attributes.get(field.area)
+                for area in self.relationships.get("areas", []):
+                    if area.id == lsoa_code:
+                        stats_block[field.id] = dig_get(area.attributes, field.location)
+                        break
+        return stats_block

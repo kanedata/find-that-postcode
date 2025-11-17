@@ -1,6 +1,6 @@
 def test_index(client):
     rv = client.get("/")
-    content = rv.data.decode("utf8")
+    content = rv.text
     assert "postcode" in content
     assert "Contains OS data © Crown copyright and database right" in content
     assert (
@@ -14,7 +14,7 @@ def test_index(client):
 
 def test_about(client):
     rv = client.get("/about")
-    content = rv.data.decode("utf8")
+    content = rv.text
     assert "postcode" in content
     assert "Contains OS data © Crown copyright and database right" in content
     assert (

@@ -4,9 +4,10 @@ import os
 from contextlib import contextmanager
 
 import pytest
+from fastapi.testclient import TestClient
 from flask import appcontext_pushed, g
 
-import findthatpostcode
+from findthatpostcode.main import app, flask_app
 
 mock_data = {}
 mock_data_dir = os.path.join(os.path.dirname(__file__), "mock_data")
@@ -27,16 +28,13 @@ def db_set(app, db, s3_client):
 
 @pytest.fixture
 def client():
-    app = findthatpostcode.create_app()
-    app.config["TESTING"] = True
+    flask_app.config["TESTING"] = True
     db = MockElasticsearch()
     s3_client = MockBoto3()
 
-    with db_set(app, db, s3_client):
-        with app.test_client() as client:
-            # with app.app_context():
-            #     app.init_db()
-            yield client
+    with db_set(flask_app, db, s3_client):
+        client = TestClient(app, follow_redirects=False)
+        yield client
 
 
 class MockBoto3:

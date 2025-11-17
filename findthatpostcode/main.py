@@ -1,7 +1,7 @@
+from a2wsgi import WSGIMiddleware
 from fastapi import FastAPI
-from fastapi.middleware.wsgi import WSGIMiddleware
 
-from findthatpostcode import create_app
+from findthatpostcode.flask_app import create_app
 
 flask_app = create_app()
 app = FastAPI()

@@ -4,9 +4,10 @@ AREA_NAME = "Lower Bow & Larkfield, Fancy Farm, Mallard Bowl"
 
 def test_area_json(client):
     rv = client.get("/areas/{}.json".format(AREA_CODE))
-    data = rv.get_json()
+    print(rv.headers)
+    data = rv.json()
 
-    assert rv.mimetype == "application/json"
+    assert rv.headers["Content-Type"].split(";")[0].strip() == "application/json"
     assert rv.headers["Access-Control-Allow-Origin"] == "*"
 
     assert data.get("data", {}).get("attributes", {}).get("name") == AREA_NAME
@@ -23,29 +24,27 @@ def test_area_json(client):
 
 def test_missing_area_json(client):
     rv = client.get("/areas/123445676.json")
-    assert rv.status == "404 NOT FOUND"
+    assert rv.status_code == 404
 
 
 def test_area_html(client):
     rv = client.get("/areas/{}.html".format(AREA_CODE))
-    content = rv.data.decode("utf8")
-    assert rv.mimetype == "text/html"
-    assert AREA_NAME in content
-    assert AREA_CODE in content
+    assert rv.headers["Content-Type"].split(";")[0].strip() == "text/html"
+    assert AREA_NAME in rv.text
+    assert AREA_CODE in rv.text
 
 
 def test_area_missing_html(client):
     rv = client.get("/areas/123445676.html")
-    content = rv.data.decode("utf8").lower()
-    assert rv.mimetype == "text/html"
-    assert "not found" in content
+    assert rv.headers["Content-Type"].split(";")[0].strip() == "text/html"
+    assert "not found" in rv.text.lower()
 
 
 def test_area_geojson(client):
     rv = client.get("/areas/{}.geojson".format(AREA_CODE))
-    data = rv.get_json()
+    data = rv.json()
 
-    assert rv.mimetype == "application/json"
+    assert rv.headers["Content-Type"].split(";")[0].strip() == "application/json"
     assert rv.headers["Access-Control-Allow-Origin"] == "*"
     assert data.get("type") == "FeatureCollection"
     assert len(data.get("features")) == 1
@@ -57,12 +56,11 @@ def test_area_geojson(client):
 
 def test_area_search(client):
     rv = client.get("/areas/search")
-    assert rv.headers["Location"] == "/search/"
     assert rv.status_code == 301
+    assert rv.headers["Location"] == "/search/"
 
 
 def test_area_names(client):
     rv = client.get("/areas/names.csv")
-    content = rv.data.decode("utf8")
-    assert rv.mimetype == "text/csv"
-    assert "E01020135" in content
+    assert rv.headers["Content-Type"].split(";")[0].strip() == "text/csv"
+    assert "E01020135" in rv.text

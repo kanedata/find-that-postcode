@@ -22,3 +22,5 @@ numpy<2
 Flask-Limiter
 openpyxl
 fastapi[standard]
+httpx
+a2wsgi

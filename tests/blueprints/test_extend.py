@@ -4,7 +4,7 @@ from urllib.parse import urlencode
 
 def test_reconcile_spec(client):
     rv = client.get("/reconcile")
-    spec = rv.get_json()
+    spec = rv.json()
     assert rv.headers["Access-Control-Allow-Origin"] == "*"
     assert "extend" in spec
     # assert "propose_properties" in spec["extend"]
@@ -23,7 +23,7 @@ def test_reconcile_spec(client):
 
 # def test_reconcile_properties(client):
 #     rv = client.get('/reconcile/properties?type=testtype')
-#     spec = rv.get_json()
+#     spec = rv.json()
 
 #     assert spec["type"] == "testtype"
 #     assert isinstance(spec.get("properties"), list)
@@ -38,7 +38,7 @@ extend_q = {
 
 def test_reconcile_extend(client):
     rv = client.get("/reconcile?{}".format(urlencode(extend_q)))
-    result = rv.get_json()
+    result = rv.json()
     assert rv.headers["Access-Control-Allow-Origin"] == "*"
     assert "meta" in result
     assert "EX36 4AT" in result["rows"]
@@ -49,7 +49,7 @@ def test_reconcile_extend(client):
 def test_reconcile_extend_jsonp(client):
     extend_q["callback"] = "testCallback"
     rv = client.get("/reconcile?{}".format(urlencode(extend_q)))
-    data = rv.data.decode("utf8")
+    data = rv.text
     assert data.startswith(extend_q["callback"])
 
     result = json.loads(data[len(extend_q["callback"]) + 1 : -1])
@@ -61,7 +61,7 @@ def test_reconcile_extend_jsonp(client):
 
 def test_reconcile_extend_post(client):
     rv = client.post("/reconcile", data=extend_q)
-    result = rv.get_json()
+    result = rv.json()
     assert rv.headers["Access-Control-Allow-Origin"] == "*"
     assert "meta" in result
     assert "EX36 4AT" in result["rows"]
@@ -71,7 +71,7 @@ def test_reconcile_extend_post(client):
 
 def test_reconcile_extend_post_jsonp(client):
     rv = client.post("/reconcile?callback=testCallback", data=extend_q)
-    data = rv.data.decode("utf8")
+    data = rv.text
     assert data.startswith("testCallback")
 
     result = json.loads(data[len("testCallback") + 1 : -1])
@@ -99,7 +99,7 @@ recon_q = {
 
 def test_reconcile(client):
     rv = client.get("/reconcile?{}".format(urlencode(recon_q)))
-    result = rv.get_json()
+    result = rv.json()
     assert rv.headers["Access-Control-Allow-Origin"] == "*"
     assert "q0" in result
     assert "q1" in result
@@ -107,7 +107,7 @@ def test_reconcile(client):
 
 def test_reconcile_post(client):
     rv = client.post("/reconcile", data=recon_q)
-    result = rv.get_json()
+    result = rv.json()
     assert rv.headers["Access-Control-Allow-Origin"] == "*"
     assert "q0" in result
     assert "q1" in result

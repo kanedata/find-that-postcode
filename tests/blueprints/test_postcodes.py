@@ -1,8 +1,8 @@
 def test_postcode_json(client):
     rv = client.get("/postcodes/EX36 4AT")
-    postcode_json = rv.get_json()
+    postcode_json = rv.json()
 
-    assert rv.mimetype == "application/json"
+    assert rv.headers["Content-Type"].split(";")[0].strip() == "application/json"
     assert rv.headers["Access-Control-Allow-Origin"] == "*"
 
     areas = (
@@ -23,38 +23,38 @@ def test_postcode_json(client):
 
 def test_postcode_missing_json(client):
     rv = client.get("/postcodes/14214124")
-    assert rv.mimetype == "application/json"
-    assert rv.status == "404 NOT FOUND"
+    assert rv.headers["Content-Type"].split(";")[0].strip() == "application/json"
+    assert rv.status_code == 404
 
 
 def test_postcode_html(client):
     rv = client.get("/postcodes/EX36 4AT.html")
-    assert rv.mimetype == "text/html"
-    content = rv.data.decode("utf8")
-    assert "EX36 4AT" in content
-    assert "E01020135" in content
-    assert "E01020122" not in content
+    assert rv.headers["Content-Type"].split(";")[0].strip() == "text/html"
+    assert "EX36 4AT" in rv.text
+    assert "E01020135" in rv.text
+    assert "E01020122" not in rv.text
 
 
 def test_postcode_missing_html(client):
     rv = client.get("/postcodes/14214124.html")
-    assert rv.status == "404 NOT FOUND"
-    assert rv.mimetype == "text/html"
+    assert rv.status_code == 404
+    assert rv.headers["Content-Type"].split(";")[0].strip() == "text/html"
 
 
 def test_postcode_redirect(client):
     rv = client.get("/postcodes/redirect?postcode=EX36 4AT")
     assert rv.status_code == 303
-    assert rv.mimetype == "text/html"
+    assert rv.headers["Content-Type"].split(";")[0].strip() == "text/html"
     assert rv.headers["Location"].endswith("/postcodes/EX36%204AT.html")
 
 
 def test_postcode_hash(client):
     rv = client.get("/postcodes/hash/abc1.json?properties=ward_code")
-    assert rv.mimetype == "application/json"
+    assert rv.headers["Content-Type"].split(";")[0].strip() == "application/json"
     assert rv.headers["Access-Control-Allow-Origin"] == "*"
-    assert "data" in rv.json
-    assert rv.json["data"]
+    data = rv.json()
+    assert "data" in data
+    assert data["data"]
 
 
 def test_postcode_hash_too_small(client):
@@ -70,10 +70,11 @@ def test_postcode_hashes(client):
             properties=["ward_code"],
         ),
     )
-    assert rv.mimetype == "application/json"
+    assert rv.headers["Content-Type"].split(";")[0].strip() == "application/json"
     assert rv.headers["Access-Control-Allow-Origin"] == "*"
-    assert "data" in rv.json
-    assert rv.json["data"]
+    data = rv.json()
+    assert "data" in data
+    assert data["data"]
 
 
 def test_postcode_hashes_too_small(client):

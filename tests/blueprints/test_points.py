@@ -1,6 +1,6 @@
 def test_point_json(client):
     rv = client.get("/points/51.501,-0.2936")
-    point_json = rv.get_json()
+    point_json = rv.json()
 
     assert rv.headers["Access-Control-Allow-Origin"] == "*"
     assert (
@@ -23,8 +23,8 @@ def test_point_json_distance(client):
 
 def test_point_html(client):
     rv = client.get("/points/51.501,-0.2936.html")
-    assert rv.mimetype == "text/html"
-    content = rv.data.decode("utf8")
+    assert rv.headers["Content-Type"].split(";")[0].strip() == "text/html"
+    content = rv.text
     assert "EX36 4AT" in content
     assert "E01020135" in content
     assert "E01020122" not in content

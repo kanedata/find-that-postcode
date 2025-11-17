@@ -36,5 +36,6 @@ def get(latlon):
             filetype,
             "postcode.html.j2",
             point=result,
+            stats=result.relationships["nearest_postcode"].get_stats(),
         )
     return return_result(result, filetype, "postcode.html.j2")

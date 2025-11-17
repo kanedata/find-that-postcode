@@ -5,7 +5,12 @@ from flask import Blueprint, abort, jsonify, redirect, request, url_for
 from findthatpostcode.blueprints.utils import return_result
 from findthatpostcode.controllers.postcodes import Postcode
 from findthatpostcode.db import get_db
-from findthatpostcode.metadata import STATS_FIELDS
+from findthatpostcode.metadata import (
+    OAC11_CODE,
+    RU11IND_CODES,
+    RUC21_CODES,
+    STATS_FIELDS,
+)
 
 bp = Blueprint("postcodes", __name__, url_prefix="/postcodes")
 
@@ -23,7 +28,7 @@ def postcode_redirect():
 def get_postcode(postcode, filetype="json"):
     es = get_db()
     result = Postcode.get_from_es(postcode, es)
-    return return_result(result, filetype, "postcode.html.j2")
+    return return_result(result, filetype, "postcode.html.j2", stats=result.get_stats())
 
 
 @bp.route("/hash/<hash>")
@@ -40,7 +45,7 @@ def multi_hash():
     return jsonify({"data": get_postcode_by_hash(hashes, fields)})
 
 
-def get_postcode_by_hash(hashes, fields):
+def get_postcode_by_hash(hashes: str | list[str], fields: list[str]):
     es = get_db()
 
     if not isinstance(hashes, list):
@@ -59,17 +64,19 @@ def get_postcode_by_hash(hashes, fields):
         )
 
     name_fields = [i.replace("_name", "") for i in fields if i.endswith("_name")]
-    extra_fields = []
-    stats = [i for i in STATS_FIELDS if i[0] in fields]
+    stats_fields = []
+    stats = [field for field in STATS_FIELDS if field.id in fields]
     if stats:
-        extra_fields.append("lsoa11")
+        for field in stats:
+            if field.area not in stats_fields:
+                stats_fields.append(field.area)
 
     results = list(
         scan(
             es,
             index="geo_postcode",
             query={"query": {"bool": {"should": query}}},
-            _source_includes=fields + name_fields + extra_fields,
+            _source_includes=fields + name_fields + stats_fields,
         )
     )
     areas = scan(
@@ -81,39 +88,45 @@ def get_postcode_by_hash(hashes, fields):
     areanames = {i["_id"]: i["_source"].get("name") for i in areas}
 
     def get_names(data):
-        return {
-            i: areanames.get(data.get(i.replace("_name", "")))
-            for i in fields
-            if i.endswith("_name")
-        }
+        names = {}
+        for i in name_fields:
+            names[f"{i}_name"] = None
+            if i == "oac11":
+                oac_name = OAC11_CODE.get(data.get(i))
+                if oac_name:
+                    names[f"{i}_name"] = " > ".join(oac_name)
+            elif i == "ru11ind":
+                names[f"{i}_name"] = RU11IND_CODES.get(data.get(i))
+            elif i == "ruc21":
+                names[f"{i}_name"] = RUC21_CODES.get(data.get(i))
+            else:
+                names[f"{i}_name"] = areanames.get(data.get(i))
+        return names
 
-    lsoas = {}
-
-    def get_stats(data):
-        lsoa = data.get("lsoa11")
-        if not lsoa or not stats or lsoa not in lsoas:
-            return {}
-        return {i[0]: dig_get(lsoas[lsoa], i[3]) for i in stats}
+    def get_stats(data, lsoas):
+        result = {}
+        for field in stats:
+            lsoa_code = data.get(field.area)
+            if not lsoa_code or not stats or lsoa_code not in lsoas:
+                continue
+            result[field.id] = dig_get(lsoas[lsoa_code], field.location)
+        return result
 
     if results:
+        lsoas = {}
         if stats:
+            lsoas_to_get = set()
+            for r in results:
+                for i in stats_fields:
+                    if r.get("_source", {}).get(i):
+                        lsoas_to_get.add(r.get("_source", {}).get(i))
             lsoas = {
                 i["_id"]: i["_source"]
                 for i in scan(
                     es,
                     index="geo_area",
-                    query={
-                        "query": {
-                            "terms": {
-                                "_id": [
-                                    r.get("_source", {}).get("lsoa11")
-                                    for r in results
-                                    if r.get("_source", {}).get("lsoa11")
-                                ]
-                            }
-                        }
-                    },
-                    _source_includes=[i[3] for i in stats],
+                    query={"query": {"terms": {"_id": list(lsoas_to_get)}}},
+                    _source_includes=[i.location for i in stats],
                 )
             }
 
@@ -122,7 +135,7 @@ def get_postcode_by_hash(hashes, fields):
                 "id": r["_id"],
                 **r["_source"],
                 **get_names(r["_source"]),
-                **get_stats(r["_source"]),
+                **get_stats(r["_source"], lsoas),
             }
             for r in results
         ]

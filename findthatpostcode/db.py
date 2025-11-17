@@ -1,8 +1,10 @@
 import datetime
+from typing import Annotated, Any
 
 import click
 from boto3 import session
 from elasticsearch import Elasticsearch
+from fastapi import Depends
 from flask import g
 from flask.cli import with_appcontext
 from sqlite_utils import Database
@@ -26,6 +28,17 @@ INDEXES = {
     "geo_placename": {"properties": {"location": {"type": "geo_point"}}},
     "geo_area": {"properties": {"boundary": {"type": "geo_shape"}}},
 }
+
+
+async def get_es():
+    db = Elasticsearch(ES_URL)
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+ElasticsearchDep = Annotated[Elasticsearch, Depends(get_es)]
 
 
 def get_db():
@@ -83,28 +96,22 @@ def close_log_db(e=None):
 
 
 def get_s3_client():
-    if "s3_client" not in g:
-        s3_session = session.Session()
-        g.s3_client = s3_session.client(
-            "s3",
-            region_name=S3_REGION,
-            endpoint_url=S3_ENDPOINT,
-            aws_access_key_id=S3_ACCESS_ID,
-            aws_secret_access_key=S3_SECRET_KEY,
-        )
-    return g.s3_client
+    s3_session = session.Session()
+    return s3_session.client(
+        "s3",
+        region_name=S3_REGION,
+        endpoint_url=S3_ENDPOINT,
+        aws_access_key_id=S3_ACCESS_ID,
+        aws_secret_access_key=S3_SECRET_KEY,
+    )
 
 
-def close_s3_client(e=None):
-    if "s3_client" in g:
-        g.s3_client.close()
-        g.pop("s3_client", None)
+S3Dep = Annotated[Any, Depends(get_s3_client)]
 
 
 def init_app(app):
     app.teardown_appcontext(close_db)
     app.teardown_appcontext(close_log_db)
-    app.teardown_appcontext(close_s3_client)
     app.cli.add_command(init_db_command)
 
 

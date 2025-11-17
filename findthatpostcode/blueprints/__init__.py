@@ -1,3 +1,5 @@
+from fastapi import FastAPI
+
 from findthatpostcode.blueprints import (
     addtocsv,
     areas,
@@ -10,14 +12,14 @@ from findthatpostcode.blueprints import (
     tools,
 )
 
+app = FastAPI()
 
-def init_app(app):
-    app.register_blueprint(areas.bp)
-    app.register_blueprint(areatypes.bp)
-    app.register_blueprint(postcodes.bp)
-    app.register_blueprint(points.bp)
-    app.register_blueprint(reconcile.bp)
-    app.register_blueprint(addtocsv.bp)
-    app.register_blueprint(places.bp)
-    app.register_blueprint(search.bp)
-    app.register_blueprint(tools.bp)
+app.include_router(areas.bp)
+app.include_router(addtocsv.bp)
+app.include_router(areatypes.bp)
+app.include_router(places.bp)
+app.include_router(points.bp)
+# app.include_router(postcodes.bp)
+# app.include_router(reconcile.bp)
+# app.include_router(search.bp)
+# app.include_router(tools.bp)

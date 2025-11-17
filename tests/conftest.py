@@ -7,7 +7,8 @@ import pytest
 from fastapi.testclient import TestClient
 from flask import appcontext_pushed, g
 
-from findthatpostcode.main import app, flask_app
+from findthatpostcode.db import get_es, get_s3_client
+from findthatpostcode.main import app
 
 mock_data = {}
 mock_data_dir = os.path.join(os.path.dirname(__file__), "mock_data")
@@ -26,15 +27,21 @@ def db_set(app, db, s3_client):
         yield
 
 
+def mock_es():
+    return MockElasticsearch()
+
+
+def mock_s3():
+    return MockBoto3()
+
+
 @pytest.fixture
 def client():
-    flask_app.config["TESTING"] = True
-    db = MockElasticsearch()
-    s3_client = MockBoto3()
+    app.dependency_overrides[get_es] = mock_es
+    app.dependency_overrides[get_s3_client] = mock_s3
 
-    with db_set(flask_app, db, s3_client):
-        client = TestClient(app, follow_redirects=False)
-        yield client
+    client = TestClient(app, follow_redirects=False)
+    yield client
 
 
 class MockBoto3:

@@ -177,7 +177,9 @@ python-dotenv==1.1.1
     #   -r requirements.in
     #   uvicorn
 python-multipart==0.0.20
-    # via fastapi
+    # via
+    #   -r requirements.in
+    #   fastapi
 pyyaml==6.0.3
     # via uvicorn
 requests==2.32.5

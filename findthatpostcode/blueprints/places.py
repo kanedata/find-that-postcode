@@ -1,25 +1,23 @@
-from flask import Blueprint, jsonify, redirect, request, url_for
+from fastapi import APIRouter, Request
+from fastapi.responses import JSONResponse, RedirectResponse
 
 from findthatpostcode.blueprints.utils import return_result
 from findthatpostcode.controllers.places import Place
-from findthatpostcode.db import get_db
+from findthatpostcode.db import ElasticsearchDep
 
-bp = Blueprint("places", __name__, url_prefix="/places")
+bp = APIRouter(prefix="/places")
 
 
-@bp.route("/redirect")
-def point_redirect():
-    lat = float(request.args.get("lat"))
-    lon = float(request.args.get("lon"))
-    return redirect(
-        url_for("places.nearest", lat=lat, lon=lon, filetype="html"), code=303
+@bp.get("/redirect")
+def point_redirect(lat: float, lon: float, request: Request):
+    return RedirectResponse(
+        request.url_for("places.nearest", lat=lat, lon=lon, filetype="html"), code=303
     )
 
 
-@bp.route("/nearest/<lat>,<lon>")
-@bp.route("/nearest/<lat>,<lon>.<filetype>")
-def nearest(lat, lon, filetype="json"):
-    es = get_db()
+@bp.get("/nearest/{lat},{lon}")
+@bp.get("/nearest/{lat},{lon}.{filetype}")
+def nearest(lat: float, lon: float, es: ElasticsearchDep, filetype: str = "json"):
     query = {
         "query": {"match_all": {}},
         "sort": [
@@ -34,11 +32,11 @@ def nearest(lat, lon, filetype="json"):
         size=10,
         _source_excludes=[],
     )
-    return jsonify(data)
+    return JSONResponse(content=data)
 
 
-@bp.route("/<areacode>")
-@bp.route("/<areacode>.<filetype>")
-def get_place(areacode, filetype="json"):
-    result = Place.get_from_es(areacode, get_db())
+@bp.get("/{areacode}")
+@bp.get("/{areacode}.{filetype}")
+def get_place(areacode: str, es: ElasticsearchDep, filetype: str = "json"):
+    result = Place.get_from_es(areacode, es)
     return return_result(result, filetype, "place.html.j2")

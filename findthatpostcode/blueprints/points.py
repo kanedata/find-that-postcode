@@ -1,23 +1,25 @@
-from flask import Blueprint, redirect, request, url_for
+from fastapi import APIRouter, Request
+from fastapi.responses import RedirectResponse
 
 from findthatpostcode.blueprints.utils import return_result
 from findthatpostcode.controllers.points import Point
-from findthatpostcode.db import get_db
+from findthatpostcode.db import ElasticsearchDep
 
-bp = Blueprint("points", __name__, url_prefix="/points")
+bp = APIRouter(prefix="/points")
 
 
 @bp.route("/redirect")
-def point_redirect():
-    lat = float(request.args.get("lat"))
-    lon = float(request.args.get("lon"))
-    return redirect(
-        url_for("points.get", latlon="{},{}.html".format(lat, lon)), code=303
+def point_redirect(lat: float, lon: float, request: Request):
+    return RedirectResponse(
+        request.url_for(
+            "points.get", latlon="{},{}.html".format(lat, lon), filetype="html"
+        ),
+        code=303,
     )
 
 
-@bp.route("/<latlon>")
-def get(latlon):
+@bp.get("/{latlon}")
+def get(latlon, es: ElasticsearchDep):
     filetype = "json"
     if latlon.endswith(".json"):
         latlon = latlon[:-5]
@@ -25,7 +27,6 @@ def get(latlon):
         latlon = latlon[:-5]
         filetype = "html"
     lat, lon = latlon.split(",")
-    es = get_db()
     result = Point.get_from_es((float(lat), float(lon)), es)
     errors = result.get_errors()
     if errors:

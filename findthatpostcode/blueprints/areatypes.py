@@ -1,23 +1,28 @@
-from flask import Blueprint, render_template, request, url_for
+from fastapi import APIRouter, Request
 
 from findthatpostcode.blueprints.areas import areas_csv
 from findthatpostcode.blueprints.utils import return_result
-from findthatpostcode.controllers.areas import Areatype, area_types_count, get_all_areas
+from findthatpostcode.controllers.areas import (
+    Areatype,
+    area_types_count,
+    get_all_areas,
+)
 from findthatpostcode.controllers.controller import Pagination
 from findthatpostcode.db import get_db
+from findthatpostcode.utils import templates
 
-bp = Blueprint("areatypes", __name__, url_prefix="/areatypes")
+bp = APIRouter(prefix="/areatypes")
 
 
-@bp.route("/", strict_slashes=False)
+@bp.get("/")
 def all():
     ats = area_types_count(get_db())
-    return render_template("areatypes.html.j2", result=ats)
+    return templates.TemplateResponse("areatypes.html.j2", {"result": ats})
 
 
-@bp.route("/<areacode>")
-@bp.route("/<areacode>.<filetype>")
-def get_areatype(areacode, filetype="json"):
+@bp.get("/<areacode>")
+@bp.get("/<areacode>.<filetype>")
+def get_areatype(areacode: str, request: Request, filetype: str = "json"):
     if filetype == "csv":
         areas = get_all_areas(get_db(), areatypes=[areacode.strip().lower()])
         return areas_csv(areas, "{}.csv".format(areacode))
@@ -27,7 +32,7 @@ def get_areatype(areacode, filetype="json"):
 
     pagination.set_pagination(result.attributes["count_areas"])
     nav = {
-        p: url_for(
+        p: request.url_for(
             "areatypes.get_areatype", areacode=areacode, filetype=filetype, **args
         )
         if isinstance(args, dict)

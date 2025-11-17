@@ -183,7 +183,7 @@ class Postcode(Controller):
 
         return json
 
-    def get_stats(self):
+    def get_stats(self) -> dict[str, int | None]:
         stats_block = {}
         for field in STATS_FIELDS:
             field_type = field.id.removesuffix("_rank").removesuffix("_decile")

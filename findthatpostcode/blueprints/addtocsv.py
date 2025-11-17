@@ -1,25 +1,28 @@
 import codecs
 import os
 import tempfile
+from typing import Annotated
 
-from flask import Blueprint, make_response, render_template, request
+from fastapi import APIRouter, Form, UploadFile
 
+from findthatpostcode.blueprints.areas import CSVResponse
 from findthatpostcode.blueprints.process_csv import process_csv
 from findthatpostcode.controllers.areas import area_types_count
-from findthatpostcode.db import get_db
+from findthatpostcode.db import ElasticsearchDep
 from findthatpostcode.metadata import (
     BASIC_UPLOAD_FIELDS,
     DEFAULT_UPLOAD_FIELDS,
     STATS_FIELDS,
 )
+from findthatpostcode.utils import templates
 
-bp = Blueprint("addtocsv", __name__, url_prefix="/addtocsv")
+bp = APIRouter(prefix="/addtocsv")
 
 
-@bp.route("/", strict_slashes=False, methods=["GET"])
-def addtocsv():
-    ats = area_types_count(get_db())
-    return render_template(
+@bp.get("/")
+def addtocsv(es: ElasticsearchDep):
+    ats = area_types_count(es)
+    return templates.TemplateResponse(
         "addtocsv.html.j2",
         result=ats,
         basic_fields=BASIC_UPLOAD_FIELDS,
@@ -28,11 +31,13 @@ def addtocsv():
     )
 
 
-@bp.route("/", strict_slashes=False, methods=["POST"])
-def return_csv():
-    upload = request.files.get("csvfile")
-    column_name = request.form.get("column_name", "postcode")
-    fields = request.form.getlist("fields")
+@bp.post("/")
+def return_csv(
+    es: ElasticsearchDep,
+    csvfile: UploadFile,
+    column_name: Annotated[str, Form()],
+    fields: Annotated[list[str], Form()],
+):
     if not fields:
         fields = DEFAULT_UPLOAD_FIELDS
 
@@ -56,23 +61,23 @@ def return_csv():
         fields.append("lep2_name")
         fields.remove("lep_name")
 
-    _, ext = os.path.splitext(upload.filename)
+    _, ext = os.path.splitext(csvfile.filename)
     if ext not in [".csv"]:
         return "File extension not allowed."
 
     with tempfile.SpooledTemporaryFile(mode="w+", newline="") as output:
         process_csv(
-            codecs.iterdecode(upload.stream, "utf-8"),
+            codecs.iterdecode(csvfile.file, "utf-8"),
             output,
-            get_db(),
+            es,
             column_name,
             fields,
         )
         output.seek(0)
 
-        response = make_response(output.read())
+        response = CSVResponse(output.read())
         response.headers["Content-Type"] = "text/csv"
         response.headers["Content-Disposition"] = 'attachment; filename="{}"'.format(
-            upload.filename
+            csvfile.filename
         )
         return response

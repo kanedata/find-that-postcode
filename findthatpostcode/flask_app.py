@@ -98,3 +98,6 @@ def create_app(test_config=None):
     blueprints.init_app(app)
 
     return app
+
+
+app = create_app()

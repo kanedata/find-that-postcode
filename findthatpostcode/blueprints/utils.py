@@ -1,11 +1,14 @@
 from functools import wraps
 
-from flask import abort, current_app, jsonify, make_response, render_template, request
+from fastapi import HTTPException
+from fastapi.responses import JSONResponse
+
+from findthatpostcode.utils import templates
 
 
 def return_result(result, filetype="json", template=None, **kwargs):
     if filetype == "html" and not template:
-        abort(500, "No template provided")
+        raise HTTPException(status_code=500, detail="No template provided")
 
     status = 200 if result.found else 404
 
@@ -14,24 +17,20 @@ def return_result(result, filetype="json", template=None, **kwargs):
         if errors and errors[0].get("status"):
             status = int(errors[0]["status"])
         if filetype in ("json", "geojson"):
-            return abort(make_response(jsonify(message=result.topJSON()), status))
+            raise HTTPException(status_code=status, detail=result.topJSON())
         elif filetype == "html":
-            # @TODO: non-json response here
-            return abort(
-                make_response(
-                    render_template(
-                        "error.html.j2", result=result, errors=errors, **kwargs
-                    ),
-                    status,
-                )
+            return templates.TemplateResponse(
+                "error.html.j2",
+                {"result": result, "errors": errors, **kwargs},
+                status_code=status,
             )
 
     if filetype in ("json", "geojson"):
-        return jsonify(result.topJSON())
+        return JSONResponse(result.topJSON())
     elif filetype == "html":
-        return render_template(template, result=result, **kwargs)
+        return templates.TemplateResponse(template, {"result": result, **kwargs})
 
-    abort(404)
+    raise HTTPException(status_code=404, detail="Not found")
 
 
 def jsonp(func):

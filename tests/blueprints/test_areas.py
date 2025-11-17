@@ -1,9 +1,20 @@
+import pytest
+
 AREA_CODE = "S02000783"
 AREA_NAME = "Lower Bow & Larkfield, Fancy Farm, Mallard Bowl"
 
 
-def test_area_json(client):
-    rv = client.get("/areas/{}.json".format(AREA_CODE))
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "/areas/{}.json".format(AREA_CODE),
+        "/api/v1/areas/{}".format(AREA_CODE),
+    ],
+)
+def test_area_json(client, endpoint):
+    rv = client.get(endpoint)
+    assert rv.status_code == 200
+
     print(rv.headers)
     data = rv.json()
 

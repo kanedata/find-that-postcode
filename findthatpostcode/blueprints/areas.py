@@ -2,37 +2,30 @@ import csv
 import io
 import re
 
-from flask import (
-    Blueprint,
-    abort,
-    jsonify,
-    make_response,
-    redirect,
-    render_template,
-    request,
-    url_for,
-)
+from fastapi import APIRouter, Request
+from fastapi.responses import JSONResponse, RedirectResponse
 
 from findthatpostcode.blueprints.utils import return_result
 from findthatpostcode.controllers.areas import Area, get_all_areas
-from findthatpostcode.db import get_db
+from findthatpostcode.db import ElasticsearchDep
+from findthatpostcode.utils import CSVResponse, templates
 
-bp = Blueprint("areas", __name__, url_prefix="/areas")
-
-
-@bp.route("/search")
-@bp.route("/search.<filetype>")
-def area_search(filetype="json"):
-    return redirect(url_for("search.search_index", q=request.values.get("q")), code=301)
+bp = APIRouter(prefix="/areas")
 
 
-@bp.route("/names.csv")
-def all_names():
+@bp.get("/search")
+@bp.get("/search.<filetype>")
+def area_search(request: Request, filetype="json", q: str | None = None):
+    return RedirectResponse(
+        request.url_for("search.search_index", q=q), status_code=301
+    )
+
+
+@bp.get("/names.csv")
+def all_names(es: ElasticsearchDep, types: str = ""):
     areas = get_all_areas(
-        get_db(),
-        areatypes=[
-            a.strip().lower() for a in request.values.get("types", "").split(",") if a
-        ],
+        es,
+        areatypes=[a.strip().lower() for a in types.split(",") if a],
     )
     return areas_csv(areas, "names.csv")
 
@@ -49,15 +42,14 @@ def areas_csv(areas, filename):
         if re.match(r"[A-Z][0-9]{8}", row.get("code")):
             writer.writerow(row)
 
-    output = make_response(si.getvalue())
+    output = CSVResponse(si.getvalue())
     output.headers["Content-Disposition"] = "attachment; filename={}".format(filename)
     output.headers["Content-type"] = "text/csv"
     return output
 
 
-@bp.route("/<areacodes>.geojson")
-def get_area_boundary(areacodes):
-    es = get_db()
+@bp.get("/<areacodes>.geojson")
+def get_area_boundary(areacodes: str, es: ElasticsearchDep):
     areacodes = areacodes.split("+")
     features = []
     for areacode in areacodes:
@@ -66,13 +58,12 @@ def get_area_boundary(areacodes):
         if status == 200:
             features.extend(r.get("features"))
     if status != 200:
-        return abort(make_response(jsonify(message=r), status))
-    return jsonify({"type": "FeatureCollection", "features": features})
+        return JSONResponse(message=r, status_code=status)
+    return JSONResponse({"type": "FeatureCollection", "features": features})
 
 
-@bp.route("/<areacode>/children/<areatype>.geojson")
-def get_area_children_boundary(areacode, areatype):
-    es = get_db()
+@bp.get("/<areacode>/children/<areatype>.geojson")
+def get_area_children_boundary(areacode: str, areatype: str, es: ElasticsearchDep):
     area = Area.get_from_es(areacode, es, boundary=False, examples_count=0)
     features = []
     errors = {}
@@ -84,16 +75,21 @@ def get_area_children_boundary(areacode, areatype):
         else:
             errors[child_area.id] = r
     if not features:
-        return abort(make_response(jsonify(message=errors), status))
-    return jsonify({"type": "FeatureCollection", "features": features})
+        return JSONResponse(message=errors, status_code=status)
+    return JSONResponse({"type": "FeatureCollection", "features": features})
 
 
 @bp.route("/<areacode>")
 @bp.route("/<areacode>.<filetype>")
-def get_area(areacode, filetype="json"):
+def get_area(
+    areacode: str,
+    filetype: str = "json",
+    es: ElasticsearchDep = None,
+    child: str | None = None,
+):
     result = Area.get_from_es(
         areacode,
-        get_db(),
+        es,
         boundary=(filetype == "geojson"),
         examples_count=(0 if filetype == "geojson" else 5),
     )
@@ -101,14 +97,14 @@ def get_area(areacode, filetype="json"):
     if filetype == "geojson":
         status, r = result.geoJSON()
         if status != 200:
-            return abort(make_response(jsonify(message=r), status))
-        return jsonify(r)
+            return JSONResponse(message=r, status_code=status)
+        return JSONResponse(r)
 
     return return_result(
         result,
         filetype,
         "area.html.j2",
-        child=request.values.get("child"),
+        child=child,
         example_postcode_json=[
             p.attributes.get("location")
             for p in result.relationships["example_postcodes"]
@@ -119,4 +115,4 @@ def get_area(areacode, filetype="json"):
 
 @bp.route("/<areacodes>/map")
 def get_area_map(areacodes):
-    return render_template("area_map.html.j2", areacodes=areacodes)
+    return templates.TemplateResponse("area_map.html.j2", {"areacodes": areacodes})

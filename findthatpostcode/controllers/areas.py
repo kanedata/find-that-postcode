@@ -4,12 +4,12 @@ from datetime import datetime
 
 from botocore.exceptions import ClientError
 from elasticsearch.helpers import scan
-from flask import current_app
 
 from findthatpostcode.controllers.controller import GEOJSON_TYPES, Controller
 from findthatpostcode.controllers.places import Place
 from findthatpostcode.db import get_s3_client
 from findthatpostcode.metadata import AREA_TYPES
+from findthatpostcode.settings import S3_BUCKET
 
 
 class Areatype(Controller):
@@ -292,7 +292,7 @@ class Area(Controller):
         prefix = self.id[0:3]
         try:
             client.download_fileobj(
-                current_app.config["S3_BUCKET"],
+                S3_BUCKET,
                 "%s/%s.json" % (prefix, area_code),
                 buffer,
             )

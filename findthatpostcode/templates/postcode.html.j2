@@ -111,7 +111,7 @@
     {% endcall %}
     {% endif %}
 
-    {% if stats.imd2025_rank is not none %}
+    {% if stats.imd2025_rank is not none and stats.imd2025_total is not none %}
     {% call info_block("Index of multiple deprivation (2025)") %}
     <p><strong>{{ "{:,.0f}".format(stats.imd2025_rank) }}</strong> out of {{ "{:,.0f}".format(stats.imd2025_total) }}
       lower super output areas in

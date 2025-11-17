@@ -10,11 +10,11 @@ import click
 import requests
 import requests_cache
 from elasticsearch.helpers import bulk
-from flask import current_app
 from flask.cli import with_appcontext
 
 from findthatpostcode import db
 from findthatpostcode.commands.utils import get_latest_geoportal_url
+from findthatpostcode.settings import DEBUG
 
 PLACENAMES_INDEX = "geo_placename"
 PRD_IPN = "PRD_IPN"
@@ -82,7 +82,7 @@ AREA_LOOKUP = [
 @click.option("--url", default=None)
 @with_appcontext
 def import_placenames(url=None, es_index=PLACENAMES_INDEX):
-    if current_app.config["DEBUG"]:
+    if DEBUG:
         requests_cache.install_cache()
 
     if not url:

@@ -9,12 +9,12 @@ import requests
 import requests_cache
 import tqdm
 from elasticsearch.helpers import bulk
-from flask import current_app
 from flask.cli import with_appcontext
 
 from findthatpostcode import db
 from findthatpostcode.commands.codes import AREA_INDEX
 from findthatpostcode.commands.postcodes import PC_INDEX
+from findthatpostcode.settings import DEBUG
 
 PCON_NAMES_AND_CODES_URL = "https://opendata.arcgis.com/api/v3/datasets/9a876e4777bc47e392e670a7b8bc3f5c_0/downloads/data?format=csv&spatialRefId=4326&where=1%3D1"
 PCON_2010_LOOKUP_URL = "https://opendata.arcgis.com/api/v3/datasets/c776b66c0e534b849cae5a5121b7a16a_0/downloads/data?format=csv&spatialRefId=4326&where=1%3D1"
@@ -27,7 +27,7 @@ PCON_BOUNDARIES_URL = "https://stg-arcgisazurecdataprod1.az.arcgis.com/exportfil
 @click.option("--postcode-index", default=PC_INDEX)
 @with_appcontext
 def import_new_pcon(area_index=AREA_INDEX, postcode_index=PC_INDEX):
-    if current_app.config["DEBUG"]:
+    if DEBUG:
         requests_cache.install_cache()
 
     es = db.get_db()

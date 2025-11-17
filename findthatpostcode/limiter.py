@@ -1,11 +1,8 @@
-import os
-
 from flask import request
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
-RATE_LIMIT_EXEMPT_HEADER = "X-RateLimit-Exempt"
-RATE_LIMIT_EXEMPT_KEYS = os.environ.get("RATE_LIMIT_EXEMPT_KEYS", "").split(",")
+from findthatpostcode.settings import RATE_LIMIT_EXEMPT_HEADER, RATE_LIMIT_EXEMPT_KEYS
 
 
 def exempt_if_header():

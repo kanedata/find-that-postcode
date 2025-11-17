@@ -7,7 +7,7 @@ from flask import Flask, make_response, render_template
 from flask_cors import CORS
 from sentry_sdk.integrations.flask import FlaskIntegration
 
-from findthatpostcode import blueprints, commands, db
+from findthatpostcode import blueprints, commands, db, settings
 from findthatpostcode.controllers.areas import area_types_count
 from findthatpostcode.metadata import (
     AREA_TYPES,
@@ -17,22 +17,12 @@ from findthatpostcode.metadata import (
 )
 
 
-def get_es_url(default):
-    potential_env_vars = ["ELASTICSEARCH_URL", "ES_URL", "BONSAI_URL"]
-    for e_v in potential_env_vars:
-        if os.environ.get(e_v):
-            return os.environ.get(e_v)
-    return default
-
-
 def create_app(test_config=None):
-    if os.environ.get("SENTRY_DSN"):
+    if settings.SENTRY_DSN:
         sentry_sdk.init(
-            dsn=os.environ.get("SENTRY_DSN"),
+            dsn=settings.SENTRY_DSN,
             integrations=[FlaskIntegration()],
-            environment=(
-                "development" if os.environ.get("FLASK_DEBUG") else "production"
-            ),
+            environment=settings.ENVIRONMENT,
             traces_sample_rate=0.005,
             profiles_sample_rate=0.005,
         )
@@ -40,17 +30,17 @@ def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
-        SECRET_KEY="dev",
-        ES_URL=get_es_url("http://localhost:9200"),
-        ES_INDEX=os.environ.get("ES_INDEX", "postcodes"),
-        LOGGING_DB=os.environ.get("LOGGING_DB"),
-        SERVER_NAME=os.environ.get("SERVER_NAME"),
-        S3_REGION=os.environ.get("S3_REGION"),
-        S3_ENDPOINT=os.environ.get("S3_ENDPOINT"),
-        S3_ACCESS_ID=os.environ.get("S3_ACCESS_ID"),
-        S3_SECRET_KEY=os.environ.get("S3_SECRET_KEY"),
-        S3_BUCKET=os.environ.get("S3_BUCKET", "geo-boundaries"),
-        ETHICAL_ADS_PUBLISHER=os.environ.get("ETHICAL_ADS_PUBLISHER"),
+        SECRET_KEY=settings.SECRET_KEY,
+        ES_URL=settings.ES_URL,
+        ES_INDEX=settings.ES_INDEX,
+        LOGGING_DB=settings.LOGGING_DB,
+        SERVER_NAME=settings.SERVER_NAME,
+        S3_REGION=settings.S3_REGION,
+        S3_ENDPOINT=settings.S3_ENDPOINT,
+        S3_ACCESS_ID=settings.S3_ACCESS_ID,
+        S3_SECRET_KEY=settings.S3_SECRET_KEY,
+        S3_BUCKET=settings.S3_BUCKET,
+        ETHICAL_ADS_PUBLISHER=settings.ETHICAL_ADS_PUBLISHER,
     )
 
     if test_config is None:

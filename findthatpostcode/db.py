@@ -3,9 +3,18 @@ import datetime
 import click
 from boto3 import session
 from elasticsearch import Elasticsearch
-from flask import current_app, g
+from flask import g
 from flask.cli import with_appcontext
 from sqlite_utils import Database
+
+from findthatpostcode.settings import (
+    ES_URL,
+    LOGGING_DB,
+    S3_ACCESS_ID,
+    S3_ENDPOINT,
+    S3_REGION,
+    S3_SECRET_KEY,
+)
 
 INDEXES = {
     "geo_postcode": {
@@ -21,7 +30,7 @@ INDEXES = {
 
 def get_db():
     if "db" not in g:
-        g.db = Elasticsearch(current_app.config["ES_URL"])
+        g.db = Elasticsearch(ES_URL)
 
     return g.db
 
@@ -52,10 +61,10 @@ def init_db(reset=False):
 
 def get_log_db():
     if "log_db" not in g:
-        if current_app.config.get("LOGGING_DB"):
+        if LOGGING_DB:
             datetime.datetime.now()
             g.log_db = Database(
-                current_app.config.get("LOGGING_DB").format(
+                LOGGING_DB.format(
                     year=datetime.datetime.now().year,
                     month=datetime.datetime.now().month,
                     day=datetime.datetime.now().day,
@@ -78,10 +87,10 @@ def get_s3_client():
         s3_session = session.Session()
         g.s3_client = s3_session.client(
             "s3",
-            region_name=current_app.config["S3_REGION"],
-            endpoint_url=current_app.config["S3_ENDPOINT"],
-            aws_access_key_id=current_app.config["S3_ACCESS_ID"],
-            aws_secret_access_key=current_app.config["S3_SECRET_KEY"],
+            region_name=S3_REGION,
+            endpoint_url=S3_ENDPOINT,
+            aws_access_key_id=S3_ACCESS_ID,
+            aws_secret_access_key=S3_SECRET_KEY,
         )
     return g.s3_client
 

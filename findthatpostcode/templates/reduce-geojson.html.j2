@@ -73,15 +73,15 @@
 {% endblock %}
 
 {% block headscripts %}
-<link rel="stylesheet" href="{{ url_for('static', filename='lib/leaflet/leaflet.css' )}}" />
-<link rel="stylesheet" href="{{ url_for('static', filename='lib/maplibre/maplibre-gl.css' )}}" />
+<link rel="stylesheet" href="{{ url_for('static', path='lib/leaflet/leaflet.css' )}}" />
+<link rel="stylesheet" href="{{ url_for('static', path='lib/maplibre/maplibre-gl.css' )}}" />
 {% endblock %}
 
 {% block bodyscripts %}
 <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-<script src="{{ url_for('static', filename='lib/leaflet/leaflet.js' )}}"></script>
-<script src="{{ url_for('static', filename='lib/maplibre/maplibre-gl.js' )}}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='lib/maplibre/leaflet-maplibre-gl.js') }}"></script>
+<script src="{{ url_for('static', path='lib/leaflet/leaflet.js' )}}"></script>
+<script src="{{ url_for('static', path='lib/maplibre/maplibre-gl.js' )}}"></script>
+<script type="text/javascript" src="{{ url_for('static', path='lib/maplibre/leaflet-maplibre-gl.js') }}"></script>
 <script src="//unpkg.com/vue2-leaflet"></script>
 <script>
   // recursively round all coordinates in a javascript array

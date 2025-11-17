@@ -10,10 +10,9 @@ import requests
 import requests_cache
 import tqdm
 from elasticsearch.helpers import bulk
-from flask.cli import with_appcontext
 
-from findthatpostcode import db
 from findthatpostcode.commands.codes import AREA_INDEX
+from findthatpostcode.db import get_es
 from findthatpostcode.settings import DEBUG
 
 IMD2025_URL = "https://assets.publishing.service.gov.uk/media/68ff5daabcb10f6bf9bef911/File_7_IoD2025_All_Ranks_Scores_Deciles_Population_Denominators.csv"
@@ -177,12 +176,11 @@ IMD_FIELDS = {
 @click.command("imd2025")
 @click.option("--es-index", default=AREA_INDEX)
 @click.option("--url", default=IMD2025_URL)
-@with_appcontext
 def import_imd2025(url=IMD2025_URL, es_index=AREA_INDEX):
     if DEBUG:
         requests_cache.install_cache()
 
-    es = db.get_db()
+    es = get_es()
 
     r = requests.get(url, stream=True)
 
@@ -227,12 +225,11 @@ def import_imd2025(url=IMD2025_URL, es_index=AREA_INDEX):
 @click.command("imd2019")
 @click.option("--es-index", default=AREA_INDEX)
 @click.option("--url", default=IMD2019_URL)
-@with_appcontext
 def import_imd2019(url=IMD2019_URL, es_index=AREA_INDEX):
     if DEBUG:
         requests_cache.install_cache()
 
-    es = db.get_db()
+    es = get_es()
 
     r = requests.get(url, stream=True)
 
@@ -277,12 +274,11 @@ def import_imd2019(url=IMD2019_URL, es_index=AREA_INDEX):
 @click.command("imd2015")
 @click.option("--es-index", default=AREA_INDEX)
 @click.option("--url", default=IMD2015_URL)
-@with_appcontext
 def import_imd2015(url=IMD2015_URL, es_index=AREA_INDEX):
     if DEBUG:
         requests_cache.install_cache()
 
-    es = db.get_db()
+    es = get_es()
 
     r = requests.get(url, stream=True)
 

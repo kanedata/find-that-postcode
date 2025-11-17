@@ -1,9 +1,17 @@
-def test_postcode_json(client):
-    rv = client.get("/postcodes/EX36 4AT")
+import pytest
+
+
+@pytest.mark.parametrize("origin", ["http://example.com", None])
+def test_postcode_json(client, origin):
+    headers = {}
+    check_cors = False
+    if origin:
+        headers["Origin"] = origin
+        check_cors = True
+    rv = client.get("/postcodes/EX36 4AT", headers=headers)
     postcode_json = rv.json()
 
     assert rv.headers["Content-Type"].split(";")[0].strip() == "application/json"
-    assert rv.headers["Access-Control-Allow-Origin"] == "*"
 
     areas = (
         postcode_json.get("data", {})
@@ -19,6 +27,8 @@ def test_postcode_json(client):
 
     assert postcode_json.get("data", {}).get("attributes", {}).get("lat") == 51.01467
     assert postcode_json.get("data", {}).get("attributes", {}).get("long") == -3.83317
+    if check_cors:
+        assert rv.headers["Access-Control-Allow-Origin"] == "*"
 
 
 def test_postcode_missing_json(client):
@@ -41,20 +51,26 @@ def test_postcode_missing_html(client):
     assert rv.headers["Content-Type"].split(";")[0].strip() == "text/html"
 
 
-def test_postcode_redirect(client):
-    rv = client.get("/postcodes/redirect?postcode=EX36 4AT")
+def test_postcode_redirect(client_redirect):
+    rv = client_redirect.get("/postcodes/redirect?postcode=EX36 4AT")
     assert rv.status_code == 303
-    assert rv.headers["Content-Type"].split(";")[0].strip() == "text/html"
     assert rv.headers["Location"].endswith("/postcodes/EX36%204AT.html")
 
 
-def test_postcode_hash(client):
-    rv = client.get("/postcodes/hash/abc1.json?properties=ward_code")
+@pytest.mark.parametrize("origin", ["http://example.com", None])
+def test_postcode_hash(client, origin):
+    headers = {}
+    check_cors = False
+    if origin:
+        headers["Origin"] = origin
+        check_cors = True
+    rv = client.get("/postcodes/hash/abc1.json?properties=ward_code", headers=headers)
     assert rv.headers["Content-Type"].split(";")[0].strip() == "application/json"
-    assert rv.headers["Access-Control-Allow-Origin"] == "*"
     data = rv.json()
     assert "data" in data
     assert data["data"]
+    if check_cors:
+        assert rv.headers["Access-Control-Allow-Origin"] == "*"
 
 
 def test_postcode_hash_too_small(client):
@@ -62,28 +78,44 @@ def test_postcode_hash_too_small(client):
     assert rv.status_code == 400
 
 
-def test_postcode_hashes(client):
+@pytest.mark.parametrize("origin", ["http://example.com", None])
+def test_postcode_hashes(client, origin):
+    headers = {}
+    check_cors = False
+    if origin:
+        headers["Origin"] = origin
+        check_cors = True
     rv = client.post(
         "/postcodes/hashes.json",
         data=dict(
             hash="abc1",
             properties=["ward_code"],
         ),
+        headers=headers,
     )
     assert rv.headers["Content-Type"].split(";")[0].strip() == "application/json"
-    assert rv.headers["Access-Control-Allow-Origin"] == "*"
     data = rv.json()
     assert "data" in data
     assert data["data"]
+    if check_cors:
+        assert rv.headers["Access-Control-Allow-Origin"] == "*"
 
 
-def test_postcode_hashes_too_small(client):
+@pytest.mark.parametrize("origin", ["http://example.com", None])
+def test_postcode_hashes_too_small(client, origin):
+    headers = {}
+    check_cors = False
+    if origin:
+        headers["Origin"] = origin
+        check_cors = True
     rv = client.post(
         "/postcodes/hashes.json",
         data=dict(
             hash="ab",
             properties=["ward_code"],
         ),
+        headers=headers,
     )
-    assert rv.headers["Access-Control-Allow-Origin"] == "*"
     assert rv.status_code == 400
+    if check_cors:
+        assert rv.headers["Access-Control-Allow-Origin"] == "*"

@@ -40,13 +40,13 @@
       Showing {{ "{:,.0f}".format(result.relationships.areas|length) }} of
       {{ "{:,.0f}".format(result.attributes.count_areas) }} areas
       {% endif %}
-      - <a href="{{ url_for('areatypes.get_areatype', areacode=result.id, filetype='csv') }}" class="f6">Download all as
+      - <a href="{{ url_for('get_areatype', areacode=result.id, filetype='csv') }}" class="f6">Download all as
         CSV</a>
     </p>
     <ul class="">
       {% for i in result.relationships.areas if not i.id.endswith('999999') %}
       <li class="pa0 mv3">
-        {{ display_area(i, hide_areatype=true) }}
+        {{ display_area(i, hide_areatype=true, request=request) }}
       </li>
       {% endfor %}
     </ul>
@@ -55,7 +55,7 @@
 </div>
 <section class="section section pa3 bg-light-gray mt4 f6">
   <h2 class="f4-ns f4 header-font ma0">
-    <a class="near-black no-underline dim" href="{{ url_for('areatypes.all') }}">Other areatypes</a>
+    <a class="near-black no-underline dim" href="{{ url_for('all_areatypes') }}">Other areatypes</a>
   </h2>
   {% include "_areatypes.html.j2" %}
 </section>

@@ -1,7 +1,16 @@
 import json
 import os
+from dataclasses import dataclass
 
-from findthatpostcode.utils import Field
+
+@dataclass
+class Field:
+    id: str
+    name: str
+    location: str | None = None
+    has_name: bool = False
+    area: str | None = None
+
 
 with open(
     os.path.join(os.path.dirname(os.path.realpath(__file__)), "areatypes.json")

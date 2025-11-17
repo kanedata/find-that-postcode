@@ -37,6 +37,8 @@ def nearest(lat: float, lon: float, es: ElasticsearchDep, filetype: str = "json"
 
 @bp.get("/{areacode}")
 @bp.get("/{areacode}.{filetype}")
-def get_place(areacode: str, es: ElasticsearchDep, filetype: str = "json"):
+def get_place(
+    areacode: str, es: ElasticsearchDep, request: Request, filetype: str = "json"
+):
     result = Place.get_from_es(areacode, es)
-    return return_result(result, filetype, "place.html.j2")
+    return return_result(result, request, filetype, "place.html.j2")

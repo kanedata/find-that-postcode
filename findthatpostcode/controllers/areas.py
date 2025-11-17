@@ -7,7 +7,6 @@ from elasticsearch.helpers import scan
 
 from findthatpostcode.controllers.controller import GEOJSON_TYPES, Controller
 from findthatpostcode.controllers.places import Place
-from findthatpostcode.db import get_s3_client
 from findthatpostcode.metadata import AREA_TYPES
 from findthatpostcode.settings import S3_BUCKET
 
@@ -110,7 +109,7 @@ class Area(Controller):
     template = "area.html.j2"
     date_fields = ["date_end", "date_start"]
 
-    def __init__(self, id, data=None, **kwargs):
+    def __init__(self, id, data=None, s3_client=None, **kwargs):
         super().__init__(id)
         self.relationships["example_postcodes"] = kwargs.get("example_postcodes")
         self.relationships["areatype"] = kwargs.get("areatype")
@@ -123,12 +122,21 @@ class Area(Controller):
             self.found = True
             self.attributes = self.process_attributes(data)
 
+        self._s3_client = s3_client
+
     def __repr__(self):
         return "<Area {}>".format(self.id)
 
     @classmethod
     def get_from_es(
-        cls, id, es, es_config=None, examples_count=5, boundary=False, recursive=True
+        cls,
+        id,
+        es,
+        es_config=None,
+        examples_count=5,
+        boundary=False,
+        recursive=True,
+        s3_client=None,
     ):
         if not es_config:
             es_config = {}
@@ -166,23 +174,36 @@ class Area(Controller):
 
         if data.get("_source", {}).get("parent") and recursive:
             relationships["parent"] = cls.get_from_es(
-                data["_source"]["parent"], es, examples_count=0, recursive=False
+                data["_source"]["parent"],
+                es,
+                examples_count=0,
+                recursive=False,
+                s3_client=s3_client,
             )
 
         if data.get("_source", {}).get("predecessor") and recursive:
             relationships["predecessor"] = [
-                cls.get_from_es(i, es, examples_count=0, recursive=False)
+                cls.get_from_es(
+                    i, es, examples_count=0, recursive=False, s3_client=s3_client
+                )
                 for i in data["_source"]["predecessor"]
             ]
 
         if data.get("_source", {}).get("successor") and recursive:
             relationships["successor"] = [
-                cls.get_from_es(i, es, examples_count=0, recursive=False)
+                cls.get_from_es(
+                    i, es, examples_count=0, recursive=False, s3_client=s3_client
+                )
                 for i in data["_source"]["successor"]
                 if i
             ]
 
-        return cls(data.get("_id"), data=data.get("_source"), **relationships)
+        return cls(
+            data.get("_id"),
+            data=data.get("_source"),
+            s3_client=s3_client,
+            **relationships,
+        )
 
     def process_attributes(self, data):
         if not self.relationships.get("areatype") and data.get("type"):
@@ -286,12 +307,13 @@ class Area(Controller):
         return self._boundary is not None
 
     def _get_boundary(self):
-        client = get_s3_client()
+        if not getattr(self, "_s3_client", None):
+            raise ValueError("S3 client not set on Area instance")
         buffer = io.BytesIO()
         area_code = self.id
         prefix = self.id[0:3]
         try:
-            client.download_fileobj(
+            self._s3_client.download_fileobj(
                 S3_BUCKET,
                 "%s/%s.json" % (prefix, area_code),
                 buffer,

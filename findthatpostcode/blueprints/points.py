@@ -8,18 +8,18 @@ from findthatpostcode.db import ElasticsearchDep
 bp = APIRouter(prefix="/points")
 
 
-@bp.route("/redirect")
+@bp.get("/redirect")
 def point_redirect(lat: float, lon: float, request: Request):
     return RedirectResponse(
         request.url_for(
-            "points.get", latlon="{},{}.html".format(lat, lon), filetype="html"
+            "get_point", latlon="{},{}.html".format(lat, lon), filetype="html"
         ),
         code=303,
     )
 
 
 @bp.get("/{latlon}")
-def get(latlon, es: ElasticsearchDep):
+def get_point(latlon: str, es: ElasticsearchDep, request: Request):
     filetype = "json"
     if latlon.endswith(".json"):
         latlon = latlon[:-5]
@@ -30,13 +30,14 @@ def get(latlon, es: ElasticsearchDep):
     result = Point.get_from_es((float(lat), float(lon)), es)
     errors = result.get_errors()
     if errors:
-        return_result(result, filetype, "postcode.html.j2")
+        return_result(result, request, filetype, "postcode.html.j2")
     if filetype == "html":
         return return_result(
             result.relationships["nearest_postcode"],
+            request,
             filetype,
             "postcode.html.j2",
             point=result,
             stats=result.relationships["nearest_postcode"].get_stats(),
         )
-    return return_result(result, filetype, "postcode.html.j2")
+    return return_result(result, request, filetype, "postcode.html.j2")

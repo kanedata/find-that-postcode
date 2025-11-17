@@ -8,7 +8,7 @@
         {% for j in i[1] %}
         {% set areatype = area_types.get(j) %}
         <li class="pb2">
-          <a href="{{ url_for('areatypes.get_areatype', areacode=j, filetype='html') }}"
+          <a href="{{ url_for('get_areatype', areacode=j, filetype='html') }}"
             class="underline dark-blue f4">{{ areatype["name"] }}</a>
           {% if result.get and result.get(j) %}
           <small class="gray no-underline fr"> ({{ "{:,.0f}".format(result.get(j)) }}{% if loop.index0==0 %}

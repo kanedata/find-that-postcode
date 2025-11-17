@@ -1,13 +1,23 @@
-from flask import Blueprint, render_template
+from fastapi import APIRouter, Request
 
-bp = Blueprint("tools", __name__, url_prefix="/tools")
+from findthatpostcode.utils import templates
 
-
-@bp.route("/merge-geojson", strict_slashes=False, methods=["GET"])
-def merge_geojson():
-    return render_template("merge-geojson.html.j2")
+bp = APIRouter(prefix="/tools")
 
 
-@bp.route("/reduce-geojson", strict_slashes=False, methods=["GET"])
-def reduce_geojson():
-    return render_template("reduce-geojson.html.j2")
+@bp.get("/merge-geojson")
+def merge_geojson(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="merge-geojson.html.j2",
+        media_type="text/html",
+    )
+
+
+@bp.get("/reduce-geojson")
+def reduce_geojson(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="reduce-geojson.html.j2",
+        media_type="text/html",
+    )

@@ -15,15 +15,21 @@ import requests_cache
 import tqdm
 from boto3 import session
 from elasticsearch.helpers import scan
-from flask import current_app
-from flask.cli import with_appcontext
 from pyproj import Transformer
 from shapely import to_geojson
 from shapely.geometry import shape
 from shapely.ops import transform
 
-from findthatpostcode import db
 from findthatpostcode.commands.codes import AREA_INDEX
+from findthatpostcode.db import get_es, get_s3_client
+from findthatpostcode.settings import (
+    DEBUG,
+    S3_ACCESS_ID,
+    S3_BUCKET,
+    S3_ENDPOINT,
+    S3_REGION,
+    S3_SECRET_KEY,
+)
 
 
 @click.command("boundaries")
@@ -32,13 +38,12 @@ from findthatpostcode.commands.codes import AREA_INDEX
 @click.option("--examine/--no-examine", default=False)
 @click.option("--remove/--no-remove", default=False)
 @click.argument("urls", nargs=-1)
-@with_appcontext
 def import_boundaries(
     urls, examine=False, code_field=None, es_index=AREA_INDEX, remove=False
 ):
     if remove:
         # update all instances of area to remove the "boundary" key
-        es = db.get_db()
+        es = get_es()
         es.update_by_query(
             index=es_index,
             body={
@@ -48,11 +53,11 @@ def import_boundaries(
         )
         return
 
-    if current_app.config["DEBUG"]:
+    if DEBUG:
         requests_cache.install_cache()
 
     # initialise the boto3 session
-    client = db.get_s3_client()
+    client = get_s3_client()
 
     for url in urls:
         if url.startswith("http"):
@@ -156,7 +161,7 @@ def import_boundary(client, url, examine=False, code_field=None):
 
             client.upload_fileobj(
                 io.BytesIO(json.dumps(i).encode("utf-8")),
-                current_app.config["S3_BUCKET"],
+                S3_BUCKET,
                 "%s/%s.json" % (prefix, area_code),
             )
             boundary_count += 1
@@ -165,10 +170,9 @@ def import_boundary(client, url, examine=False, code_field=None):
 
 @click.command("boundaries")
 @click.option("--es-index", default=AREA_INDEX)
-@with_appcontext
 def check_boundaries(es_index=AREA_INDEX):
     # Get list of all areas from ES
-    es = db.get_db()
+    es = get_es()
 
     areas = defaultdict(dict)
     area_search = scan(
@@ -191,15 +195,13 @@ def check_boundaries(es_index=AREA_INDEX):
     s3_session = session.Session()
     s3_client = s3_session.client(
         "s3",
-        region_name=current_app.config["S3_REGION"],
-        endpoint_url=current_app.config["S3_ENDPOINT"].replace(
-            current_app.config["S3_BUCKET"] + ".", ""
-        ),
-        aws_access_key_id=current_app.config["S3_ACCESS_ID"],
-        aws_secret_access_key=current_app.config["S3_SECRET_KEY"],
+        region_name=S3_REGION,
+        endpoint_url=S3_ENDPOINT.replace(S3_BUCKET + ".", ""),
+        aws_access_key_id=S3_ACCESS_ID,
+        aws_secret_access_key=S3_SECRET_KEY,
     )
     paginator = s3_client.get_paginator("list_objects_v2")
-    page_iterator = paginator.paginate(Bucket=current_app.config["S3_BUCKET"])
+    page_iterator = paginator.paginate(Bucket=S3_BUCKET)
     for page in tqdm.tqdm(page_iterator):
         for obj in page["Contents"]:
             if obj["Key"].endswith(".json"):

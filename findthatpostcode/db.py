@@ -5,8 +5,6 @@ import click
 from boto3 import session
 from elasticsearch import Elasticsearch
 from fastapi import Depends
-from flask import g
-from flask.cli import with_appcontext
 from sqlite_utils import Database
 
 from findthatpostcode.settings import (
@@ -41,19 +39,7 @@ async def get_es():
 ElasticsearchDep = Annotated[Elasticsearch, Depends(get_es)]
 
 
-def get_db():
-    if "db" not in g:
-        g.db = Elasticsearch(ES_URL)
-
-    return g.db
-
-
-def close_db(e=None):
-    g.pop("db", None)
-
-
-def init_db(reset=False):
-    es = get_db()
+def init_db(es: Elasticsearch, reset=False):
     doc_type = "_doc"
 
     for index, mapping in INDEXES.items():
@@ -72,27 +58,25 @@ def init_db(reset=False):
         )
 
 
-def get_log_db():
-    if "log_db" not in g:
-        if LOGGING_DB:
-            datetime.datetime.now()
-            g.log_db = Database(
-                LOGGING_DB.format(
-                    year=datetime.datetime.now().year,
-                    month=datetime.datetime.now().month,
-                    day=datetime.datetime.now().day,
-                )
+async def get_log_db():
+    if LOGGING_DB:
+        datetime.datetime.now()
+        db = Database(
+            LOGGING_DB.format(
+                year=datetime.datetime.now().year,
+                month=datetime.datetime.now().month,
+                day=datetime.datetime.now().day,
             )
-        else:
-            g.log_db = Database(memory=True)
+        )
+    else:
+        db = Database(memory=True)
+    try:
+        yield db
+    finally:
+        db.close()
 
-    return g.log_db
 
-
-def close_log_db(e=None):
-    if "log_db" in g:
-        g.log_db.close()
-        g.pop("log_db", None)
+LogDatabaseDep = Annotated[Database, Depends(get_log_db)]
 
 
 def get_s3_client():
@@ -109,15 +93,8 @@ def get_s3_client():
 S3Dep = Annotated[Any, Depends(get_s3_client)]
 
 
-def init_app(app):
-    app.teardown_appcontext(close_db)
-    app.teardown_appcontext(close_log_db)
-    app.cli.add_command(init_db_command)
-
-
 @click.command("init-db")
 @click.option("--reset/--no-reset", default=False)
-@with_appcontext
 def init_db_command(reset):
     """Clear the existing data and create new tables."""
     init_db(reset)

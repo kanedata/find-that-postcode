@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse, RedirectResponse
 
 from findthatpostcode.blueprints.utils import return_result
 from findthatpostcode.controllers.areas import Area, get_all_areas
-from findthatpostcode.db import ElasticsearchDep
+from findthatpostcode.db import ElasticsearchDep, S3Dep
 from findthatpostcode.utils import CSVResponse, templates
 
 bp = APIRouter(prefix="/areas")
@@ -16,9 +16,10 @@ bp = APIRouter(prefix="/areas")
 @bp.get("/search")
 @bp.get("/search.<filetype>")
 def area_search(request: Request, filetype="json", q: str | None = None):
-    return RedirectResponse(
-        request.url_for("search.search_index", q=q), status_code=301
-    )
+    redirect_url = request.url_for("search_index")
+    if q:
+        redirect_url = redirect_url.include_query_params(q=q)
+    return RedirectResponse(redirect_url, status_code=301)
 
 
 @bp.get("/names.csv")
@@ -48,43 +49,51 @@ def areas_csv(areas, filename):
     return output
 
 
-@bp.get("/<areacodes>.geojson")
-def get_area_boundary(areacodes: str, es: ElasticsearchDep):
+@bp.get("/{areacodes}.geojson")
+def get_area_boundary(areacodes: str, es: ElasticsearchDep, s3_client: S3Dep):
     areacodes = areacodes.split("+")
     features = []
     for areacode in areacodes:
-        result = Area.get_from_es(areacode, es, boundary=True, examples_count=0)
+        result = Area.get_from_es(
+            areacode, es, boundary=True, examples_count=0, s3_client=s3_client
+        )
         status, r = result.geoJSON()
         if status == 200:
             features.extend(r.get("features"))
     if status != 200:
-        return JSONResponse(message=r, status_code=status)
-    return JSONResponse({"type": "FeatureCollection", "features": features})
+        return JSONResponse(dict(message=r), status_code=status)
+    return {"type": "FeatureCollection", "features": features}
 
 
-@bp.get("/<areacode>/children/<areatype>.geojson")
-def get_area_children_boundary(areacode: str, areatype: str, es: ElasticsearchDep):
+@bp.get("/{areacode}/children/{areatype}.geojson")
+def get_area_children_boundary(
+    areacode: str, areatype: str, es: ElasticsearchDep, s3_client: S3Dep
+):
     area = Area.get_from_es(areacode, es, boundary=False, examples_count=0)
     features = []
     errors = {}
     for child_area in area.relationships["children"][areatype]:
-        result = Area.get_from_es(child_area.id, es, boundary=True, examples_count=0)
+        result = Area.get_from_es(
+            child_area.id, es, boundary=True, examples_count=0, s3_client=s3_client
+        )
         status, r = result.geoJSON()
         if status == 200:
             features.extend(r.get("features"))
         else:
             errors[child_area.id] = r
     if not features:
-        return JSONResponse(message=errors, status_code=status)
-    return JSONResponse({"type": "FeatureCollection", "features": features})
+        return JSONResponse(dict(message=errors), status_code=status)
+    return {"type": "FeatureCollection", "features": features}
 
 
-@bp.route("/<areacode>")
-@bp.route("/<areacode>.<filetype>")
+@bp.get("/{areacode}")
+@bp.get("/{areacode}.{filetype}")
 def get_area(
     areacode: str,
+    request: Request,
     filetype: str = "json",
     es: ElasticsearchDep = None,
+    s3_client: S3Dep = None,
     child: str | None = None,
 ):
     result = Area.get_from_es(
@@ -92,16 +101,18 @@ def get_area(
         es,
         boundary=(filetype == "geojson"),
         examples_count=(0 if filetype == "geojson" else 5),
+        s3_client=s3_client,
     )
 
     if filetype == "geojson":
         status, r = result.geoJSON()
         if status != 200:
             return JSONResponse(message=r, status_code=status)
-        return JSONResponse(r)
+        return r
 
     return return_result(
         result,
+        request,
         filetype,
         "area.html.j2",
         child=child,
@@ -113,6 +124,11 @@ def get_area(
     )
 
 
-@bp.route("/<areacodes>/map")
-def get_area_map(areacodes):
-    return templates.TemplateResponse("area_map.html.j2", {"areacodes": areacodes})
+@bp.get("/{areacodes}/map")
+def get_area_map(request: Request, areacodes):
+    return templates.TemplateResponse(
+        request=request,
+        name="area_map.html.j2",
+        context={"areacodes": areacodes},
+        media_type="text/html",
+    )

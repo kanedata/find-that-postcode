@@ -3,7 +3,7 @@ import os
 import tempfile
 from typing import Annotated
 
-from fastapi import APIRouter, Form, UploadFile
+from fastapi import APIRouter, Form, Request, UploadFile
 
 from findthatpostcode.blueprints.areas import CSVResponse
 from findthatpostcode.blueprints.process_csv import process_csv
@@ -20,14 +20,18 @@ bp = APIRouter(prefix="/addtocsv")
 
 
 @bp.get("/")
-def addtocsv(es: ElasticsearchDep):
+def addtocsv(es: ElasticsearchDep, request: Request):
     ats = area_types_count(es)
     return templates.TemplateResponse(
-        "addtocsv.html.j2",
-        result=ats,
-        basic_fields=BASIC_UPLOAD_FIELDS,
-        stats_fields=STATS_FIELDS,
-        default_fields=DEFAULT_UPLOAD_FIELDS,
+        request=request,
+        name="addtocsv.html.j2",
+        context={
+            "result": ats,
+            "basic_fields": BASIC_UPLOAD_FIELDS,
+            "stats_fields": STATS_FIELDS,
+            "default_fields": DEFAULT_UPLOAD_FIELDS,
+        },
+        media_type="text/html",
     )
 
 

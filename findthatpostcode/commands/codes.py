@@ -14,11 +14,10 @@ import requests
 import requests_cache
 import tqdm
 from elasticsearch.helpers import bulk
-from flask.cli import with_appcontext
 from openpyxl import load_workbook
 
-from findthatpostcode import db
 from findthatpostcode.commands.utils import get_latest_geoportal_url
+from findthatpostcode.db import get_es
 from findthatpostcode.metadata import ENTITIES
 from findthatpostcode.settings import DEBUG
 
@@ -72,13 +71,11 @@ def process_float(value):
 @click.command("rgc")
 @click.option("--url", default=None)
 @click.option("--es-index", default=ENTITY_INDEX)
-@with_appcontext
 def import_rgc(url=None, es_index=ENTITY_INDEX):
     if DEBUG:
         requests_cache.install_cache()
 
-    es = db.get_db()
-
+    es = get_es()
     if not url:
         url = get_latest_geoportal_url(PRD_RGC)
 
@@ -167,7 +164,6 @@ def import_rgc(url=None, es_index=ENTITY_INDEX):
 @click.option("--url", default=None)
 @click.option("--es-index", default=AREA_INDEX)
 @click.option("--encoding", default=DEFAULT_ENCODING)
-@with_appcontext
 def import_chd(url=None, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
     if DEBUG:
         requests_cache.install_cache()
@@ -175,7 +171,7 @@ def import_chd(url=None, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
     if not url:
         url = get_latest_geoportal_url(PRD_CHD)
 
-    es = db.get_db()
+    es = get_es()
 
     r = requests.get(url, stream=True)
     z = zipfile.ZipFile(io.BytesIO(r.content))
@@ -290,12 +286,11 @@ def import_chd(url=None, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
 @click.command("msoanames")
 @click.option("--url", default=MSOA_2021_URL)
 @click.option("--es-index", default=AREA_INDEX)
-@with_appcontext
-def import_msoa_names(url=MSOA_2011_URL, es_index=AREA_INDEX):
+def import_msoa_names(url=MSOA_2021_URL, es_index=AREA_INDEX):
     if DEBUG:
         requests_cache.install_cache()
 
-    es = db.get_db()
+    es = get_es()
 
     r = requests.get(url, stream=True)
 

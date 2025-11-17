@@ -1,10 +1,13 @@
+from typing import Annotated
+
 from dictlib import dig_get
 from elasticsearch.helpers import scan
-from flask import Blueprint, abort, jsonify, redirect, request, url_for
+from fastapi import APIRouter, Form, HTTPException, Query, Request
+from fastapi.responses import JSONResponse, RedirectResponse
 
 from findthatpostcode.blueprints.utils import return_result
 from findthatpostcode.controllers.postcodes import Postcode
-from findthatpostcode.db import get_db
+from findthatpostcode.db import ElasticsearchDep
 from findthatpostcode.metadata import (
     OAC11_CODE,
     RU11IND_CODES,
@@ -12,49 +15,71 @@ from findthatpostcode.metadata import (
     STATS_FIELDS,
 )
 
-bp = Blueprint("postcodes", __name__, url_prefix="/postcodes")
+bp = APIRouter(prefix="/postcodes")
 
 
-@bp.route("/redirect")
-def postcode_redirect():
-    pcd = request.args.get("postcode")
-    return redirect(
-        url_for("postcodes.get_postcode", postcode=pcd, filetype="html"), code=303
+@bp.get("/redirect")
+def postcode_redirect(postcode: str, request: Request):
+    return RedirectResponse(
+        request.url_for("get_postcode", postcode=postcode, filetype="html"),
+        status_code=303,
     )
 
 
-@bp.route("/<postcode>")
-@bp.route("/<postcode>.<filetype>")
-def get_postcode(postcode, filetype="json"):
-    es = get_db()
+@bp.get("/{postcode}")
+@bp.get("/{postcode}.{filetype}")
+def get_postcode(
+    postcode: str, request: Request, es: ElasticsearchDep, filetype: str = "json"
+):
     result = Postcode.get_from_es(postcode, es)
-    return return_result(result, filetype, "postcode.html.j2", stats=result.get_stats())
+    return return_result(
+        result, request, filetype, "postcode.html.j2", stats=result.get_stats()
+    )
 
 
-@bp.route("/hash/<hash>")
-@bp.route("/hash/<hash>.json")
-def single_hash(hash):
-    fields = request.values.getlist("properties")
-    return jsonify({"data": get_postcode_by_hash(hash, fields)})
+@bp.get("/hash/{hash_}")
+@bp.get("/hash/{hash_}.json")
+def single_hash(
+    hash_: str,
+    properties: Annotated[list[str], Query()],
+    request: Request,
+    es: ElasticsearchDep,
+):
+    return JSONResponse({"data": get_postcode_by_hash(es, hash_, properties)})
 
 
-@bp.route("/hashes.json", methods=["GET", "POST"])
-def multi_hash():
-    fields = request.values.getlist("properties")
-    hashes = request.values.getlist("hash")
-    return jsonify({"data": get_postcode_by_hash(hashes, fields)})
+@bp.get("/hashes.json")
+def multi_hash_get(
+    hash: Annotated[str | list[str], Query()],
+    properties: Annotated[list[str], Query()],
+    request: Request,
+    es: ElasticsearchDep,
+):
+    return JSONResponse({"data": get_postcode_by_hash(es, hash, properties)})
 
 
-def get_postcode_by_hash(hashes: str | list[str], fields: list[str]):
-    es = get_db()
+@bp.post("/hashes.json")
+def multi_hash_post(
+    hash: Annotated[str | list[str], Form()],
+    properties: Annotated[list[str], Form()],
+    request: Request,
+    es: ElasticsearchDep,
+):
+    return JSONResponse({"data": get_postcode_by_hash(es, hash, properties)})
 
+
+def get_postcode_by_hash(
+    es: ElasticsearchDep, hashes: Annotated[str | list[str], Query()], fields: list[str]
+) -> list[dict]:
     if not isinstance(hashes, list):
         hashes = [hashes]
 
     query = []
     for hash_ in hashes:
         if len(hash_) < 3:
-            abort(400, description="Hash length must be at least 3 characters")
+            raise HTTPException(
+                status_code=400, detail="Hash length must be at least 3 characters"
+            )
         query.append(
             {
                 "prefix": {

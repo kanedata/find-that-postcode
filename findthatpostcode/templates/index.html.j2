@@ -24,23 +24,23 @@
 {% block content %}
 <section class="flex flex-wrap w-60-l w-100 center">
 
-  {% call frontpageblock("Search", title_link=url_for('search.search_index'), div_classes='mb6') %}
+  {% call frontpageblock("Search", title_link=url_for('search_index'), div_classes='mb6') %}
   {% include "_search.html.j2" %}
   {% endcall %}
 
 
   {% call frontpageblock("Tools", div_classes='w-50-l') %}
   <p>
-    <a href="{{url_for('addtocsv.addtocsv')}}" class="link blue underline b">Add data to a CSV</a> with a column of
+    <a href="{{url_for('addtocsv')}}" class="link blue underline b">Add data to a CSV</a> with a column of
     postcode data.
     Information includes latitude/longitude and areas.
   </p>
   <p>
-    <a href="{{url_for('tools.merge_geojson')}}" class="link blue underline b">Combine GeoJSON files</a> into one merged
+    <a href="{{url_for('merge_geojson')}}" class="link blue underline b">Combine GeoJSON files</a> into one merged
     file.
   </p>
   <p>
-    <a href="{{url_for('tools.reduce_geojson')}}" class="link blue underline b">Reduce GeoJSON filesize</a>.
+    <a href="{{url_for('reduce_geojson')}}" class="link blue underline b">Reduce GeoJSON filesize</a>.
   </p>
   {% endcall %}
 
@@ -56,7 +56,7 @@
 
 <section class="section pa3 bg-light-gray mt4">
   <h2 class="f2-ns f3 header-font normal ma0">
-    <a class="near-black no-underline dim" href="{{ url_for('areatypes.all') }}">Browse by area type</a>
+    <a class="near-black no-underline dim" href="{{ url_for('all_areatypes') }}">Browse by area type</a>
   </h2>
   {% include "_areatypes.html.j2" %}
 </section>

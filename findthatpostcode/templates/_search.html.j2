@@ -1,5 +1,5 @@
 <p class="mt2 mb5 gray f5">Search for an area name, or enter a postcode or latitude and longitude.</p>
-<form action="{{ url_for('search.search_index') }}">
+<form action="{{ url_for('search_index') }}">
     <div class="cf mt3 flex">
         {{ input(type="text", name="q", id="q", placeholder="Summershire OR AB12 3CD OR 51.50,-0.14", order="first", value=(q or '')) }}
         {{ input(type="submit", id="search_button", value="Search", order="last") }}

@@ -1,5 +1,3 @@
-{% from '_utils.html.j2' import info_block, display_area, area_loop %}
-
 {% extends "base.html.j2" %}
 
 {% block headscripts %}
@@ -16,7 +14,7 @@
 
 {% block bodyscripts %}
 <script type="text/javascript">
-  var geojson = {{ url_for('areas.get_area_boundary', areacodes = areacodes) | tojson }};
+  var geojson = {{ url_for('get_area_boundary', areacodes = areacodes) | string | tojson }};
 </script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/map.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', path='js/map.js') }}"></script>
 {% endblock %}

@@ -1,4 +1,4 @@
-{% from '_utils.html.j2' import input, display_area, area_link %}
+{% from '_utils.html.j2' import input, area_link %}
 {% from '_pagination.html.j2' import pagination %}
 
 {% set title = "Search" %}
@@ -27,7 +27,7 @@
       {% for i, score in result %}
       <li class="pa0 mb4 content measure-wide">
         <h3 class="title pa0 mb1 mt0 mh0">
-          <a href="{{ area_link(i) }}" class="dark-blue link underline-hover tracked-tight lh-copy normal">
+          <a href="{{ area_link(i, request) }}" class="dark-blue link underline-hover tracked-tight lh-copy normal">
             {{- i.attributes.name|expand_commas -}}
           </a>
           {% if i.attributes.active==false %}
@@ -42,21 +42,20 @@
           {{ i.relationships.areatype.get_name(i.id) }}
           {% elif i.__class__.__name__=='Place' %}{{i.attributes.type|default('Place', true) }}{% endif %}
           {% if i.relationships.parent %}
-          in <a href="{{ url_for('areas.get_area', areacode=i.relationships.parent.id, filetype='html') }}"
+          in <a href="{{ url_for('get_area', areacode=i.relationships.parent.id, filetype='html') }}"
             class="blue link underline-hover dim">
             {{- i.relationships.parent.attributes.name -}}
           </a>
           {% elif i.relationships.areas %}
           {% for j in i.relationships.areas %}
-          in <a href="{{ url_for('areas.get_area', areacode=j.id, filetype='html') }}"
-            class="blue link underline-hover dim">
+          in <a href="{{ url_for('get_area', areacode=j.id, filetype='html') }}" class="blue link underline-hover dim">
             {{- j.attributes.name -}}
           </a>
           {% endfor %}
           {% endif %}
         </h4>
         <span class='pa1 bg-light-gray mr1'>
-          <a href="{{ area_link(i) }}" class='near-black code link underline-hover'>{{ i.id }}</a>
+          <a href="{{ area_link(i, request) }}" class='near-black code link underline-hover'>{{ i.id }}</a>
         </span>
       </li>
       {% endfor %}

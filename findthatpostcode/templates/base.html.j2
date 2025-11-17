@@ -4,10 +4,10 @@
 
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/tachyons.min.css') }}" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/fonts.css') }}" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', path='css/tachyons.min.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', path='css/fonts.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', path='css/custom.css') }}" />
   {% if ethical_ads_publisher %}
   <script async src="https://media.ethicalads.io/media/client/ethicalads.min.js"></script>
   {% endif %}
@@ -27,7 +27,7 @@
       <a href="{{ url_for('about') }}" class="white logo underline double underline-yellow">About</a>
       | <a href="{{ url_for('about') }}#data-sources" class="white logo underline double underline-yellow">Data
         sources</a>
-      | <a href="{{ url_for('search.search_index') }}" class="white logo underline double underline-yellow">Search</a>
+      | <a href="{{ url_for('search_index') }}" class="white logo underline double underline-yellow">Search</a>
       | <a href="{{ url_for('index') }}#api" class="white logo underline double underline-yellow">API</a>
     </div>
     <h1 class="{% if frontpage %}f-subheadline-ns{% endif %} tracked-tight f1 lh-title mv0 logo normal">

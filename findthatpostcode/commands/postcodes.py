@@ -12,10 +12,9 @@ import click
 import requests
 import requests_cache
 from elasticsearch.helpers import bulk
-from flask.cli import with_appcontext
 
-from findthatpostcode import db
 from findthatpostcode.commands.utils import get_latest_geoportal_url
+from findthatpostcode.db import get_es
 from findthatpostcode.settings import DEBUG
 
 PC_INDEX = "geo_postcode"
@@ -25,7 +24,6 @@ PRD_NSPL = "PRD_NSPL"
 @click.command("nspl")
 @click.option("--es-index", default=PC_INDEX)
 @click.option("--url", default=None)
-@with_appcontext
 def import_nspl(url=None, es_index=PC_INDEX):
     if not url:
         url = get_latest_geoportal_url(PRD_NSPL)
@@ -33,7 +31,7 @@ def import_nspl(url=None, es_index=PC_INDEX):
     if DEBUG:
         requests_cache.install_cache()
 
-    es = db.get_db()
+    es = get_es()
 
     r = requests.get(url, stream=True)
     z = zipfile.ZipFile(io.BytesIO(r.content))

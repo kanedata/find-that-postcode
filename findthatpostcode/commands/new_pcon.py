@@ -9,11 +9,10 @@ import requests
 import requests_cache
 import tqdm
 from elasticsearch.helpers import bulk
-from flask.cli import with_appcontext
 
-from findthatpostcode import db
 from findthatpostcode.commands.codes import AREA_INDEX
 from findthatpostcode.commands.postcodes import PC_INDEX
+from findthatpostcode.db import get_es
 from findthatpostcode.settings import DEBUG
 
 PCON_NAMES_AND_CODES_URL = "https://opendata.arcgis.com/api/v3/datasets/9a876e4777bc47e392e670a7b8bc3f5c_0/downloads/data?format=csv&spatialRefId=4326&where=1%3D1"
@@ -25,12 +24,11 @@ PCON_BOUNDARIES_URL = "https://stg-arcgisazurecdataprod1.az.arcgis.com/exportfil
 @click.command("new_pcon")
 @click.option("--area-index", default=AREA_INDEX)
 @click.option("--postcode-index", default=PC_INDEX)
-@with_appcontext
 def import_new_pcon(area_index=AREA_INDEX, postcode_index=PC_INDEX):
     if DEBUG:
         requests_cache.install_cache()
 
-    es = db.get_db()
+    es = get_es()
 
     # get the names and codes for the new areas
     r = requests.get(PCON_NAMES_AND_CODES_URL, stream=True)

@@ -196,11 +196,7 @@ class Controller:
 class Pagination:
     default_size = 10
 
-    def __init__(self, request, size=None):
-        try:
-            page = int(request.values.get("p"))
-        except (ValueError, TypeError):
-            page = 1
+    def __init__(self, page: int = 1, size: int | None = None):
         self.page = page if isinstance(page, int) else 1
         self.size = size if isinstance(size, int) else self.default_size
         self.from_ = self.get_from()

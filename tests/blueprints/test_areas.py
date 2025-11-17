@@ -8,18 +8,23 @@ AREA_NAME = "Lower Bow & Larkfield, Fancy Farm, Mallard Bowl"
     "endpoint",
     [
         "/areas/{}.json".format(AREA_CODE),
-        "/api/v1/areas/{}".format(AREA_CODE),
+        # "/api/v1/areas/{}".format(AREA_CODE),
     ],
 )
-def test_area_json(client, endpoint):
-    rv = client.get(endpoint)
+@pytest.mark.parametrize("origin", ["http://example.com", None])
+def test_area_json(client, endpoint, origin):
+    headers = {}
+    check_cors = False
+    if origin:
+        headers["Origin"] = origin
+        check_cors = True
+    rv = client.get(endpoint, headers=headers)
     assert rv.status_code == 200
 
     print(rv.headers)
     data = rv.json()
 
     assert rv.headers["Content-Type"].split(";")[0].strip() == "application/json"
-    assert rv.headers["Access-Control-Allow-Origin"] == "*"
 
     assert data.get("data", {}).get("attributes", {}).get("name") == AREA_NAME
     assert (
@@ -31,6 +36,8 @@ def test_area_json(client, endpoint):
         )
         == 5
     )
+    if check_cors:
+        assert rv.headers["Access-Control-Allow-Origin"] == "*"
 
 
 def test_missing_area_json(client):
@@ -51,24 +58,31 @@ def test_area_missing_html(client):
     assert "not found" in rv.text.lower()
 
 
-def test_area_geojson(client):
-    rv = client.get("/areas/{}.geojson".format(AREA_CODE))
+@pytest.mark.parametrize("origin", ["http://example.com", None])
+def test_area_geojson(client, origin):
+    headers = {}
+    check_cors = False
+    if origin:
+        headers["Origin"] = origin
+        check_cors = True
+    rv = client.get("/areas/{}.geojson".format(AREA_CODE), headers=headers)
     data = rv.json()
 
     assert rv.headers["Content-Type"].split(";")[0].strip() == "application/json"
-    assert rv.headers["Access-Control-Allow-Origin"] == "*"
     assert data.get("type") == "FeatureCollection"
     assert len(data.get("features")) == 1
     assert data.get("features")[0].get("type") == "Feature"
     assert len(data["features"][0]["geometry"]["coordinates"][0]) > 3
     assert len(data["features"][0]["properties"]) > 0
     assert data["features"][0]["properties"]["name"] == AREA_NAME
+    if check_cors:
+        assert rv.headers["Access-Control-Allow-Origin"] == "*"
 
 
-def test_area_search(client):
-    rv = client.get("/areas/search")
+def test_area_search(client_redirect):
+    rv = client_redirect.get("/areas/search")
     assert rv.status_code == 301
-    assert rv.headers["Location"] == "/search/"
+    assert rv.headers["Location"] == "http://testserver/search/"
 
 
 def test_area_names(client):

@@ -1,11 +1,11 @@
-{% from '_utils.html.j2' import info_block, display_area, area_loop %}
+{% from '_utils.html.j2' import info_block, display_area %}
 
 {% if point %}
 {% set title = 'Point {:,.5f}, {:,.5f}'.format(*point.id) %}
 {% set subtitle = 'Closest postcode to point {0:,.5f}, {1:,.5f} is <a href="{2}">{3}</a>.<br>Centre of {3} is {4:,.1f} meters away.'.format(
     point.id[0],
     point.id[1],
-    url_for('postcodes.get_postcode', postcode=result.id, filetype='html'),
+    url_for('get_postcode', postcode=result.id, filetype='html'),
     result.id,
     point.attributes.distance_from_postcode
   ) %}
@@ -43,7 +43,7 @@
     {% set a = result.get_area(key_area) %}
     {% if a %}
     {% call info_block(a.relationships.areatype.get_name(a.id)) %}
-    {{ display_area(a, hide_areatype=true) }}
+    {{ display_area(a, hide_areatype=true, request=request) }}
     {% endcall %}
     {% endif %}
     {% endfor %}
@@ -62,7 +62,7 @@
     <p class="f5 b mt0 mb1 w-100">
       {% if result.get_area('laua') %}
       Approximate location within
-      <a href="{{ url_for('areas.get_area', areacode=result.get_area('laua').id, filetype='html') }}"
+      <a href="{{ url_for('get_area', areacode=result.get_area('laua').id, filetype='html') }}"
         class="link blue underline-hover">
         {{- result.get_area('laua').attributes.name -}}
       </a>
@@ -83,7 +83,7 @@
     <h2 class="header-font mt2 pt2 mb1 bt bw3 b--yellow">Nearby places</h2>
     {% for i in result.relationships.nearest_places %}
     <div class="mt1">
-      {{ display_area(i) }}
+      {{ display_area(i, request=request) }}
     </div>
     {% endfor %}
   </div>
@@ -140,7 +140,7 @@
     {% set a = result.get_area(key_area) %}
     {% if a %}
     {% call info_block(a.relationships.areatype.get_name(a.id)) %}
-    {{ display_area(a, hide_areatype=true) }}
+    {{ display_area(a, hide_areatype=true, request=request) }}
     {% endcall %}
     {% endif %}
     {% endfor %}
@@ -199,8 +199,10 @@
 <script type="text/javascript">
   var postcodes = [{{ result.attributes.location | tojson }}];
   var show_postcode = true;
-  var geojson = {{ url_for('areas.get_area_boundary', areacodes = result.get_area('laua').id) | tojson }};
+  {% if result.get_area('laua').id %}
+  var geojson = {{ url_for('get_area_boundary', areacodes = result.get_area('laua').id) | string | tojson }};
+  {% endif %}
 </script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/map.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', path='js/map.js') }}"></script>
 {% endif %}
 {% endblock %}

@@ -1,12 +1,11 @@
 import copy
 import json
 import os
-from contextlib import contextmanager
 
 import pytest
 from fastapi.testclient import TestClient
-from flask import appcontext_pushed, g
 
+from findthatpostcode.blueprints import app as legacy_app
 from findthatpostcode.db import get_es, get_s3_client
 from findthatpostcode.main import app
 
@@ -17,26 +16,31 @@ for i in os.listdir(mock_data_dir):
         mock_data[i.replace(".json", "")] = json.load(a)
 
 
-@contextmanager
-def db_set(app, db, s3_client):
-    def handler(sender, **kwargs):
-        g.db = db
-        g.s3_client = s3_client
-
-    with appcontext_pushed.connected_to(handler, app):
-        yield
-
-
 def mock_es():
+    print("USING MOCK ES")
     return MockElasticsearch()
 
 
 def mock_s3():
+    print("USING MOCK S3")
     return MockBoto3()
 
 
 @pytest.fixture
-def client():
+def client(mocker):
+    legacy_app.dependency_overrides[get_es] = mock_es
+    legacy_app.dependency_overrides[get_s3_client] = mock_s3
+    app.dependency_overrides[get_es] = mock_es
+    app.dependency_overrides[get_s3_client] = mock_s3
+
+    client = TestClient(app, follow_redirects=True)
+    yield client
+
+
+@pytest.fixture
+def client_redirect(mocker):
+    legacy_app.dependency_overrides[get_es] = mock_es
+    legacy_app.dependency_overrides[get_s3_client] = mock_s3
     app.dependency_overrides[get_es] = mock_es
     app.dependency_overrides[get_s3_client] = mock_s3
 

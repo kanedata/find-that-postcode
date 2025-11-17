@@ -19,17 +19,16 @@
 {% block content %}
 <div class="cf">
   <div class="fl w-third-l w-100 pr4 f5">
-    {{ result.relationships.areatype }}
     {% if result.has_boundary %}
     <div class="mb3">
-      <a href="{{ url_for('areas.get_area_boundary', areacodes=result.id) }}" class="link blue underline-hover">Boundary
+      <a href="{{ url_for('get_area_boundary', areacodes=result.id) }}" class="link blue underline-hover">Boundary
         (geoJSON)</a>
     </div>
     {% endif %}
 
     {% if result.relationships.successor %}
     {% call info_block("Successor area") %}
-    {{ area_loop(result.relationships.successor, result.id)}}
+    {{ area_loop(result.relationships.successor, result.id, request) }}
     {% endcall %}
     {% endif %}
 
@@ -39,7 +38,7 @@
       {% for i in example_postcodes[0:5] %}
       <li class="dib">
         <code class="pa1 code mr2">
-          <a href='/postcodes/{{ i["id"] }}.html' class='near-black link underline-hover'>{{ i.id }}</a>
+          <a href='{{ url_for("get_postcode", postcode=i["id"], filetype="html") }}' class='near-black link underline-hover'>{{ i.id }}</a>
           </code>
       </li>
       {% endfor %}
@@ -49,13 +48,13 @@
 
     {% if result.relationships.parent %}
     {% call info_block("Parent area") %}
-    {{ display_area(result.relationships.parent) }}
+    {{ display_area(result.relationships.parent, request=request) }}
     {% endcall %}
     {% endif %}
 
     {% if result.relationships.predecessor %}
     {% call info_block("Predecessor area") %}
-    {{ area_loop(result.relationships.predecessor, result.id)}}
+    {{ area_loop(result.relationships.predecessor, result.id, request)}}
     {% endcall %}
     {% endif %}
 
@@ -149,7 +148,7 @@
     {#% if result.relationships.parent %}
     <p class="f5 b mt0 mb1 w-100">
       Location within 
-      <a href="{{ url_for('areas.get_area', areacode=result.relationships.parent.id, filetype='html') }}" class="link blue underline-hover">
+      <a href="{{ url_for('get_area', areacode=result.relationships.parent.id, filetype='html') }}" class="link blue underline-hover">
         {{- result.relationships.parent.attributes.name -}} 
       </a>
       {{ result.relationships.parent.relationships.areatype.get_name(result.id) }}
@@ -168,7 +167,7 @@
       <li class="db fl mr3 {% if k == selected %}bw2 b--light-gray bt bl br bg-white{% else %}bg-near-white{% endif %}"
         style="margin-bottom: -0.25rem;">
         <a class="b f5 i pv2 ph3 db {% if k == selected %}{% else %}{% endif %} near-black link glow"
-          href="{{ url_for('areas.get_area', areacode=result.id, filetype='html', child=k, _anchor='children') }}">
+          href="{{ url_for('get_area', areacode=result.id, filetype='html').include_query_params(child=k) }}#children">
           {{ area_types[k].name }}<br>
           <span class="normal">{{ "{:,.0f}".format(v) }} areas<span>
         </a>
@@ -178,11 +177,11 @@
     <div class="pa3 f5">
       <p>
         <a class="link blue underline-hover"
-          href="{{ url_for('areas.get_area_children_boundary', areacode=result.id, areatype=selected)}}">
+          href="{{ url_for('get_area_children_boundary', areacode=result.id, areatype=selected)}}">
           Boundaries (GeoJSON)
         </a>
       </p>
-      {{ area_loop(result.relationships.children[selected]|sort(attribute="id"), result.id)}}
+      {{ area_loop(result.relationships.children[selected]|sort(attribute="id"), result.id, request) }}
     </div>
     {% endcall %}
     {% endif %}
@@ -208,14 +207,14 @@
   var postcodes = null;
   {% endif %}
   {% if result.has_boundary %}
-  var geojson = {{ url_for('areas.get_area_boundary', areacodes = result.id) | tojson }};
+  var geojson = {{ url_for('get_area_boundary', areacodes = result.id) | string | tojson }};
   {% else %}
   var geojson = null;
   {% endif %}
   {% if result.relationships.parent %}
-  var parent_geojson = {{ url_for('areas.get_area_boundary', areacodes = result.relationships.parent.id) | tojson }};
+  var parent_geojson = {{ url_for('get_area_boundary', areacodes = result.relationships.parent.id) | string | tojson }};
   {% endif %}
 </script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/map.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', path='js/map.js') }}"></script>
 {% endif %}
 {% endblock %}

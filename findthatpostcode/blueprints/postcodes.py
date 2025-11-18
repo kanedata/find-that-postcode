@@ -2,7 +2,7 @@ from typing import Annotated
 
 from dictlib import dig_get
 from elasticsearch.helpers import scan
-from fastapi import APIRouter, Form, HTTPException, Query, Request
+from fastapi import APIRouter, Form, HTTPException, Query, Request, Response
 from fastapi.responses import JSONResponse, RedirectResponse
 
 from findthatpostcode.blueprints.utils import return_result
@@ -19,7 +19,7 @@ bp = APIRouter(prefix="/postcodes")
 
 
 @bp.get("/redirect")
-def postcode_redirect(postcode: str, request: Request):
+def postcode_redirect(postcode: str, request: Request) -> Response:
     return RedirectResponse(
         request.url_for("get_postcode", postcode=postcode, filetype="html"),
         status_code=303,
@@ -44,7 +44,7 @@ def single_hash(
     properties: Annotated[list[str], Query()],
     request: Request,
     es: ElasticsearchDep,
-):
+) -> Response:
     return JSONResponse({"data": get_postcode_by_hash(es, hash_, properties)})
 
 
@@ -54,7 +54,7 @@ def multi_hash_get(
     properties: Annotated[list[str], Query()],
     request: Request,
     es: ElasticsearchDep,
-):
+) -> Response:
     return JSONResponse({"data": get_postcode_by_hash(es, hash, properties)})
 
 
@@ -64,7 +64,7 @@ def multi_hash_post(
     properties: Annotated[list[str], Form()],
     request: Request,
     es: ElasticsearchDep,
-):
+) -> Response:
     return JSONResponse({"data": get_postcode_by_hash(es, hash, properties)})
 
 
@@ -164,3 +164,5 @@ def get_postcode_by_hash(
             }
             for r in results
         ]
+
+    return []

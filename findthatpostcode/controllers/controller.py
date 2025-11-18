@@ -1,5 +1,9 @@
 import math
-from urllib.parse import urlencode, urlunparse
+from urllib.parse import ParseResult, urlencode, urlunparse
+
+from elasticsearch import Elasticsearch
+
+from findthatpostcode.utils import ESConfig
 
 GEOJSON_TYPES = {
     "point": "Point",  # A single geographic coordinate.
@@ -17,45 +21,53 @@ GEOJSON_TYPES = {
 
 
 class Controller:
-    template = None
-    es_index = "geo"
-    es_type = "_doc"
+    template: str | None = None
+    es_index: str = "geo"
+    es_type: str = "_doc"
+    url_slug: str = "controllers"
 
-    def __init__(self, id, data=None):
+    def __init__(
+        self: "Controller", id: str | tuple[float, float], data: dict | None = None
+    ):
         # main configuration
-        self.urlparts = None
-        self.found = False
-        self.errors = []
-        self.attributes = {}
-        self.relationships = {}
-        self.id = self.parse_id(id)
-        self.pagination = None
+        self.urlparts: ParseResult | None = None
+        self.found: bool = False
+        self.errors: list[str] = []
+        self.attributes: dict[str, object] = {}
+        self.relationships: dict[str, object] = {}
+        self.id: str | tuple[float, float] = self.parse_id(id)
+        self.pagination: Pagination | None = None
         if data:
             self.found = True
             self.attributes = self.process_attributes(data)
 
     @classmethod
-    def get_from_es(cls, id, es, es_config=None):
+    def get_from_es(
+        cls: type["Controller"],
+        id: str,
+        es: Elasticsearch,
+        es_config: ESConfig | None = None,
+    ):
         if not es_config:
-            es_config = {}
+            es_config = ESConfig(es_index=cls.es_index, es_type=cls.es_type)
         data = es.get(
-            index=es_config.get("es_index", cls.es_index),
-            doc_type=es_config.get("es_type", cls.es_type),
+            index=es_config.es_index,
+            doc_type=es_config.es_type,
             id=cls.parse_id(id),
-            ignore=[404],
-            _source_excludes=es_config.get("_source_exclude", []),
+            ignore=[404],  # type: ignore
+            _source_excludes=es_config._source_exclude,  # type: ignore
         )
         return cls(data.get("_id"), data.get("_source"))
 
-    def process_attributes(self, data):
+    def process_attributes(self: "Controller", data: dict) -> dict[str, object]:
         return data
 
     @staticmethod
-    def parse_id(id):
+    def parse_id(id: str | tuple[float, float]) -> str | tuple[float, float]:
         return id
 
     @staticmethod
-    def get_total_from_es(result):
+    def get_total_from_es(result: dict) -> int | None:
         """
         Elasticsearch python seems to have changed how it returns the total number of
         hits in a search - this gets a consistent figure no matter the version
@@ -64,8 +76,13 @@ class Controller:
             return result["hits"]["total"]["value"]
         if isinstance(result["hits"]["total"], (float, int)):
             return result["hits"]["total"]
+        return None
 
-    def url(self, filetype=None, query_vars={}):
+    def url(
+        self: "Controller", filetype: str | None = None, query_vars: dict = {}
+    ) -> str:
+        if not isinstance(self.id, str):
+            raise ValueError("ID must be a string to create URL")
         path = [
             self.url_slug,
             self.id.replace(" ", "+") + self.set_url_filetype(filetype),
@@ -82,8 +99,14 @@ class Controller:
         )
 
     def relationship_url(
-        self, relationship, related=True, filetype=None, query_vars={}
-    ):
+        self: "Controller",
+        relationship: str,
+        related: bool = True,
+        filetype: str | None = None,
+        query_vars: dict = {},
+    ) -> str:
+        if not isinstance(self.id, str):
+            raise ValueError("ID must be a string to create URL")
         if related:
             path = [
                 self.url_slug,
@@ -108,16 +131,16 @@ class Controller:
             ]
         )
 
-    def set_url_filetype(self, filetype=None):
+    def set_url_filetype(self: "Controller", filetype: str | None = None) -> str:
         if filetype:
             return "." + filetype
         return ""
 
-    def get_query_string(self, query_vars={}):
+    def get_query_string(self: "Controller", query_vars: dict = {}) -> str:
         # query_vars = self.page_query_vars(query_vars)
         return urlencode(query_vars)
 
-    def get_errors(self):
+    def get_errors(self: "Controller") -> list[dict[str, str]]:
         if not self.found:
             return [
                 {
@@ -129,7 +152,7 @@ class Controller:
         return []
 
     # role = top|identifier|embedded
-    def toJSON(self, role="top"):
+    def toJSON(self: "Controller", role: str = "top") -> tuple[dict, list]:
         json = {}
         included = []
 
@@ -165,13 +188,13 @@ class Controller:
                 if role != "embedded":
                     included += [j.toJSON("embedded")[0] for j in items]
             elif hasattr(items, "toJSON"):
-                json["relationships"][i]["data"] = items.toJSON("identifer")[0]
+                json["relationships"][i]["data"] = items.toJSON("identifer")[0]  # type: ignore
                 if role != "embedded":
-                    included.append(items.toJSON("embedded")[0])
+                    included.append(items.toJSON("embedded")[0])  # type: ignore
 
         return (json, included)
 
-    def topJSON(self):
+    def topJSON(self: "Controller") -> dict:
         json = self.toJSON()
         if not self.found:
             return {
@@ -186,23 +209,28 @@ class Controller:
             "links": {"self": self.url(), "html": self.url("html")},
         }
 
-    def get_es_version(self, es):
-        version_number = es.info().get("version").get("number")
+    def get_es_version(self: "Controller", es: Elasticsearch) -> list[int] | None:
+        version_number = es.info().get("version").get("number")  # type: ignore
         if not version_number:
             return None
         return [int(v) for v in version_number.split(".")]
 
 
 class Pagination:
-    default_size = 10
+    default_size: int = 10
 
-    def __init__(self, page: int = 1, size: int | None = None):
+    def __init__(self: "Pagination", page: int = 1, size: int | None = None) -> None:
         self.page = page if isinstance(page, int) else 1
         self.size = size if isinstance(size, int) else self.default_size
         self.from_ = self.get_from()
-        self.pagination = {"next": None, "prev": None, "first": None, "last": None}
+        self.pagination: dict[str, dict[str, object] | int | None] = {
+            "next": None,
+            "prev": None,
+            "first": None,
+            "last": None,
+        }
 
-    def page_query_vars(self, query_vars={}):
+    def page_query_vars(self: "Pagination", query_vars: dict = {}) -> dict:
         if self.page and self.page > 1 and "p" not in query_vars:
             query_vars["p"] = self.page
         if (
@@ -214,14 +242,16 @@ class Pagination:
             query_vars["size"] = self.size
         return query_vars
 
-    def get_from(self):
+    def get_from(self: "Pagination") -> int:
         return (self.page - 1) * self.size
 
-    def set_pages(self, page, size):
+    def set_pages(self: "Pagination", page: int, size: int) -> None:
         self.page = page
         self.size = size
 
-    def set_pagination(self, total_results, url_args={}, range=5):
+    def set_pagination(
+        self: "Pagination", total_results: int, url_args: dict = {}, range: int = 5
+    ) -> None:
         self.total = total_results
         self.min_page = 1
         self.max_page = math.ceil(float(total_results) / float(self.size))
@@ -254,11 +284,11 @@ class Pagination:
         # page ranges
         # @TODO calculate page ranges
 
-    def get_meta(self, meta):
+    def get_meta(self: "Pagination", meta: dict) -> dict:
         meta["from"] = self.get_from()
         meta["p"] = self.page
         meta["size"] = self.size
         return meta
 
-    def get_links(self, links):
+    def get_links(self: "Pagination", links: dict) -> dict:
         return links

@@ -22,3 +22,4 @@ shapely
 sqlite-utils
 tqdm
 ua-parser
+boto3-stubs[s3]

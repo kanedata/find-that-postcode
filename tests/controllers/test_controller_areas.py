@@ -14,31 +14,34 @@ def test_area_class():
 
 def test_area_class_es():
     es = MockElasticsearch()
-    a = Area.get_from_es("S02000783", es)
+    a = Area.get_from_es("S02000783", es)  # type: ignore
 
     assert a.id == "S02000783"
     assert a.attributes["name"] == "Lower Bow & Larkfield, Fancy Farm, Mallard Bowl"
     assert str(a) == "<Area S02000783>"
 
-    a = Area.get_from_es("E01020135", es)  # get an area with example postcodes
+    a = Area.get_from_es(
+        "E01020135",
+        es,  # type: ignore
+    )  # get an area with example postcodes
 
-    assert len(a.relationships["example_postcodes"]) > 0
-    assert isinstance(a.relationships["example_postcodes"][0], Postcode)
+    assert len(a.relationships["example_postcodes"]) > 0  # type: ignore
+    assert isinstance(a.relationships["example_postcodes"][0], Postcode)  # type: ignore
 
 
 def test_search_areas():
     es = MockElasticsearch()
-    a = search_areas("test", es)
+    a = search_areas("test", es)  # type: ignore
 
     assert "result" in a
     assert "result_count" in a
-    assert a["result_count"] > 0
-    assert isinstance(a["result"][0], Area)
+    assert a["result_count"] > 0  # type: ignore
+    assert isinstance(a["result"][0], Area)  # type: ignore
 
 
 def test_get_all_areas():
     es = MockElasticsearch()
-    a = get_all_areas(es)
+    a = get_all_areas(es)  # type: ignore
 
     assert isinstance(a, types.GeneratorType)
     result = [area for area in a]

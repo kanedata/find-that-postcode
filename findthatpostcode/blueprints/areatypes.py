@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Response
 
 from findthatpostcode.blueprints.areas import areas_csv
 from findthatpostcode.blueprints.utils import return_result
@@ -15,9 +15,8 @@ bp = APIRouter(prefix="/areatypes")
 
 
 @bp.get("/")
-def all_areatypes(es: ElasticsearchDep, request: Request):
+def all_areatypes(es: ElasticsearchDep, request: Request) -> Response:
     ats = area_types_count(es)
-    print(ats)
     return templates.TemplateResponse(
         request=request,
         name="areatypes.html.j2",
@@ -40,10 +39,10 @@ def get_areatype(
         areas = get_all_areas(es, areatypes=[areacode.strip().lower()])
         return areas_csv(areas, "{}.csv".format(areacode))
     result = Areatype.get_from_es(areacode, es)
-    pagination = Pagination(p, size=size)
+    pagination = Pagination(page=p, size=size)
     result.get_areas(es, pagination=pagination)
 
-    pagination.set_pagination(result.attributes["count_areas"])
+    pagination.set_pagination(result.attributes["count_areas"])  # type: ignore
     nav = {
         p: request.url_for(
             "get_areatype", areacode=areacode, filetype=filetype

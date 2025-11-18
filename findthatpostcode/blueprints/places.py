@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Response
 from fastapi.responses import JSONResponse, RedirectResponse
 
 from findthatpostcode.blueprints.utils import return_result
@@ -9,15 +9,18 @@ bp = APIRouter(prefix="/places")
 
 
 @bp.get("/redirect")
-def point_redirect(lat: float, lon: float, request: Request):
+def point_redirect(lat: float, lon: float, request: Request) -> Response:
     return RedirectResponse(
-        request.url_for("places.nearest", lat=lat, lon=lon, filetype="html"), code=303
+        request.url_for("places.nearest", lat=lat, lon=lon, filetype="html"),
+        status_code=303,
     )
 
 
 @bp.get("/nearest/{lat},{lon}")
 @bp.get("/nearest/{lat},{lon}.{filetype}")
-def nearest(lat: float, lon: float, es: ElasticsearchDep, filetype: str = "json"):
+def nearest(
+    lat: float, lon: float, es: ElasticsearchDep, filetype: str = "json"
+) -> Response:
     query = {
         "query": {"match_all": {}},
         "sort": [
@@ -28,9 +31,9 @@ def nearest(lat: float, lon: float, es: ElasticsearchDep, filetype: str = "json"
     data = es.search(
         index="geo_placename",
         body=query,
-        ignore=[404],
-        size=10,
-        _source_excludes=[],
+        ignore=[404],  # type: ignore
+        size=10,  # type: ignore
+        _source_excludes=[],  # type: ignore
     )
     return JSONResponse(content=data)
 

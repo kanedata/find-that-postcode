@@ -1,10 +1,11 @@
 import datetime
-from typing import Annotated, Any
+from typing import Annotated
 
 import click
 from boto3 import session
 from elasticsearch import Elasticsearch
 from fastapi import Depends
+from mypy_boto3_s3 import S3Client
 from sqlite_utils import Database
 
 from findthatpostcode.settings import (
@@ -28,18 +29,23 @@ INDEXES = {
 }
 
 
-async def get_es():
-    db = Elasticsearch(ES_URL)
+def get_es():
+    return Elasticsearch(ES_URL)
+
+
+async def get_es_dep():
+    db = get_es()
     try:
         yield db
     finally:
         db.close()
 
 
-ElasticsearchDep = Annotated[Elasticsearch, Depends(get_es)]
+ElasticsearchDep = Annotated[Elasticsearch, Depends(get_es_dep)]
 
 
-def init_db(es: Elasticsearch, reset=False):
+def init_db(reset: bool = False):
+    es = get_es()
     doc_type = "_doc"
 
     for index, mapping in INDEXES.items():
@@ -51,7 +57,10 @@ def init_db(es: Elasticsearch, reset=False):
         res = es.indices.create(index=index)
 
         res = es.indices.put_mapping(
-            doc_type=doc_type, body=mapping, index=index, include_type_name=True
+            doc_type=doc_type,
+            body=mapping,
+            index=index,
+            include_type_name=True,  # type: ignore
         )
         click.echo(
             "[elasticsearch] set mapping on %s index, %s type" % (index, doc_type)
@@ -79,7 +88,7 @@ async def get_log_db():
 LogDatabaseDep = Annotated[Database, Depends(get_log_db)]
 
 
-def get_s3_client():
+def get_s3_client() -> S3Client:
     s3_session = session.Session()
     return s3_session.client(
         "s3",
@@ -90,7 +99,15 @@ def get_s3_client():
     )
 
 
-S3Dep = Annotated[Any, Depends(get_s3_client)]
+async def get_s3_client_dep():
+    db = get_s3_client()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+S3Dep = Annotated[S3Client, Depends(get_s3_client_dep)]
 
 
 @click.command("init-db")

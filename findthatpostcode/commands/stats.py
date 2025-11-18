@@ -4,14 +4,15 @@ Import commands for the register of geographic codes and code history database
 
 import codecs
 import csv
+from typing import Any
 
 import click
 import requests
 import requests_cache
 import tqdm
-from elasticsearch.helpers import bulk
 
 from findthatpostcode.commands.codes import AREA_INDEX
+from findthatpostcode.commands.utils import bulk_upload
 from findthatpostcode.db import get_es
 from findthatpostcode.settings import DEBUG
 
@@ -20,7 +21,7 @@ IMD2019_URL = "https://assets.publishing.service.gov.uk/government/uploads/syste
 IMD2015_URL = "https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/467774/File_7_ID_2015_All_ranks__deciles_and_scores_for_the_Indices_of_Deprivation__and_population_denominators.csv"
 
 
-def parse_field(k, v):
+def parse_field(k: str, v: Any) -> str | int | float | None:
     if not isinstance(v, str):
         return v
     if v == "":
@@ -215,11 +216,7 @@ def import_imd2025(url=IMD2025_URL, es_index=AREA_INDEX):
         }
         area_updates.append(area_update)
 
-    print("[imd2025] Processed %s areas" % len(area_updates))
-    print("[elasticsearch] %s areas to save" % len(area_updates))
-    results = bulk(es, area_updates)
-    print("[elasticsearch] saved %s areas to %s index" % (results[0], es_index))
-    print("[elasticsearch] %s errors reported" % len(results[1]))
+    bulk_upload(area_updates, es, es_index, "imd2025")
 
 
 @click.command("imd2019")
@@ -264,11 +261,7 @@ def import_imd2019(url=IMD2019_URL, es_index=AREA_INDEX):
         }
         area_updates.append(area_update)
 
-    print("[imd2019] Processed %s areas" % len(area_updates))
-    print("[elasticsearch] %s areas to save" % len(area_updates))
-    results = bulk(es, area_updates)
-    print("[elasticsearch] saved %s areas to %s index" % (results[0], es_index))
-    print("[elasticsearch] %s errors reported" % len(results[1]))
+    bulk_upload(area_updates, es, es_index, "imd2019")
 
 
 @click.command("imd2015")
@@ -313,8 +306,4 @@ def import_imd2015(url=IMD2015_URL, es_index=AREA_INDEX):
         }
         area_updates.append(area_update)
 
-    print("[imd2015] Processed %s areas" % len(area_updates))
-    print("[elasticsearch] %s areas to save" % len(area_updates))
-    results = bulk(es, area_updates)
-    print("[elasticsearch] saved %s areas to %s index" % (results[0], es_index))
-    print("[elasticsearch] %s errors reported" % len(results[1]))
+    bulk_upload(area_updates, es, es_index, "imd2015")

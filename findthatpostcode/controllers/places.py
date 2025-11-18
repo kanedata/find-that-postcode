@@ -1,6 +1,14 @@
 import re
+from typing import TYPE_CHECKING
+
+from elasticsearch import Elasticsearch
 
 from findthatpostcode.controllers.controller import Controller
+from findthatpostcode.utils import ESConfig
+
+if TYPE_CHECKING:
+    from findthatpostcode.controllers.areas import Area
+    from findthatpostcode.controllers.postcodes import Postcode
 
 
 class Place(Controller):
@@ -8,7 +16,7 @@ class Place(Controller):
     url_slug = "places"
     template = "place.html.j2"
 
-    def __init__(self, id, data=None, **kwargs):
+    def __init__(self, id: str, data: dict | None = None, **kwargs):
         super().__init__(id)
         self.relationships["nearest_postcodes"] = kwargs.get("nearest_postcodes")
         self.relationships["nearest_places"] = kwargs.get("nearest_places")
@@ -17,23 +25,30 @@ class Place(Controller):
             self.found = True
             self.attributes = self.process_attributes(data)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<Place {}>".format(self.id)
 
     @classmethod
-    def get_from_es(cls, id, es, es_config=None, examples_count=5, recursive=True):
+    def get_from_es(
+        cls,
+        id: str,
+        es: Elasticsearch,
+        es_config: ESConfig | None = None,
+        examples_count: int = 5,
+        recursive: bool = True,
+    ):
         from findthatpostcode.controllers.areas import Area
 
         if not es_config:
-            es_config = {}
+            es_config = ESConfig(es_index=cls.es_index, es_type=cls.es_type)
 
         # fetch the initial area
         data = es.get(
-            index=es_config.get("es_index", cls.es_index),
-            doc_type=es_config.get("es_type", cls.es_type),
+            index=es_config.es_index,
+            doc_type=es_config.es_type,
             id=cls.parse_id(id),
-            ignore=[404],
-            _source_excludes=[],
+            ignore=[404],  # type: ignore
+            _source_excludes=[],  # type: ignore
         )
         relationships = {
             "nearest_postcodes": [],
@@ -60,7 +75,7 @@ class Place(Controller):
 
         return cls(data.get("_id"), data=data.get("_source"), **relationships)
 
-    def process_attributes(self, data):
+    def process_attributes(self, data: dict) -> dict:
         if "name" not in data:
             for k in data.keys():
                 if k.startswith("place") and k.endswith("nm"):
@@ -70,7 +85,9 @@ class Place(Controller):
         return data
 
     @staticmethod
-    def get_nearest_postcodes(location, es, examples_count=5):
+    def get_nearest_postcodes(
+        location: dict | None, es: Elasticsearch, examples_count: int = 5
+    ) -> list["Postcode"]:
         from findthatpostcode.controllers.postcodes import Postcode
 
         if not location:
@@ -89,11 +106,17 @@ class Place(Controller):
                 }
             ],
         }
-        example = es.search(index="geo_postcode", body=query, size=examples_count)
+        example = es.search(
+            index="geo_postcode",
+            body=query,
+            size=examples_count,  # type: ignore
+        )
         return [Postcode(e["_id"], e["_source"]) for e in example["hits"]["hits"]]
 
     @staticmethod
-    def get_nearest_places(location, es, examples_count=10):
+    def get_nearest_places(
+        location: dict | None, es: Elasticsearch, examples_count: int = 10
+    ) -> list["Place"]:
         if not location:
             return []
         query = {
@@ -110,13 +133,18 @@ class Place(Controller):
                 }
             ],
         }
-        example = es.search(index="geo_placename", body=query, size=examples_count)
+        example = es.search(
+            index="geo_placename",
+            body=query,
+            size=examples_count,  # type: ignore
+        )
         return [Place(e["_id"], e["_source"]) for e in example["hits"]["hits"]]
 
-    def get_area(self, areatype):
+    def get_area(self: "Place", areatype: str) -> "Area | None":
         """
         Get the area for this postcode based on the type
         """
-        for a in self.relationships["areas"]:
+        for a in self.relationships["areas"]:  # type: ignore
             if a.relationships["areatype"].id == areatype:
                 return a
+        return None

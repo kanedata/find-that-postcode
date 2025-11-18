@@ -11,9 +11,9 @@ def test_point_class():
 
 def test_point_class_es():
     es = MockElasticsearch()
-    a = Point.get_from_es((100, -100), es)
+    a = Point.get_from_es((100, -100), es)  # type: ignore
 
     assert a.id == (100, -100)
-    assert a.relationships["nearest_postcode"].id == "EX36 4AT"
-    assert a.relationships["nearest_postcode"].attributes["oseast1m"] == 271505
+    assert a.relationships["nearest_postcode"].id == "EX36 4AT"  # type: ignore
+    assert a.relationships["nearest_postcode"].attributes["oseast1m"] == 271505  # type: ignore
     assert str(a) == "<Point 100, -100>"

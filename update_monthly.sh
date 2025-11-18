@@ -1,5 +1,5 @@
-flask import rgc
-flask import chd
-flask import msoanames
-flask import placenames
-flask import nspl
+python -m findthatpostcode import rgc
+python -m findthatpostcode import chd
+python -m findthatpostcode import msoanames
+python -m findthatpostcode import placenames
+python -m findthatpostcode import nspl

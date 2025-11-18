@@ -11,7 +11,7 @@ def test_postcode_class():
 
 def test_postcode_class_es():
     es = MockElasticsearch()
-    a = Postcode.get_from_es("EX36 4AT", es)
+    a = Postcode.get_from_es("EX36 4AT", es)  # type: ignore
 
     assert a.id == "EX36 4AT"
     assert a.attributes["oseast1m"] == 271505

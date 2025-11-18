@@ -11,9 +11,8 @@ import zipfile
 import click
 import requests
 import requests_cache
-from elasticsearch.helpers import bulk
 
-from findthatpostcode.commands.utils import get_latest_geoportal_url
+from findthatpostcode.commands.utils import bulk_upload, get_latest_geoportal_url
 from findthatpostcode.db import get_es
 from findthatpostcode.settings import DEBUG
 
@@ -43,7 +42,7 @@ def import_nspl(url=None, es_index=PC_INDEX):
         ):
             continue
 
-        print("[postcodes] Opening %s" % f.filename)
+        click.echo("[postcodes] Opening {}".format(f.filename))
 
         pcount = 0
         with z.open(f, "r") as pccsv:
@@ -130,12 +129,5 @@ def import_nspl(url=None, es_index=PC_INDEX):
                 postcodes.append(record)
                 pcount += 1
 
-            print("[postcodes] Processed %s postcodes" % pcount)
-            print("[elasticsearch] %s postcodes to save" % len(postcodes))
-            results = bulk(es, postcodes)
-            print(
-                "[elasticsearch] saved %s postcodes to %s index"
-                % (results[0], es_index)
-            )
-            print("[elasticsearch] %s errors reported" % len(results[1]))
+            bulk_upload(postcodes, es, es_index, "postcodes")
             postcodes = []

@@ -1,8 +1,9 @@
 import csv
 import io
 import re
+from typing import Iterator
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Response
 from fastapi.responses import JSONResponse, RedirectResponse
 
 from findthatpostcode.blueprints.utils import return_result
@@ -15,7 +16,7 @@ bp = APIRouter(prefix="/areas")
 
 @bp.get("/search")
 @bp.get("/search.<filetype>")
-def area_search(request: Request, filetype="json", q: str | None = None):
+def area_search(request: Request, filetype="json", q: str | None = None) -> Response:
     redirect_url = request.url_for("search_index")
     if q:
         redirect_url = redirect_url.include_query_params(q=q)
@@ -23,7 +24,7 @@ def area_search(request: Request, filetype="json", q: str | None = None):
 
 
 @bp.get("/names.csv")
-def all_names(es: ElasticsearchDep, types: str = ""):
+def all_names(es: ElasticsearchDep, types: str = "") -> Response:
     areas = get_all_areas(
         es,
         areatypes=[a.strip().lower() for a in types.split(",") if a],
@@ -31,7 +32,7 @@ def all_names(es: ElasticsearchDep, types: str = ""):
     return areas_csv(areas, "names.csv")
 
 
-def areas_csv(areas, filename):
+def areas_csv(areas: Iterator[dict], filename: str) -> Response:
     si = io.StringIO()
     writer = csv.DictWriter(
         si, fieldnames=["code", "name", "type", "active", "date_start", "date_end"]
@@ -40,7 +41,8 @@ def areas_csv(areas, filename):
     for row in areas:
         if not row.get("name") or not row.get("type"):
             continue
-        if re.match(r"[A-Z][0-9]{8}", row.get("code")):
+        code = row.get("code")
+        if isinstance(code, str) and re.match(r"[A-Z][0-9]{8}", code):
             writer.writerow(row)
 
     output = CSVResponse(si.getvalue())
@@ -51,17 +53,15 @@ def areas_csv(areas, filename):
 
 @bp.get("/{areacodes}.geojson")
 def get_area_boundary(areacodes: str, es: ElasticsearchDep, s3_client: S3Dep):
-    areacodes = areacodes.split("+")
+    areacode_list: list[str] = areacodes.split("+")
     features = []
-    for areacode in areacodes:
+    for areacode in areacode_list:
         result = Area.get_from_es(
             areacode, es, boundary=True, examples_count=0, s3_client=s3_client
         )
         status, r = result.geoJSON()
-        if status == 200:
-            features.extend(r.get("features"))
-    if status != 200:
-        return JSONResponse(dict(message=r), status_code=status)
+        if status == 200 and isinstance(r, dict):
+            features.extend(r.get("features", []))
     return {"type": "FeatureCollection", "features": features}
 
 
@@ -72,17 +72,17 @@ def get_area_children_boundary(
     area = Area.get_from_es(areacode, es, boundary=False, examples_count=0)
     features = []
     errors = {}
-    for child_area in area.relationships["children"][areatype]:
+    for child_area in area.relationships["children"][areatype]:  # type: ignore
         result = Area.get_from_es(
             child_area.id, es, boundary=True, examples_count=0, s3_client=s3_client
         )
         status, r = result.geoJSON()
-        if status == 200:
-            features.extend(r.get("features"))
+        if status == 200 and isinstance(r, dict):
+            features.extend(r.get("features", []))
         else:
             errors[child_area.id] = r
     if not features:
-        return JSONResponse(dict(message=errors), status_code=status)
+        return JSONResponse(dict(message=errors), status_code=404)
     return {"type": "FeatureCollection", "features": features}
 
 
@@ -91,11 +91,11 @@ def get_area_children_boundary(
 def get_area(
     areacode: str,
     request: Request,
-    filetype: str = "json",
-    es: ElasticsearchDep = None,
-    s3_client: S3Dep = None,
+    es: ElasticsearchDep,
+    s3_client: S3Dep,
     child: str | None = None,
-):
+    filetype: str = "json",
+) -> Response:
     result = Area.get_from_es(
         areacode,
         es,
@@ -107,8 +107,8 @@ def get_area(
     if filetype == "geojson":
         status, r = result.geoJSON()
         if status != 200:
-            return JSONResponse(message=r, status_code=status)
-        return r
+            return JSONResponse(content={"message": r}, status_code=status)
+        return JSONResponse(r)
 
     return return_result(
         result,
@@ -118,14 +118,14 @@ def get_area(
         child=child,
         example_postcode_json=[
             p.attributes.get("location")
-            for p in result.relationships["example_postcodes"]
+            for p in result.relationships["example_postcodes"]  # type: ignore
             if p.attributes.get("location")
         ],
     )
 
 
 @bp.get("/{areacodes}/map")
-def get_area_map(request: Request, areacodes):
+def get_area_map(request: Request, areacodes: str) -> Response:
     return templates.TemplateResponse(
         request=request,
         name="area_map.html.j2",

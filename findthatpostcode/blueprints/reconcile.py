@@ -31,7 +31,7 @@ def recon_query(q, es, p: int = 1, size: int = 10):
                 }
             )
     elif query:
-        pagination = Pagination(p, size=size)
+        pagination = Pagination(page=p, size=size)
         areas = search_areas(query, es, pagination=pagination)
         for a, score in zip(areas["result"], areas["scores"]):
             result.append(

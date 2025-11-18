@@ -1,4 +1,5 @@
 from findthatpostcode.controllers.controller import Controller
+from findthatpostcode.utils import ESConfig
 from tests.conftest import MockElasticsearch
 
 
@@ -30,7 +31,9 @@ def test_controller_fetch():
     es = MockElasticsearch()
 
     a = Controller.get_from_es(
-        "EX36 4AT", es, es_config={"es_index": "geo_postcode", "es_type": "_doc"}
+        "EX36 4AT",
+        es,  # type: ignore
+        es_config=ESConfig(es_index="geo_postcode", es_type="_doc"),
     )
     assert isinstance(a.id, str)
     assert len(a.attributes) > 4

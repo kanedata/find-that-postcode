@@ -28,6 +28,9 @@ def mock_s3():
 
 @pytest.fixture
 def client(mocker):
+    mocker.patch("findthatpostcode.db.get_es", return_value=mock_es())
+    mocker.patch("findthatpostcode.db.get_s3_client", return_value=mock_s3())
+
     legacy_app.dependency_overrides[get_es] = mock_es
     legacy_app.dependency_overrides[get_s3_client] = mock_s3
     app.dependency_overrides[get_es] = mock_es
@@ -39,6 +42,9 @@ def client(mocker):
 
 @pytest.fixture
 def client_redirect(mocker):
+    mocker.patch("findthatpostcode.db.get_es", return_value=mock_es())
+    mocker.patch("findthatpostcode.db.get_s3_client", return_value=mock_s3())
+
     legacy_app.dependency_overrides[get_es] = mock_es
     legacy_app.dependency_overrides[get_s3_client] = mock_s3
     app.dependency_overrides[get_es] = mock_es
@@ -83,7 +89,7 @@ class MockElasticsearch:
         return result
 
     def search(self, **kwargs):
-        index = kwargs.get("index").split(",")
+        index = kwargs.get("index", "").split(",")
 
         # get some specific queries used in the data
         if (
@@ -172,4 +178,7 @@ class MockElasticsearch:
         return result
 
     def clear_scroll(self, **kwargs):
+        pass
+
+    def close(self, *args, **kwargs):
         pass

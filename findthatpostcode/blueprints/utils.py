@@ -1,18 +1,19 @@
-from fastapi import HTTPException, Request
+from fastapi import HTTPException, Request, Response
 
+from findthatpostcode.controllers.controller import Controller
 from findthatpostcode.utils import templates
 
 
 def return_result(
-    result,
-    request: Request = None,
+    result: Controller,
+    request: Request | None = None,
     filetype: str = "json",
-    template: str = None,
+    template: str | None = None,
     **kwargs,
-):
+) -> Response | dict:
     if filetype == "html" and not template:
         raise HTTPException(status_code=500, detail="No template provided")
-    if template and not request:
+    if template is not None and request is None:
         raise HTTPException(
             status_code=500, detail="No request provided for HTML response"
         )
@@ -25,7 +26,7 @@ def return_result(
             status = int(errors[0]["status"])
         if filetype in ("json", "geojson"):
             raise HTTPException(status_code=status, detail=result.topJSON())
-        elif filetype == "html":
+        elif filetype == "html" and request is not None:
             return templates.TemplateResponse(
                 request=request,
                 name="error.html.j2",
@@ -36,7 +37,7 @@ def return_result(
 
     if filetype in ("json", "geojson"):
         return result.topJSON()
-    elif filetype == "html":
+    elif filetype == "html" and template is not None and request is not None:
         return templates.TemplateResponse(
             request=request,
             name=template,

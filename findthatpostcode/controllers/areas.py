@@ -1,14 +1,25 @@
 import io
 import json
 from datetime import datetime
+from typing import TYPE_CHECKING, Generator
 
 from botocore.exceptions import ClientError
+from elasticsearch import Elasticsearch
 from elasticsearch.helpers import scan
+from mypy_boto3_s3 import S3Client
 
-from findthatpostcode.controllers.controller import GEOJSON_TYPES, Controller
+from findthatpostcode.controllers.controller import (
+    GEOJSON_TYPES,
+    Controller,
+    Pagination,
+)
 from findthatpostcode.controllers.places import Place
 from findthatpostcode.metadata import AREA_TYPES
 from findthatpostcode.settings import S3_BUCKET
+from findthatpostcode.utils import ESConfig
+
+if TYPE_CHECKING:
+    from findthatpostcode.controllers.postcodes import Postcode
 
 
 class Areatype(Controller):
@@ -16,16 +27,18 @@ class Areatype(Controller):
     url_slug = "areatypes"
     areatypes = AREA_TYPES
 
-    def __init__(self, id, data=None):
+    def __init__(self, id: str, data: dict | None = None) -> None:
         id = id.strip()
         if not data:
             data = self.areatypes.get(id)
         super().__init__(id, data)
+        if not isinstance(self.id, str):
+            raise ValueError("ID must be a string to create Areatype")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<AreaType {}>".format(self.id)
 
-    def process_attributes(self, data):
+    def process_attributes(self, data: dict | list | tuple) -> dict:
         if isinstance(data, (list, tuple)):
             return {
                 "code": data[0],
@@ -37,7 +50,9 @@ class Areatype(Controller):
             }
         return data
 
-    def get_name(self, country=None):
+    def get_name(self, country: str | None = None) -> str | None:
+        if not isinstance(self.id, str):
+            return None
         if isinstance(country, str):
             country = country[0].upper()
         if self.id.startswith("lsoa") and country == "S":
@@ -47,16 +62,33 @@ class Areatype(Controller):
         if self.id.startswith("msoa") and country == "S":
             return "Intermediate Zone"
 
-        return self.attributes.get("name")
+        name = self.attributes.get("name")
+        if isinstance(name, str):
+            return name
+        return None
 
     @classmethod
-    def get_from_es(cls, id, es, es_config=None, full=False):
+    def get_from_es(
+        cls: type["Areatype"],
+        id: str,
+        es: Elasticsearch,
+        es_config: ESConfig | None = None,
+        full: bool = False,
+    ) -> "Areatype":
         id = id.strip()
         if cls.areatypes.get(id):
             return cls(id)
-        return super().get_from_es(id, es, es_config=es_config)
+        result = super(Areatype, cls).get_from_es(id, es, es_config=es_config)
+        if not isinstance(result.id, str):
+            raise ValueError("ID must be a string to create Areatype")
+        return cls(result.id, result.attributes)
 
-    def get_areas(self, es, es_config=None, pagination=None):
+    def get_areas(
+        self: "Areatype",
+        es: Elasticsearch,
+        es_config: ESConfig | None = None,
+        pagination: Pagination | None = None,
+    ) -> None:
         query = {
             "query": {
                 "function_score": {
@@ -65,24 +97,32 @@ class Areatype(Controller):
                 }
             }
         }
-        search_params = dict(
+        search_params: dict[str, str | dict | int] = dict(
             index="geo_area",
             body=query,
             sort="_id:asc",
         )
-        if pagination:
+        if (
+            pagination
+            and isinstance(pagination.from_, int)
+            and isinstance(pagination.size, int)
+        ):
             search_params["from_"] = pagination.from_
             search_params["size"] = pagination.size
         example = es.search(**search_params)
+        if not isinstance(example, dict):
+            return
         self.relationships["areas"] = [
             Area(e["_id"], e["_source"]) for e in example["hits"]["hits"]
         ]
         self.attributes["count_areas"] = self.get_total_from_es(example)
 
 
-def area_types_count(es, es_config=None):
+def area_types_count(
+    es: Elasticsearch, es_config: ESConfig | None = None
+) -> dict[str, int]:
     if not es_config:
-        es_config = {}
+        es_config = ESConfig(es_index=Area.es_index)
 
     # fetch counts per entity
     query = {
@@ -90,10 +130,10 @@ def area_types_count(es, es_config=None):
         "aggs": {"group_by_type": {"terms": {"field": "type.keyword", "size": 100}}},
     }
     result = es.search(
-        index=es_config.get("es_index", Area.es_index),
+        index=es_config.es_index,
         body=query,
-        ignore=[404],
-        _source_includes=[],
+        ignore=[404],  # type: ignore
+        _source_includes=[],  # type: ignore
     )
     return {
         i["key"]: i["doc_count"]
@@ -109,8 +149,16 @@ class Area(Controller):
     template = "area.html.j2"
     date_fields = ["date_end", "date_start"]
 
-    def __init__(self, id, data=None, s3_client=None, **kwargs):
+    def __init__(
+        self: "Area",
+        id: str,
+        data: dict | None = None,
+        s3_client: S3Client | None = None,
+        **kwargs,
+    ) -> None:
         super().__init__(id)
+        if not isinstance(self.id, str):
+            raise ValueError("ID must be a string to create URL")
         self.relationships["example_postcodes"] = kwargs.get("example_postcodes")
         self.relationships["areatype"] = kwargs.get("areatype")
         self.relationships["parent"] = kwargs.get("parent")
@@ -124,30 +172,30 @@ class Area(Controller):
 
         self._s3_client = s3_client
 
-    def __repr__(self):
+    def __repr__(self: "Area") -> str:
         return "<Area {}>".format(self.id)
 
     @classmethod
     def get_from_es(
-        cls,
-        id,
-        es,
-        es_config=None,
-        examples_count=5,
-        boundary=False,
-        recursive=True,
-        s3_client=None,
-    ):
+        cls: type["Area"],
+        id: str,
+        es: Elasticsearch,
+        es_config: ESConfig | None = None,
+        examples_count: int = 5,
+        boundary: bool = False,
+        recursive: bool = True,
+        s3_client: S3Client | None = None,
+    ) -> "Area":
         if not es_config:
-            es_config = {}
+            es_config = ESConfig(es_index=cls.es_index, es_type=cls.es_type)
 
         # fetch the initial area
         data = es.get(
-            index=es_config.get("es_index", cls.es_index),
-            doc_type=es_config.get("es_type", cls.es_type),
+            index=es_config.es_index,
+            doc_type=es_config.es_type,
             id=cls.parse_id(id),
-            ignore=[404],
-            _source_excludes=(["boundary"]),
+            ignore=[404],  # type: ignore
+            _source_excludes=(["boundary"]),  # type: ignore
         )
         relationships = {
             "areatype": {},
@@ -205,9 +253,13 @@ class Area(Controller):
             **relationships,
         )
 
-    def process_attributes(self, data):
-        if not self.relationships.get("areatype") and data.get("type"):
-            self.relationships["areatype"] = Areatype(data.get("type"))
+    def process_attributes(self: "Area", data: dict) -> dict:
+        if not isinstance(self.id, str):
+            raise ValueError("ID must be a string to process attributes")
+
+        areatype = data.get("type")
+        if not self.relationships.get("areatype") and isinstance(areatype, str):
+            self.relationships["areatype"] = Areatype(areatype)
         if "type" in data:
             del data["type"]
 
@@ -235,7 +287,9 @@ class Area(Controller):
         return data
 
     @staticmethod
-    def get_example_postcodes(areacode, es, examples_count=5):
+    def get_example_postcodes(
+        areacode: str, es: Elasticsearch, examples_count: int = 5
+    ) -> list["Postcode"]:
         from findthatpostcode.controllers.postcodes import Postcode
 
         query = {
@@ -251,12 +305,16 @@ class Area(Controller):
                 }
             }
         }
-        example = es.search(index="geo_postcode", body=query, size=examples_count)
+        example = es.search(
+            index="geo_postcode",
+            body=query,
+            size=examples_count,  # type: ignore
+        )
 
         return [Postcode(e["_id"], e["_source"]) for e in example["hits"]["hits"]]
 
     @staticmethod
-    def get_children(areacode, es):
+    def get_children(areacode: str, es: Elasticsearch) -> dict:
         query = {
             "aggs": {"types": {"terms": {"field": "type.keyword"}}},
             "query": {
@@ -271,8 +329,8 @@ class Area(Controller):
         children = es.search(
             index="geo_area",
             body=query,
-            size=100,
-            _source_includes=["code", "name", "type", "active"],
+            size=100,  # type: ignore
+            _source_includes=["code", "name", "type", "active"],  # type: ignore
         )
         return {
             "total": Area.get_total_from_es(children),
@@ -295,19 +353,19 @@ class Area(Controller):
         }
 
     @property
-    def boundary(self):
+    def boundary(self: "Area") -> dict | None:
         if self._boundary is None:
             self._boundary = self._get_boundary()
         return self._boundary
 
     @property
-    def has_boundary(self):
+    def has_boundary(self: "Area") -> bool:
         if self._boundary is None:
             self._boundary = self._get_boundary()
         return self._boundary is not None
 
-    def _get_boundary(self):
-        if not getattr(self, "_s3_client", None):
+    def _get_boundary(self: "Area") -> dict | None:
+        if getattr(self, "_s3_client", None) is None or self._s3_client is None:
             raise ValueError("S3 client not set on Area instance")
         buffer = io.BytesIO()
         area_code = self.id
@@ -321,9 +379,9 @@ class Area(Controller):
             boundary = json.loads(buffer.getvalue().decode("utf-8"))
             return boundary.get("geometry")
         except ClientError:
-            None
+            return None
 
-    def topJSON(self):
+    def topJSON(self: "Area") -> dict:
         json = super().topJSON()
         if self.found:
             # @TODO need to check whether boundary data
@@ -332,7 +390,7 @@ class Area(Controller):
                 json["links"]["geojson"] = self.url(filetype="geojson")
         return json
 
-    def geoJSON(self):
+    def geoJSON(self: "Area") -> tuple[int, dict | str]:
         if not self.boundary:
             return (404, "boundary not found")
 
@@ -356,12 +414,17 @@ class Area(Controller):
         )
 
 
-def search_areas(q, es, pagination=None, es_config=None):
+def search_areas(
+    q: str,
+    es: Elasticsearch,
+    pagination: Pagination | None = None,
+    es_config: ESConfig | None = None,
+) -> dict[str, object]:
     """
     Search for areas based on a name
     """
     if not es_config:
-        es_config = {}
+        es_config = ESConfig(es_index="geo_area")
     query = {
         "query": {
             "function_score": {
@@ -428,17 +491,17 @@ def search_areas(q, es, pagination=None, es_config=None):
         result = es.search(
             index="geo_area,geo_placename",
             body=query,
-            from_=pagination.from_,
-            size=pagination.size,
-            _source_excludes=["boundary"],
-            ignore=[404],
+            from_=pagination.from_,  # type: ignore
+            size=pagination.size,  # type: ignore
+            _source_excludes=["boundary"],  # type: ignore
+            ignore=[404],  # type: ignore
         )
     else:
         result = es.search(
             index="geo_area,geo_placename",
             body=query,
-            _source_excludes=["boundary"],
-            ignore=[404],
+            _source_excludes=["boundary"],  # type: ignore
+            ignore=[404],  # type: ignore
         )
     return_result = []
     for a in result.get("hits", {}).get("hits", []):
@@ -471,12 +534,16 @@ def search_areas(q, es, pagination=None, es_config=None):
     }
 
 
-def get_all_areas(es, areatypes=None, es_config=None):
+def get_all_areas(
+    es: Elasticsearch,
+    areatypes: list[str] | None = None,
+    es_config: ESConfig | None = None,
+) -> Generator[dict, None, None]:
     """
     Search for areas based on a name
     """
     if not es_config:
-        es_config = {}
+        es_config = ESConfig(es_index=Area.es_index)
     query = {"match_all": {}}
     if areatypes:
         query = {"terms": {"type": areatypes}}
@@ -486,7 +553,7 @@ def get_all_areas(es, areatypes=None, es_config=None):
     result = scan(
         es,
         query=query,
-        index=es_config.get("es_index", Area.es_index),
+        index=es_config.es_index,
         _source_includes=["type", "name", "active", "date_start", "date_end"],
         ignore=[400],
     )

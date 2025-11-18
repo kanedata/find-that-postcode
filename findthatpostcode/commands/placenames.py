@@ -9,36 +9,35 @@ import zipfile
 import click
 import requests
 import requests_cache
-from elasticsearch.helpers import bulk
 
-from findthatpostcode.commands.utils import get_latest_geoportal_url
+from findthatpostcode.commands.utils import bulk_upload, get_latest_geoportal_url
 from findthatpostcode.db import get_es
 from findthatpostcode.settings import DEBUG
 
 PLACENAMES_INDEX = "geo_placename"
 PRD_IPN = "PRD_IPN"
 
-PLACE_TYPES = {
-    "BUA": ["Built-up Area", "England and Wales"],
-    "BUASD": ["Built-up Area Sub-Division", "England and Wales"],
-    "CA": ["Council Area", "Scotland"],
-    "CED": ["County Electoral Division", "England"],
-    "COM": ["Community", "Wales"],
-    "CTY": ["County", "England"],
-    "CTYHIST": ["Historic County", "Great Britain"],
-    "CTYLT": ["Lieutenancy County", "Great Britain"],
-    "LOC": ["Locality", "Great Britain"],
-    "LONB": ["London Borough", "England"],
-    "MD": ["Metropolitan District", "England"],
-    "NMD": ["Non-metropolitan District", "England"],
-    "NPARK": ["National Park Great", "Britain"],
-    "PAR": ["Civil Parish", "England and Scotland"],
-    "RGN": ["Region", "England"],
-    "UA": ["Unitary Authority", "England and Wales"],
-    "WD": ["Electoral Ward/Division", "Great Britain"],
+PLACE_TYPES: dict[str, tuple[str, str]] = {
+    "BUA": ("Built-up Area", "England and Wales"),
+    "BUASD": ("Built-up Area Sub-Division", "England and Wales"),
+    "CA": ("Council Area", "Scotland"),
+    "CED": ("County Electoral Division", "England"),
+    "COM": ("Community", "Wales"),
+    "CTY": ("County", "England"),
+    "CTYHIST": ("Historic County", "Great Britain"),
+    "CTYLT": ("Lieutenancy County", "Great Britain"),
+    "LOC": ("Locality", "Great Britain"),
+    "LONB": ("London Borough", "England"),
+    "MD": ("Metropolitan District", "England"),
+    "NMD": ("Non-metropolitan District", "England"),
+    "NPARK": ("National Park Great", "Britain"),
+    "PAR": ("Civil Parish", "England and Scotland"),
+    "RGN": ("Region", "England"),
+    "UA": ("Unitary Authority", "England and Wales"),
+    "WD": ("Electoral Ward/Division", "Great Britain"),
 }
 
-AREA_LOOKUP = [
+AREA_LOOKUP: list[tuple[str, str, str | None]] = [
     ("bua11cd", "bua11", None),
     ("bua22cd", "bua22", None),
     ("cty15cd", "cty", "cty15nm"),
@@ -96,7 +95,7 @@ def import_placenames(url=None, es_index=PLACENAMES_INDEX):
         if not f.filename.endswith(".csv"):
             continue
 
-        print("[placenames] Opening %s" % f.filename)
+        click.echo("[placenames] Opening {}".format(f.filename))
 
         with z.open(f, "r") as pccsv:
             pccsv = io.TextIOWrapper(pccsv, encoding="latin1")
@@ -147,26 +146,19 @@ def import_placenames(url=None, es_index=PLACENAMES_INDEX):
 
                 # get areas
                 areas = {}
-                for j in AREA_LOOKUP:
-                    if j[0] in row:
-                        areas[j[1]] = row[j[0]]
-                        del row[j[0]]
-                        if j[2] and j[2] in row:
-                            del row[j[2]]
+                for code_field, area_type, name_field in AREA_LOOKUP:
+                    if code_field in row:
+                        areas[area_type] = row[code_field]
+                        del row[code_field]
+                        if name_field and name_field in row:
+                            del row[name_field]
                 row["areas"] = areas
                 row["type"], row["country"] = PLACE_TYPES.get(
-                    row["descnm"], [row["descnm"], "United Kingdom"]
+                    row["descnm"], (row["descnm"], "United Kingdom")
                 )
 
                 record["doc"] = row
                 placenames.append(record)
 
-            print("[placenames] Processed %s placenames" % len(placenames))
-            print("[elasticsearch] %s placenames to save" % len(placenames))
-            results = bulk(es, placenames)
-            print(
-                "[elasticsearch] saved %s placenames to %s index"
-                % (results[0], es_index)
-            )
-            print("[elasticsearch] %s errors reported" % len(results[1]))
+            bulk_upload(placenames, es, es_index, "placenames")
             placenames = []

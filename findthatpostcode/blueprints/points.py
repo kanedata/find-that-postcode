@@ -1,20 +1,21 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Response
 from fastapi.responses import RedirectResponse
 
 from findthatpostcode.blueprints.utils import return_result
 from findthatpostcode.controllers.points import Point
+from findthatpostcode.controllers.postcodes import Postcode
 from findthatpostcode.db import ElasticsearchDep
 
 bp = APIRouter(prefix="/points")
 
 
 @bp.get("/redirect")
-def point_redirect(lat: float, lon: float, request: Request):
+def point_redirect(lat: float, lon: float, request: Request) -> Response:
     return RedirectResponse(
         request.url_for(
             "get_point", latlon="{},{}.html".format(lat, lon), filetype="html"
         ),
-        code=303,
+        status_code=303,
     )
 
 
@@ -30,14 +31,18 @@ def get_point(latlon: str, es: ElasticsearchDep, request: Request):
     result = Point.get_from_es((float(lat), float(lon)), es)
     errors = result.get_errors()
     if errors:
-        return_result(result, request, filetype, "postcode.html.j2")
+        return return_result(result, request, filetype, "postcode.html.j2")
     if filetype == "html":
+        nearest_postcode = result.relationships.get("nearest_postcode")
+        if not isinstance(nearest_postcode, Postcode):
+            return return_result(result, request, filetype, "postcode.html.j2")
+
         return return_result(
-            result.relationships["nearest_postcode"],
+            nearest_postcode,
             request,
             filetype,
             "postcode.html.j2",
             point=result,
-            stats=result.relationships["nearest_postcode"].get_stats(),
+            stats=nearest_postcode.get_stats(),
         )
     return return_result(result, request, filetype, "postcode.html.j2")

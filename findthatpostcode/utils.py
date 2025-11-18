@@ -1,6 +1,7 @@
 import datetime
 import re
 from collections.abc import Mapping
+from dataclasses import dataclass, field
 from typing import Any
 
 from fastapi.responses import JSONResponse, PlainTextResponse
@@ -63,3 +64,10 @@ class JSONPResponse(JSONResponse):
         if self._callback:
             content = f"{self._callback}({content})".encode("utf-8")
         return content
+
+
+@dataclass
+class ESConfig:
+    es_index: str
+    es_type: str = "_doc"
+    _source_exclude: list[str] = field(default_factory=list)

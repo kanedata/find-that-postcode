@@ -8,10 +8,10 @@ import click
 import requests
 import requests_cache
 import tqdm
-from elasticsearch.helpers import bulk
 
 from findthatpostcode.commands.codes import AREA_INDEX
 from findthatpostcode.commands.postcodes import PC_INDEX
+from findthatpostcode.commands.utils import bulk_upload
 from findthatpostcode.db import get_es
 from findthatpostcode.settings import DEBUG
 
@@ -96,20 +96,8 @@ def import_new_pcon(area_index=AREA_INDEX, postcode_index=PC_INDEX):
         }
         for area_id, successors in update_2010.items()
     ]
-    print(
-        "[new parliamentary constituencies] Processed %s new parliamentary constituencies"
-        % len(to_update)
-    )
-    print(
-        "[elasticsearch] %s parliamentary constituencies to create or update"
-        % len(to_update)
-    )
-    results = bulk(es, to_update)
-    print(
-        "[elasticsearch] saved %s new parliamentary constituencies to %s index"
-        % (results[0], area_index)
-    )
-    print("[elasticsearch] %s errors reported" % len(results[1]))
+
+    bulk_upload(to_update, es, area_index, "new parliamentary constituencies")
 
     # fetch postcode data
     r = requests.get(PCON_POSTCODE_URL)
@@ -135,14 +123,5 @@ def import_new_pcon(area_index=AREA_INDEX, postcode_index=PC_INDEX):
                     },
                 }
                 postcode_updates.append(record)
-    print(
-        "[new parliamentary constituencies] Processed %s postcodes to update"
-        % len(postcode_updates)
-    )
-    print("[elasticsearch] %s postcodes to update" % len(postcode_updates))
-    results = bulk(es, postcode_updates, raise_on_error=False)
-    print(
-        "[elasticsearch] updated %s postcodes in %s index"
-        % (results[0], postcode_index)
-    )
-    print("[elasticsearch] %s errors reported" % len(results[1]))
+
+            bulk_upload(postcode_updates, es, postcode_index, "postcodes")

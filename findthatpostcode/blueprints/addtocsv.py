@@ -3,7 +3,7 @@ import os
 import tempfile
 from typing import Annotated
 
-from fastapi import APIRouter, Form, Request, UploadFile
+from fastapi import APIRouter, Form, HTTPException, Request, Response, UploadFile
 
 from findthatpostcode.blueprints.areas import CSVResponse
 from findthatpostcode.blueprints.process_csv import process_csv
@@ -20,7 +20,7 @@ bp = APIRouter(prefix="/addtocsv")
 
 
 @bp.get("/")
-def addtocsv(es: ElasticsearchDep, request: Request):
+def addtocsv(es: ElasticsearchDep, request: Request) -> Response:
     ats = area_types_count(es)
     return templates.TemplateResponse(
         request=request,
@@ -41,7 +41,7 @@ def return_csv(
     csvfile: UploadFile,
     column_name: Annotated[str, Form()],
     fields: Annotated[list[str], Form()],
-):
+) -> Response:
     if not fields:
         fields = DEFAULT_UPLOAD_FIELDS
 
@@ -65,9 +65,12 @@ def return_csv(
         fields.append("lep2_name")
         fields.remove("lep_name")
 
-    _, ext = os.path.splitext(csvfile.filename)
+    filename = csvfile.filename
+    if not isinstance(filename, str):
+        raise HTTPException(status_code=400, detail="No file uploaded.")
+    _, ext = os.path.splitext(filename)
     if ext not in [".csv"]:
-        return "File extension not allowed."
+        raise HTTPException(status_code=400, detail="File extension not allowed.")
 
     with tempfile.SpooledTemporaryFile(mode="w+", newline="") as output:
         process_csv(

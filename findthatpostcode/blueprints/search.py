@@ -60,7 +60,7 @@ def search_index(
             status_code=303,
         )
 
-    pagination = Pagination(p=p, size=size)
+    pagination = Pagination(page=p, size=size)
     areas = search_areas(
         q,
         es,

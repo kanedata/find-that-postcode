@@ -126,4 +126,4 @@ class PostcodeResponse(BaseModel):
 
 @router.get("/{postcode}", tags=["postcodes"])
 async def read_postcode(postcode: str, es: ElasticsearchDep) -> PostcodeResponse:
-    return Postcode.get_from_es(postcode, es)
+    return Postcode.get_from_es(postcode, es)  # type: ignore

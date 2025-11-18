@@ -8,6 +8,11 @@
   <link rel="stylesheet" href="{{ url_for('static', path='css/fonts.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', path='css/custom.css') }}" />
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', path='images/apple-touch-icon.png') }}">
+  <link rel="icon" type="image/png" sizes="64x64" href="{{ url_for('static', path='images/favicon-64x64.png') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', path='images/favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', path='images/favicon-16x16.png') }}">
+  <link rel="manifest" href="{{ url_for('static', path='images/site.webmanifest') }}">
   {% if ethical_ads_publisher %}
   <script async src="https://media.ethicalads.io/media/client/ethicalads.min.js"></script>
   {% endif %}

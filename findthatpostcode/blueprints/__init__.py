@@ -1,5 +1,4 @@
-from fastapi import APIRouter, FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import APIRouter, Request
 
 from findthatpostcode.blueprints import (
     addtocsv,
@@ -16,19 +15,7 @@ from findthatpostcode.controllers.areas import area_types_count
 from findthatpostcode.db import ElasticsearchDep
 from findthatpostcode.utils import templates
 
-app = FastAPI(
-    docs_url=None,
-    redoc_url=None,
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["Content-Disposition"],
-)
+app = APIRouter()
 
 
 @app.get("/")

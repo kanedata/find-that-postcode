@@ -1,6 +1,13 @@
+import os
+
 import sentry_sdk
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.docs import (
+    get_swagger_ui_html,
+    get_swagger_ui_oauth2_redirect_html,
+)
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 
@@ -23,11 +30,11 @@ app = FastAPI(
     title="Find that Postcode",
     version="2.0",
     description="""
-This site presents data on UK postcodes and geographical areas, based on open data released by
+This API presents data on UK postcodes and geographical areas, based on open data released by
 the [Office for National Statistics](https://geoportal.statistics.gov.uk/) and
 [Ordnance Survey](https://osdatahub.os.uk/).
 """,
-    docs_url="/api/docs",
+    docs_url=None,
     redoc_url=None,
     openapi_url="/api/openapi.json",
     openapi_tags=[
@@ -41,14 +48,16 @@ the [Office for National Statistics](https://geoportal.statistics.gov.uk/) and
         },
     ],
     contact={
-        "name": "Kane Data Ltd",
-        "url": "https://kanedata.co.uk",
+        "name": "Find that Postcode",
+        "url": "https://findthatpostcode.uk",
         "email": "info@findthatpostcode.uk",
     },
-    license_info={
-        "name": "TBD",
-        # "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
-    },
+    # license_info={
+    #     "name": "TBD",
+    #     # "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
+    # },  # @todo License?
+    swagger_js_url="/static/swagger-ui/swagger-ui-bundle.js",
+    swagger_css_url="/static/swagger-ui/swagger-ui.css",
 )
 
 
@@ -60,8 +69,9 @@ app.mount(
 
 app.include_router(legacy_router, prefix="/api/v1", deprecated=True)
 app.include_router(api_router, prefix="/api/v2")
-
-app.mount("/", legacy_app)  # Mount the legacy FastAPI app at the root
+app.include_router(
+    legacy_app, include_in_schema=False
+)  # Mount the legacy FastAPI app at the root
 
 app.add_middleware(
     CORSMiddleware,
@@ -71,3 +81,31 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["Content-Disposition"],
 )
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    return FileResponse(os.path.join(STATIC_DIR, "images/favicon.ico"))
+
+
+@app.get("/api/docs", include_in_schema=False)
+async def custom_swagger_ui_html():
+    if app.openapi_url:
+        return get_swagger_ui_html(
+            openapi_url=app.openapi_url,
+            title=app.title + " - API Documentation",
+            oauth2_redirect_url=app.swagger_ui_oauth2_redirect_url,
+            swagger_js_url="/static/lib/swagger-ui/swagger-ui-bundle.js",
+            swagger_css_url="/static/css/swagger-ui.css",
+            swagger_favicon_url="/favicon.ico",
+            swagger_ui_parameters={
+                "defaultModelsExpandDepth": 0,
+            },
+        )
+
+
+if app.swagger_ui_oauth2_redirect_url:
+
+    @app.get(app.swagger_ui_oauth2_redirect_url, include_in_schema=False)
+    async def swagger_ui_redirect():
+        return get_swagger_ui_oauth2_redirect_html()

@@ -22,7 +22,7 @@ def point_redirect(lat: float, lon: float, request: Request) -> Response:
 
 
 @bp.get("/{latlon}")
-@api.get("/{latlon}")
+@api.get("/{latlon}", name="legacy_get_point")
 def get_point(latlon: str, es: ElasticsearchDep, request: Request):
     filetype = "json"
     if latlon.endswith(".json"):

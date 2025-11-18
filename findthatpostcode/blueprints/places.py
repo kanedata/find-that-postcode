@@ -20,7 +20,7 @@ def point_redirect(lat: float, lon: float, request: Request) -> Response:
 
 @bp.get("/nearest/{lat},{lon}")
 @bp.get("/nearest/{lat},{lon}.{filetype}")
-@api.get("/nearest/{lat},{lon}")
+@api.get("/nearest/{lat},{lon}", include_in_schema=False)
 def nearest(
     lat: float, lon: float, es: ElasticsearchDep, filetype: str = "json"
 ) -> Response:
@@ -43,7 +43,7 @@ def nearest(
 
 @bp.get("/{areacode}")
 @bp.get("/{areacode}.{filetype}")
-@api.get("/{areacode}")
+@api.get("/{areacode}", name="legacy_get_place")
 def get_place(
     areacode: str, es: ElasticsearchDep, request: Request, filetype: str = "json"
 ):

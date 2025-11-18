@@ -29,7 +29,7 @@ def all_areatypes(es: ElasticsearchDep, request: Request) -> Response:
 
 @bp.get("/{areacode}")
 @bp.get("/{areacode}.{filetype}")
-@api.get("/{areacode}")
+@api.get("/{areacode}", name="legacy_get_areatype")
 def get_areatype(
     areacode: str,
     request: Request,

@@ -5,7 +5,6 @@ import os
 import pytest
 from fastapi.testclient import TestClient
 
-from findthatpostcode.blueprints import app as legacy_app
 from findthatpostcode.db import get_es, get_s3_client
 from findthatpostcode.main import app
 
@@ -30,9 +29,6 @@ def mock_s3():
 def client(mocker):
     mocker.patch("findthatpostcode.db.get_es", return_value=mock_es())
     mocker.patch("findthatpostcode.db.get_s3_client", return_value=mock_s3())
-
-    legacy_app.dependency_overrides[get_es] = mock_es
-    legacy_app.dependency_overrides[get_s3_client] = mock_s3
     app.dependency_overrides[get_es] = mock_es
     app.dependency_overrides[get_s3_client] = mock_s3
 
@@ -44,9 +40,6 @@ def client(mocker):
 def client_redirect(mocker):
     mocker.patch("findthatpostcode.db.get_es", return_value=mock_es())
     mocker.patch("findthatpostcode.db.get_s3_client", return_value=mock_s3())
-
-    legacy_app.dependency_overrides[get_es] = mock_es
-    legacy_app.dependency_overrides[get_s3_client] = mock_s3
     app.dependency_overrides[get_es] = mock_es
     app.dependency_overrides[get_s3_client] = mock_s3
 

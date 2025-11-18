@@ -54,7 +54,7 @@ class ReconcileRequest(BaseModel):
 
 
 @bp.get("/")
-@api.get("/")
+@api.get("/", include_in_schema=False)
 def reconcile_get(
     es: ElasticsearchDep,
     extend: Annotated[str | None, Query()] = None,
@@ -65,7 +65,7 @@ def reconcile_get(
 
 
 @bp.post("/")
-@api.post("/")
+@api.post("/", include_in_schema=False)
 def reconcile_post(
     es: ElasticsearchDep,
     extend: Annotated[str | None, Form()] = None,

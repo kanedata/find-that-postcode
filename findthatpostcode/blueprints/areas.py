@@ -54,7 +54,7 @@ def areas_csv(areas: Iterator[dict], filename: str) -> Response:
 
 
 @bp.get("/{areacodes}.geojson")
-@api.get("/{areacodes}.geojson")
+@api.get("/{areacodes}.geojson", name="legacy_get_area_boundary")
 def get_area_boundary(areacodes: str, es: ElasticsearchDep, s3_client: S3Dep):
     areacode_list: list[str] = areacodes.split("+")
     features = []
@@ -69,7 +69,7 @@ def get_area_boundary(areacodes: str, es: ElasticsearchDep, s3_client: S3Dep):
 
 
 @bp.get("/{areacode}/children/{areatype}.geojson")
-@api.get("/{areacode}/children/{areatype}.geojson")
+@api.get("/{areacode}/children/{areatype}.geojson", include_in_schema=False)
 def get_area_children_boundary(
     areacode: str, areatype: str, es: ElasticsearchDep, s3_client: S3Dep
 ):
@@ -92,7 +92,7 @@ def get_area_children_boundary(
 
 @bp.get("/{areacode}")
 @bp.get("/{areacode}.{filetype}")
-@api.get("/{areacode}")
+@api.get("/{areacode}", name="legacy_get_area")
 def get_area(
     areacode: str,
     request: Request,

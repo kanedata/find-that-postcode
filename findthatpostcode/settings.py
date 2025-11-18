@@ -34,5 +34,5 @@ SENTRY_DSN = os.environ.get("SENTRY_DSN")
 RATE_LIMIT_EXEMPT_HEADER = "X-RateLimit-Exempt"
 RATE_LIMIT_EXEMPT_KEYS = os.environ.get("RATE_LIMIT_EXEMPT_KEYS", "").split(",")
 
-STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "..", "static")
 TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), "templates")

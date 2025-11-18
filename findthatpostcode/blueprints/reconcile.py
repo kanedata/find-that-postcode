@@ -14,7 +14,7 @@ from findthatpostcode.utils import JSONPResponse
 
 bp = APIRouter(prefix="/reconcile")
 
-api = APIRouter(prefix="/reconcile")
+api = APIRouter(prefix="/reconcile", redirect_slashes=True)
 
 
 def recon_query(q, es, p: int = 1, size: int = 10):

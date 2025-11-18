@@ -27,6 +27,28 @@ This site presents data on UK postcodes and geographical areas, based on open da
 the [Office for National Statistics](https://geoportal.statistics.gov.uk/) and
 [Ordnance Survey](https://osdatahub.os.uk/).
 """,
+    docs_url="/api/docs",
+    redoc_url=None,
+    openapi_url="/api/openapi.json",
+    openapi_tags=[
+        {
+            "name": "Postcode",
+            "description": "Endpoints for searching and retrieving postcode data.",
+        },
+        {
+            "name": "Legacy",
+            "description": "Legacy API endpoints from v1 of the Find that Postcode API.",
+        },
+    ],
+    contact={
+        "name": "Kane Data Ltd",
+        "url": "https://kanedata.co.uk",
+        "email": "info@findthatpostcode.uk",
+    },
+    license_info={
+        "name": "TBD",
+        # "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
+    },
 )
 
 
@@ -36,7 +58,7 @@ app.mount(
     name="static",
 )
 
-app.include_router(legacy_router, prefix="/api/v1")
+app.include_router(legacy_router, prefix="/api/v1", deprecated=True)
 app.include_router(api_router, prefix="/api/v2")
 
 app.mount("/", legacy_app)  # Mount the legacy FastAPI app at the root

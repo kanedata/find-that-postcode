@@ -3,8 +3,15 @@ from urllib.parse import urlencode
 
 import pytest
 
+reconcile_endpoints = [
+    "/reconcile",
+    "/reconcile/",
+    "/api/v1/reconcile",
+    "/api/v1/reconcile/",
+]
 
-@pytest.mark.parametrize("endpoint", ["/reconcile", "/api/v1/reconcile/"])
+
+@pytest.mark.parametrize("endpoint", reconcile_endpoints)
 @pytest.mark.parametrize("origin", ["http://example.com", None])
 def test_reconcile_spec(client, origin, endpoint):
     headers = {}
@@ -46,7 +53,7 @@ extend_q = {
 }
 
 
-@pytest.mark.parametrize("endpoint", ["/reconcile", "/api/v1/reconcile/"])
+@pytest.mark.parametrize("endpoint", reconcile_endpoints)
 @pytest.mark.parametrize("origin", ["http://example.com", None])
 def test_reconcile_extend(client, origin, endpoint):
     headers = {}
@@ -65,7 +72,7 @@ def test_reconcile_extend(client, origin, endpoint):
         assert rv.headers["Access-Control-Allow-Origin"] == "*"
 
 
-@pytest.mark.parametrize("endpoint", ["/reconcile", "/api/v1/reconcile/"])
+@pytest.mark.parametrize("endpoint", reconcile_endpoints)
 def test_reconcile_extend_jsonp(client, endpoint):
     extend_q["callback"] = "testCallback"
     rv = client.get("{}?{}".format(endpoint, urlencode(extend_q)))
@@ -80,7 +87,7 @@ def test_reconcile_extend_jsonp(client, endpoint):
     assert result["rows"]["EX36 4AT"]["lsoa21"] == "E01020135"
 
 
-@pytest.mark.parametrize("endpoint", ["/reconcile", "/api/v1/reconcile/"])
+@pytest.mark.parametrize("endpoint", reconcile_endpoints)
 @pytest.mark.parametrize("origin", ["http://example.com", None])
 def test_reconcile_extend_post(client, origin, endpoint):
     headers = {}
@@ -99,7 +106,7 @@ def test_reconcile_extend_post(client, origin, endpoint):
         assert rv.headers["Access-Control-Allow-Origin"] == "*"
 
 
-@pytest.mark.parametrize("endpoint", ["/reconcile", "/api/v1/reconcile/"])
+@pytest.mark.parametrize("endpoint", reconcile_endpoints)
 def test_reconcile_extend_post_jsonp(client, endpoint):
     rv = client.post("{}?callback=testCallback".format(endpoint), data=extend_q)
     data = rv.text
@@ -129,7 +136,7 @@ recon_q = {
 }
 
 
-@pytest.mark.parametrize("endpoint", ["/reconcile", "/api/v1/reconcile/"])
+@pytest.mark.parametrize("endpoint", reconcile_endpoints)
 @pytest.mark.parametrize("origin", ["http://example.com", None])
 def test_reconcile(client, origin, endpoint):
     headers = {}
@@ -147,7 +154,7 @@ def test_reconcile(client, origin, endpoint):
         assert rv.headers["Access-Control-Allow-Origin"] == "*"
 
 
-@pytest.mark.parametrize("endpoint", ["/reconcile", "/api/v1/reconcile/"])
+@pytest.mark.parametrize("endpoint", reconcile_endpoints)
 @pytest.mark.parametrize("origin", ["http://example.com", None])
 def test_reconcile_post(client, origin, endpoint):
     headers = {}

@@ -16,7 +16,10 @@ from findthatpostcode.controllers.areas import area_types_count
 from findthatpostcode.db import ElasticsearchDep
 from findthatpostcode.utils import templates
 
-app = FastAPI()
+app = FastAPI(
+    docs_url=None,
+    redoc_url=None,
+)
 
 app.add_middleware(
     CORSMiddleware,

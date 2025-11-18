@@ -8,7 +8,7 @@ from pydantic import BaseModel, model_validator
 from findthatpostcode.controllers.postcodes import Postcode
 from findthatpostcode.db import ElasticsearchDep
 
-router = APIRouter()
+router = APIRouter(tags=["Postcode"])
 
 
 class Location(BaseModel):
@@ -124,6 +124,6 @@ class PostcodeResponse(BaseModel):
         return result
 
 
-@router.get("/{postcode}", tags=["postcodes"])
+@router.get("/{postcode}")
 async def read_postcode(postcode: str, es: ElasticsearchDep) -> PostcodeResponse:
     return Postcode.get_from_es(postcode, es)  # type: ignore

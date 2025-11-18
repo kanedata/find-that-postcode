@@ -49,7 +49,8 @@ def search_index(
     if latlon:
         return RedirectResponse(
             request.url_for(
-                "get_point", latlon="{},{}.html".format(latlon["lat"], latlon["lon"])
+                "get_point",
+                latlon="{},{}.html".format(latlon["lat"], latlon["lon"]),  # type: ignore
             ),
             status_code=303,
         )
@@ -66,8 +67,8 @@ def search_index(
         es,
         pagination=pagination,
     )
-    result = zip(areas["result"], areas["scores"])
-    pagination.set_pagination(areas["result_count"])
+    result = zip(areas["result"], areas["scores"])  # type: ignore
+    pagination.set_pagination(areas["result_count"])  # type: ignore
     nav = {
         p: request.url_for("search_index").include_query_params(q=q, **args)
         if isinstance(args, dict)

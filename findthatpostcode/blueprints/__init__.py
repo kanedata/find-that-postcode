@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from findthatpostcode.blueprints import (
@@ -65,3 +65,13 @@ app.include_router(postcodes.bp)
 app.include_router(reconcile.bp)
 app.include_router(search.bp)
 app.include_router(tools.bp)
+
+
+api = APIRouter(tags=["Legacy"])
+
+api.include_router(areas.api)
+api.include_router(areatypes.api)
+api.include_router(places.api)
+api.include_router(points.api)
+api.include_router(postcodes.api)
+api.include_router(reconcile.api)

@@ -14,6 +14,8 @@ from findthatpostcode.utils import JSONPResponse
 
 bp = APIRouter(prefix="/reconcile")
 
+api = APIRouter(prefix="/reconcile")
+
 
 def recon_query(q, es, p: int = 1, size: int = 10):
     result = []
@@ -33,7 +35,7 @@ def recon_query(q, es, p: int = 1, size: int = 10):
     elif query:
         pagination = Pagination(page=p, size=size)
         areas = search_areas(query, es, pagination=pagination)
-        for a, score in zip(areas["result"], areas["scores"]):
+        for a, score in zip(areas["result"], areas["scores"]):  # type: ignore
             result.append(
                 {
                     "id": a.id,
@@ -52,9 +54,10 @@ class ReconcileRequest(BaseModel):
 
 
 @bp.get("/")
+@api.get("/")
 def reconcile_get(
     es: ElasticsearchDep,
-    extend: Annotated[str, Query()] = None,
+    extend: Annotated[str | None, Query()] = None,
     queries: Annotated[str | None, Query()] = None,
     callback: str | None = None,
 ):
@@ -62,9 +65,10 @@ def reconcile_get(
 
 
 @bp.post("/")
+@api.post("/")
 def reconcile_post(
     es: ElasticsearchDep,
-    extend: Annotated[str, Form()] = None,
+    extend: Annotated[str | None, Form()] = None,
     queries: Annotated[str | None, Form()] = None,
     callback: Annotated[str | None, Query()] = None,
 ):

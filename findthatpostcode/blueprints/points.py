@@ -8,6 +8,8 @@ from findthatpostcode.db import ElasticsearchDep
 
 bp = APIRouter(prefix="/points")
 
+api = APIRouter(prefix="/points")
+
 
 @bp.get("/redirect")
 def point_redirect(lat: float, lon: float, request: Request) -> Response:
@@ -20,6 +22,7 @@ def point_redirect(lat: float, lon: float, request: Request) -> Response:
 
 
 @bp.get("/{latlon}")
+@api.get("/{latlon}")
 def get_point(latlon: str, es: ElasticsearchDep, request: Request):
     filetype = "json"
     if latlon.endswith(".json"):

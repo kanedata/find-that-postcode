@@ -13,6 +13,8 @@ from findthatpostcode.utils import templates
 
 bp = APIRouter(prefix="/areatypes")
 
+api = APIRouter(prefix="/areatypes")
+
 
 @bp.get("/")
 def all_areatypes(es: ElasticsearchDep, request: Request) -> Response:
@@ -27,6 +29,7 @@ def all_areatypes(es: ElasticsearchDep, request: Request) -> Response:
 
 @bp.get("/{areacode}")
 @bp.get("/{areacode}.{filetype}")
+@api.get("/{areacode}")
 def get_areatype(
     areacode: str,
     request: Request,

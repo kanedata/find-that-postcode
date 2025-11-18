@@ -7,8 +7,9 @@ AREA_NAME = "Lower Bow & Larkfield, Fancy Farm, Mallard Bowl"
 @pytest.mark.parametrize(
     "endpoint",
     [
+        "/areas/{}".format(AREA_CODE),
         "/areas/{}.json".format(AREA_CODE),
-        # "/api/v1/areas/{}".format(AREA_CODE),
+        "/api/v1/areas/{}".format(AREA_CODE),
     ],
 )
 @pytest.mark.parametrize("origin", ["http://example.com", None])
@@ -40,8 +41,16 @@ def test_area_json(client, endpoint, origin):
         assert rv.headers["Access-Control-Allow-Origin"] == "*"
 
 
-def test_missing_area_json(client):
-    rv = client.get("/areas/123445676.json")
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "/areas/{}".format("123445676"),
+        "/areas/{}.json".format("123445676"),
+        "/api/v1/areas/{}".format("123445676"),
+    ],
+)
+def test_missing_area_json(client, endpoint):
+    rv = client.get(endpoint)
     assert rv.status_code == 404
 
 
@@ -58,14 +67,21 @@ def test_area_missing_html(client):
     assert "not found" in rv.text.lower()
 
 
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "/areas/{}.geojson".format(AREA_CODE),
+        "/api/v1/areas/{}.geojson".format(AREA_CODE),
+    ],
+)
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_area_geojson(client, origin):
+def test_area_geojson(client, origin, endpoint):
     headers = {}
     check_cors = False
     if origin:
         headers["Origin"] = origin
         check_cors = True
-    rv = client.get("/areas/{}.geojson".format(AREA_CODE), headers=headers)
+    rv = client.get(endpoint, headers=headers)
     data = rv.json()
 
     assert rv.headers["Content-Type"].split(";")[0].strip() == "application/json"

@@ -1,14 +1,22 @@
 import pytest
 
 
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "/postcodes/EX36 4AT",
+        "/postcodes/EX36 4AT.json",
+        "/api/v1/postcodes/EX36 4AT",
+    ],
+)
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_postcode_json(client, origin):
+def test_postcode_json(client, origin, endpoint):
     headers = {}
     check_cors = False
     if origin:
         headers["Origin"] = origin
         check_cors = True
-    rv = client.get("/postcodes/EX36 4AT", headers=headers)
+    rv = client.get(endpoint, headers=headers)
     postcode_json = rv.json()
 
     assert rv.headers["Content-Type"].split(";")[0].strip() == "application/json"
@@ -31,8 +39,16 @@ def test_postcode_json(client, origin):
         assert rv.headers["Access-Control-Allow-Origin"] == "*"
 
 
-def test_postcode_missing_json(client):
-    rv = client.get("/postcodes/14214124")
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "/postcodes/14214124",
+        "/postcodes/14214124.json",
+        "/api/v1/postcodes/14214124",
+    ],
+)
+def test_postcode_missing_json(client, endpoint):
+    rv = client.get(endpoint)
     assert rv.headers["Content-Type"].split(";")[0].strip() == "application/json"
     assert rv.status_code == 404
 
@@ -57,14 +73,22 @@ def test_postcode_redirect(client_redirect):
     assert rv.headers["Location"].endswith("/postcodes/EX36%204AT.html")
 
 
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "/postcodes/hash/abc1",
+        "/postcodes/hash/abc1.json",
+        "/api/v1/postcodes/hash/abc1",
+    ],
+)
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_postcode_hash(client, origin):
+def test_postcode_hash(client, origin, endpoint):
     headers = {}
     check_cors = False
     if origin:
         headers["Origin"] = origin
         check_cors = True
-    rv = client.get("/postcodes/hash/abc1.json?properties=ward_code", headers=headers)
+    rv = client.get(f"{endpoint}?properties=ward_code", headers=headers)
     assert rv.headers["Content-Type"].split(";")[0].strip() == "application/json"
     data = rv.json()
     assert "data" in data
@@ -73,20 +97,36 @@ def test_postcode_hash(client, origin):
         assert rv.headers["Access-Control-Allow-Origin"] == "*"
 
 
-def test_postcode_hash_too_small(client):
-    rv = client.get("/postcodes/hash/ab.json?properties=ward_code")
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "/postcodes/hash/ab",
+        "/postcodes/hash/ab.json",
+        "/api/v1/postcodes/hash/ab",
+    ],
+)
+def test_postcode_hash_too_small(client, endpoint):
+    rv = client.get(f"{endpoint}?properties=ward_code")
     assert rv.status_code == 400
 
 
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "/postcodes/hashes",
+        "/postcodes/hashes.json",
+        "/api/v1/postcodes/hashes",
+    ],
+)
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_postcode_hashes(client, origin):
+def test_postcode_hashes(client, origin, endpoint):
     headers = {}
     check_cors = False
     if origin:
         headers["Origin"] = origin
         check_cors = True
     rv = client.post(
-        "/postcodes/hashes.json",
+        endpoint,
         data=dict(
             hash="abc1",
             properties=["ward_code"],
@@ -101,15 +141,23 @@ def test_postcode_hashes(client, origin):
         assert rv.headers["Access-Control-Allow-Origin"] == "*"
 
 
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "/postcodes/hashes",
+        "/postcodes/hashes.json",
+        "/api/v1/postcodes/hashes",
+    ],
+)
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_postcode_hashes_too_small(client, origin):
+def test_postcode_hashes_too_small(client, origin, endpoint):
     headers = {}
     check_cors = False
     if origin:
         headers["Origin"] = origin
         check_cors = True
     rv = client.post(
-        "/postcodes/hashes.json",
+        endpoint,
         data=dict(
             hash="ab",
             properties=["ward_code"],

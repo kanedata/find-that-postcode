@@ -17,6 +17,8 @@ from findthatpostcode.metadata import (
 
 bp = APIRouter(prefix="/postcodes")
 
+api = APIRouter(prefix="/postcodes")
+
 
 @bp.get("/redirect")
 def postcode_redirect(postcode: str, request: Request) -> Response:
@@ -28,6 +30,7 @@ def postcode_redirect(postcode: str, request: Request) -> Response:
 
 @bp.get("/{postcode}")
 @bp.get("/{postcode}.{filetype}")
+@api.get("/{postcode}")
 def get_postcode(
     postcode: str, request: Request, es: ElasticsearchDep, filetype: str = "json"
 ):
@@ -39,6 +42,7 @@ def get_postcode(
 
 @bp.get("/hash/{hash_}")
 @bp.get("/hash/{hash_}.json")
+@api.get("/hash/{hash_}")
 def single_hash(
     hash_: str,
     properties: Annotated[list[str], Query()],
@@ -48,7 +52,9 @@ def single_hash(
     return JSONResponse({"data": get_postcode_by_hash(es, hash_, properties)})
 
 
+@bp.get("/hashes")
 @bp.get("/hashes.json")
+@api.get("/hashes")
 def multi_hash_get(
     hash: Annotated[str | list[str], Query()],
     properties: Annotated[list[str], Query()],
@@ -58,7 +64,9 @@ def multi_hash_get(
     return JSONResponse({"data": get_postcode_by_hash(es, hash, properties)})
 
 
+@bp.post("/hashes")
 @bp.post("/hashes.json")
+@api.post("/hashes")
 def multi_hash_post(
     hash: Annotated[str | list[str], Form()],
     properties: Annotated[list[str], Form()],

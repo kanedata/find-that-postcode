@@ -13,6 +13,8 @@ from findthatpostcode.utils import CSVResponse, templates
 
 bp = APIRouter(prefix="/areas")
 
+api = APIRouter(prefix="/areas")
+
 
 @bp.get("/search")
 @bp.get("/search.<filetype>")
@@ -52,6 +54,7 @@ def areas_csv(areas: Iterator[dict], filename: str) -> Response:
 
 
 @bp.get("/{areacodes}.geojson")
+@api.get("/{areacodes}.geojson")
 def get_area_boundary(areacodes: str, es: ElasticsearchDep, s3_client: S3Dep):
     areacode_list: list[str] = areacodes.split("+")
     features = []
@@ -66,6 +69,7 @@ def get_area_boundary(areacodes: str, es: ElasticsearchDep, s3_client: S3Dep):
 
 
 @bp.get("/{areacode}/children/{areatype}.geojson")
+@api.get("/{areacode}/children/{areatype}.geojson")
 def get_area_children_boundary(
     areacode: str, areatype: str, es: ElasticsearchDep, s3_client: S3Dep
 ):
@@ -88,6 +92,7 @@ def get_area_children_boundary(
 
 @bp.get("/{areacode}")
 @bp.get("/{areacode}.{filetype}")
+@api.get("/{areacode}")
 def get_area(
     areacode: str,
     request: Request,

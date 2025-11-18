@@ -5,14 +5,22 @@ import pytest
 AREATYPE_CODE = "lsoa21"
 
 
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "/areatypes/{}".format(AREATYPE_CODE),
+        "/areatypes/{}.json".format(AREATYPE_CODE),
+        "/api/v1/areatypes/{}".format(AREATYPE_CODE),
+    ],
+)
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_areatype_json(client, origin):
+def test_areatype_json(client, origin, endpoint):
     headers = {}
     check_cors = False
     if origin:
         headers["Origin"] = origin
         check_cors = True
-    rv = client.get("/areatypes/{}.json".format(AREATYPE_CODE), headers=headers)
+    rv = client.get(endpoint, headers=headers)
     data = rv.json()
 
     assert (
@@ -24,8 +32,16 @@ def test_areatype_json(client, origin):
         assert rv.headers["Access-Control-Allow-Origin"] == "*"
 
 
-def test_areatype_json_missing(client):
-    rv = client.get("/areatypes/{}.json".format("kjhgdskgds"))
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "/areatypes/{}".format("kjhgdskgds"),
+        "/areatypes/{}.json".format("kjhgdskgds"),
+        "/api/v1/areatypes/{}".format("kjhgdskgds"),
+    ],
+)
+def test_areatype_json_missing(client, endpoint):
+    rv = client.get(endpoint)
     assert rv.status_code == 404
 
 

@@ -1,14 +1,22 @@
 import pytest
 
 
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "/points/51.501,-0.2936",
+        "/points/51.501,-0.2936.json",
+        "/api/v1/points/51.501,-0.2936",
+    ],
+)
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_point_json(client, origin):
+def test_point_json(client, origin, endpoint):
     headers = {}
     check_cors = False
     if origin:
         headers["Origin"] = origin
         check_cors = True
-    rv = client.get("/points/51.501,-0.2936", headers=headers)
+    rv = client.get(endpoint, headers=headers)
     point_json = rv.json()
 
     assert (

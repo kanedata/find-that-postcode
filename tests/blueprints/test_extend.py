@@ -4,14 +4,15 @@ from urllib.parse import urlencode
 import pytest
 
 
+@pytest.mark.parametrize("endpoint", ["/reconcile", "/api/v1/reconcile/"])
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_reconcile_spec(client, origin):
+def test_reconcile_spec(client, origin, endpoint):
     headers = {}
     check_cors = False
     if origin:
         headers["Origin"] = origin
         check_cors = True
-    rv = client.get("/reconcile", headers=headers)
+    rv = client.get(endpoint, headers=headers)
     spec = rv.json()
     assert "extend" in spec
     if check_cors:
@@ -45,14 +46,15 @@ extend_q = {
 }
 
 
+@pytest.mark.parametrize("endpoint", ["/reconcile", "/api/v1/reconcile/"])
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_reconcile_extend(client, origin):
+def test_reconcile_extend(client, origin, endpoint):
     headers = {}
     check_cors = False
     if origin:
         headers["Origin"] = origin
         check_cors = True
-    rv = client.get("/reconcile?{}".format(urlencode(extend_q)), headers=headers)
+    rv = client.get("{}?{}".format(endpoint, urlencode(extend_q)), headers=headers)
     result = rv.json()
     assert rv.status_code == 200
     assert "meta" in result
@@ -63,9 +65,10 @@ def test_reconcile_extend(client, origin):
         assert rv.headers["Access-Control-Allow-Origin"] == "*"
 
 
-def test_reconcile_extend_jsonp(client):
+@pytest.mark.parametrize("endpoint", ["/reconcile", "/api/v1/reconcile/"])
+def test_reconcile_extend_jsonp(client, endpoint):
     extend_q["callback"] = "testCallback"
-    rv = client.get("/reconcile?{}".format(urlencode(extend_q)))
+    rv = client.get("{}?{}".format(endpoint, urlencode(extend_q)))
     data = rv.text
     assert rv.status_code == 200
     assert data.startswith(extend_q["callback"])
@@ -77,14 +80,15 @@ def test_reconcile_extend_jsonp(client):
     assert result["rows"]["EX36 4AT"]["lsoa21"] == "E01020135"
 
 
+@pytest.mark.parametrize("endpoint", ["/reconcile", "/api/v1/reconcile/"])
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_reconcile_extend_post(client, origin):
+def test_reconcile_extend_post(client, origin, endpoint):
     headers = {}
     check_cors = False
     if origin:
         headers["Origin"] = origin
         check_cors = True
-    rv = client.post("/reconcile", data=extend_q, headers=headers)
+    rv = client.post(endpoint, data=extend_q, headers=headers)
     result = rv.json()
     assert rv.status_code == 200
     assert "meta" in result
@@ -95,8 +99,9 @@ def test_reconcile_extend_post(client, origin):
         assert rv.headers["Access-Control-Allow-Origin"] == "*"
 
 
-def test_reconcile_extend_post_jsonp(client):
-    rv = client.post("/reconcile?callback=testCallback", data=extend_q)
+@pytest.mark.parametrize("endpoint", ["/reconcile", "/api/v1/reconcile/"])
+def test_reconcile_extend_post_jsonp(client, endpoint):
+    rv = client.post("{}?callback=testCallback".format(endpoint), data=extend_q)
     data = rv.text
     assert rv.status_code == 200
     assert data.startswith("testCallback")
@@ -124,15 +129,16 @@ recon_q = {
 }
 
 
+@pytest.mark.parametrize("endpoint", ["/reconcile", "/api/v1/reconcile/"])
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_reconcile(client, origin):
+def test_reconcile(client, origin, endpoint):
     headers = {}
     check_cors = False
     if origin:
         headers["Origin"] = origin
         check_cors = True
-    print("/reconcile?{}".format(urlencode(recon_q)))
-    rv = client.get("/reconcile?{}".format(urlencode(recon_q)), headers=headers)
+    print("{}?{}".format(endpoint, urlencode(recon_q)))
+    rv = client.get("{}?{}".format(endpoint, urlencode(recon_q)), headers=headers)
     result = rv.json()
     assert rv.status_code == 200
     assert "q0" in result
@@ -141,14 +147,15 @@ def test_reconcile(client, origin):
         assert rv.headers["Access-Control-Allow-Origin"] == "*"
 
 
+@pytest.mark.parametrize("endpoint", ["/reconcile", "/api/v1/reconcile/"])
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_reconcile_post(client, origin):
+def test_reconcile_post(client, origin, endpoint):
     headers = {}
     check_cors = False
     if origin:
         headers["Origin"] = origin
         check_cors = True
-    rv = client.post("/reconcile", data=recon_q, headers=headers)
+    rv = client.post(endpoint, data=recon_q, headers=headers)
     result = rv.json()
     assert rv.status_code == 200
     assert "q0" in result

@@ -7,6 +7,8 @@ from findthatpostcode.db import ElasticsearchDep
 
 bp = APIRouter(prefix="/places")
 
+api = APIRouter(prefix="/places")
+
 
 @bp.get("/redirect")
 def point_redirect(lat: float, lon: float, request: Request) -> Response:
@@ -18,6 +20,7 @@ def point_redirect(lat: float, lon: float, request: Request) -> Response:
 
 @bp.get("/nearest/{lat},{lon}")
 @bp.get("/nearest/{lat},{lon}.{filetype}")
+@api.get("/nearest/{lat},{lon}")
 def nearest(
     lat: float, lon: float, es: ElasticsearchDep, filetype: str = "json"
 ) -> Response:
@@ -40,6 +43,7 @@ def nearest(
 
 @bp.get("/{areacode}")
 @bp.get("/{areacode}.{filetype}")
+@api.get("/{areacode}")
 def get_place(
     areacode: str, es: ElasticsearchDep, request: Request, filetype: str = "json"
 ):

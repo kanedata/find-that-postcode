@@ -13,7 +13,7 @@ def get_es_url(default):
     return default
 
 
-ENVIRONMENT = "development" if os.environ.get("FLASK_DEBUG") else "production"
+ENVIRONMENT = "development" if os.environ.get("DEBUG") else "production"
 DEBUG = ENVIRONMENT == "development"
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev")

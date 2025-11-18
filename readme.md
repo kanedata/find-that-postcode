@@ -16,7 +16,7 @@ Run the server. At the moment the scripts only work on a default server of
 
 ### 2. Install python dependencies
 
-You'll need to install the python `elasticsearch` and `flask` libraries, either
+You'll need to install the python `elasticsearch` and `fastapi` libraries, either
 directly through `pip` or by running a virtual environment and running:
 
 ```bash
@@ -25,15 +25,12 @@ pip install -r requirements.txt
 
 The code is written in python 3 and hasn't been tested in python 2.
 
-### 3. Point flask to the app
+### 3. Setup S3 details for boundaries
 
-Flask needs to know which app it's running. The easiest way to do this is to create
+You'll need to setup S3 bucket if you want to have boundary details. The easiest way to do this is to create
 a file called `.env` in the project directory, and add the following contents:
 
 ```bash
-FLASK_APP=findthatpostcode
-FLASK_ENV=development
-
 # S3 credentials for boundaries
 S3_REGION=XXXXXXXX
 S3_ENDPOINT=XXXXXXXX
@@ -44,7 +41,7 @@ S3_BUCKET=XXXXXXXX
 
 ### 4. Create elasticsearch indexes
 
-Run `flask init-db` to create the needed index and mappings
+Run `python -m findthatpostcode init-db` to create the needed index and mappings
 before data import.
 
 ### 5. Import postcodes
@@ -53,7 +50,7 @@ Run the following to import the data and save postcodes to the
 elasticsearch index:
 
 ```bash
-flask import nspl
+python -m findthatpostcode import nspl
 ```
 
 This will then run the import process, fetching the latest version of the
@@ -65,9 +62,9 @@ right file. It takes a while to run as there are over
 Run the following to import the code history database and register of geographic codes.
 
 ```bash
-flask import rgc
-flask import chd
-flask import msoanames # imports the names for MSOAs from House of Commons Library
+python -m findthatpostcode import rgc
+python -m findthatpostcode import chd
+python -m findthatpostcode import msoanames # imports the names for MSOAs from House of Commons Library
 ```
 
 The URL of the files used can be customised with the `--url` parameter. Unfortunately the
@@ -111,7 +108,7 @@ These files are large:
 Import the boundary files by running:
 
 ```bash
-flask import boundaries "https://opendata.arcgis.com/datasets/094f326b0b1247e3bcf1eb7236c24679_0.geojson"
+python -m findthatpostcode import boundaries "https://opendata.arcgis.com/datasets/094f326b0b1247e3bcf1eb7236c24679_0.geojson"
 ```
 
 You can add more than one URL to each import script.
@@ -123,7 +120,7 @@ which can be imported using the `import placenames` command. An entry for each
 placename is added to the `geo_placenames` elasticsearch index.
 
 ```bash
-flask import placenames
+python -m findthatpostcode import placenames
 ```
 
 The `--url` parameter can be used to customise the URL used.
@@ -134,9 +131,9 @@ Statistics can be added to areas, using ONS data. The available statistics are
 added to LSOAs, but could also be added to other areas.
 
 ```bash
-flask import imd2025
-flask import imd2019
-flask import imd2015
+python -m findthatpostcode import imd2025
+python -m findthatpostcode import imd2019
+python -m findthatpostcode import imd2015
 ```
 
 The `--url` parameter can be used to customise the URL used to get the data.
@@ -151,14 +148,14 @@ python -m pytest tests
 
 ### Run the server
 
-The project comes with a simple server (using the [flask](https://flask.palletsprojects.com/) framework) allowing
+The project comes with a simple server (using the [fastapi](https://fastapi.tiangolo.com/) framework) allowing
 you to look at postcodes. The server returns either html pages (using `.html`)
 or json data by default.
 
 Run the server by:
 
 ```bash
-flask run
+fastapi dev findthatpostcode
 ```
 
 By default the server is available at <http://localhost:5000/>.
@@ -329,44 +326,43 @@ On Dokku server run:
 
 ```bash
 # setup and run import
-dokku config:set find-that-postcode FLASK_APP=findthatpostcode
 dokku config:set find-that-postcode S3_REGION=XXXXXXXX
 dokku config:set find-that-postcode S3_ENDPOINT=XXXXXXXX
 dokku config:set find-that-postcode S3_ACCESS_ID=XXXXXXXX
 dokku config:set find-that-postcode S3_SECRET_KEY=XXXXXXXX
 dokku config:set find-that-postcode S3_BUCKET=XXXXXXXX
-dokku run find-that-postcode flask init-db
-dokku run find-that-postcode flask import nspl --year=2011
-dokku run find-that-postcode flask import nspl --year=2021
-dokku run find-that-postcode flask import rgc
-dokku run find-that-postcode flask import chd
-dokku run find-that-postcode flask import msoanames
-dokku run find-that-postcode flask import imd2025
-dokku run find-that-postcode flask import imd2019
-dokku run find-that-postcode flask import imd2015
-dokku run find-that-postcode flask import placenames
+dokku run find-that-postcode python -m findthatpostcode init-db
+dokku run find-that-postcode python -m findthatpostcode import nspl --year=2011
+dokku run find-that-postcode python -m findthatpostcode import nspl --year=2021
+dokku run find-that-postcode python -m findthatpostcode import rgc
+dokku run find-that-postcode python -m findthatpostcode import chd
+dokku run find-that-postcode python -m findthatpostcode import msoanames
+dokku run find-that-postcode python -m findthatpostcode import imd2025
+dokku run find-that-postcode python -m findthatpostcode import imd2019
+dokku run find-that-postcode python -m findthatpostcode import imd2015
+dokku run find-that-postcode python -m findthatpostcode import placenames
 
 # import boundaries
-dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/7be6a3c1be3b4385951224d2f522470a_0.geojson
-dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/094f326b0b1247e3bcf1eb7236c24679_0.geojson
-dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/0de4288db3774cb78e45b8b74e9eab31_0.geojson
-dokku run find-that-postcode flask import boundaries https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/Local_Authority_Districts_May_2022_UK_BGC_V3/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson
-dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/284d82f437554938b0d0fbb3c6522007_0.geojson
-dokku run find-that-postcode flask import boundaries https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/Clinical_Commissioning_Groups_April_2021_EN_BGC/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson
-dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/20595dbf22534e20944c9cee42c665b3_0.geojson
-dokku run find-that-postcode flask import boundaries https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/LEP_MAY_2021_EN_BGC_V2/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson
-dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/edcbf58c70004d0f8d44501d07c38fe9_0.geojson
-dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/f41bd8ff39ce4a2393c2f454006ea60a_0.geojson
-dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/282af275c1a24c2ea64ff9e05bdd7d7d_0.geojson
-dokku run find-that-postcode flask import boundaries https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/Travel_to_Work_Areas_December_2011_UK_BGC_v2/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson
-dokku run find-that-postcode flask import boundaries https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/TCITY_2015_EW_BGG_V2/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson
-dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/c6bd4568af5947519cf266b80a94de2e_0.geojson
+dokku run find-that-postcode python -m findthatpostcode import boundaries https://opendata.arcgis.com/datasets/7be6a3c1be3b4385951224d2f522470a_0.geojson
+dokku run find-that-postcode python -m findthatpostcode import boundaries https://opendata.arcgis.com/datasets/094f326b0b1247e3bcf1eb7236c24679_0.geojson
+dokku run find-that-postcode python -m findthatpostcode import boundaries https://opendata.arcgis.com/datasets/0de4288db3774cb78e45b8b74e9eab31_0.geojson
+dokku run find-that-postcode python -m findthatpostcode import boundaries https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/Local_Authority_Districts_May_2022_UK_BGC_V3/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson
+dokku run find-that-postcode python -m findthatpostcode import boundaries https://opendata.arcgis.com/datasets/284d82f437554938b0d0fbb3c6522007_0.geojson
+dokku run find-that-postcode python -m findthatpostcode import boundaries https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/Clinical_Commissioning_Groups_April_2021_EN_BGC/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson
+dokku run find-that-postcode python -m findthatpostcode import boundaries https://opendata.arcgis.com/datasets/20595dbf22534e20944c9cee42c665b3_0.geojson
+dokku run find-that-postcode python -m findthatpostcode import boundaries https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/LEP_MAY_2021_EN_BGC_V2/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson
+dokku run find-that-postcode python -m findthatpostcode import boundaries https://opendata.arcgis.com/datasets/edcbf58c70004d0f8d44501d07c38fe9_0.geojson
+dokku run find-that-postcode python -m findthatpostcode import boundaries https://opendata.arcgis.com/datasets/f41bd8ff39ce4a2393c2f454006ea60a_0.geojson
+dokku run find-that-postcode python -m findthatpostcode import boundaries https://opendata.arcgis.com/datasets/282af275c1a24c2ea64ff9e05bdd7d7d_0.geojson
+dokku run find-that-postcode python -m findthatpostcode import boundaries https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/Travel_to_Work_Areas_December_2011_UK_BGC_v2/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson
+dokku run find-that-postcode python -m findthatpostcode import boundaries https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/TCITY_2015_EW_BGG_V2/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson
+dokku run find-that-postcode python -m findthatpostcode import boundaries https://opendata.arcgis.com/datasets/c6bd4568af5947519cf266b80a94de2e_0.geojson
 
 # large boundary files
-dokku run find-that-postcode flask import boundaries --code-field=par18cd https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/Parishes_May_2022_EW_BGC/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson
-dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/d2dce556b4604be49382d363a7cade72_0.geojson
-dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/e993add3f1944437bc91ec7c76100c63_0.geojson
-dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/29fdaa2efced40378ce8173b411aeb0e_2.geojson
-dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/f6684981be23404e83321077306fa837_0.geojson
-dokku run find-that-postcode flask import boundaries https://opendata.arcgis.com/datasets/1f021bb824ee4820b353b4b58fab6df5_0.geojson
+dokku run find-that-postcode python -m findthatpostcode import boundaries --code-field=par18cd https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/Parishes_May_2022_EW_BGC/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson
+dokku run find-that-postcode python -m findthatpostcode import boundaries https://opendata.arcgis.com/datasets/d2dce556b4604be49382d363a7cade72_0.geojson
+dokku run find-that-postcode python -m findthatpostcode import boundaries https://opendata.arcgis.com/datasets/e993add3f1944437bc91ec7c76100c63_0.geojson
+dokku run find-that-postcode python -m findthatpostcode import boundaries https://opendata.arcgis.com/datasets/29fdaa2efced40378ce8173b411aeb0e_2.geojson
+dokku run find-that-postcode python -m findthatpostcode import boundaries https://opendata.arcgis.com/datasets/f6684981be23404e83321077306fa837_0.geojson
+dokku run find-that-postcode python -m findthatpostcode import boundaries https://opendata.arcgis.com/datasets/1f021bb824ee4820b353b4b58fab6df5_0.geojson
 ```

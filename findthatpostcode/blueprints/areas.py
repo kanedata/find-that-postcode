@@ -76,15 +76,18 @@ def get_area_children_boundary(
     area = Area.get_from_es(areacode, es, boundary=False, examples_count=0)
     features = []
     errors = {}
-    for child_area in area.relationships["children"][areatype]:  # type: ignore
-        result = Area.get_from_es(
-            child_area.id, es, boundary=True, examples_count=0, s3_client=s3_client
-        )
-        status, r = result.geoJSON()
-        if status == 200 and isinstance(r, dict):
-            features.extend(r.get("features", []))
-        else:
-            errors[child_area.id] = r
+    if area.relationships["children"]:
+        for child_area in area.relationships["children"][areatype]:  # type: ignore
+            result = Area.get_from_es(
+                child_area.id, es, boundary=True, examples_count=0, s3_client=s3_client
+            )
+            status, r = result.geoJSON()
+            if status == 200 and isinstance(r, dict):
+                features.extend(r.get("features", []))
+            else:
+                errors[child_area.id] = r
+    else:
+        errors["area"] = f"No children of type {areatype} found for area {areacode}"
     if not features:
         return JSONResponse(dict(message=errors), status_code=404)
     return {"type": "FeatureCollection", "features": features}

@@ -39,12 +39,32 @@ the [Office for National Statistics](https://geoportal.statistics.gov.uk/) and
     openapi_url="/api/openapi.json",
     openapi_tags=[
         {
+            "name": "Area Type",
+            "description": "Get information about the type of area",
+        },
+        {
+            "name": "Area",
+            "description": "Get information about an area",
+        },
+        {
+            "name": "Place",
+            "description": "Get information about a place in the UK",
+        },
+        {
+            "name": "Point",
+            "description": "Get information about the nearest postcode to a given lat/long",
+        },
+        {
             "name": "Postcode",
-            "description": "Endpoints for searching and retrieving postcode data.",
+            "description": "Get information about an individual postcode",
+        },
+        {
+            "name": "GeoJSON",
+            "description": "Endpoints that return GeoJSON formatted data",
         },
         {
             "name": "Legacy",
-            "description": "Legacy API endpoints from v1 of the Find that Postcode API.",
+            "description": "Legacy API endpoints from v1 of the Find that Postcode API",
         },
     ],
     contact={

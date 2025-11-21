@@ -64,6 +64,9 @@ elasticsearch==7.8.1
     # via
     #   -r requirements.in
     #   elasticmock
+    #   elasticsearch-dsl
+elasticsearch-dsl==7.4.1
+    # via -r requirements.in
 email-validator==2.3.0
     # via
     #   fastapi
@@ -150,6 +153,7 @@ python-dateutil==2.9.0.post0
     # via
     #   botocore
     #   elasticmock
+    #   elasticsearch-dsl
     #   sqlite-utils
 python-dotenv==1.1.1
     # via
@@ -193,7 +197,9 @@ shapely==2.1.1
 shellingham==1.5.4
     # via typer
 six==1.17.0
-    # via python-dateutil
+    # via
+    #   elasticsearch-dsl
+    #   python-dateutil
 sniffio==1.3.1
     # via anyio
 sqlite-fts4==1.0.3

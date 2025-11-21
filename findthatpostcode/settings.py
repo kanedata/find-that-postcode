@@ -37,6 +37,7 @@ RATE_LIMIT_EXEMPT_KEYS = os.environ.get("RATE_LIMIT_EXEMPT_KEYS", "").split(",")
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "..", "static")
 TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), "templates")
 
+MAX_DISTANCE_FROM_POINT = 10_000  # in metres
 
 ENTITY_INDEX = "geo_entity"
 AREA_INDEX = "geo_area"

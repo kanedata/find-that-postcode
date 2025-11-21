@@ -18,7 +18,7 @@ from openpyxl import load_workbook
 from findthatpostcode.commands.utils import bulk_upload, get_latest_geoportal_url
 from findthatpostcode.db import get_es
 from findthatpostcode.metadata import ENTITIES
-from findthatpostcode.settings import DEBUG, ENTITY_INDEX
+from findthatpostcode.settings import AREA_INDEX, DEBUG, ENTITY_INDEX
 
 PRD_RGC = "PRD_RGC"
 PRD_CHD = "PRD_CHD"

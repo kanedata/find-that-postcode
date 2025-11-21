@@ -6,9 +6,8 @@ from typing import Iterable
 
 from elasticsearch import Elasticsearch
 
-from findthatpostcode.controllers.postcodes import Postcode
 from findthatpostcode.settings import AREA_INDEX, POSTCODE_INDEX
-from findthatpostcode.utils import ESConfig
+from findthatpostcode.utils import ESConfig, clean_postcode
 
 # List of potential postcode fields
 POSTCODE_FIELDS = ["postcode", "postal_code", "post_code", "post code"]
@@ -37,7 +36,7 @@ def process_csv(
     for _, row in enumerate(reader):
         for i in fields:
             row[i] = None
-        postcode = Postcode.parse_id(row.get(postcode_field))
+        postcode = clean_postcode(row.get(postcode_field))
         if postcode:
             pc = es.get(
                 index=es_config.es_index,

@@ -64,7 +64,7 @@ class Controller:
 
     @staticmethod
     def parse_id(id: str | tuple[float, float]) -> str | tuple[float, float]:
-        return id.strip().upper() if isinstance(id, str) else id
+        return id.strip() if isinstance(id, str) else id
 
     @staticmethod
     def get_total_from_es(result: dict) -> int | None:

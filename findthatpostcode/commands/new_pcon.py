@@ -9,11 +9,9 @@ import requests
 import requests_cache
 import tqdm
 
-from findthatpostcode.commands.codes import AREA_INDEX
-from findthatpostcode.commands.postcodes import PC_INDEX
 from findthatpostcode.commands.utils import bulk_upload
 from findthatpostcode.db import get_es
-from findthatpostcode.settings import DEBUG
+from findthatpostcode.settings import AREA_INDEX, DEBUG, POSTCODE_INDEX
 
 PCON_NAMES_AND_CODES_URL = "https://opendata.arcgis.com/api/v3/datasets/9a876e4777bc47e392e670a7b8bc3f5c_0/downloads/data?format=csv&spatialRefId=4326&where=1%3D1"
 PCON_2010_LOOKUP_URL = "https://opendata.arcgis.com/api/v3/datasets/c776b66c0e534b849cae5a5121b7a16a_0/downloads/data?format=csv&spatialRefId=4326&where=1%3D1"
@@ -23,8 +21,8 @@ PCON_BOUNDARIES_URL = "https://stg-arcgisazurecdataprod1.az.arcgis.com/exportfil
 
 @click.command("new_pcon")
 @click.option("--area-index", default=AREA_INDEX)
-@click.option("--postcode-index", default=PC_INDEX)
-def import_new_pcon(area_index=AREA_INDEX, postcode_index=PC_INDEX):
+@click.option("--postcode-index", default=POSTCODE_INDEX)
+def import_new_pcon(area_index=AREA_INDEX, postcode_index=POSTCODE_INDEX):
     if DEBUG:
         requests_cache.install_cache()
 

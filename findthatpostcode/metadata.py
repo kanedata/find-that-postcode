@@ -1,6 +1,6 @@
-import json
-import os
 from dataclasses import dataclass
+
+from findthatpostcode.areatypes import AREA_TYPES
 
 
 @dataclass
@@ -12,16 +12,8 @@ class Field:
     area: str | None = None
 
 
-with open(
-    os.path.join(os.path.dirname(os.path.realpath(__file__)), "areatypes.json")
-) as a:
-    AREA_TYPES = json.load(a)
-    for k in AREA_TYPES:
-        AREA_TYPES[k]["countries"] = list(
-            set([e[0] for e in AREA_TYPES[k]["entities"]])
-        )
-    AREA_THEMES = list(set([a["theme"] for a in AREA_TYPES.values()]))
-    ENTITIES = {e: k for k, v in AREA_TYPES.items() for e in v["entities"]}
+AREA_THEMES = list(set([a["theme"] for a in AREA_TYPES.values()]))
+ENTITIES = {e: k for k, v in AREA_TYPES.items() for e in v["entities"]}
 
 KEY_AREA_TYPES = [
     ("Key", ["ctry", "rgn", "cty", "laua", "ward", "msoa21", "pcon"]),

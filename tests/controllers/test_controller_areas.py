@@ -7,9 +7,9 @@ from tests.conftest import MockElasticsearch
 
 def test_area_class():
     a = Area("testentity", {"code": "testentity", "name": "Test Entity"})
-    assert a.id == "testentity"
+    assert a.id == "TESTENTITY"
     assert a.attributes["name"] == "Test Entity"
-    assert str(a) == "<Area testentity>"
+    assert str(a) == "<Area TESTENTITY>"
 
 
 def test_area_class_es():

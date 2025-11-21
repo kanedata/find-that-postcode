@@ -8,13 +8,13 @@ from elasticsearch import Elasticsearch
 from elasticsearch.helpers import scan
 from mypy_boto3_s3 import S3Client
 
+from findthatpostcode.areatypes import AREA_TYPES, AreaTypeEnum
 from findthatpostcode.controllers.controller import (
     GEOJSON_TYPES,
     Controller,
     Pagination,
 )
 from findthatpostcode.controllers.places import Place
-from findthatpostcode.metadata import AREA_TYPES
 from findthatpostcode.settings import (
     AREA_INDEX,
     ENTITY_INDEX,
@@ -34,12 +34,27 @@ class Areatype(Controller):
     areatypes = AREA_TYPES
 
     def __init__(self, id: str, data: dict | None = None) -> None:
-        id = id.strip()
-        if not data:
-            data = self.areatypes.get(id)
-        super().__init__(id, data)
+        id_areatype = self.check_id(id)
+        if not data and id_areatype:
+            data = self.areatypes.get(id_areatype)
+        super().__init__(id_areatype.value, data)
         if not isinstance(self.id, str):
             raise ValueError("ID must be a string to create Areatype")
+
+    @staticmethod
+    def check_id(id: str) -> AreaTypeEnum:
+        id = id.strip()
+        try:
+            id_areatype = AreaTypeEnum(id)
+        except ValueError:
+            id_areatype = None
+            for at, at_data in Areatype.areatypes.items():
+                if id in at_data.get("entities", []):
+                    id_areatype = at
+                    break
+        if not id_areatype:
+            raise ValueError(f"Invalid AreaType ID: {id}")
+        return id_areatype
 
     def __repr__(self) -> str:
         return "<AreaType {}>".format(self.id)
@@ -81,8 +96,8 @@ class Areatype(Controller):
         es_config: ESConfig | None = None,
         full: bool = False,
     ) -> "Areatype":
-        id = id.strip()
-        if cls.areatypes.get(id):
+        id_areatype = cls.check_id(id)
+        if cls.areatypes.get(id_areatype):
             return cls(id)
         result = super(Areatype, cls).get_from_es(id, es, es_config=es_config)
         if not isinstance(result.id, str):
@@ -180,6 +195,10 @@ class Area(Controller):
 
     def __repr__(self: "Area") -> str:
         return "<Area {}>".format(self.id)
+
+    @staticmethod
+    def parse_id(id: str | tuple[float, float]) -> str | tuple[float, float]:
+        return id.strip().upper() if isinstance(id, str) else id
 
     @classmethod
     def get_from_es(

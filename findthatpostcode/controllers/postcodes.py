@@ -15,7 +15,7 @@ from findthatpostcode.metadata import (
     STATS_FIELDS,
 )
 from findthatpostcode.settings import PLACENAME_INDEX, POSTCODE_INDEX
-from findthatpostcode.utils import ESConfig
+from findthatpostcode.utils import ESConfig, clean_postcode
 
 
 class Postcode(Controller):
@@ -170,33 +170,9 @@ class Postcode(Controller):
         """
         standardises a postcode into the correct format
         """
-
         if not isinstance(id, str):
             return ""
-
-        # check for blank/empty
-        # put in all caps
-        postcode = id.strip().upper()
-        if postcode == "":
-            return ""
-
-        # replace any non alphanumeric characters
-        postcode = re.sub("[^0-9a-zA-Z]+", "", postcode)
-
-        # check for nonstandard codes
-        if len(postcode) > 7:
-            return postcode
-
-        first_part = postcode[:-3].strip()
-        last_part = postcode[-3:].strip()
-
-        # check for incorrect characters
-        first_part = list(first_part)
-        last_part = list(last_part)
-        if last_part[0] == "O":
-            last_part[0] = "0"
-
-        return "%s %s" % ("".join(first_part), "".join(last_part))
+        return clean_postcode(id)
 
     def toJSON(self, role: str = "top") -> tuple[dict, list]:  # type: ignore
         json, included = super().toJSON(role)

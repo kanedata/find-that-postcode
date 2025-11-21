@@ -83,7 +83,12 @@ class MockElasticsearch:
         return result
 
     def search(self, **kwargs):
-        index = kwargs.get("index", "").split(",")
+        index = kwargs.get("index", "")
+        # Handle index as either string or list
+        if isinstance(index, list):
+            index = index
+        else:
+            index = index.split(",")
 
         # get some specific queries used in the data
         if (
@@ -165,6 +170,41 @@ class MockElasticsearch:
             "_id": kwargs["id"],
             "found": False,
         }
+
+    def mget(self, body=None, index=None, **kwargs):
+        """Multi-get - retrieve multiple documents by ID"""
+        if body is None:
+            body = kwargs.get("body", {})
+        if index is None:
+            index = kwargs.get("index", "")
+
+        ids = body.get("ids", [])
+
+        potentials = {i.get("_id", "__missing"): i for i in mock_data.get(index, [])}
+
+        docs = []
+        for doc_id in ids:
+            if potentials.get(doc_id):
+                docs.append(
+                    {
+                        "_version": 9,
+                        "_seq_no": 694904,
+                        "_primary_term": 9,
+                        "found": True,
+                        **copy.deepcopy(potentials[doc_id]),
+                    }
+                )
+            else:
+                docs.append(
+                    {
+                        "_index": index,
+                        "_type": "_doc",
+                        "_id": doc_id,
+                        "found": False,
+                    }
+                )
+
+        return {"docs": docs}
 
     def scroll(self, body=None, scroll_id=None, **kwargs):
         result = self.search_result_wrapper()

@@ -14,6 +14,7 @@ from findthatpostcode.metadata import (
     RUC21_CODES,
     STATS_FIELDS,
 )
+from findthatpostcode.settings import AREA_INDEX, POSTCODE_INDEX
 
 bp = APIRouter(prefix="/postcodes")
 
@@ -107,14 +108,14 @@ def get_postcode_by_hash(
     results = list(
         scan(
             es,
-            index="geo_postcode",
+            index=POSTCODE_INDEX,
             query={"query": {"bool": {"should": query}}},
             _source_includes=fields + name_fields + stats_fields,
         )
     )
     areas = scan(
         es,
-        index="geo_area",
+        index=AREA_INDEX,
         query={"query": {"terms": {"type": name_fields}}},
         _source_includes=["name"],
     )
@@ -157,7 +158,7 @@ def get_postcode_by_hash(
                 i["_id"]: i["_source"]
                 for i in scan(
                     es,
-                    index="geo_area",
+                    index=AREA_INDEX,
                     query={"query": {"terms": {"_id": list(lsoas_to_get)}}},
                     _source_includes=[i.location for i in stats],
                 )

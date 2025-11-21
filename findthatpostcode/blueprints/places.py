@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from findthatpostcode.blueprints.utils import return_result
 from findthatpostcode.controllers.places import Place
 from findthatpostcode.db import ElasticsearchDep
+from findthatpostcode.settings import PLACENAME_INDEX
 
 bp = APIRouter(prefix="/places")
 
@@ -32,7 +33,7 @@ def nearest(
     }
 
     data = es.search(
-        index="geo_placename",
+        index=PLACENAME_INDEX,
         body=query,
         ignore=[404],  # type: ignore
         size=10,  # type: ignore

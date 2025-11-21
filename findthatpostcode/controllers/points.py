@@ -4,11 +4,12 @@ from elasticsearch import Elasticsearch
 
 from findthatpostcode.controllers.controller import Controller
 from findthatpostcode.controllers.postcodes import Postcode
+from findthatpostcode.settings import POSTCODE_INDEX
 from findthatpostcode.utils import ESConfig
 
 
 class Point(Controller):
-    es_index = "geo_postcode"
+    es_index = POSTCODE_INDEX
     url_slug = "points"
     template = "postcode.html.j2"
     max_distance = 10000

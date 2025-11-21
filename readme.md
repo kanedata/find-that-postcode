@@ -117,7 +117,7 @@ You can add more than one URL to each import script.
 
 A further related dataset is placenames. The [ONS has a list of these](http://geoportal.statistics.gov.uk/datasets/a6c138d17ac54532b0ca8ee693922f10_0)
 which can be imported using the `import placenames` command. An entry for each
-placename is added to the `geo_placenames` elasticsearch index.
+placename is added to the `geo_placename` elasticsearch index.
 
 ```bash
 python -m findthatpostcode import placenames

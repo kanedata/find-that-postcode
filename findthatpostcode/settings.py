@@ -36,3 +36,9 @@ RATE_LIMIT_EXEMPT_KEYS = os.environ.get("RATE_LIMIT_EXEMPT_KEYS", "").split(",")
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "..", "static")
 TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), "templates")
+
+
+ENTITY_INDEX = "geo_entity"
+AREA_INDEX = "geo_area"
+POSTCODE_INDEX = "geo_postcode"
+PLACENAME_INDEX = "geo_placename"

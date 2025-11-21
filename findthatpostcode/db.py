@@ -9,8 +9,11 @@ from mypy_boto3_s3 import S3Client
 from sqlite_utils import Database
 
 from findthatpostcode.settings import (
+    AREA_INDEX,
     ES_URL,
     LOGGING_DB,
+    PLACENAME_INDEX,
+    POSTCODE_INDEX,
     S3_ACCESS_ID,
     S3_ENDPOINT,
     S3_REGION,
@@ -18,14 +21,14 @@ from findthatpostcode.settings import (
 )
 
 INDEXES = {
-    "geo_postcode": {
+    POSTCODE_INDEX: {
         "properties": {
             "location": {"type": "geo_point"},
             "hash": {"type": "text", "index_prefixes": {}},
         }
     },
-    "geo_placename": {"properties": {"location": {"type": "geo_point"}}},
-    "geo_area": {"properties": {"boundary": {"type": "geo_shape"}}},
+    PLACENAME_INDEX: {"properties": {"location": {"type": "geo_point"}}},
+    AREA_INDEX: {"properties": {"boundary": {"type": "geo_shape"}}},
 }
 
 

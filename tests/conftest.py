@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 
 from findthatpostcode.db import get_es, get_s3_client
 from findthatpostcode.main import app
+from findthatpostcode.settings import AREA_INDEX
 
 mock_data = {}
 mock_data_dir = os.path.join(os.path.dirname(__file__), "mock_data")
@@ -86,7 +87,7 @@ class MockElasticsearch:
 
         # get some specific queries used in the data
         if (
-            "geo_area" in index
+            AREA_INDEX in index
             and kwargs.get("body", {})
             .get("aggs", {})
             .get("group_by_type", {})
@@ -109,7 +110,7 @@ class MockElasticsearch:
                 },
             )
         if (
-            "geo_area" in index
+            AREA_INDEX in index
             and kwargs.get("body", {})
             .get("aggs", {})
             .get("group_by_type", {})

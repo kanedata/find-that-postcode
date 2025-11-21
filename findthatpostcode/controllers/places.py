@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from elasticsearch import Elasticsearch
 
 from findthatpostcode.controllers.controller import Controller
+from findthatpostcode.settings import PLACENAME_INDEX, POSTCODE_INDEX
 from findthatpostcode.utils import ESConfig
 
 if TYPE_CHECKING:
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class Place(Controller):
-    es_index = "geo_placename"
+    es_index = PLACENAME_INDEX
     url_slug = "places"
     template = "place.html.j2"
 
@@ -107,7 +108,7 @@ class Place(Controller):
             ],
         }
         example = es.search(
-            index="geo_postcode",
+            index=POSTCODE_INDEX,
             body=query,
             size=examples_count,  # type: ignore
         )
@@ -134,7 +135,7 @@ class Place(Controller):
             ],
         }
         example = es.search(
-            index="geo_placename",
+            index=PLACENAME_INDEX,
             body=query,
             size=examples_count,  # type: ignore
         )

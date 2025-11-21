@@ -12,9 +12,8 @@ import requests_cache
 
 from findthatpostcode.commands.utils import bulk_upload, get_latest_geoportal_url
 from findthatpostcode.db import get_es
-from findthatpostcode.settings import DEBUG
+from findthatpostcode.settings import DEBUG, PLACENAME_INDEX
 
-PLACENAMES_INDEX = "geo_placename"
 PRD_IPN = "PRD_IPN"
 
 PLACE_TYPES: dict[str, tuple[str, str]] = {
@@ -76,9 +75,9 @@ AREA_LOOKUP: list[tuple[str, str, str | None]] = [
 
 
 @click.command("placenames")
-@click.option("--es-index", default=PLACENAMES_INDEX)
+@click.option("--es-index", default=PLACENAME_INDEX)
 @click.option("--url", default=None)
-def import_placenames(url=None, es_index=PLACENAMES_INDEX):
+def import_placenames(url=None, es_index=PLACENAME_INDEX):
     if DEBUG:
         requests_cache.install_cache()
 

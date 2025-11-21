@@ -15,7 +15,13 @@ from findthatpostcode.controllers.controller import (
 )
 from findthatpostcode.controllers.places import Place
 from findthatpostcode.metadata import AREA_TYPES
-from findthatpostcode.settings import S3_BUCKET
+from findthatpostcode.settings import (
+    AREA_INDEX,
+    ENTITY_INDEX,
+    PLACENAME_INDEX,
+    POSTCODE_INDEX,
+    S3_BUCKET,
+)
 from findthatpostcode.utils import ESConfig
 
 if TYPE_CHECKING:
@@ -23,7 +29,7 @@ if TYPE_CHECKING:
 
 
 class Areatype(Controller):
-    es_index = "geo_entity"
+    es_index = ENTITY_INDEX
     url_slug = "areatypes"
     areatypes = AREA_TYPES
 
@@ -98,7 +104,7 @@ class Areatype(Controller):
             }
         }
         search_params: dict[str, str | dict | int] = dict(
-            index="geo_area",
+            index=AREA_INDEX,
             body=query,
             sort="_id:asc",
         )
@@ -144,7 +150,7 @@ def area_types_count(
 
 
 class Area(Controller):
-    es_index = "geo_area"
+    es_index = AREA_INDEX
     url_slug = "areas"
     template = "area.html.j2"
     date_fields = ["date_end", "date_start"]
@@ -306,7 +312,7 @@ class Area(Controller):
             }
         }
         example = es.search(
-            index="geo_postcode",
+            index=POSTCODE_INDEX,
             body=query,
             size=examples_count,  # type: ignore
         )
@@ -327,7 +333,7 @@ class Area(Controller):
             },
         }
         children = es.search(
-            index="geo_area",
+            index=AREA_INDEX,
             body=query,
             size=100,  # type: ignore
             _source_includes=["code", "name", "type", "active"],  # type: ignore
@@ -424,7 +430,7 @@ def search_areas(
     Search for areas based on a name
     """
     if not es_config:
-        es_config = ESConfig(es_index="geo_area")
+        es_config = ESConfig(es_index=AREA_INDEX)
     query = {
         "query": {
             "function_score": {
@@ -489,7 +495,7 @@ def search_areas(
     }
     if pagination:
         result = es.search(
-            index="geo_area,geo_placename",
+            index=f"{AREA_INDEX},{PLACENAME_INDEX}",
             body=query,
             from_=pagination.from_,  # type: ignore
             size=pagination.size,  # type: ignore
@@ -498,14 +504,14 @@ def search_areas(
         )
     else:
         result = es.search(
-            index="geo_area,geo_placename",
+            index=f"{AREA_INDEX},{PLACENAME_INDEX}",
             body=query,
             _source_excludes=["boundary"],  # type: ignore
             ignore=[404],  # type: ignore
         )
     return_result = []
     for a in result.get("hits", {}).get("hits", []):
-        if a["_index"] == "geo_placename":
+        if a["_index"] == PLACENAME_INDEX:
             relationships = {}
             if a["_source"].get("areas", {}).get("laua"):
                 relationships["areas"] = [

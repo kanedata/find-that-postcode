@@ -14,11 +14,12 @@ from findthatpostcode.metadata import (
     RUC21_CODES,
     STATS_FIELDS,
 )
+from findthatpostcode.settings import PLACENAME_INDEX, POSTCODE_INDEX
 from findthatpostcode.utils import ESConfig
 
 
 class Postcode(Controller):
-    es_index = "geo_postcode"
+    es_index = POSTCODE_INDEX
     url_slug = "postcodes"
     date_fields = ["dointr", "doterm"]
     not_area_fields = ["osgrdind", "usertype"]
@@ -127,7 +128,7 @@ class Postcode(Controller):
             ],
         }
         example = es.search(
-            index="geo_placename",
+            index=PLACENAME_INDEX,
             body=query,
             size=examples_count,  # type: ignore
         )

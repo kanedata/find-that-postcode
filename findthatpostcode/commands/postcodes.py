@@ -14,16 +14,15 @@ import requests_cache
 
 from findthatpostcode.commands.utils import bulk_upload, get_latest_geoportal_url
 from findthatpostcode.db import get_es
-from findthatpostcode.settings import DEBUG
+from findthatpostcode.settings import DEBUG, POSTCODE_INDEX
 
-PC_INDEX = "geo_postcode"
 PRD_NSPL = "PRD_NSPL"
 
 
 @click.command("nspl")
-@click.option("--es-index", default=PC_INDEX)
+@click.option("--es-index", default=POSTCODE_INDEX)
 @click.option("--url", default=None)
-def import_nspl(url=None, es_index=PC_INDEX):
+def import_nspl(url=None, es_index=POSTCODE_INDEX):
     if not url:
         url = get_latest_geoportal_url(PRD_NSPL)
 

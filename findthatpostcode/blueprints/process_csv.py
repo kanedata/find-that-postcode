@@ -7,6 +7,7 @@ from typing import Iterable
 from elasticsearch import Elasticsearch
 
 from findthatpostcode.controllers.postcodes import Postcode
+from findthatpostcode.settings import AREA_INDEX, POSTCODE_INDEX
 from findthatpostcode.utils import ESConfig
 
 # List of potential postcode fields
@@ -22,7 +23,7 @@ def process_csv(
     es_config: ESConfig | None = None,
 ) -> None:
     if not es_config:
-        es_config = ESConfig(es_index="geo_postcode")
+        es_config = ESConfig(es_index=POSTCODE_INDEX)
 
     # @TODO add option for different CSV dialects and for no headers
     # In the case of no headers you would find the field by number
@@ -52,7 +53,7 @@ def process_csv(
                             row[i] = code_cache[code]
                         elif code:
                             area = es.get(
-                                index="geo_area",
+                                index=AREA_INDEX,
                                 doc_type=es_config.es_type,
                                 id=code,
                                 ignore=[404],  # type: ignore

@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from findthatpostcode.areatypes import AreaTypeEnum
 from findthatpostcode.crud.areas import (
     get_area,
     get_area_boundary,
@@ -52,7 +53,7 @@ async def read_example_postcodes(
     tags=["GeoJSON"],
 )
 async def read_area_children_geojson(
-    areacode: str, areatype: str, es: ElasticsearchDep, s3_client: S3Dep
+    areacode: str, areatype: AreaTypeEnum, es: ElasticsearchDep, s3_client: S3Dep
 ) -> AreaGeoJSON:
     area = get_area(areacode, es)
     areas = get_child_areas(area, areatype, es)
@@ -68,7 +69,7 @@ async def read_area_children_geojson(
 
 @router.get("/{areacode}/children/{areatype}", response_model_exclude_unset=True)
 async def read_area_children(
-    areacode: str, areatype: str, es: ElasticsearchDep
+    areacode: str, areatype: AreaTypeEnum, es: ElasticsearchDep
 ) -> list[AreaResponse]:
     area = get_area(areacode, es)
     return get_child_areas(area, areatype, es)

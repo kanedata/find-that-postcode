@@ -6,6 +6,7 @@ from botocore.exceptions import ClientError
 from elasticsearch import Elasticsearch
 from mypy_boto3_s3 import S3Client
 
+from findthatpostcode.areatypes import AreaTypeEnum
 from findthatpostcode.crud.utils import get_or_404
 from findthatpostcode.schema import Area, Postcode
 from findthatpostcode.schema.db import Area as AreaDocument
@@ -75,13 +76,15 @@ def get_example_postcodes(
     return []
 
 
-def get_child_areas(area: Area, areatype: str, es: Elasticsearch) -> list[Area]:
+def get_child_areas(
+    area: Area, areatype: AreaTypeEnum, es: Elasticsearch
+) -> list[Area]:
     query = {
         "query": {
             "bool": {
                 "filter": [
                     {"term": {"parent.keyword": area.code}},
-                    {"term": {"type.keyword": areatype}},
+                    {"term": {"type.keyword": areatype.value}},
                 ]
             }
         }

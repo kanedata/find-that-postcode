@@ -1,4 +1,5 @@
 import math
+from http import HTTPStatus
 from urllib.parse import ParseResult, urlencode, urlunparse
 
 from elasticsearch import Elasticsearch
@@ -54,7 +55,7 @@ class Controller:
             index=es_config.es_index,
             doc_type=es_config.es_type,
             id=cls.parse_id(id),
-            ignore=[404],  # type: ignore
+            ignore=[HTTPStatus.NOT_FOUND],  # type: ignore
             _source_excludes=es_config._source_exclude,  # type: ignore
         )
         return cls(data.get("_id"), data.get("_source"))
@@ -140,11 +141,11 @@ class Controller:
         # query_vars = self.page_query_vars(query_vars)
         return urlencode(query_vars)
 
-    def get_errors(self: "Controller") -> list[dict[str, str]]:
+    def get_errors(self: "Controller") -> list[dict[str, str | int]]:
         if not self.found:
             return [
                 {
-                    "status": "404",
+                    "status": HTTPStatus.NOT_FOUND,
                     "title": "resource not found",
                     "detail": "resource could not be found",
                 }
@@ -199,7 +200,11 @@ class Controller:
         if not self.found:
             return {
                 "errors": [
-                    {"status": "404", "code": "not_found", "title": "Code not found"}
+                    {
+                        "status": HTTPStatus.NOT_FOUND,
+                        "code": "not_found",
+                        "title": "Code not found",
+                    }
                 ]
             }
 

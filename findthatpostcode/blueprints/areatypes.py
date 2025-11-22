@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from fastapi import APIRouter, HTTPException, Request, Response
 
 from findthatpostcode.blueprints.areas import areas_csv
@@ -44,7 +46,9 @@ def get_areatype(
     try:
         result = Areatype.get_from_es(areacode, es)
     except ValueError:
-        raise HTTPException(status_code=404, detail="AreaType not found")
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail="AreaType not found"
+        )
     pagination = Pagination(page=p, size=size)
     result.get_areas(es, pagination=pagination)
 

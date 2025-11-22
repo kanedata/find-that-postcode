@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Type, overload
 
 from elasticsearch import Elasticsearch, NotFoundError
@@ -30,6 +31,9 @@ def get_or_404(
             return result
     except NotFoundError:
         raise HTTPException(
-            status_code=404, detail=f"{document.__name__} {id} not found"
+            status_code=HTTPStatus.NOT_FOUND,
+            detail=f"{document.__name__} {id} not found",
         )
-    raise HTTPException(status_code=404, detail=f"{document.__name__} {id} not found")
+    raise HTTPException(
+        status_code=HTTPStatus.NOT_FOUND, detail=f"{document.__name__} {id} not found"
+    )

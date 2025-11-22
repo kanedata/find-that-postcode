@@ -1,4 +1,5 @@
 import re
+from http import HTTPStatus
 
 from fastapi import APIRouter, Request
 from fastapi.responses import RedirectResponse
@@ -52,13 +53,13 @@ def search_index(
                 "get_point",
                 latlon="{},{}.html".format(latlon["lat"], latlon["lon"]),  # type: ignore
             ),
-            status_code=303,
+            status_code=HTTPStatus.SEE_OTHER,
         )
 
     if is_postcode(q):
         return RedirectResponse(
             request.url_for("get_postcode", postcode=q, filetype="html"),
-            status_code=303,
+            status_code=HTTPStatus.SEE_OTHER,
         )
 
     pagination = Pagination(page=p, size=size)

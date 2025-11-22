@@ -80,7 +80,6 @@ the [Office for National Statistics](https://geoportal.statistics.gov.uk/) and
     swagger_css_url="/static/swagger-ui/swagger-ui.css",
 )
 
-
 app.mount(
     "/static",
     StaticFiles(directory=STATIC_DIR),

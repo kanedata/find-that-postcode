@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from findthatpostcode.controllers.controller import Controller
 from findthatpostcode.settings import POSTCODE_INDEX
 from findthatpostcode.utils import ESConfig
@@ -25,7 +27,7 @@ def test_controller_class():
     assert a.attributes.get("name") is None
     assert a.found is False
     assert len(a.get_errors()) == 1
-    assert a.get_errors()[0]["status"] == "404"
+    assert a.get_errors()[0]["status"] == HTTPStatus.NOT_FOUND
 
 
 def test_controller_fetch():

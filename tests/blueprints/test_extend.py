@@ -1,4 +1,5 @@
 import json
+from http import HTTPStatus
 from urllib.parse import urlencode
 
 import pytest
@@ -63,7 +64,7 @@ def test_reconcile_extend(client, origin, endpoint):
         check_cors = True
     rv = client.get("{}?{}".format(endpoint, urlencode(extend_q)), headers=headers)
     result = rv.json()
-    assert rv.status_code == 200
+    assert rv.status_code == HTTPStatus.OK
     assert "meta" in result
     assert "EX36 4AT" in result["rows"]
     assert "lsoa11" not in result["rows"]["EX36 4AT"]
@@ -77,7 +78,7 @@ def test_reconcile_extend_jsonp(client, endpoint):
     extend_q["callback"] = "testCallback"
     rv = client.get("{}?{}".format(endpoint, urlencode(extend_q)))
     data = rv.text
-    assert rv.status_code == 200
+    assert rv.status_code == HTTPStatus.OK
     assert data.startswith(extend_q["callback"])
 
     result = json.loads(data[len(extend_q["callback"]) + 1 : -1])
@@ -97,7 +98,7 @@ def test_reconcile_extend_post(client, origin, endpoint):
         check_cors = True
     rv = client.post(endpoint, data=extend_q, headers=headers)
     result = rv.json()
-    assert rv.status_code == 200
+    assert rv.status_code == HTTPStatus.OK
     assert "meta" in result
     assert "EX36 4AT" in result["rows"]
     assert "lsoa11" not in result["rows"]["EX36 4AT"]
@@ -110,7 +111,7 @@ def test_reconcile_extend_post(client, origin, endpoint):
 def test_reconcile_extend_post_jsonp(client, endpoint):
     rv = client.post("{}?callback=testCallback".format(endpoint), data=extend_q)
     data = rv.text
-    assert rv.status_code == 200
+    assert rv.status_code == HTTPStatus.OK
     assert data.startswith("testCallback")
 
     result = json.loads(data[len("testCallback") + 1 : -1])
@@ -147,7 +148,7 @@ def test_reconcile(client, origin, endpoint):
     print("{}?{}".format(endpoint, urlencode(recon_q)))
     rv = client.get("{}?{}".format(endpoint, urlencode(recon_q)), headers=headers)
     result = rv.json()
-    assert rv.status_code == 200
+    assert rv.status_code == HTTPStatus.OK
     assert "q0" in result
     assert "q1" in result
     if check_cors:
@@ -164,7 +165,7 @@ def test_reconcile_post(client, origin, endpoint):
         check_cors = True
     rv = client.post(endpoint, data=recon_q, headers=headers)
     result = rv.json()
-    assert rv.status_code == 200
+    assert rv.status_code == HTTPStatus.OK
     assert "q0" in result
     assert "q1" in result
     if check_cors:

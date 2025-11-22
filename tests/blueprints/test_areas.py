@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 import pytest
 
 AREA_CODE = "S02000783"
@@ -20,7 +22,7 @@ def test_area_json(client, endpoint, origin):
         headers["Origin"] = origin
         check_cors = True
     rv = client.get(endpoint, headers=headers)
-    assert rv.status_code == 200
+    assert rv.status_code == HTTPStatus.OK
 
     print(rv.headers)
     data = rv.json()
@@ -51,7 +53,7 @@ def test_area_json(client, endpoint, origin):
 )
 def test_missing_area_json(client, endpoint):
     rv = client.get(endpoint)
-    assert rv.status_code == 404
+    assert rv.status_code == HTTPStatus.NOT_FOUND
 
 
 def test_area_html(client):

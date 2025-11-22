@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from urllib.parse import urlunparse
 
 from elasticsearch import Elasticsearch
@@ -60,7 +61,7 @@ class Point(Controller):
         data = es.search(
             index=es_config.es_index,
             body=query,
-            ignore=[404],  # type: ignore
+            ignore=[HTTPStatus.NOT_FOUND],  # type: ignore
             size=1,  # type: ignore
             _source_excludes=es_config._source_exclude,  # type: ignore
         )
@@ -84,7 +85,7 @@ class Point(Controller):
         if not isinstance(nearest_postcode, Postcode):
             return [
                 {
-                    "status": "400",
+                    "status": HTTPStatus.NOT_FOUND,
                     "code": "no_postcode_found",
                     "title": "No nearest postcode found",
                 }
@@ -94,7 +95,7 @@ class Point(Controller):
             self.found = False
             return [
                 {
-                    "status": "400",
+                    "status": HTTPStatus.BAD_REQUEST,
                     "code": "point_outside_uk",
                     "title": "Nearest postcode is more than 10km away",
                     "detail": (
@@ -109,7 +110,7 @@ class Point(Controller):
         if not self.found:
             return [
                 {
-                    "status": "404",
+                    "status": HTTPStatus.NOT_FOUND,
                     "title": "resource not found",
                     "detail": "resource could not be found",
                 }
@@ -126,7 +127,7 @@ class Point(Controller):
             return {
                 "errors": [
                     {
-                        "status": "400",
+                        "status": HTTPStatus.NOT_FOUND,
                         "code": "no_postcode_found",
                         "title": "No nearest postcode found",
                     }
@@ -139,7 +140,7 @@ class Point(Controller):
             return {
                 "errors": [
                     {
-                        "status": "400",
+                        "status": HTTPStatus.BAD_REQUEST,
                         "code": "point_outside_uk",
                         "title": "Nearest postcode is more than 10km away",
                         "detail": (

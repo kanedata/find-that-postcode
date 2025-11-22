@@ -128,6 +128,188 @@ class AreaTypeEnum(str, enum.Enum):
     WARD = "ward"
     WARD1961 = "ward1961"
     WZ11 = "wz11"
+    E00 = "E00"
+    E01 = "E01"
+    E02 = "E02"
+    E04 = "E04"
+    E05 = "E05"
+    E06 = "E06"
+    E07 = "E07"
+    E08 = "E08"
+    E09 = "E09"
+    E10 = "E10"
+    E11 = "E11"
+    E12 = "E12"
+    E13 = "E13"
+    E14 = "E14"
+    E15 = "E15"
+    E16 = "E16"
+    E17 = "E17"
+    E18 = "E18"
+    E19 = "E19"
+    E20 = "E20"
+    E21 = "E21"
+    E22 = "E22"
+    E23 = "E23"
+    E24 = "E24"
+    E25 = "E25"
+    E26 = "E26"
+    E27 = "E27"
+    E28 = "E28"
+    E29 = "E29"
+    E30 = "E30"
+    E31 = "E31"
+    E32 = "E32"
+    E33 = "E33"
+    E34 = "E34"
+    E35 = "E35"
+    E36 = "E36"
+    E37 = "E37"
+    E38 = "E38"
+    E39 = "E39"
+    E40 = "E40"
+    E41 = "E41"
+    E42 = "E42"
+    E43 = "E43"
+    E45 = "E45"
+    E46 = "E46"
+    E47 = "E47"
+    E48 = "E48"
+    E49 = "E49"
+    E50 = "E50"
+    E51 = "E51"
+    E52 = "E52"
+    E53 = "E53"
+    E54 = "E54"
+    E55 = "E55"
+    E56 = "E56"
+    E57 = "E57"
+    E58 = "E58"
+    E59 = "E59"
+    E60 = "E60"
+    E61 = "E61"
+    E92 = "E92"
+    J01 = "J01"
+    J02 = "J02"
+    J03 = "J03"
+    J04 = "J04"
+    J05 = "J05"
+    K01 = "K01"
+    K02 = "K02"
+    K03 = "K03"
+    K04 = "K04"
+    K05 = "K05"
+    K06 = "K06"
+    L00 = "L00"
+    L93 = "L93"
+    M00 = "M00"
+    M01 = "M01"
+    M83 = "M83"
+    N00 = "N00"
+    N06 = "N06"
+    N07 = "N07"
+    N08 = "N08"
+    N09 = "N09"
+    N10 = "N10"
+    N11 = "N11"
+    N12 = "N12"
+    N13 = "N13"
+    N19 = "N19"
+    N23 = "N23"
+    N24 = "N24"
+    N31 = "N31"
+    N32 = "N32"
+    N33 = "N33"
+    N92 = "N92"
+    S00 = "S00"
+    S01 = "S01"
+    S02 = "S02"
+    S03 = "S03"
+    S04 = "S04"
+    S05 = "S05"
+    S06 = "S06"
+    S07 = "S07"
+    S08 = "S08"
+    S09 = "S09"
+    S10 = "S10"
+    S11 = "S11"
+    S12 = "S12"
+    S13 = "S13"
+    S14 = "S14"
+    S15 = "S15"
+    S16 = "S16"
+    S17 = "S17"
+    S19 = "S19"
+    S20 = "S20"
+    S21 = "S21"
+    S22 = "S22"
+    S23 = "S23"
+    S24 = "S24"
+    S25 = "S25"
+    S26 = "S26"
+    S27 = "S27"
+    S28 = "S28"
+    S29 = "S29"
+    S30 = "S30"
+    S31 = "S31"
+    S32 = "S32"
+    S33 = "S33"
+    S34 = "S34"
+    S35 = "S35"
+    S36 = "S36"
+    S37 = "S37"
+    S38 = "S38"
+    S39 = "S39"
+    S40 = "S40"
+    S41 = "S41"
+    S42 = "S42"
+    S43 = "S43"
+    S44 = "S44"
+    S92 = "S92"
+    W00 = "W00"
+    W01 = "W01"
+    W02 = "W02"
+    W03 = "W03"
+    W04 = "W04"
+    W05 = "W05"
+    W06 = "W06"
+    W07 = "W07"
+    W08 = "W08"
+    W09 = "W09"
+    W10 = "W10"
+    W11 = "W11"
+    W12 = "W12"
+    W13 = "W13"
+    W14 = "W14"
+    W15 = "W15"
+    W16 = "W16"
+    W18 = "W18"
+    W19 = "W19"
+    W20 = "W20"
+    W21 = "W21"
+    W22 = "W22"
+    W23 = "W23"
+    W24 = "W24"
+    W25 = "W25"
+    W26 = "W26"
+    W27 = "W27"
+    W28 = "W28"
+    W29 = "W29"
+    W30 = "W30"
+    W31 = "W31"
+    W32 = "W32"
+    W33 = "W33"
+    W34 = "W34"
+    W35 = "W35"
+    W36 = "W36"
+    W37 = "W37"
+    W38 = "W38"
+    W39 = "W39"
+    W40 = "W40"
+    W41 = "W41"
+    W42 = "W42"
+    W43 = "W43"
+    W92 = "W92"
 
 
 AREA_TYPES = {
@@ -165,7 +347,7 @@ AREA_TYPES = {
         "name": "Built-up Area",
         "full_name": "Built-up Area (BUA)",
         "description": "The code for the BUAs in England and Wales. Pseudo codes are included for those OAs not classed as 'built-up' and cross-border codes are included for areas straddling the English/Welsh border. Pseudo codes are also included for Scotland, Northern Ireland, Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code.",
-        "countries": ["K", "W", "E"],
+        "countries": ["E", "K", "W"],
     },
     AreaTypeEnum.BUASD11: {
         "entities": ["E35", "K06", "W38"],
@@ -174,7 +356,7 @@ AREA_TYPES = {
         "name": "Built-up Area Sub-division (BUASD)",
         "full_name": "Built-up Area Sub-division",
         "description": "The code for the BUASDs in England and Wales. Pseudo codes are included for those OAs not classed as 'built-up' and cross-border codes are included for areas straddling the English/Welsh border. Pseudo codes are also included for Scotland, Northern Ireland, Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code",
-        "countries": ["K", "W", "E"],
+        "countries": ["E", "K", "W"],
     },
     AreaTypeEnum.CAL: {
         "entities": ["E56"],
@@ -192,7 +374,7 @@ AREA_TYPES = {
         "name": "Cancer Networks",
         "full_name": "Cancer Networks",
         "description": None,
-        "countries": ["W", "E"],
+        "countries": ["E", "W"],
     },
     AreaTypeEnum.CANREG: {
         "entities": ["E20", "W12"],
@@ -201,7 +383,7 @@ AREA_TYPES = {
         "name": "Cancer Registries",
         "full_name": "Cancer Registries",
         "description": None,
-        "countries": ["W", "E"],
+        "countries": ["E", "W"],
     },
     AreaTypeEnum.CAUTH: {
         "entities": ["E47"],
@@ -300,7 +482,7 @@ AREA_TYPES = {
         "name": "Census Merged Local Authority Districts",
         "full_name": "Census Merged Local Authority Districts",
         "description": None,
-        "countries": ["W", "E"],
+        "countries": ["E", "W"],
     },
     AreaTypeEnum.CMWD: {
         "entities": ["E36", "W39"],
@@ -309,7 +491,7 @@ AREA_TYPES = {
         "name": "Census Merged Wards",
         "full_name": "Census Merged Wards",
         "description": None,
-        "countries": ["W", "E"],
+        "countries": ["E", "W"],
     },
     AreaTypeEnum.COM: {
         "entities": ["W04"],
@@ -336,7 +518,7 @@ AREA_TYPES = {
         "name": "Community Safety Partnerships",
         "full_name": "Community Safety Partnerships",
         "description": None,
-        "countries": ["W", "E"],
+        "countries": ["E", "W"],
     },
     AreaTypeEnum.CT: {
         "entities": ["E17"],
@@ -354,7 +536,7 @@ AREA_TYPES = {
         "name": "Country",
         "full_name": "Country",
         "description": "The code for the appropriate country (i.e. one of the four constituent countries of the UK or Crown dependencies - the Channel Islands or the Isle of Man) to which each postcode is assigned.",
-        "countries": ["K", "E", "L", "N", "S", "M", "W"],
+        "countries": ["M", "N", "W", "K", "S", "E", "L"],
     },
     AreaTypeEnum.CTY: {
         "entities": ["E10"],
@@ -417,7 +599,7 @@ AREA_TYPES = {
         "name": "European Electoral Region",
         "full_name": "European Electoral Region (EER)",
         "description": "The European Electoral Region code for each postcode. A pseudo code is included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code",
-        "countries": ["N", "W", "S", "E"],
+        "countries": ["E", "N", "W", "S"],
     },
     AreaTypeEnum.ER: {
         "entities": ["S09"],
@@ -444,7 +626,7 @@ AREA_TYPES = {
         "name": "Fire and Rescue Authorities",
         "full_name": "Fire and Rescue Authorities",
         "description": None,
-        "countries": ["W", "E"],
+        "countries": ["E", "W"],
     },
     AreaTypeEnum.GLA: {
         "entities": ["E61"],
@@ -570,7 +752,7 @@ AREA_TYPES = {
         "name": "Local Authority",
         "full_name": "Local Authority District (LAD)/unitary authority (UA)/metropolitan district (MD)/London borough (LB)/ council area (CA)/district council area (DCA)",
         "description": "The current district/UA to which the postcode has been assigned. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code.",
-        "countries": ["N", "W", "S", "E"],
+        "countries": ["E", "N", "W", "S"],
     },
     AreaTypeEnum.LEP: {
         "entities": ["E37"],
@@ -633,7 +815,7 @@ AREA_TYPES = {
         "name": "Local Planning Authorities",
         "full_name": "Local Planning Authorities",
         "description": None,
-        "countries": ["N", "W", "S", "E"],
+        "countries": ["E", "N", "W", "S"],
     },
     AreaTypeEnum.LRF: {
         "entities": ["E48", "W41"],
@@ -642,7 +824,7 @@ AREA_TYPES = {
         "name": "Local Resilience Forums",
         "full_name": "Local Resilience Forums",
         "description": None,
-        "countries": ["W", "E"],
+        "countries": ["E", "W"],
     },
     AreaTypeEnum.LSOA11: {
         "entities": ["E01", "S01", "W01"],
@@ -651,7 +833,7 @@ AREA_TYPES = {
         "name": "Lower Super Output Area",
         "full_name": "2011 Census Lower Layer Super Output Area (LSOA)/ Data Zone (DZ)/ SOA",
         "description": "The 2011 Census LSOA code for England and Wales, SOA code for Northern Ireland and DZ code for Scotland. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code. N.B. NI SOAs remain unchanged from 2001.",
-        "countries": ["S", "W", "E"],
+        "countries": ["E", "W", "S"],
     },
     AreaTypeEnum.LSOA21: {
         "entities": ["E01", "S01", "W01"],
@@ -660,7 +842,7 @@ AREA_TYPES = {
         "name": "Lower Super Output Area",
         "full_name": "2021 Census Lower Layer Super Output Area (LSOA)/ Data Zone (DZ)/ SOA",
         "description": "The 2021 Census LSOA code for England and Wales, SOA code for Northern Ireland and DZ code for Scotland. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code. N.B. NI SOAs remain unchanged from 2001.",
-        "countries": ["S", "W", "E"],
+        "countries": ["E", "W", "S"],
     },
     AreaTypeEnum.MCTY: {
         "entities": ["E11"],
@@ -678,7 +860,7 @@ AREA_TYPES = {
         "name": "Middle Super Output Area",
         "full_name": "Middle Layer Super Output Area (MSOA)/Intermediate Zone (IZ)",
         "description": "The 2011 Census MSOA code for England and Wales and IZ code for Scotland. Pseudo codes are included for Northern Ireland, Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code.",
-        "countries": ["S", "W", "E"],
+        "countries": ["E", "W", "S"],
     },
     AreaTypeEnum.MSOA21: {
         "entities": ["E02", "S02", "W02"],
@@ -687,7 +869,7 @@ AREA_TYPES = {
         "name": "Middle Super Output Area",
         "full_name": "Middle Layer Super Output Area (MSOA)/Intermediate Zone (IZ)",
         "description": "The 2021 Census MSOA code for England and Wales and IZ code for Scotland. Pseudo codes are included for Northern Ireland, Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code.",
-        "countries": ["S", "W", "E"],
+        "countries": ["E", "W", "S"],
     },
     AreaTypeEnum.NAER: {
         "entities": ["W19"],
@@ -822,7 +1004,7 @@ AREA_TYPES = {
         "name": "National Parks",
         "full_name": "National Parks",
         "description": None,
-        "countries": ["S", "W", "E"],
+        "countries": ["E", "W", "S"],
     },
     AreaTypeEnum.OA11: {
         "entities": ["E00", "N00", "S00", "W00"],
@@ -831,7 +1013,7 @@ AREA_TYPES = {
         "name": "Output area",
         "full_name": "2011 Census Output Area (OA)/ Small Area (SA)",
         "description": "The 2011 Census OAs in GB and SAs in Northern Ireland were based on 2001 Census OAs, and they form the building bricks for defining higher level geographies. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no grid reference.",
-        "countries": ["N", "W", "S", "E"],
+        "countries": ["E", "N", "W", "S"],
     },
     AreaTypeEnum.OA21: {
         "entities": ["E00", "N00", "S00", "W00"],
@@ -840,7 +1022,7 @@ AREA_TYPES = {
         "name": "Output area",
         "full_name": "2021 Census Output Area (OA)/ Small Area (SA)",
         "description": "The 2021 Census OAs in GB and SAs in Northern Ireland were based on 2001 Census OAs, and they form the building bricks for defining higher level geographies. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no grid reference.",
-        "countries": ["N", "W", "S", "E"],
+        "countries": ["E", "N", "W", "S"],
     },
     AreaTypeEnum.PAR: {
         "entities": ["E04"],
@@ -867,7 +1049,7 @@ AREA_TYPES = {
         "name": "Westminster parliamentary constituency",
         "full_name": "Westminster parliamentary constituency",
         "description": "The Westminster parliamentary constituency code for each postcode. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code.",
-        "countries": ["N", "W", "S", "E"],
+        "countries": ["E", "N", "W", "S"],
     },
     AreaTypeEnum.PCT: {
         "entities": ["E16"],
@@ -885,7 +1067,7 @@ AREA_TYPES = {
         "name": "Police Force Area",
         "full_name": "Police Force Area (PFA)",
         "description": "The PFA code for each postcode. A single PFA covers each of Scotland and Northern Ireland (not coded). A pseudo code is included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code.",
-        "countries": ["N", "W", "S", "E"],
+        "countries": ["E", "N", "W", "S"],
     },
     AreaTypeEnum.PFD: {
         "entities": ["N24"],
@@ -957,7 +1139,7 @@ AREA_TYPES = {
         "name": "Registration Districts",
         "full_name": "Registration Districts",
         "description": None,
-        "countries": ["W", "E"],
+        "countries": ["E", "W"],
     },
     AreaTypeEnum.REGSD: {
         "entities": ["E29", "W21"],
@@ -966,7 +1148,7 @@ AREA_TYPES = {
         "name": "Registration Sub-district",
         "full_name": "Registration Sub-district",
         "description": None,
-        "countries": ["W", "E"],
+        "countries": ["E", "W"],
     },
     AreaTypeEnum.RGN: {
         "entities": ["E12"],
@@ -1083,7 +1265,7 @@ AREA_TYPES = {
         "name": "Strategic Health Authorities",
         "full_name": "Strategic Health Authorities",
         "description": None,
-        "countries": ["M", "E", "L"],
+        "countries": ["E", "M", "L"],
     },
     AreaTypeEnum.SLRP: {
         "entities": ["S42"],
@@ -1200,7 +1382,7 @@ AREA_TYPES = {
         "name": "Travel to Work Area",
         "full_name": "Travel to Work Area (TTWA)",
         "description": "The TTWA code for the postcode. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code.",
-        "countries": ["K", "E", "N", "S", "W"],
+        "countries": ["N", "W", "K", "S", "E"],
     },
     AreaTypeEnum.URC: {
         "entities": ["S10"],
@@ -1236,7 +1418,7 @@ AREA_TYPES = {
         "name": "Ward",
         "full_name": "(Electoral) ward/division",
         "description": "The current administrative/electoral area to which the postcode has been assigned. Pseudo codes are included for Channel Islands and Isle of Man. The field will otherwise be blank for postcodes with no OA code.",
-        "countries": ["N", "W", "S", "E"],
+        "countries": ["E", "N", "W", "S"],
     },
     AreaTypeEnum.WARD1961: {
         "entities": ["J03"],
@@ -1254,6 +1436,6 @@ AREA_TYPES = {
         "name": "Workplace Zone",
         "full_name": "2011 Census Workplace Zone",
         "description": "The UK WZ code. Pseudo codes are included for Channel Islands and Isle of Man. The field will be blank for UK postcodes with no grid reference.",
-        "countries": ["N", "W", "S", "E"],
+        "countries": ["E", "N", "W", "S"],
     },
 }

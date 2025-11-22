@@ -1,6 +1,7 @@
 import io
 import json
 from datetime import datetime
+from http import HTTPStatus
 from typing import TYPE_CHECKING, Generator
 
 from botocore.exceptions import ClientError
@@ -153,7 +154,7 @@ def area_types_count(
     result = es.search(
         index=es_config.es_index,
         body=query,
-        ignore=[404],  # type: ignore
+        ignore=[HTTPStatus.NOT_FOUND],  # type: ignore
         _source_includes=[],  # type: ignore
     )
     return {
@@ -219,7 +220,7 @@ class Area(Controller):
             index=es_config.es_index,
             doc_type=es_config.es_type,
             id=cls.parse_id(id),
-            ignore=[404],  # type: ignore
+            ignore=[HTTPStatus.NOT_FOUND],  # type: ignore
             _source_excludes=(["boundary"]),  # type: ignore
         )
         relationships = {
@@ -417,10 +418,10 @@ class Area(Controller):
 
     def geoJSON(self: "Area") -> tuple[int, dict | str]:
         if not self.boundary:
-            return (404, "boundary not found")
+            return (HTTPStatus.NOT_FOUND, "boundary not found")
 
         return (
-            200,
+            HTTPStatus.OK,
             {
                 "type": "FeatureCollection",
                 "features": [
@@ -519,14 +520,14 @@ def search_areas(
             from_=pagination.from_,  # type: ignore
             size=pagination.size,  # type: ignore
             _source_excludes=["boundary"],  # type: ignore
-            ignore=[404],  # type: ignore
+            ignore=[HTTPStatus.NOT_FOUND],  # type: ignore
         )
     else:
         result = es.search(
             index=f"{AREA_INDEX},{PLACENAME_INDEX}",
             body=query,
             _source_excludes=["boundary"],  # type: ignore
-            ignore=[404],  # type: ignore
+            ignore=[HTTPStatus.NOT_FOUND],  # type: ignore
         )
     return_result = []
     for a in result.get("hits", {}).get("hits", []):
@@ -580,7 +581,7 @@ def get_all_areas(
         query=query,
         index=es_config.es_index,
         _source_includes=["type", "name", "active", "date_start", "date_end"],
-        ignore=[400],
+        ignore=[HTTPStatus.BAD_REQUEST],
     )
 
     for r in result:

@@ -1,6 +1,7 @@
 import codecs
 import os
 import tempfile
+from http import HTTPStatus
 from typing import Annotated
 
 from fastapi import APIRouter, Form, HTTPException, Request, Response, UploadFile
@@ -67,10 +68,14 @@ def return_csv(
 
     filename = csvfile.filename
     if not isinstance(filename, str):
-        raise HTTPException(status_code=400, detail="No file uploaded.")
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST, detail="No file uploaded."
+        )
     _, ext = os.path.splitext(filename)
     if ext not in [".csv"]:
-        raise HTTPException(status_code=400, detail="File extension not allowed.")
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST, detail="File extension not allowed."
+        )
 
     with tempfile.SpooledTemporaryFile(mode="w+", newline="") as output:
         process_csv(

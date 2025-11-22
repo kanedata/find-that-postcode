@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from fastapi import APIRouter, Request, Response
 from fastapi.responses import JSONResponse, RedirectResponse
 
@@ -15,7 +17,7 @@ api = APIRouter(prefix="/places")
 def point_redirect(lat: float, lon: float, request: Request) -> Response:
     return RedirectResponse(
         request.url_for("places.nearest", lat=lat, lon=lon, filetype="html"),
-        status_code=303,
+        status_code=HTTPStatus.SEE_OTHER,
     )
 
 
@@ -35,7 +37,7 @@ def nearest(
     data = es.search(
         index=PLACENAME_INDEX,
         body=query,
-        ignore=[404],  # type: ignore
+        ignore=[HTTPStatus.NOT_FOUND],  # type: ignore
         size=10,  # type: ignore
         _source_excludes=[],  # type: ignore
     )

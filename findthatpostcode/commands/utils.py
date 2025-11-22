@@ -43,14 +43,20 @@ def json_to_python(file_path: str) -> None:
         f.write("# Auto-generated from JSON file\n")
         # create an enum from the keys
         f.write("import enum\n\n")
+
+        entities = set()
         f.write("class AreaTypeEnum(str, enum.Enum):\n")
         for key in data.keys():
             f.write(f'    {key.upper()} = "{key}"\n')
+            entities.update(data[key]["entities"])
+        for entity in sorted(entities):
+            f.write(f'    {entity.upper()} = "{entity}"\n')
+
         f.write("\n")
         f.write("AREA_TYPES = {\n")
         # write the dictionary - replacing the keys with the enum references
         for key, value in data.items():
             # add countries to the value if not present
-            value["countries"] = list(set([e[0] for e in value["entities"]]))
+            value["countries"] = sorted(set([e[0] for e in value["entities"]]))
             f.write(f"    AreaTypeEnum.{key.upper()}: {repr(value)},\n")
         f.write("}\n")

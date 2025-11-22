@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from fastapi import HTTPException, Request, Response
 
 from findthatpostcode.controllers.controller import Controller
@@ -12,15 +14,18 @@ def return_result(
     **kwargs,
 ) -> Response | dict:
     if filetype == "html" and not template:
-        raise HTTPException(status_code=500, detail="No template provided")
+        raise HTTPException(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="No template provided"
+        )
     if template is not None and request is None:
         raise HTTPException(
-            status_code=500, detail="No request provided for HTML response"
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail="No request provided for HTML response",
         )
 
-    status = 200 if result.found else 404
+    status = HTTPStatus.OK if result.found else HTTPStatus.NOT_FOUND
 
-    if status != 200:
+    if status != HTTPStatus.OK:
         errors = result.get_errors()
         if errors and errors[0].get("status"):
             status = int(errors[0]["status"])
@@ -45,4 +50,4 @@ def return_result(
             media_type="text/html",
         )
 
-    raise HTTPException(status_code=404, detail="Not found")
+    raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Not found")

@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 import pytest
 
 POSTCODE = "EX36 4AT"
@@ -12,7 +14,7 @@ class TestPostcodeRouter:
     def test_read_postcode(self, client):
         """Test GET /api/v2/postcodes/{postcode}"""
         rv = client.get(f"/api/v2/postcodes/{POSTCODE}")
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
 
         data = rv.json()
         assert data["pcds"] == POSTCODE
@@ -23,7 +25,7 @@ class TestPostcodeRouter:
     def test_read_postcode_normalized(self, client):
         """Test GET /api/v2/postcodes/{postcode} with non-normalized format"""
         rv = client.get("/api/v2/postcodes/EX364AT")
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
 
         data = rv.json()
         assert data["pcds"] == POSTCODE
@@ -31,12 +33,12 @@ class TestPostcodeRouter:
     def test_read_postcode_not_found(self, client):
         """Test GET /api/v2/postcodes/{postcode} with non-existent postcode"""
         rv = client.get("/api/v2/postcodes/NOTFOUND123")
-        assert rv.status_code == 404
+        assert rv.status_code == HTTPStatus.NOT_FOUND
 
     def test_read_nearby_places(self, client):
         """Test GET /api/v2/postcodes/{postcode}/places"""
         rv = client.get(f"/api/v2/postcodes/{POSTCODE}/places")
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
 
         data = rv.json()
         assert isinstance(data, list)
@@ -44,12 +46,12 @@ class TestPostcodeRouter:
     def test_read_nearby_places_not_found(self, client):
         """Test GET /api/v2/postcodes/{postcode}/places with non-existent postcode"""
         rv = client.get("/api/v2/postcodes/NOTFOUND123/places")
-        assert rv.status_code == 404
+        assert rv.status_code == HTTPStatus.NOT_FOUND
 
     def test_nearest_to_point(self, client):
         """Test GET /api/v2/postcodes/nearest/{lat},{lon}"""
         rv = client.get(f"/api/v2/postcodes/nearest/{LAT},{LON}")
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
 
         data = rv.json()
         assert "pcds" in data
@@ -60,7 +62,7 @@ class TestPostcodeRouter:
         rv = client.get(
             "/api/v2/postcodes/nearest/51.5074,-0.1278"
         )  # London coordinates
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
 
         data = rv.json()
         assert "pcds" in data
@@ -76,7 +78,7 @@ class TestPostcodeRouter:
     def test_nearest_to_point_various_locations(self, client, lat, lon):
         """Test GET /api/v2/postcodes/nearest/{lat},{lon} with various coordinates"""
         rv = client.get(f"/api/v2/postcodes/nearest/{lat},{lon}")
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
 
         data = rv.json()
         assert "pcds" in data
@@ -90,7 +92,7 @@ class TestPostcodeRouter:
             headers["Origin"] = origin
 
         rv = client.get(f"/api/v2/postcodes/{POSTCODE}", headers=headers)
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
 
         if origin:
             assert rv.headers.get("Access-Control-Allow-Origin") == "*"
@@ -98,7 +100,7 @@ class TestPostcodeRouter:
     def test_read_postcode_structure(self, client):
         """Test the structure of postcode response"""
         rv = client.get(f"/api/v2/postcodes/{POSTCODE}")
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
 
         data = rv.json()
         # Check for expected top-level fields
@@ -117,7 +119,7 @@ class TestPostcodeRouter:
     def test_read_postcode_location(self, client):
         """Test that postcode has location data"""
         rv = client.get(f"/api/v2/postcodes/{POSTCODE}")
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
 
         data = rv.json()
         assert "location" in data
@@ -135,13 +137,13 @@ class TestPostcodeRouter:
     def test_postcode_endpoints_json_response(self, client, endpoint):
         """Test that all postcode endpoints return JSON"""
         rv = client.get(endpoint)
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         assert rv.headers["Content-Type"].startswith("application/json")
 
     def test_read_postcode_case_insensitive(self, client):
         """Test GET /api/v2/postcodes/{postcode} with different case"""
         rv = client.get("/api/v2/postcodes/ex36 4at")
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
 
         data = rv.json()
         assert data["pcds"] == POSTCODE

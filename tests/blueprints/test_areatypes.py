@@ -1,4 +1,5 @@
 import html
+from http import HTTPStatus
 
 import pytest
 
@@ -42,7 +43,7 @@ def test_areatype_json(client, origin, endpoint):
 )
 def test_areatype_json_missing(client, endpoint):
     rv = client.get(endpoint)
-    assert rv.status_code == 404
+    assert rv.status_code == HTTPStatus.NOT_FOUND
 
 
 def test_areatype_html(client):
@@ -55,7 +56,7 @@ def test_areatype_html(client):
 
 def test_areatype_html_missing(client):
     rv = client.get("/areatypes/{}.html".format("kjhgdskgds"))
-    assert rv.status_code == 404
+    assert rv.status_code == HTTPStatus.NOT_FOUND
 
 
 def test_areatypes_html(client):
@@ -63,7 +64,7 @@ def test_areatypes_html(client):
     content = rv.text
     print(rv.headers)
     print(content)
-    assert rv.status_code == 200
+    assert rv.status_code == HTTPStatus.OK
     assert rv.headers["Content-Type"].split(";")[0].strip() == "text/html"
     assert html.escape("Lower Super Output Area") in content
     assert AREATYPE_CODE in content

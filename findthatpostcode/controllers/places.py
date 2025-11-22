@@ -1,4 +1,5 @@
 import re
+from http import HTTPStatus
 from typing import TYPE_CHECKING
 
 from elasticsearch import Elasticsearch
@@ -48,7 +49,7 @@ class Place(Controller):
             index=es_config.es_index,
             doc_type=es_config.es_type,
             id=cls.parse_id(id),
-            ignore=[404],  # type: ignore
+            ignore=[HTTPStatus.NOT_FOUND],  # type: ignore
             _source_excludes=[],  # type: ignore
         )
         relationships = {

@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+from http import HTTPStatus
 
 from dictlib import dig_get
 from elasticsearch import Elasticsearch
@@ -52,7 +53,7 @@ class Postcode(Controller):
             index=es_config.es_index,
             doc_type=es_config.es_type,
             id=cls.parse_id(id),
-            ignore=[404],  # type: ignore
+            ignore=[HTTPStatus.NOT_FOUND],  # type: ignore
             _source_excludes=es_config._source_exclude,  # type: ignore
         )
 

@@ -1,6 +1,7 @@
 import csv
 import io
 import re
+from http import HTTPStatus
 from typing import Iterator
 
 from fastapi import APIRouter, Request, Response
@@ -22,7 +23,7 @@ def area_search(request: Request, filetype="json", q: str | None = None) -> Resp
     redirect_url = request.url_for("search_index")
     if q:
         redirect_url = redirect_url.include_query_params(q=q)
-    return RedirectResponse(redirect_url, status_code=301)
+    return RedirectResponse(redirect_url, status_code=HTTPStatus.SEE_OTHER)
 
 
 @bp.get("/names.csv")
@@ -63,7 +64,7 @@ def get_area_boundary(areacodes: str, es: ElasticsearchDep, s3_client: S3Dep):
             areacode, es, boundary=True, examples_count=0, s3_client=s3_client
         )
         status, r = result.geoJSON()
-        if status == 200 and isinstance(r, dict):
+        if status == HTTPStatus.OK and isinstance(r, dict):
             features.extend(r.get("features", []))
     return {"type": "FeatureCollection", "features": features}
 
@@ -82,14 +83,14 @@ def get_area_children_boundary(
                 child_area.id, es, boundary=True, examples_count=0, s3_client=s3_client
             )
             status, r = result.geoJSON()
-            if status == 200 and isinstance(r, dict):
+            if status == HTTPStatus.OK and isinstance(r, dict):
                 features.extend(r.get("features", []))
             else:
                 errors[child_area.id] = r
     else:
         errors["area"] = f"No children of type {areatype} found for area {areacode}"
     if not features:
-        return JSONResponse(dict(message=errors), status_code=404)
+        return JSONResponse(dict(message=errors), status_code=HTTPStatus.NOT_FOUND)
     return {"type": "FeatureCollection", "features": features}
 
 
@@ -114,7 +115,7 @@ def get_area(
 
     if filetype == "geojson":
         status, r = result.geoJSON()
-        if status != 200:
+        if status != HTTPStatus.OK:
             return JSONResponse(content={"message": r}, status_code=status)
         return JSONResponse(r)
 

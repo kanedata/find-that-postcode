@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import csv
 import io
+from http import HTTPStatus
 from typing import Iterable
 
 from elasticsearch import Elasticsearch
@@ -42,7 +43,7 @@ def process_csv(
                 index=es_config.es_index,
                 doc_type=es_config.es_type,
                 id=postcode,
-                ignore=[404],  # type: ignore
+                ignore=[HTTPStatus.NOT_FOUND],  # type: ignore
             )
             if pc["found"]:
                 for i in fields:
@@ -55,7 +56,7 @@ def process_csv(
                                 index=AREA_INDEX,
                                 doc_type=es_config.es_type,
                                 id=code,
-                                ignore=[404],  # type: ignore
+                                ignore=[HTTPStatus.NOT_FOUND],  # type: ignore
                                 _source_excludes=["boundary"],  # type: ignore
                             )
                             if area["found"]:

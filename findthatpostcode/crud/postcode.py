@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from elasticsearch import Elasticsearch
 from fastapi import HTTPException
 
@@ -24,7 +26,7 @@ def nearest_postcodes(
 ) -> list[Postcode]:
     if max_distance <= 0:
         raise HTTPException(
-            status_code=400,
+            status_code=HTTPStatus.BAD_REQUEST,
             detail="max_distance must be a positive integer",
         )
     if max_distance > MAX_DISTANCE_FROM_POINT:
@@ -62,7 +64,7 @@ def get_postcode_for_point(
     postcodes = nearest_postcodes(lat, lon, es, max_distance, count=1)
     if not postcodes:
         raise HTTPException(
-            status_code=404,
+            status_code=HTTPStatus.NOT_FOUND,
             detail=f"No postcode found within {max_distance} metres of point",
         )
     return postcodes[0]

@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Annotated
 
 from dictlib import dig_get
@@ -25,7 +26,7 @@ api = APIRouter(prefix="/postcodes")
 def postcode_redirect(postcode: str, request: Request) -> Response:
     return RedirectResponse(
         request.url_for("get_postcode", postcode=postcode, filetype="html"),
-        status_code=303,
+        status_code=HTTPStatus.SEE_OTHER,
     )
 
 
@@ -87,7 +88,8 @@ def get_postcode_by_hash(
     for hash_ in hashes:
         if len(hash_) < 3:
             raise HTTPException(
-                status_code=400, detail="Hash length must be at least 3 characters"
+                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                detail="Hash length must be at least 3 characters",
             )
         query.append(
             {

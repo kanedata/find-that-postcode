@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from elasticsearch import Elasticsearch
 from fastapi import HTTPException
 
@@ -9,7 +11,14 @@ from findthatpostcode.schema.db import Area as AreaDocument
 def get_areatype(areatype: AreaTypeEnum, es: Elasticsearch) -> AreaType:
     areatype_obj = AREA_TYPES.get(areatype)
     if not areatype_obj:
-        raise HTTPException(status_code=404, detail=f"AreaType {areatype} not found")
+        for areatype_key, area in AREA_TYPES.items():
+            if areatype in area["entities"]:
+                areatype_obj = area
+                break
+    if not areatype_obj:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail=f"AreaType {areatype} not found"
+        )
     return AreaType(**areatype_obj, id=areatype)
 
 

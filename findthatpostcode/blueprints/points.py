@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from fastapi import APIRouter, Request, Response
 from fastapi.responses import RedirectResponse
 
@@ -17,7 +19,7 @@ def point_redirect(lat: float, lon: float, request: Request) -> Response:
         request.url_for(
             "get_point", latlon="{},{}.html".format(lat, lon), filetype="html"
         ),
-        status_code=303,
+        status_code=HTTPStatus.SEE_OTHER,
     )
 
 

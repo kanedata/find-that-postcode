@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 import pytest
 
 
@@ -50,7 +52,7 @@ def test_postcode_json(client, origin, endpoint):
 def test_postcode_missing_json(client, endpoint):
     rv = client.get(endpoint)
     assert rv.headers["Content-Type"].split(";")[0].strip() == "application/json"
-    assert rv.status_code == 404
+    assert rv.status_code == HTTPStatus.NOT_FOUND
 
 
 def test_postcode_html(client):
@@ -63,7 +65,7 @@ def test_postcode_html(client):
 
 def test_postcode_missing_html(client):
     rv = client.get("/postcodes/14214124.html")
-    assert rv.status_code == 404
+    assert rv.status_code == HTTPStatus.NOT_FOUND
     assert rv.headers["Content-Type"].split(";")[0].strip() == "text/html"
 
 
@@ -107,7 +109,7 @@ def test_postcode_hash(client, origin, endpoint):
 )
 def test_postcode_hash_too_small(client, endpoint):
     rv = client.get(f"{endpoint}?properties=ward_code")
-    assert rv.status_code == 400
+    assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.parametrize(
@@ -164,6 +166,6 @@ def test_postcode_hashes_too_small(client, origin, endpoint):
         ),
         headers=headers,
     )
-    assert rv.status_code == 400
+    assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
     if check_cors:
         assert rv.headers["Access-Control-Allow-Origin"] == "*"

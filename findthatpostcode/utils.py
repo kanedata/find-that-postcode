@@ -2,6 +2,7 @@ import datetime
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass, field
+from http import HTTPStatus
 from typing import Any
 
 from fastapi.responses import JSONResponse, PlainTextResponse
@@ -83,7 +84,7 @@ class JSONPResponse(JSONResponse):
         self,
         content: Any,
         callback: str = "",
-        status_code: int = 200,
+        status_code: int = HTTPStatus.OK,
         headers: Mapping[str, str] | None = None,
         media_type: str | None = None,
         background: BackgroundTask | None = None,

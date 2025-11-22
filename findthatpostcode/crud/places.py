@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from elasticsearch import Elasticsearch
 from fastapi import HTTPException
 
@@ -33,7 +35,7 @@ def get_nearby_places(
 ) -> list[Place]:
     if max_distance <= 0:
         raise HTTPException(
-            status_code=400,
+            status_code=HTTPStatus.BAD_REQUEST,
             detail="max_distance must be a positive integer",
         )
     if max_distance > MAX_DISTANCE_FROM_POINT:

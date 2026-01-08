@@ -32,11 +32,6 @@ click==8.3.0
     #   sqlite-utils
 click-default-group==1.2.4
     # via sqlite-utils
-colorama==0.4.6
-    # via
-    #   click
-    #   pytest
-    #   tqdm
 deprecated==1.2.18
     # via limits
 dictlib==1.1.5
@@ -136,7 +131,7 @@ ruff==0.13.1
     # via -r requirements.in
 s3transfer==0.14.0
     # via boto3
-sentry-sdk==2.38.0
+sentry-sdk[flask]==2.38.0
     # via -r requirements.in
 shapely==2.1.1
     # via -r requirements.in
@@ -161,7 +156,7 @@ ua-parser-builtins==0.18.0.post1
     # via ua-parser
 url-normalize==2.2.1
     # via requests-cache
-urllib3==2.5.0
+urllib3==2.6.3
     # via
     #   botocore
     #   elasticsearch

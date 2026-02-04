@@ -1,0 +1,39 @@
+[project]
+name = "find-that-postcode"
+version = "2.0.0"
+description = "A database and search engine for UK postcodes."
+readme = "readme.md"
+authors = [{ name = "David Kane", email = "david@dkane.net" }]
+requires-python = ">=3.13"
+dependencies = [
+    "a2wsgi",
+    "blinker",
+    "boto3",
+    "dictlib",
+    "ElasticMock",
+    "elasticsearch==7.8.1",
+    "fastapi[standard]",
+    "httpx",
+    "numpy<2",
+    "openpyxl",
+    "pyproj",
+    "pytest",
+    "pytest-mock",
+    "python-dotenv",
+    "python-multipart",
+    "requests",
+    "requests-cache",
+    "requests-mock",
+    "ruff",
+    "sentry-sdk[fastapi]",
+    "shapely",
+    "sqlite-utils",
+    "tqdm",
+    "ua-parser",
+    "boto3-stubs[s3]",
+    "elasticsearch-dsl==7.4.1",
+]
+
+[tool.ruff]
+lint.select = ["E", "F", "I"]
+lint.ignore = ['E501']

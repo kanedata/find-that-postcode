@@ -10,9 +10,13 @@ from fastapi.openapi.docs import (
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from sentry_sdk.integrations.fastapi import FastApiIntegration
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 
 from findthatpostcode.blueprints import api as legacy_router
 from findthatpostcode.blueprints import app as legacy_app
+from findthatpostcode.limiter import limiter
 from findthatpostcode.routers import router as api_router
 from findthatpostcode.settings import ENVIRONMENT, SENTRY_DSN, STATIC_DIR
 
@@ -79,6 +83,18 @@ the [Office for National Statistics](https://geoportal.statistics.gov.uk/) and
     swagger_js_url="/static/swagger-ui/swagger-ui-bundle.js",
     swagger_css_url="/static/swagger-ui/swagger-ui.css",
 )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["Content-Disposition"],
+)
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # pyright: ignore[reportArgumentType]
+app.add_middleware(SlowAPIMiddleware)
 
 app.mount(
     "/static",
@@ -91,15 +107,6 @@ app.include_router(api_router, prefix="/api/v2")
 app.include_router(
     legacy_app, include_in_schema=False
 )  # Mount the legacy FastAPI app at the root
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["Content-Disposition"],
-)
 
 
 @app.get("/favicon.ico", include_in_schema=False)

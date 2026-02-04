@@ -32,6 +32,11 @@ dependencies = [
     "ua-parser",
     "boto3-stubs[s3]",
     "elasticsearch-dsl==7.4.1",
+    "sqlmodel",
+    "alembic",
+    "stripe",
+    "slowapi",
+    "fastapi-cache2[redis]",
 ]
 
 [tool.ruff]

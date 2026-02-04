@@ -13,12 +13,14 @@ from findthatpostcode.blueprints import (
 )
 from findthatpostcode.controllers.areas import area_types_count
 from findthatpostcode.db import ElasticsearchDep
+from findthatpostcode.limiter import limiter
 from findthatpostcode.utils import templates
 
 app = APIRouter()
 
 
 @app.get("/")
+@limiter.exempt
 def index(es: ElasticsearchDep, request: Request):
     return templates.TemplateResponse(
         request=request,
@@ -29,6 +31,7 @@ def index(es: ElasticsearchDep, request: Request):
 
 
 @app.get("/robots.txt")
+@limiter.exempt
 def robots(request: Request):
     return templates.TemplateResponse(
         request=request,
@@ -38,6 +41,7 @@ def robots(request: Request):
 
 
 @app.get("/about")
+@limiter.exempt
 def about(request: Request):
     return templates.TemplateResponse(
         request=request,

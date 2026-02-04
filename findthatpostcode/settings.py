@@ -16,6 +16,8 @@ def get_es_url(default):
 ENVIRONMENT = "development" if os.environ.get("DEBUG") else "production"
 DEBUG = ENVIRONMENT == "development"
 
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///findthatpostcode.db")
+
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev")
 ES_URL = get_es_url("http://localhost:9200")
 ES_INDEX = os.environ.get("ES_INDEX", "postcodes")

@@ -1,0 +1,18 @@
+[tasks]
+serve = "fastapi dev findthatpostcode --port 8002"
+test = ['python -m pytest .']
+lint = ["ruff check .", "ruff format . --check"]
+fmt = ["ruff format .", "ruff check . --fix"]
+pip = ["uv sync"]
+ftp = ["python -m findthatpostcode"]
+
+[tasks.full_test]
+depends = ["collectstatic", "test", "lint"]
+
+[tasks.deploy]
+depends = ["test", "lint"]
+run = "git push dokku main"
+raw = true
+
+[env]
+_.python.venv = { path = ".venv" }

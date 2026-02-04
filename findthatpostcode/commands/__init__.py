@@ -28,6 +28,7 @@ import_cli.add_command(postcodes.import_nspl)
 import_cli.add_command(stats.import_imd2025)
 import_cli.add_command(stats.import_imd2019)
 import_cli.add_command(stats.import_imd2015)
+import_cli.add_command(stats.import_simd2020)
 import_cli.add_command(placenames.import_placenames)
 import_cli.add_command(new_pcon.import_new_pcon)
 

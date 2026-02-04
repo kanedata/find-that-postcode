@@ -100,13 +100,14 @@
       <li><a href="https://mapit.mysociety.org/area/{{ result.id }}.html">MapIt (mySociety)</a></li>
     </ul>
     {% endcall %}
+    {{ result.attributes }}
 
     {% if result.attributes.stats and result.attributes.stats.imd2025 %}
     {% set rank = result.attributes.stats.imd2025.imd_rank %}
     {% set total_25 = other_codes.imd[result.attributes.ctry + "-imd2025"] %}
     {% set total_19 = other_codes.imd[result.attributes.ctry + "-imd2019"] %}
     {% set total_15 = other_codes.imd[result.attributes.ctry + "-imd2015"] %}
-    {% call info_block("Index of multiple deprivation (2025)") %}
+    {% call info_block("Index of Deprivation (2025)") %}
     <p><strong>{{ "{:,.0f}".format(rank) }}</strong> out of {{ "{:,.0f}".format(total_25) }} lower super output areas in
       {{ result.attributes.ctry_name }} (where 1 is the most deprived LSOA).</p>
     <p><strong>{{ "{:.0%}".format( rank|float / total_25|float ) }}</strong> of LSOAs in
@@ -122,6 +123,19 @@
       {{ "{:.0%}".format( result.attributes.stats.imd2015.imd_rank|float / total_15|float ) }}</strong> of LSOAs in
       {{ result.attributes.ctry_name }} were more deprived than this one.</p>
     {% endif %}
+    {% endcall %}
+    {% endif %}
+
+    {% if result.attributes.stats and result.attributes.stats.simd2020 %}
+    {% set rank = result.attributes.stats.simd2020.simd_rank %}
+    {% set total_20 = other_codes.imd[result.attributes.ctry + "-simd2020"] %}
+    {% call info_block("Scottish Index of Deprivation (2020)") %}
+    <p><strong>{{ "{:,.0f}".format(rank) }}</strong> out of {{ "{:,.0f}".format(total_20) }}
+      data zones in
+      {{ result.attributes.ctry_name }} (where 1 is the most deprived DZ).</p>
+    <p><strong>{{ "{:.0%}".format( rank|float / total_20|float ) }}</strong> of DZs in
+      {{ result.attributes.ctry_name }}
+      are more deprived than this one.</p>
     {% endcall %}
     {% endif %}
 

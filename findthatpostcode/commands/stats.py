@@ -4,12 +4,14 @@ Import commands for the register of geographic codes and code history database
 
 import codecs
 import csv
+import io
 from typing import Any
 
 import click
 import requests
 import requests_cache
 import tqdm
+from openpyxl import load_workbook
 
 from findthatpostcode.commands.codes import AREA_INDEX
 from findthatpostcode.commands.utils import bulk_upload
@@ -19,6 +21,8 @@ from findthatpostcode.settings import DEBUG
 IMD2025_URL = "https://assets.publishing.service.gov.uk/media/68ff5daabcb10f6bf9bef911/File_7_IoD2025_All_Ranks_Scores_Deciles_Population_Denominators.csv"
 IMD2019_URL = "https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/845345/File_7_-_All_IoD2019_Scores__Ranks__Deciles_and_Population_Denominators_3.csv"
 IMD2015_URL = "https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/467774/File_7_ID_2015_All_ranks__deciles_and_scores_for_the_Indices_of_Deprivation__and_population_denominators.csv"
+SIMD2020_URL = "https://www.gov.scot/binaries/content/documents/govscot/publications/statistics/2020/01/scottish-index-of-multiple-deprivation-2020-data-zone-look-up-file/documents/scottish-index-of-multiple-deprivation-data-zone-look-up/scottish-index-of-multiple-deprivation-data-zone-look-up/govscot%3Adocument/SIMD%2B2020v2%2B-%2Bdatazone%2Blookup%2B-%2Bupdated%2B2025.xlsx"
+SIMD2020_SHEET = "SIMD 2020v2 DZ lookup data"
 
 
 def parse_field(k: str, v: Any) -> str | int | float | None:
@@ -307,3 +311,36 @@ def import_imd2015(url=IMD2015_URL, es_index=AREA_INDEX):
         area_updates.append(area_update)
 
     bulk_upload(area_updates, es, es_index, "imd2015")
+
+
+@click.command("simd2020")
+@click.option("--es-index", default=AREA_INDEX)
+@click.option("--url", default=SIMD2020_URL)
+def import_simd2020(url=SIMD2020_URL, es_index=AREA_INDEX):
+    if DEBUG:
+        requests_cache.install_cache()
+
+    es = get_es()
+
+    r = requests.get(url, stream=True)
+    wb = load_workbook(io.BytesIO(r.content), read_only=True, data_only=True)
+    ws = wb[SIMD2020_SHEET]
+    rows = ws.iter_rows(values_only=True)
+    headers = [cell.strip() for cell in next(rows) if isinstance(cell, str)]
+    area_updates = []
+    for record in tqdm.tqdm(rows):
+        row = dict(zip(headers, record))
+        stats = {
+            k.replace("SIMD2020_", "simd_").replace("SIMD2020v2_", "simd_").lower(): v
+            for k, v in row.items()
+            if k.startswith("SIMD2020")
+        }
+        area_update = {
+            "_index": es_index,
+            "_type": "_doc",
+            "_op_type": "update",
+            "_id": row["DZ"],
+            "doc": {"stats": {"simd2020": stats}},
+        }
+        area_updates.append(area_update)
+    bulk_upload(area_updates, es, es_index, "simd2020")

@@ -112,7 +112,7 @@
     {% endif %}
 
     {% if stats.imd2025_rank is not none and stats.imd2025_total is not none %}
-    {% call info_block("Index of multiple deprivation (2025)") %}
+    {% call info_block("Index of Deprivation (2025)") %}
     <p><strong>{{ "{:,.0f}".format(stats.imd2025_rank) }}</strong> out of {{ "{:,.0f}".format(stats.imd2025_total) }}
       lower super output areas in
       {{ result.attributes.ctry_name }} (where 1 is the most deprived LSOA).</p>
@@ -129,6 +129,17 @@
       {{ "{:.0%}".format( stats.imd2015_rank|float / stats.imd2015_total|float ) }}</strong> of LSOAs in
       {{ result.attributes.ctry.name }} were more deprived than this one.</p>
     {% endif %}
+    {% endcall %}
+    {% endif %}
+
+    {% if stats.simd2020_rank is not none and stats.simd2020_total is not none %}
+    {% call info_block("Scottish Index of Deprivation (2020)") %}
+    <p><strong>{{ "{:,.0f}".format(stats.simd2020_rank) }}</strong> out of {{ "{:,.0f}".format(stats.simd2020_total) }}
+      data zones in
+      {{ result.attributes.ctry_name }} (where 1 is the most deprived DZ).</p>
+    <p><strong>{{ "{:.0%}".format( stats.simd2020_rank|float / stats.simd2020_total|float ) }}</strong> of DZs in
+      {{ result.attributes.ctry_name }}
+      are more deprived than this one.</p>
     {% endcall %}
     {% endif %}
   </div>

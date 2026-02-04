@@ -144,6 +144,14 @@ The `--url` parameter can be used to customise the URL used to get the data.
 python -m pytest tests
 ```
 
+### Recreate the `areatypes.py` file
+
+Uses areatypes.json
+
+```sh
+uv run findthatpostcode json-to-python findthatpostcode/areatypes.json
+```
+
 ## Using the data
 
 ### Run the server

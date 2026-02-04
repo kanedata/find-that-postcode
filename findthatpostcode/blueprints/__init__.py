@@ -14,6 +14,7 @@ from findthatpostcode.blueprints import (
 from findthatpostcode.controllers.areas import area_types_count
 from findthatpostcode.db import ElasticsearchDep
 from findthatpostcode.limiter import limiter
+from findthatpostcode.settings import STRIPE_PRICING_TABLE_ID, STRIPE_PUBLISHABLE_KEY
 from findthatpostcode.utils import templates
 
 app = APIRouter()
@@ -47,6 +48,20 @@ def about(request: Request):
         request=request,
         name="about.html.j2",
         media_type="text/html",
+    )
+
+
+@app.get("/pricing")
+@limiter.exempt
+def pricing(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="pricing.html.j2",
+        media_type="text/html",
+        context={
+            "stripe_pricing_table_id": STRIPE_PRICING_TABLE_ID,
+            "stripe_publishable_key": STRIPE_PUBLISHABLE_KEY,
+        },
     )
 
 

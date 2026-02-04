@@ -1,0 +1,16 @@
+{% set title = 'Pricing' %}
+{% extends "base.html.j2" %}
+{% block content %}
+<section class="section entry-content" id="pricing">
+  <div class="container">
+    <stripe-pricing-table pricing-table-id="{{ stripe_pricing_table_id }}"
+      publishable-key="{{ stripe_publishable_key }}">
+    </stripe-pricing-table>
+  </div>
+</section>
+{% endblock %}
+
+{% block bodyscripts %}
+{{ super() }}
+<script async src="https://js.stripe.com/v3/pricing-table.js"></script>
+{% endblock %}

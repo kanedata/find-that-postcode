@@ -13,6 +13,7 @@ scratchpad/
 .vscode/
 Thumbs.db
 *.sqlite
+*.db
 
 !findthatpostcode/static/lib/
 !static/lib/

@@ -147,6 +147,9 @@ class Place(Controller):
         Get the area for this postcode based on the type
         """
         for a in self.relationships["areas"]:  # type: ignore
-            if a.relationships["areatype"].id == areatype:
+            if (
+                a.relationships["areatype"]
+                and a.relationships["areatype"].id == areatype
+            ):
                 return a
         return None

@@ -146,10 +146,16 @@ class Postcode(Controller):
 
         for a in self.relationships["areas"]:  # type: ignore
             if attr.endswith("_name"):
-                if a.relationships["areatype"].id == attr[:-5]:
+                if (
+                    a.relationships["areatype"]
+                    and a.relationships["areatype"].id == attr[:-5]
+                ):
                     return a.attributes.get("name")
             else:
-                if a.relationships["areatype"].id == attr:
+                if (
+                    a.relationships["areatype"]
+                    and a.relationships["areatype"].id == attr
+                ):
                     return a.id
 
     def get_area(self, areatype: str) -> "Area | None":
@@ -163,7 +169,10 @@ class Postcode(Controller):
                     return a
 
         for a in self.relationships["areas"]:  # type: ignore
-            if a.relationships["areatype"].id == areatype:
+            if (
+                a.relationships["areatype"]
+                and a.relationships["areatype"].id == areatype
+            ):
                 return a
 
     @staticmethod

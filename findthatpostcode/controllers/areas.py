@@ -231,9 +231,12 @@ class Area(Controller):
             if data["_source"].get("type"):
                 relationships["areatype"] = Areatype(data["_source"].get("type"))
             elif data["_source"].get("entity"):
-                relationships["areatype"] = Areatype.get_from_es(
-                    data["_source"].get("entity"), es
-                )
+                try:
+                    relationships["areatype"] = Areatype.get_from_es(
+                        data["_source"].get("entity"), es
+                    )
+                except ValueError:
+                    pass
 
         if examples_count:
             relationships["example_postcodes"] = cls.get_example_postcodes(

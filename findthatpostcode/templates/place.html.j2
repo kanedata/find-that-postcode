@@ -35,6 +35,14 @@
     {% endfor %}
     {% endfor %}
 
+    {% if result.attributes.ctyhistnm %}
+    {% call info_block("Historic county") %}
+    {{ result.attributes.ctyhistnm }}<br>
+    <small>For more on historic counties see <a href="https://www.historiccountiestrust.co.uk/">The Historic Counties
+        Trust</a></small>
+    {% endcall %}
+    {% endif %}
+
   </div>
 
   {% if result.attributes.location %}

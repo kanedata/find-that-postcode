@@ -100,7 +100,6 @@
       <li><a href="https://mapit.mysociety.org/area/{{ result.id }}.html">MapIt (mySociety)</a></li>
     </ul>
     {% endcall %}
-    {{ result.attributes }}
 
     {% if result.attributes.stats and result.attributes.stats.imd2025 %}
     {% set rank = result.attributes.stats.imd2025.imd_rank %}

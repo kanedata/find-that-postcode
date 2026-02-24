@@ -1,5 +1,5 @@
 import datetime
-from typing import Annotated
+from typing import Annotated, Generator
 
 import click
 from boto3 import session
@@ -7,9 +7,11 @@ from elasticsearch import Elasticsearch
 from fastapi import Depends
 from mypy_boto3_s3 import S3Client
 from sqlite_utils import Database
+from sqlmodel import Session, create_engine
 
 from findthatpostcode.settings import (
     AREA_INDEX,
+    DATABASE_URL,
     ES_URL,
     LOGGING_DB,
     PLACENAME_INDEX,
@@ -47,7 +49,7 @@ async def get_es_dep():
 ElasticsearchDep = Annotated[Elasticsearch, Depends(get_es_dep)]
 
 
-def init_db(reset: bool = False):
+def init_es(reset: bool = False):
     es = get_es()
     doc_type = "_doc"
 
@@ -113,9 +115,20 @@ async def get_s3_client_dep():
 S3Dep = Annotated[S3Client, Depends(get_s3_client_dep)]
 
 
+def get_db() -> Generator[Session, None, None]:
+    connect_args = {"check_same_thread": False}
+    engine = create_engine(DATABASE_URL, connect_args=connect_args)
+    with Session(engine) as session:
+        yield session
+
+
+DatabaseDep = Annotated[Session, Depends(get_db)]
+
+
 @click.command("init-db")
 @click.option("--reset/--no-reset", default=False)
 def init_db_command(reset):
     """Clear the existing data and create new tables."""
-    init_db(reset)
-    click.echo("Initialized the database.")
+    click.echo("Initialize elasticsearch indexes...")
+    init_es(reset)
+    click.echo("Initialized elasticsearch indexes.")

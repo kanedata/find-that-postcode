@@ -5,6 +5,8 @@ lint = ["ruff check .", "ruff format . --check"]
 fmt = ["ruff format .", "ruff check . --fix"]
 pip = ["uv sync"]
 ftp = ["python -m findthatpostcode"]
+mm = ["alembic revision --autogenerate"]
+m = ["alembic upgrade head"]
 
 [tasks.full_test]
 depends = ["collectstatic", "test", "lint"]

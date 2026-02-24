@@ -1,0 +1,143 @@
+{% set title = 'Register' %}
+{% extends "base.html.j2" %}
+
+{% block content %}
+<section class="section entry-content" id="register">
+  <div class="container">
+    <div class="columns">
+      <div class="column is-6 is-offset-3">
+        <div class="box">
+          <h1 class="title is-3 has-text-centered">Register</h1>
+          
+          {% if error %}
+          <div class="notification is-danger">
+            {{ error }}
+          </div>
+          {% endif %}
+          
+          <form id="register-form">
+            <div class="field">
+              <label class="label">Email</label>
+              <div class="control">
+                <input class="input" type="email" id="email" placeholder="Your email" required>
+              </div>
+            </div>
+            
+            <div class="field">
+              <label class="label">Password</label>
+              <div class="control">
+                <input class="input" type="password" id="password" placeholder="Your password" required>
+              </div>
+            </div>
+            
+            <div class="field">
+              <label class="label">Confirm Password</label>
+              <div class="control">
+                <input class="input" type="password" id="confirm-password" placeholder="Confirm your password" required>
+              </div>
+            </div>
+            
+            <div class="field">
+              <div class="control">
+                <button type="submit" class="button is-primary is-fullwidth">Register</button>
+              </div>
+            </div>
+            
+            <div class="has-text-centered">
+              <p>Already have an account? <a href="/login">Login here</a></p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block bodyscripts %}
+{{ super() }}
+<script>
+document.getElementById('register-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const confirmPassword = document.getElementById('confirm-password').value;
+  
+  // Clear any existing error messages
+  const existingErrors = document.querySelectorAll('.notification.is-danger');
+  existingErrors.forEach(error => error.remove());
+  
+  // Validate password match
+  if (password !== confirmPassword) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'notification is-danger';
+    errorDiv.textContent = 'Passwords do not match';
+    
+    const form = document.getElementById('register-form');
+    form.insertBefore(errorDiv, form.firstChild);
+    return;
+  }
+  
+  // Validate password strength
+  if (password.length < 8) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'notification is-danger';
+    errorDiv.textContent = 'Password must be at least 8 characters long';
+    
+    const form = document.getElementById('register-form');
+    form.insertBefore(errorDiv, form.firstChild);
+    return;
+  }
+  
+  try {
+    const response = await fetch('/api/v2/auth/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password
+      })
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      
+      // Show success message
+      const successDiv = document.createElement('div');
+      successDiv.className = 'notification is-success';
+      successDiv.textContent = 'Registration successful! Redirecting to login...';
+      
+      const form = document.getElementById('register-form');
+      form.insertBefore(successDiv, form.firstChild);
+      
+      // Redirect to login after a short delay
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 2000);
+    } else {
+      const error = await response.json();
+      
+      // Show error message
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'notification is-danger';
+      errorDiv.textContent = error.detail || 'Registration failed';
+      
+      const form = document.getElementById('register-form');
+      form.insertBefore(errorDiv, form.firstChild);
+    }
+  } catch (error) {
+    console.error('Registration error:', error);
+    
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'notification is-danger';
+    errorDiv.textContent = 'An error occurred during registration';
+    
+    const form = document.getElementById('register-form');
+    form.insertBefore(errorDiv, form.firstChild);
+  }
+});
+</script>
+{% endblock %}

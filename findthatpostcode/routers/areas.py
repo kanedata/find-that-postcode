@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Depends
 
 from findthatpostcode.areatypes import AreaTypeEnum
 from findthatpostcode.crud.areas import (
@@ -12,6 +14,7 @@ from findthatpostcode.db import ElasticsearchDep, S3Dep
 from findthatpostcode.schema import Area as AreaResponse
 from findthatpostcode.schema import AreaGeoJSON, AreaGeoJSONFeature
 from findthatpostcode.schema import Postcode as PostcodeResponse
+from findthatpostcode.security import oauth2_scheme
 from findthatpostcode.utils import GeoJSONResponse
 
 router = APIRouter(tags=["Area"])
@@ -24,7 +27,9 @@ router = APIRouter(tags=["Area"])
     tags=["GeoJSON"],
 )
 async def read_area_geojson(
-    areacodes: str, es: ElasticsearchDep, s3_client: S3Dep
+    areacodes: str,
+    es: ElasticsearchDep,
+    s3_client: S3Dep,
 ) -> AreaGeoJSON:
     areacode_list: list[str] = areacodes.split("+")
     features = []
@@ -76,5 +81,7 @@ async def read_area_children(
 
 
 @router.get("/{areacode}", response_model_exclude_unset=True)
-async def read_area(areacode: str, es: ElasticsearchDep) -> AreaResponse:
+async def read_area(
+    areacode: str, es: ElasticsearchDep, token: Annotated[str, Depends(oauth2_scheme)]
+) -> AreaResponse:
     return get_area(areacode, es)

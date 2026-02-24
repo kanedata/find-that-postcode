@@ -37,6 +37,10 @@ dependencies = [
     "stripe",
     "slowapi",
     "fastapi-cache2[redis]",
+    "passlib[bcrypt]>=1.7.4",
+    "bcrypt<5",
+    "starlette-session>=0.4.3",
+    "fastapi-csrf-protect>=1.0.7",
 ]
 
 [tool.ruff]

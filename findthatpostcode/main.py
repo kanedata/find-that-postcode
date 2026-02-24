@@ -3,6 +3,9 @@ import os
 import sentry_sdk
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.openapi.docs import (
     get_swagger_ui_html,
     get_swagger_ui_oauth2_redirect_html,
@@ -13,12 +16,23 @@ from sentry_sdk.integrations.fastapi import FastApiIntegration
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
+from starlette_session import BackendType, SessionMiddleware
 
 from findthatpostcode.blueprints import api as legacy_router
 from findthatpostcode.blueprints import app as legacy_app
+from findthatpostcode.db import get_db
 from findthatpostcode.limiter import limiter
 from findthatpostcode.routers import router as api_router
-from findthatpostcode.settings import ENVIRONMENT, SENTRY_DSN, STATIC_DIR
+from findthatpostcode.routers.account import router as account_router
+from findthatpostcode.security import DBSessionBackend
+from findthatpostcode.settings import (
+    ALLOWED_HOSTS,
+    DEBUG,
+    ENVIRONMENT,
+    SECRET_KEY,
+    SENTRY_DSN,
+    STATIC_DIR,
+)
 
 if SENTRY_DSN:
     sentry_sdk.init(
@@ -43,12 +57,16 @@ the [Office for National Statistics](https://geoportal.statistics.gov.uk/) and
     openapi_url="/api/openapi.json",
     openapi_tags=[
         {
-            "name": "Area Type",
-            "description": "Get information about the type of area",
+            "name": "Postcode",
+            "description": "Get information about an individual postcode",
         },
         {
             "name": "Area",
             "description": "Get information about an area",
+        },
+        {
+            "name": "Area Type",
+            "description": "Get information about the type of area",
         },
         {
             "name": "Place",
@@ -57,10 +75,6 @@ the [Office for National Statistics](https://geoportal.statistics.gov.uk/) and
         {
             "name": "Point",
             "description": "Get information about the nearest postcode to a given lat/long",
-        },
-        {
-            "name": "Postcode",
-            "description": "Get information about an individual postcode",
         },
         {
             "name": "GeoJSON",
@@ -91,17 +105,33 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["Content-Disposition"],
 )
+if not DEBUG:
+    app.add_middleware(HTTPSRedirectMiddleware)
+    app.add_middleware(
+        TrustedHostMiddleware,
+        allowed_hosts=ALLOWED_HOSTS,
+    )
+app.add_middleware(GZipMiddleware)
+
+session_backend = DBSessionBackend(db=next(get_db()))
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=SECRET_KEY,
+    cookie_name="ftpsession",
+    backend_type=BackendType.redis,
+    custom_session_backend=session_backend,
+)
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # pyright: ignore[reportArgumentType]
 app.add_middleware(SlowAPIMiddleware)
-
 app.mount(
     "/static",
     StaticFiles(directory=STATIC_DIR),
     name="static",
 )
 
+app.include_router(account_router, prefix="/account", include_in_schema=False)
 app.include_router(legacy_router, prefix="/api/v1", deprecated=True)
 app.include_router(api_router, prefix="/api/v2")
 app.include_router(

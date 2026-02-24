@@ -9,6 +9,8 @@ from findthatpostcode.blueprints import (
     postcodes,
     reconcile,
     search,
+    stripe,
+    subscription_dashboard,
     tools,
 )
 from findthatpostcode.controllers.areas import area_types_count
@@ -74,6 +76,8 @@ app.include_router(postcodes.bp)
 app.include_router(reconcile.bp)
 app.include_router(search.bp)
 app.include_router(tools.bp)
+app.include_router(stripe.router)
+app.include_router(subscription_dashboard.router)
 
 
 api = APIRouter(tags=["Legacy"])

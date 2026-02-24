@@ -1,0 +1,27 @@
+{% set title = 'Login' %}
+{% extends "base.html.j2" %}
+
+{% block content %}
+{% if error %}
+<div class="notification is-danger">
+  {{ error }}
+</div>
+{% endif %}
+
+<form id="login-form" method="POST" action="{{ request.url_for('login_submit') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+  <label class="">Email</label>
+  <input class="" type="email" name="email" placeholder="Your email" required>
+
+  <label class="">Password</label>
+  <input class="" type="password" name="password" placeholder="Your password" required>
+
+  <button type="submit" class="">Login</button>
+
+  <div class="">
+    <p>Don't have an account? <a href="/register">Register here</a></p>
+    <p><a href="/forgot-password">Forgot password?</a></p>
+  </div>
+</form>
+{% endblock %}

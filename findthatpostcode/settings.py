@@ -15,6 +15,7 @@ def get_es_url(default):
 
 ENVIRONMENT = "development" if os.environ.get("DEBUG") else "production"
 DEBUG = ENVIRONMENT == "development"
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///findthatpostcode.db")
 

@@ -3,6 +3,12 @@
 {% block content %}
 <section class="section entry-content" id="pricing">
   <div class="container">
+    <div class="notification is-info mb-4">
+      <p>Choose a subscription plan to access premium features. Already have a subscription?
+        <a href="/subscription-dashboard" class="button is-primary is-small">Manage your subscription</a>
+      </p>
+    </div>
+
     <stripe-pricing-table pricing-table-id="{{ stripe_pricing_table_id }}"
       publishable-key="{{ stripe_publishable_key }}">
     </stripe-pricing-table>

@@ -1,0 +1,560 @@
+{% set title = 'Subscription Dashboard' %}
+{% extends "base.html.j2" %}
+
+{% block content %}
+<section class="section entry-content" id="subscription-dashboard">
+  <div class="container">
+    <h1 class="title is-2">Subscription Dashboard</h1>
+    
+    {% if user and user.stripe_customer_id %}
+      <div class="notification is-success">
+        <p>You are logged in as <strong>{{ user.email }}</strong></p>
+      </div>
+    {% else %}
+      <div class="notification is-warning">
+        <p>Please <a href="/login">login</a> or <a href="/register">register</a> to manage your subscriptions.</p>
+      </div>
+    {% endif %}
+    
+    <div class="tabs is-boxed">
+      <ul>
+        <li class="is-active" data-tab="active"><a>Active Subscriptions</a></li>
+        <li data-tab="history"><a>Subscription History</a></li>
+        <li data-tab="payments"><a>Payment History</a></li>
+        <li data-tab="account"><a>Account Settings</a></li>
+      </ul>
+    </div>
+    
+    <!-- Active Subscriptions Tab -->
+    <div id="active-tab" class="tab-content">
+      <h2 class="title is-3">Active Subscriptions</h2>
+      
+      {% if active_subscriptions and active_subscriptions|length > 0 %}
+        <div class="box">
+          <table class="table is-fullwidth">
+            <thead>
+              <tr>
+                <th>Subscription ID</th>
+                <th>Status</th>
+                <th>Price</th>
+                <th>Current Period</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for subscription in active_subscriptions %}
+              <tr>
+                <td>{{ subscription.stripe_subscription_id }}</td>
+                <td><span class="tag is-success">{{ subscription.status }}</span></td>
+                <td>{{ subscription.stripe_price_id }}</td>
+                <td>
+                  {{ subscription.current_period_start|datetimeformat }} to<br>
+                  {{ subscription.current_period_end|datetimeformat }}
+                </td>
+                <td>
+                  <button class="button is-danger is-small cancel-subscription" 
+                          data-subscription-id="{{ subscription.id }}">
+                    Cancel
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="notification is-info">
+          <p>You don't have any active subscriptions.</p>
+          <p><a href="/pricing" class="button is-primary">View Pricing Plans</a></p>
+        </div>
+      {% endif %}
+    </div>
+    
+    <!-- Subscription History Tab -->
+    <div id="history-tab" class="tab-content" style="display: none;">
+      <h2 class="title is-3">Subscription History</h2>
+      
+      {% if all_subscriptions and all_subscriptions|length > 0 %}
+        <div class="box">
+          <table class="table is-fullwidth">
+            <thead>
+              <tr>
+                <th>Subscription ID</th>
+                <th>Status</th>
+                <th>Price</th>
+                <th>Period</th>
+                <th>Canceled At</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for subscription in all_subscriptions %}
+              <tr>
+                <td>{{ subscription.stripe_subscription_id }}</td>
+                <td>
+                  <span class="tag {% if subscription.status == 'active' %}is-success{% elif subscription.status == 'canceled' %}is-danger{% else %}is-warning{% endif %}">
+                    {{ subscription.status }}
+                  </span>
+                </td>
+                <td>{{ subscription.stripe_price_id }}</td>
+                <td>
+                  {{ subscription.current_period_start|datetimeformat }} to<br>
+                  {{ subscription.current_period_end|datetimeformat }}
+                </td>
+                <td>
+                  {% if subscription.canceled_at %}
+                    {{ subscription.canceled_at|datetimeformat }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="notification is-info">
+          <p>No subscription history found.</p>
+        </div>
+      {% endif %}
+    </div>
+    
+    <!-- Payment History Tab -->
+    <div id="payments-tab" class="tab-content" style="display: none;">
+      <h2 class="title is-3">Payment History</h2>
+      
+      {% if payments and payments|length > 0 %}
+        <div class="box">
+          <table class="table is-fullwidth">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Payment ID</th>
+                <th>Subscription</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for payment in payments %}
+              <tr>
+                <td>{{ payment.created_at|datetimeformat }}</td>
+                <td>£{{ "%.2f"|format(payment.amount / 100) }}</td>
+                <td>
+                  <span class="tag {% if payment.status == 'succeeded' %}is-success{% else %}is-danger{% endif %}">
+                    {{ payment.status }}
+                  </span>
+                </td>
+                <td>{{ payment.stripe_payment_intent_id }}</td>
+                <td>{{ payment.subscription_id }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          
+          <div class="level mt-4">
+            <div class="level-left">
+              <div class="level-item">
+                <p><strong>Total Amount Paid:</strong> £{{ "%.2f"|format(total_amount_paid / 100) }}</p>
+              </div>
+            </div>
+            <div class="level-right">
+              <div class="level-item">
+                <p><strong>Successful Payments:</strong> {{ successful_payments }}</p>
+              </div>
+              <div class="level-item">
+                <p><strong>Failed Payments:</strong> {{ failed_payments }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="notification is-info">
+          <p>No payment history found.</p>
+        </div>
+      {% endif %}
+    </div>
+    
+    <!-- Account Settings Tab -->
+    <div id="account-tab" class="tab-content" style="display: none;">
+      <h2 class="title is-3">Account Settings</h2>
+      
+      <div class="box">
+        <div class="field">
+          <label class="label">Email</label>
+          <div class="control">
+            <input class="input" type="email" value="{{ user.email }}" disabled>
+          </div>
+        </div>
+        
+        <div class="field">
+          <label class="label">Stripe Customer ID</label>
+          <div class="control">
+            <input class="input" type="text" value="{{ user.stripe_customer_id or 'Not set' }}" disabled>
+          </div>
+        </div>
+        
+        <div class="field is-grouped">
+          <div class="control">
+            <button class="button is-primary" id="change-password-btn">Change Password</button>
+          </div>
+          <div class="control">
+            <button class="button is-info" id="create-api-key-btn">Create API Key</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- API Keys Section -->
+      <div class="box mt-4">
+        <h3 class="title is-4">API Keys</h3>
+        
+        {% if api_keys and api_keys|length > 0 %}
+          <table class="table is-fullwidth">
+            <thead>
+              <tr>
+                <th>Key ID</th>
+                <th>Created</th>
+                <th>Last Used</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for key in api_keys %}
+              <tr>
+                <td>{{ key.id }}</td>
+                <td>{{ key.created_at }}</td>
+                <td>{{ key.last_used }}</td>
+                <td>
+                  <button class="button is-danger is-small delete-api-key" 
+                          data-key-id="{{ key.id }}">
+                    Delete
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p>No API keys found. Create one to access the API.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Change Password Modal -->
+<div class="modal" id="change-password-modal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Change Password</p>
+      <button class="delete" aria-label="close" id="close-password-modal"></button>
+    </header>
+    <section class="modal-card-body">
+      <form id="change-password-form">
+        <div class="field">
+          <label class="label">Current Password</label>
+          <div class="control">
+            <input class="input" type="password" id="current-password" required>
+          </div>
+        </div>
+        
+        <div class="field">
+          <label class="label">New Password</label>
+          <div class="control">
+            <input class="input" type="password" id="new-password" required>
+          </div>
+        </div>
+        
+        <div class="field">
+          <label class="label">Confirm New Password</label>
+          <div class="control">
+            <input class="input" type="password" id="confirm-password" required>
+          </div>
+        </div>
+      </form>
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button is-success" id="save-password-btn">Save changes</button>
+      <button class="button" id="cancel-password-btn">Cancel</button>
+    </footer>
+  </div>
+</div>
+
+<!-- API Key Modal -->
+<div class="modal" id="api-key-modal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">New API Key</p>
+      <button class="delete" aria-label="close" id="close-api-key-modal"></button>
+    </header>
+    <section class="modal-card-body">
+      <div class="content">
+        <p>Your new API key has been generated. Please copy it now as it won't be shown again.</p>
+        <div class="field">
+          <div class="control">
+            <input class="input" type="text" id="new-api-key" readonly>
+          </div>
+        </div>
+      </div>
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button" id="close-api-key-modal-btn">Close</button>
+    </footer>
+  </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal" id="confirmation-modal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Confirm Action</p>
+      <button class="delete" aria-label="close" id="close-confirmation-modal"></button>
+    </header>
+    <section class="modal-card-body">
+      <p id="confirmation-message"></p>
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button is-danger" id="confirm-action-btn">Confirm</button>
+      <button class="button" id="cancel-confirmation-btn">Cancel</button>
+    </footer>
+  </div>
+</div>
+{% endblock %}
+
+{% block bodyscripts %}
+{{ super() }}
+<script>
+// Tab switching functionality
+document.querySelectorAll('.tabs li').forEach(tab => {
+  tab.addEventListener('click', () => {
+    // Remove active class from all tabs
+    document.querySelectorAll('.tabs li').forEach(t => t.classList.remove('is-active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
+    
+    // Add active class to clicked tab
+    tab.classList.add('is-active');
+    const tabName = tab.dataset.tab;
+    document.getElementById(tabName + '-tab').style.display = 'block';
+  });
+});
+
+// Change password modal
+const changePasswordBtn = document.getElementById('change-password-btn');
+const changePasswordModal = document.getElementById('change-password-modal');
+const closePasswordModal = document.getElementById('close-password-modal');
+const cancelPasswordBtn = document.getElementById('cancel-password-btn');
+
+if (changePasswordBtn) {
+  changePasswordBtn.addEventListener('click', () => {
+    changePasswordModal.classList.add('is-active');
+  });
+}
+
+if (closePasswordModal) {
+  closePasswordModal.addEventListener('click', () => {
+    changePasswordModal.classList.remove('is-active');
+  });
+}
+
+if (cancelPasswordBtn) {
+  cancelPasswordBtn.addEventListener('click', () => {
+    changePasswordModal.classList.remove('is-active');
+  });
+}
+
+// API key modal
+const createApiKeyBtn = document.getElementById('create-api-key-btn');
+const apiKeyModal = document.getElementById('api-key-modal');
+const closeApiKeyModal = document.getElementById('close-api-key-modal');
+const closeApiKeyModalBtn = document.getElementById('close-api-key-modal-btn');
+
+if (createApiKeyBtn) {
+  createApiKeyBtn.addEventListener('click', async () => {
+    try {
+      const response = await fetch('/api/v2/auth/api-key', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        document.getElementById('new-api-key').value = data.api_key;
+        apiKeyModal.classList.add('is-active');
+      } else {
+        alert('Failed to create API key');
+      }
+    } catch (error) {
+      console.error('Error creating API key:', error);
+      alert('Error creating API key');
+    }
+  });
+}
+
+if (closeApiKeyModal) {
+  closeApiKeyModal.addEventListener('click', () => {
+    apiKeyModal.classList.remove('is-active');
+  });
+}
+
+if (closeApiKeyModalBtn) {
+  closeApiKeyModalBtn.addEventListener('click', () => {
+    apiKeyModal.classList.remove('is-active');
+  });
+}
+
+// Cancel subscription functionality
+document.querySelectorAll('.cancel-subscription').forEach(button => {
+  button.addEventListener('click', (e) => {
+    const subscriptionId = e.target.dataset.subscriptionId;
+    const confirmationModal = document.getElementById('confirmation-modal');
+    const confirmationMessage = document.getElementById('confirmation-message');
+    
+    confirmationMessage.textContent = 'Are you sure you want to cancel this subscription?';
+    confirmationModal.classList.add('is-active');
+    
+    // Store the subscription ID for the confirmation
+    confirmationModal.dataset.subscriptionId = subscriptionId;
+  });
+});
+
+// Confirmation modal handlers
+const confirmActionBtn = document.getElementById('confirm-action-btn');
+const cancelConfirmationBtn = document.getElementById('cancel-confirmation-btn');
+const closeConfirmationModal = document.getElementById('close-confirmation-modal');
+const confirmationModal = document.getElementById('confirmation-modal');
+
+if (confirmActionBtn) {
+  confirmActionBtn.addEventListener('click', async () => {
+    const subscriptionId = confirmationModal.dataset.subscriptionId;
+    
+    try {
+      const response = await fetch(`/api/v2/subscriptions/cancel/${subscriptionId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+        }
+      });
+      
+      if (response.ok) {
+        alert('Subscription canceled successfully');
+        window.location.reload();
+      } else {
+        const error = await response.json();
+        alert('Failed to cancel subscription: ' + error.detail);
+      }
+    } catch (error) {
+      console.error('Error canceling subscription:', error);
+      alert('Error canceling subscription');
+    }
+    
+    confirmationModal.classList.remove('is-active');
+  });
+}
+
+if (cancelConfirmationBtn) {
+  cancelConfirmationBtn.addEventListener('click', () => {
+    confirmationModal.classList.remove('is-active');
+  });
+}
+
+if (closeConfirmationModal) {
+  closeConfirmationModal.addEventListener('click', () => {
+    confirmationModal.classList.remove('is-active');
+  });
+}
+
+// Delete API key functionality
+document.querySelectorAll('.delete-api-key').forEach(button => {
+  button.addEventListener('click', (e) => {
+    const keyId = e.target.dataset.keyId;
+    const confirmationModal = document.getElementById('confirmation-modal');
+    const confirmationMessage = document.getElementById('confirmation-message');
+    
+    confirmationMessage.textContent = 'Are you sure you want to delete this API key?';
+    confirmationModal.classList.add('is-active');
+    
+    // Store the key ID for the confirmation
+    confirmationModal.dataset.keyId = keyId;
+    confirmationModal.dataset.action = 'delete-api-key';
+  });
+});
+
+// Handle API key deletion confirmation
+if (confirmActionBtn) {
+  confirmActionBtn.addEventListener('click', async () => {
+    if (confirmationModal.dataset.action === 'delete-api-key') {
+      const keyId = confirmationModal.dataset.keyId;
+      
+      try {
+        const response = await fetch(`/api/v2/auth/api-key/${keyId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+          }
+        });
+        
+        if (response.ok) {
+          alert('API key deleted successfully');
+          window.location.reload();
+        } else {
+          const error = await response.json();
+          alert('Failed to delete API key: ' + error.detail);
+        }
+      } catch (error) {
+        console.error('Error deleting API key:', error);
+        alert('Error deleting API key');
+      }
+      
+      confirmationModal.classList.remove('is-active');
+    }
+  });
+}
+
+// Save password functionality
+const savePasswordBtn = document.getElementById('save-password-btn');
+
+if (savePasswordBtn) {
+  savePasswordBtn.addEventListener('click', async () => {
+    const currentPassword = document.getElementById('current-password').value;
+    const newPassword = document.getElementById('new-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+    
+    if (newPassword !== confirmPassword) {
+      alert('New passwords do not match');
+      return;
+    }
+    
+    try {
+      const response = await fetch('/api/v2/auth/change-password', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          current_password: currentPassword,
+          new_password: newPassword
+        })
+      });
+      
+      if (response.ok) {
+        alert('Password changed successfully');
+        changePasswordModal.classList.remove('is-active');
+        document.getElementById('change-password-form').reset();
+      } else {
+        const error = await response.json();
+        alert('Failed to change password: ' + error.detail);
+      }
+    } catch (error) {
+      console.error('Error changing password:', error);
+      alert('Error changing password');
+    }
+  });
+}
+</script>
+{% endblock %}

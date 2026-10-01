@@ -9,6 +9,7 @@ import io
 import zipfile
 from collections import defaultdict
 
+import chardet
 import click
 import requests
 import requests_cache
@@ -186,17 +187,34 @@ def import_chd(url=None, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
     change_history = None
     changes = None
     equivalents = None
+    encodings = {}
     for f in z.namelist():
         if f.lower().startswith("changehistory") and f.lower().endswith(".csv"):
             change_history = f
+            encodings[f] = encoding
         elif f.lower().startswith("changes") and f.lower().endswith(".csv"):
             changes = f
+            encodings[f] = encoding
         elif f.lower().startswith("equivalents") and f.lower().endswith(".csv"):
             equivalents = f
+            encodings[f] = encoding
+
+    # detect encodings as they seem to change
+    detector = chardet.UniversalDetector(max_bytes=1024 * 1024 * 1024)
+    for f in encodings:
+        for line in z.open(f, "r"):
+            detector.feed(line)
+        detector.close()
+        encodings[f] = detector.result["encoding"]
+        detector.reset()
 
     with z.open(change_history, "r") as infile:
-        click.echo("Opening {}".format(infile.name))
-        reader = csv.DictReader(io.TextIOWrapper(infile, encoding))
+        click.echo(
+            "Opening {} with encoding {}".format(infile.name, encodings[change_history])
+        )
+        reader = csv.DictReader(
+            io.TextIOWrapper(infile, encoding=encodings[change_history])
+        )
         for k, area in tqdm.tqdm(enumerate(reader)):
             areas_cache[area["GEOGCD"]].append(
                 {
@@ -253,8 +271,10 @@ def import_chd(url=None, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
         }
 
     with z.open(changes, "r") as infile:
-        reader = csv.DictReader(io.TextIOWrapper(infile, encoding))
-        click.echo("Opening {}".format(infile.name))
+        reader = csv.DictReader(io.TextIOWrapper(infile, encodings[changes]))
+        click.echo(
+            "Opening {} with encoding {}".format(infile.name, encodings[changes])
+        )
         for k, area in tqdm.tqdm(enumerate(reader)):
             if area["GEOGCD_P"] == "":
                 continue
@@ -271,8 +291,10 @@ def import_chd(url=None, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
         "welsh_government": ["GEOGCDWG", "GEOGNMWG", "GEOGNMWWG"],
     }
     with z.open(equivalents, "r") as infile:
-        reader = csv.DictReader(io.TextIOWrapper(infile, encoding))
-        click.echo("Opening {}".format(infile.name))
+        reader = csv.DictReader(io.TextIOWrapper(infile, encodings[equivalents]))
+        click.echo(
+            "Opening {} with encoding {}".format(infile.name, encodings[equivalents])
+        )
         for area in tqdm.tqdm(reader):
             if area["GEOGCD"] not in areas:
                 continue

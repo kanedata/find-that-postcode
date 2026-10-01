@@ -8,9 +8,7 @@ with open(
 ) as a:
     AREA_TYPES = json.load(a)
     for k in AREA_TYPES:
-        AREA_TYPES[k]["countries"] = list(
-            {e[0] for e in AREA_TYPES[k]["entities"]}
-        )
+        AREA_TYPES[k]["countries"] = list({e[0] for e in AREA_TYPES[k]["entities"]})
     AREA_THEMES = list({a["theme"] for a in AREA_TYPES.values()})
     ENTITIES = {e: k for k, v in AREA_TYPES.items() for e in v["entities"]}
 

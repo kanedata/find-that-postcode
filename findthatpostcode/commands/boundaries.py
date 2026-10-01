@@ -92,7 +92,9 @@ def import_boundary(client, url, examine=False, code_field=None):
             errors.append(f"[ERROR][{url}] No code field found in file")
         else:
             errors.append(f"[ERROR][{url}] Too many code fields found in file")
-            errors.append("[ERROR][{}] Code fields: {}".format(url, "; ".join(code_fields)))
+            errors.append(
+                "[ERROR][{}] Code fields: {}".format(url, "; ".join(code_fields))
+            )
 
     if len(errors) > 0:
         if examine:
@@ -111,20 +113,28 @@ def import_boundary(client, url, examine=False, code_field=None):
         for k, i in enumerate(boundaries["features"][:5]):
             print("[{}] Feature {} type {}".format(code, k, i["type"]))
             print(
-                "[{}] Feature {} properties {}".format(code, k, list(i["properties"].keys()))
+                "[{}] Feature {} properties {}".format(
+                    code, k, list(i["properties"].keys())
+                )
             )
-            print("[{}] Feature {} geometry type {}".format(code, k, i["geometry"]["type"]))
             print(
-                "[{}] Feature {} geometry length {}".format(code, k, len(str(i["geometry"]["coordinates"])))
+                "[{}] Feature {} geometry type {}".format(
+                    code, k, i["geometry"]["type"]
+                )
+            )
+            print(
+                "[{}] Feature {} geometry length {}".format(
+                    code, k, len(str(i["geometry"]["coordinates"]))
+                )
             )
             if code_field in i["properties"]:
                 print(
-                    "[{}] Feature {} Code {}".format(code, k, i["properties"][code_field])
+                    "[{}] Feature {} Code {}".format(
+                        code, k, i["properties"][code_field]
+                    )
                 )
             else:
-                print(
-                    f"[ERROR][{code}] Feature {k} Code field not found"
-                )
+                print(f"[ERROR][{code}] Feature {k} Code field not found")
 
     else:
         print(f"[{code}] Opened file: [{url}]")

@@ -139,7 +139,5 @@ def import_new_pcon(area_index=AREA_INDEX, postcode_index=PC_INDEX):
     )
     print(f"[elasticsearch] {len(postcode_updates)} postcodes to update")
     results = bulk(es, postcode_updates, raise_on_error=False)
-    print(
-        f"[elasticsearch] updated {results[0]} postcodes in {postcode_index} index"
-    )
+    print(f"[elasticsearch] updated {results[0]} postcodes in {postcode_index} index")
     print(f"[elasticsearch] {len(results[1])} errors reported")

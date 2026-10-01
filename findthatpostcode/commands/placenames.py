@@ -166,8 +166,6 @@ def import_placenames(url=None, es_index=PLACENAMES_INDEX):
             print(f"[placenames] Processed {len(placenames)} placenames")
             print(f"[elasticsearch] {len(placenames)} placenames to save")
             results = bulk(es, placenames)
-            print(
-                f"[elasticsearch] saved {results[0]} placenames to {es_index} index"
-            )
+            print(f"[elasticsearch] saved {results[0]} placenames to {es_index} index")
             print(f"[elasticsearch] {len(results[1])} errors reported")
             placenames = []

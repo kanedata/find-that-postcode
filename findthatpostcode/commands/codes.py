@@ -158,9 +158,7 @@ def import_rgc(url=None, es_index=ENTITY_INDEX):
             print(f"[entities] Processed {len(entities)} entities")
             print(f"[elasticsearch] {len(entities)} entities to save")
             results = bulk(es, entities)
-            print(
-                f"[elasticsearch] saved {results[0]} entities to {es_index} index"
-            )
+            print(f"[elasticsearch] saved {results[0]} entities to {es_index} index")
             print(f"[elasticsearch] {len(results[1])} errors reported")
 
 
@@ -209,9 +207,7 @@ def import_chd(url=None, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
         detector.reset()
 
     with z.open(change_history, "r") as infile:
-        click.echo(
-            f"Opening {infile.name} with encoding {encodings[change_history]}"
-        )
+        click.echo(f"Opening {infile.name} with encoding {encodings[change_history]}")
         reader = csv.DictReader(
             io.TextIOWrapper(infile, encoding=encodings[change_history])
         )
@@ -272,9 +268,7 @@ def import_chd(url=None, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
 
     with z.open(changes, "r") as infile:
         reader = csv.DictReader(io.TextIOWrapper(infile, encodings[changes]))
-        click.echo(
-            f"Opening {infile.name} with encoding {encodings[changes]}"
-        )
+        click.echo(f"Opening {infile.name} with encoding {encodings[changes]}")
         for k, area in tqdm.tqdm(enumerate(reader)):
             if area["GEOGCD_P"] == "":
                 continue
@@ -292,9 +286,7 @@ def import_chd(url=None, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
     }
     with z.open(equivalents, "r") as infile:
         reader = csv.DictReader(io.TextIOWrapper(infile, encodings[equivalents]))
-        click.echo(
-            f"Opening {infile.name} with encoding {encodings[equivalents]}"
-        )
+        click.echo(f"Opening {infile.name} with encoding {encodings[equivalents]}")
         for area in tqdm.tqdm(reader):
             if area["GEOGCD"] not in areas:
                 continue

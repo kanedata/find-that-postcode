@@ -99,19 +99,16 @@ def import_new_pcon(area_index=AREA_INDEX, postcode_index=PC_INDEX):
         for area_id, successors in update_2010.items()
     ]
     print(
-        "[new parliamentary constituencies] Processed %s new parliamentary constituencies"
-        % len(to_update)
+        f"[new parliamentary constituencies] Processed {len(to_update)} new parliamentary constituencies"
     )
     print(
-        "[elasticsearch] %s parliamentary constituencies to create or update"
-        % len(to_update)
+        f"[elasticsearch] {len(to_update)} parliamentary constituencies to create or update"
     )
     results = bulk(es, to_update)
     print(
-        "[elasticsearch] saved %s new parliamentary constituencies to %s index"
-        % (results[0], area_index)
+        f"[elasticsearch] saved {results[0]} new parliamentary constituencies to {area_index} index"
     )
-    print("[elasticsearch] %s errors reported" % len(results[1]))
+    print(f"[elasticsearch] {len(results[1])} errors reported")
 
     # fetch postcode data
     r = requests.get(PCON_POSTCODE_URL)
@@ -126,7 +123,7 @@ def import_new_pcon(area_index=AREA_INDEX, postcode_index=PC_INDEX):
             for row in tqdm.tqdm(reader):
                 postcode = row["pcd"]
                 # convert to "pcds" format
-                postcode = "%s %s" % (postcode[:-3].strip(), postcode[-3:])
+                postcode = f"{postcode[:-3].strip()} {postcode[-3:]}"
                 record = {
                     "_index": postcode_index,
                     "_type": "_doc",
@@ -138,13 +135,11 @@ def import_new_pcon(area_index=AREA_INDEX, postcode_index=PC_INDEX):
                 }
                 postcode_updates.append(record)
     print(
-        "[new parliamentary constituencies] Processed %s postcodes to update"
-        % len(postcode_updates)
+        f"[new parliamentary constituencies] Processed {len(postcode_updates)} postcodes to update"
     )
-    print("[elasticsearch] %s postcodes to update" % len(postcode_updates))
+    print(f"[elasticsearch] {len(postcode_updates)} postcodes to update")
     results = bulk(es, postcode_updates, raise_on_error=False)
     print(
-        "[elasticsearch] updated %s postcodes in %s index"
-        % (results[0], postcode_index)
+        f"[elasticsearch] updated {results[0]} postcodes in {postcode_index} index"
     )
-    print("[elasticsearch] %s errors reported" % len(results[1]))
+    print(f"[elasticsearch] {len(results[1])} errors reported")

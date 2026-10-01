@@ -11,9 +11,7 @@ bp = Blueprint("points", __name__, url_prefix="/points")
 def point_redirect():
     lat = float(request.args.get("lat"))
     lon = float(request.args.get("lon"))
-    return redirect(
-        url_for("points.get", latlon="{},{}.html".format(lat, lon)), code=303
-    )
+    return redirect(url_for("points.get", latlon=f"{lat},{lon}.html"), code=303)
 
 
 @bp.route("/<latlon>")

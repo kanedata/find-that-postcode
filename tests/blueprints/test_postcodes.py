@@ -65,10 +65,10 @@ def test_postcode_hash_too_small(client):
 def test_postcode_hashes(client):
     rv = client.post(
         "/postcodes/hashes.json",
-        data=dict(
-            hash="abc1",
-            properties=["ward_code"],
-        ),
+        data={
+            "hash": "abc1",
+            "properties": ["ward_code"],
+        },
     )
     assert rv.mimetype == "application/json"
     assert rv.headers["Access-Control-Allow-Origin"] == "*"
@@ -79,10 +79,10 @@ def test_postcode_hashes(client):
 def test_postcode_hashes_too_small(client):
     rv = client.post(
         "/postcodes/hashes.json",
-        data=dict(
-            hash="ab",
-            properties=["ward_code"],
-        ),
+        data={
+            "hash": "ab",
+            "properties": ["ward_code"],
+        },
     )
     assert rv.headers["Access-Control-Allow-Origin"] == "*"
     assert rv.status_code == 400

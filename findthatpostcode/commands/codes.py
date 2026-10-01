@@ -4,7 +4,7 @@ Import commands for the register of geographic codes and code history database
 
 import codecs
 import csv
-import datetime
+import datetime as dt
 import io
 import zipfile
 from collections import defaultdict
@@ -39,9 +39,9 @@ DEFAULT_ENCODING = "utf-8-sig"
 def process_date(value, date_format="%d/%m/%Y"):
     if value in ["", "n/a"]:
         return None
-    if isinstance(value, datetime.datetime):
+    if isinstance(value, dt.datetime):
         return value
-    return datetime.datetime.strptime(value, date_format)
+    return dt.datetime.strptime(value, date_format).replace(tzinfo=dt.timezone.utc)
 
 
 def process_str(value):
@@ -155,13 +155,13 @@ def import_rgc(url=None, es_index=ENTITY_INDEX):
                     }
                 )
 
-            print("[entities] Processed %s entities" % len(entities))
-            print("[elasticsearch] %s entities to save" % len(entities))
+            print(f"[entities] Processed {len(entities)} entities")
+            print(f"[elasticsearch] {len(entities)} entities to save")
             results = bulk(es, entities)
             print(
-                "[elasticsearch] saved %s entities to %s index" % (results[0], es_index)
+                f"[elasticsearch] saved {results[0]} entities to {es_index} index"
             )
-            print("[elasticsearch] %s errors reported" % len(results[1]))
+            print(f"[elasticsearch] {len(results[1])} errors reported")
 
 
 @click.command("chd")
@@ -210,7 +210,7 @@ def import_chd(url=None, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
 
     with z.open(change_history, "r") as infile:
         click.echo(
-            "Opening {} with encoding {}".format(infile.name, encodings[change_history])
+            f"Opening {infile.name} with encoding {encodings[change_history]}"
         )
         reader = csv.DictReader(
             io.TextIOWrapper(infile, encoding=encodings[change_history])
@@ -273,7 +273,7 @@ def import_chd(url=None, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
     with z.open(changes, "r") as infile:
         reader = csv.DictReader(io.TextIOWrapper(infile, encodings[changes]))
         click.echo(
-            "Opening {} with encoding {}".format(infile.name, encodings[changes])
+            f"Opening {infile.name} with encoding {encodings[changes]}"
         )
         for k, area in tqdm.tqdm(enumerate(reader)):
             if area["GEOGCD_P"] == "":
@@ -293,7 +293,7 @@ def import_chd(url=None, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
     with z.open(equivalents, "r") as infile:
         reader = csv.DictReader(io.TextIOWrapper(infile, encodings[equivalents]))
         click.echo(
-            "Opening {} with encoding {}".format(infile.name, encodings[equivalents])
+            f"Opening {infile.name} with encoding {encodings[equivalents]}"
         )
         for area in tqdm.tqdm(reader):
             if area["GEOGCD"] not in areas:
@@ -302,11 +302,11 @@ def import_chd(url=None, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
                 if area[v[0]]:
                     areas[area["GEOGCD"]]["doc"]["equivalents"][k] = area[v[0]]
 
-    print("[areas] Processed %s areas" % len(areas))
-    print("[elasticsearch] %s areas to save" % len(areas))
+    print(f"[areas] Processed {len(areas)} areas")
+    print(f"[elasticsearch] {len(areas)} areas to save")
     results = bulk(es, areas.values())
-    print("[elasticsearch] saved %s areas to %s index" % (results[0], es_index))
-    print("[elasticsearch] %s errors reported" % len(results[1]))
+    print(f"[elasticsearch] saved {results[0]} areas to {es_index} index")
+    print(f"[elasticsearch] {len(results[1])} errors reported")
 
 
 @click.command("msoanames")
@@ -324,11 +324,11 @@ def import_msoa_names(url=MSOA_2011_URL, es_index=AREA_INDEX):
     reader = csv.DictReader(codecs.iterdecode(r.iter_lines(), "utf-8-sig"))
     area_updates = []
     for k, area in tqdm.tqdm(enumerate(reader)):
-        if "msoa21cd" in area.keys():
+        if "msoa21cd" in area:
             areacode = area.get("msoa21cd")
             name = area.get("msoa21hclnm")
             name_welsh = area.get("msoa21hclnmw")
-        if "msoa11cd" in area.keys():
+        if "msoa11cd" in area:
             areacode = area.get("msoa11cd")
             name = area.get("msoa11hclnm")
             name_welsh = area.get("msoa11hclnmw")
@@ -354,8 +354,8 @@ def import_msoa_names(url=MSOA_2011_URL, es_index=AREA_INDEX):
             }
         )
 
-    print("[areas] Processed %s areas" % len(area_updates))
-    print("[elasticsearch] %s areas to save" % len(area_updates))
+    print(f"[areas] Processed {len(area_updates)} areas")
+    print(f"[elasticsearch] {len(area_updates)} areas to save")
     results = bulk(es, area_updates)
-    print("[elasticsearch] saved %s areas to %s index" % (results[0], es_index))
-    print("[elasticsearch] %s errors reported" % len(results[1]))
+    print(f"[elasticsearch] saved {results[0]} areas to {es_index} index")
+    print(f"[elasticsearch] {len(results[1])} errors reported")

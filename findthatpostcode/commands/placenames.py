@@ -98,7 +98,7 @@ def import_placenames(url=None, es_index=PLACENAMES_INDEX):
         if not f.filename.endswith(".csv"):
             continue
 
-        print("[placenames] Opening %s" % f.filename)
+        print(f"[placenames] Opening {f.filename}")
 
         with z.open(f, "r") as pccsv:
             pccsv = io.TextIOWrapper(pccsv, encoding="latin1")
@@ -108,7 +108,7 @@ def import_placenames(url=None, es_index=PLACENAMES_INDEX):
             for row in reader:
                 # get the names of the name and code fields
                 if not place_code or not place_name:
-                    for key in row.keys():
+                    for key in row:
                         if key.startswith("place") and key.endswith("cd"):
                             place_code = key
                         if key.startswith("place") and key.endswith("nm"):
@@ -163,12 +163,11 @@ def import_placenames(url=None, es_index=PLACENAMES_INDEX):
                 record["doc"] = row
                 placenames.append(record)
 
-            print("[placenames] Processed %s placenames" % len(placenames))
-            print("[elasticsearch] %s placenames to save" % len(placenames))
+            print(f"[placenames] Processed {len(placenames)} placenames")
+            print(f"[elasticsearch] {len(placenames)} placenames to save")
             results = bulk(es, placenames)
             print(
-                "[elasticsearch] saved %s placenames to %s index"
-                % (results[0], es_index)
+                f"[elasticsearch] saved {results[0]} placenames to {es_index} index"
             )
-            print("[elasticsearch] %s errors reported" % len(results[1]))
+            print(f"[elasticsearch] {len(results[1])} errors reported")
             placenames = []

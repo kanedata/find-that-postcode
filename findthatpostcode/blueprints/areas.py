@@ -50,7 +50,7 @@ def areas_csv(areas, filename):
             writer.writerow(row)
 
     output = make_response(si.getvalue())
-    output.headers["Content-Disposition"] = "attachment; filename={}".format(filename)
+    output.headers["Content-Disposition"] = f"attachment; filename={filename}"
     output.headers["Content-type"] = "text/csv"
     return output
 

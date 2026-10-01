@@ -1,5 +1,5 @@
+import datetime as dt
 import re
-from datetime import datetime
 
 from dictlib import dig_get
 
@@ -19,8 +19,8 @@ from findthatpostcode.metadata import (
 class Postcode(Controller):
     es_index = "geo_postcode"
     url_slug = "postcodes"
-    date_fields = ["dointr", "doterm"]
-    not_area_fields = ["osgrdind", "usertype"]
+    date_fields = ("dointr", "doterm")
+    not_area_fields = ("osgrdind", "usertype")
 
     def __init__(self, id, data=None, pcareas=None, places=None):
         super().__init__(id, data)
@@ -29,7 +29,7 @@ class Postcode(Controller):
             self.relationships["nearest_places"] = places
 
     def __repr__(self):
-        return "<Postcode {}>".format(self.id)
+        return f"<Postcode {self.id}>"
 
     @classmethod
     def get_from_es(cls, id, es, es_config=None):
@@ -61,9 +61,11 @@ class Postcode(Controller):
     def process_attributes(self, postcode):
         # turn dates into dates
         for i in self.date_fields:
-            if postcode.get(i) and not isinstance(postcode[i], datetime):
+            if postcode.get(i) and not isinstance(postcode[i], dt.datetime):
                 try:
-                    postcode[i] = datetime.strptime(postcode[i][0:10], "%Y-%m-%d")
+                    postcode[i] = dt.datetime.strptime(
+                        postcode[i][0:10], "%Y-%m-%d"
+                    ).replace(tzinfo=dt.timezone.utc)
                 except ValueError:
                     continue
 
@@ -196,13 +198,13 @@ class Postcode(Controller):
         if last_part[0] == "O":
             last_part[0] = "0"
 
-        return "%s %s" % ("".join(first_part), "".join(last_part))
+        return "{} {}".format("".join(first_part), "".join(last_part))
 
     def toJSON(self, role="top"):
         json = super().toJSON(role)
         for i in self.date_fields:
             if json[0].get("attributes", {}).get(i) and isinstance(
-                json[0]["attributes"][i], datetime
+                json[0]["attributes"][i], dt.datetime
             ):
                 json[0]["attributes"][i] = json[0]["attributes"][i].strftime("%Y-%m-%d")
 

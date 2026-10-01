@@ -1,6 +1,6 @@
+import datetime as dt
 import io
 import json
-from datetime import datetime
 
 from botocore.exceptions import ClientError
 from elasticsearch.helpers import scan
@@ -24,7 +24,7 @@ class Areatype(Controller):
         super().__init__(id, data)
 
     def __repr__(self):
-        return "<AreaType {}>".format(self.id)
+        return f"<AreaType {self.id}>"
 
     def process_attributes(self, data):
         if isinstance(data, (list, tuple)):
@@ -66,11 +66,11 @@ class Areatype(Controller):
                 }
             }
         }
-        search_params = dict(
-            index="geo_area",
-            body=query,
-            sort="_id:asc",
-        )
+        search_params = {
+            "index": "geo_area",
+            "body": query,
+            "sort": "_id:asc",
+        }
         if pagination:
             search_params["from_"] = pagination.from_
             search_params["size"] = pagination.size
@@ -108,10 +108,10 @@ class Area(Controller):
     es_index = "geo_area"
     url_slug = "areas"
     template = "area.html.j2"
-    date_fields = ["date_end", "date_start"]
+    date_fields = ("date_end", "date_start")
 
     def __init__(self, id, data=None, **kwargs):
-        super().__init__(id)
+        super().__init__(id, data=data)
         self.relationships["example_postcodes"] = kwargs.get("example_postcodes")
         self.relationships["areatype"] = kwargs.get("areatype")
         self.relationships["parent"] = kwargs.get("parent")
@@ -124,7 +124,7 @@ class Area(Controller):
             self.attributes = self.process_attributes(data)
 
     def __repr__(self):
-        return "<Area {}>".format(self.id)
+        return f"<Area {self.id}>"
 
     @classmethod
     def get_from_es(
@@ -192,9 +192,11 @@ class Area(Controller):
 
         # turn dates into dates
         for i in self.date_fields:
-            if data.get(i) and not isinstance(data[i], datetime):
+            if data.get(i) and not isinstance(data[i], dt.datetime):
                 try:
-                    data[i] = datetime.strptime(data[i][0:10], "%Y-%m-%d")
+                    data[i] = dt.datetime.strptime(data[i][0:10], "%Y-%m-%d").replace(
+                        tzinfo=dt.timezone.utc
+                    )
                 except ValueError:
                     continue
 
@@ -293,21 +295,20 @@ class Area(Controller):
         try:
             client.download_fileobj(
                 current_app.config["S3_BUCKET"],
-                "%s/%s.json" % (prefix, area_code),
+                f"{prefix}/{area_code}.json",
                 buffer,
             )
             boundary = json.loads(buffer.getvalue().decode("utf-8"))
             return boundary.get("geometry")
         except ClientError:
-            None
+            return None
 
     def topJSON(self):
         json = super().topJSON()
-        if self.found:
+        if self.found and self.has_boundary:
             # @TODO need to check whether boundary data
             # actually exists before applying this
-            if self.has_boundary:
-                json["links"]["geojson"] = self.url(filetype="geojson")
+            json["links"]["geojson"] = self.url(filetype="geojson")
         return json
 
     def geoJSON(self):

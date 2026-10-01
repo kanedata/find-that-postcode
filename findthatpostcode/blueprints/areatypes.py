@@ -20,7 +20,7 @@ def all():
 def get_areatype(areacode, filetype="json"):
     if filetype == "csv":
         areas = get_all_areas(get_db(), areatypes=[areacode.strip().lower()])
-        return areas_csv(areas, "{}.csv".format(areacode))
+        return areas_csv(areas, f"{areacode}.csv")
     result = Areatype.get_from_es(areacode, get_db())
     pagination = Pagination(request)
     result.get_areas(get_db(), pagination=pagination)

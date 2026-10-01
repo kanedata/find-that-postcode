@@ -18,7 +18,7 @@ class Place(Controller):
             self.attributes = self.process_attributes(data)
 
     def __repr__(self):
-        return "<Place {}>".format(self.id)
+        return f"<Place {self.id}>"
 
     @classmethod
     def get_from_es(cls, id, es, es_config=None, examples_count=5, recursive=True):
@@ -40,7 +40,7 @@ class Place(Controller):
             "nearest_places": [],
             "areas": [],
         }
-        for k, v in data.get("_source", {}).get("areas", {}).items():
+        for v in data.get("_source", {}).get("areas", {}).values():
             if isinstance(v, str) and re.match(r"[A-Z][0-9]{8}", v):
                 area = Area.get_from_es(v, es, examples_count=0)
                 if area.found:
@@ -62,7 +62,7 @@ class Place(Controller):
 
     def process_attributes(self, data):
         if "name" not in data:
-            for k in data.keys():
+            for k in data:
                 if k.startswith("place") and k.endswith("nm"):
                     data["name"] = data[k]
                     del data[k]

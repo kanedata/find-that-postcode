@@ -4,7 +4,7 @@ AREATYPE_CODE = "lsoa21"
 
 
 def test_areatype_json(client):
-    rv = client.get("/areatypes/{}.json".format(AREATYPE_CODE))
+    rv = client.get(f"/areatypes/{AREATYPE_CODE}.json")
     data = rv.get_json()
 
     assert rv.headers["Access-Control-Allow-Origin"] == "*"
@@ -21,7 +21,7 @@ def test_areatype_json_missing(client):
 
 
 def test_areatype_html(client):
-    rv = client.get("/areatypes/{}.html".format(AREATYPE_CODE))
+    rv = client.get(f"/areatypes/{AREATYPE_CODE}.html")
     content = rv.data.decode("utf8")
     assert rv.mimetype == "text/html"
     assert html.escape("Lower Super Output Area") in content
@@ -42,7 +42,7 @@ def test_areatypes_html(client):
 
 
 def test_areatype_csv(client):
-    rv = client.get("/areatypes/{}.csv".format(AREATYPE_CODE))
+    rv = client.get(f"/areatypes/{AREATYPE_CODE}.csv")
     content = rv.data.decode("utf8")
     assert rv.mimetype == "text/csv"
     assert "E01020135" in content

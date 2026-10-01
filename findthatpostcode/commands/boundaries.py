@@ -79,7 +79,7 @@ def import_boundary(client, url, examine=False, code_field=None):
 
     # find the code field for a boundary
     if len(boundaries.get("features", [])) == 0:
-        errors.append("[ERROR][%s] Features not found in file" % (url,))
+        errors.append(f"[ERROR][{url}] Features not found in file")
     if len(boundaries.get("features", [])) > 0 and not code_field:
         test_boundary = boundaries.get("features", [])[0]
         code_fields = []
@@ -89,10 +89,10 @@ def import_boundary(client, url, examine=False, code_field=None):
         if len(code_fields) == 1:
             code_field = code_fields[0]
         elif len(code_fields) == 0:
-            errors.append("[ERROR][%s] No code field found in file" % (url,))
+            errors.append(f"[ERROR][{url}] No code field found in file")
         else:
-            errors.append("[ERROR][%s] Too many code fields found in file" % (url,))
-            errors.append("[ERROR][%s] Code fields: %s" % (url, "; ".join(code_fields)))
+            errors.append(f"[ERROR][{url}] Too many code fields found in file")
+            errors.append("[ERROR][{}] Code fields: {}".format(url, "; ".join(code_fields)))
 
     if len(errors) > 0:
         if examine:
@@ -104,37 +104,31 @@ def import_boundary(client, url, examine=False, code_field=None):
     code = code_field.lower().replace("cd", "")
 
     if examine:
-        print("[%s] Opened file: [%s]" % (code, url))
-        print("[%s] Looking for code field: [%s]" % (code, code_field))
-        print("[%s] Geojson type: [%s]" % (code, boundaries["type"]))
-        print("[%s] Number of features [%s]" % (code, len(boundaries["features"])))
+        print(f"[{code}] Opened file: [{url}]")
+        print(f"[{code}] Looking for code field: [{code_field}]")
+        print("[{}] Geojson type: [{}]".format(code, boundaries["type"]))
+        print("[{}] Number of features [{}]".format(code, len(boundaries["features"])))
         for k, i in enumerate(boundaries["features"][:5]):
-            print("[%s] Feature %s type %s" % (code, k, i["type"]))
+            print("[{}] Feature {} type {}".format(code, k, i["type"]))
             print(
-                "[%s] Feature %s properties %s"
-                % (code, k, list(i["properties"].keys()))
+                "[{}] Feature {} properties {}".format(code, k, list(i["properties"].keys()))
             )
-            print("[%s] Feature %s geometry type %s" % (code, k, i["geometry"]["type"]))
+            print("[{}] Feature {} geometry type {}".format(code, k, i["geometry"]["type"]))
             print(
-                "[%s] Feature %s geometry length %s"
-                % (code, k, len(str(i["geometry"]["coordinates"])))
+                "[{}] Feature {} geometry length {}".format(code, k, len(str(i["geometry"]["coordinates"])))
             )
             if code_field in i["properties"]:
                 print(
-                    "[%s] Feature %s Code %s" % (code, k, i["properties"][code_field])
+                    "[{}] Feature {} Code {}".format(code, k, i["properties"][code_field])
                 )
             else:
                 print(
-                    "[ERROR][%s] Feature %s Code field not found"
-                    % (
-                        code,
-                        k,
-                    )
+                    f"[ERROR][{code}] Feature {k} Code field not found"
                 )
 
     else:
-        print("[%s] Opened file: [%s]" % (code, url))
-        print("[%s] %s features to import" % (code, len(boundaries["features"])))
+        print(f"[{code}] Opened file: [{url}]")
+        print("[{}] {} features to import".format(code, len(boundaries["features"])))
         boundary_count = 0
         errors = []
         for k, i in tqdm.tqdm(
@@ -157,10 +151,10 @@ def import_boundary(client, url, examine=False, code_field=None):
             client.upload_fileobj(
                 io.BytesIO(json.dumps(i).encode("utf-8")),
                 current_app.config["S3_BUCKET"],
-                "%s/%s.json" % (prefix, area_code),
+                f"{prefix}/{area_code}.json",
             )
             boundary_count += 1
-        print("[%s] %s boundaries imported" % (code, boundary_count))
+        print(f"[{code}] {boundary_count} boundaries imported")
 
 
 @click.command("boundaries")
@@ -203,7 +197,7 @@ def check_boundaries(es_index=AREA_INDEX):
     for page in tqdm.tqdm(page_iterator):
         for obj in page["Contents"]:
             if obj["Key"].endswith(".json"):
-                bucket, prefix, code = obj["Key"].replace(".json", "").split("/")
+                _bucket, prefix, code = obj["Key"].replace(".json", "").split("/")
                 if prefix in areas and code in areas[prefix]:
                     areas[prefix][code]["boundary"] = True
 

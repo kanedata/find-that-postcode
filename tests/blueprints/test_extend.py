@@ -37,7 +37,7 @@ extend_q = {
 
 
 def test_reconcile_extend(client):
-    rv = client.get("/reconcile?{}".format(urlencode(extend_q)))
+    rv = client.get(f"/reconcile?{urlencode(extend_q)}")
     result = rv.get_json()
     assert rv.headers["Access-Control-Allow-Origin"] == "*"
     assert "meta" in result
@@ -48,7 +48,7 @@ def test_reconcile_extend(client):
 
 def test_reconcile_extend_jsonp(client):
     extend_q["callback"] = "testCallback"
-    rv = client.get("/reconcile?{}".format(urlencode(extend_q)))
+    rv = client.get(f"/reconcile?{urlencode(extend_q)}")
     data = rv.data.decode("utf8")
     assert data.startswith(extend_q["callback"])
 
@@ -98,7 +98,7 @@ recon_q = {
 
 
 def test_reconcile(client):
-    rv = client.get("/reconcile?{}".format(urlencode(recon_q)))
+    rv = client.get(f"/reconcile?{urlencode(recon_q)}")
     result = rv.get_json()
     assert rv.headers["Access-Control-Allow-Origin"] == "*"
     assert "q0" in result

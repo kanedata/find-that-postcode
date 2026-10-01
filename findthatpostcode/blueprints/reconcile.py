@@ -71,7 +71,7 @@ def reconcile():
         q = json.loads(request.values["extend"])
         properties = [p["id"] for p in q.get("properties", [])]
         ids = list(set(q.get("ids", [])))
-        result = {"meta": [{"id": p for p in properties}], "rows": {}}
+        result = {"meta": [{"id": p} for p in properties], "rows": {}}
         for i in ids:
             postcode = Postcode.get_from_es(i, es)
             result["rows"][i] = {p: postcode.attributes.get(p) for p in properties}

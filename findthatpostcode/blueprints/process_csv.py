@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import csv
 
 from findthatpostcode.controllers.postcodes import Postcode
@@ -13,9 +11,11 @@ def process_csv(
     outfile,
     es,
     postcode_field="postcode",
-    fields=["lat", "long", "cty"],
+    fields=None,
     es_config=None,
 ):
+    if fields is None:
+        fields = ["lat", "long", "cty"]
     if not es_config:
         es_config = {}
 

@@ -72,7 +72,7 @@ def return_csv():
 
         response = make_response(output.read())
         response.headers["Content-Type"] = "text/csv"
-        response.headers["Content-Disposition"] = 'attachment; filename="{}"'.format(
-            upload.filename
+        response.headers["Content-Disposition"] = (
+            f'attachment; filename="{upload.filename}"'
         )
         return response

@@ -26,7 +26,7 @@ def parse_field(k, v):
         return v
     if v == "":
         return None
-    if k.endswith("_decile") or k.endswith("_rank") or k.startswith("population_"):
+    if k.endswith(("_decile", "_rank")) or k.startswith("population_"):
         return int(v.split(".")[0])
     if k.endswith("_score"):
         return float(v)
@@ -217,11 +217,11 @@ def import_imd2025(url=IMD2025_URL, es_index=AREA_INDEX):
         }
         area_updates.append(area_update)
 
-    print("[imd2025] Processed %s areas" % len(area_updates))
-    print("[elasticsearch] %s areas to save" % len(area_updates))
+    print(f"[imd2025] Processed {len(area_updates)} areas")
+    print(f"[elasticsearch] {len(area_updates)} areas to save")
     results = bulk(es, area_updates)
-    print("[elasticsearch] saved %s areas to %s index" % (results[0], es_index))
-    print("[elasticsearch] %s errors reported" % len(results[1]))
+    print(f"[elasticsearch] saved {results[0]} areas to {es_index} index")
+    print(f"[elasticsearch] {len(results[1])} errors reported")
 
 
 @click.command("imd2019")
@@ -267,11 +267,11 @@ def import_imd2019(url=IMD2019_URL, es_index=AREA_INDEX):
         }
         area_updates.append(area_update)
 
-    print("[imd2019] Processed %s areas" % len(area_updates))
-    print("[elasticsearch] %s areas to save" % len(area_updates))
+    print(f"[imd2019] Processed {len(area_updates)} areas")
+    print(f"[elasticsearch] {len(area_updates)} areas to save")
     results = bulk(es, area_updates)
-    print("[elasticsearch] saved %s areas to %s index" % (results[0], es_index))
-    print("[elasticsearch] %s errors reported" % len(results[1]))
+    print(f"[elasticsearch] saved {results[0]} areas to {es_index} index")
+    print(f"[elasticsearch] {len(results[1])} errors reported")
 
 
 @click.command("imd2015")
@@ -317,8 +317,8 @@ def import_imd2015(url=IMD2015_URL, es_index=AREA_INDEX):
         }
         area_updates.append(area_update)
 
-    print("[imd2015] Processed %s areas" % len(area_updates))
-    print("[elasticsearch] %s areas to save" % len(area_updates))
+    print(f"[imd2015] Processed {len(area_updates)} areas")
+    print(f"[elasticsearch] {len(area_updates)} areas to save")
     results = bulk(es, area_updates)
-    print("[elasticsearch] saved %s areas to %s index" % (results[0], es_index))
-    print("[elasticsearch] %s errors reported" % len(results[1]))
+    print(f"[elasticsearch] saved {results[0]} areas to {es_index} index")
+    print(f"[elasticsearch] {len(results[1])} errors reported")

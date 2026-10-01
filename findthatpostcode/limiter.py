@@ -9,9 +9,7 @@ RATE_LIMIT_EXEMPT_KEYS = os.environ.get("RATE_LIMIT_EXEMPT_KEYS", "").split(",")
 
 
 def exempt_if_header():
-    if request.headers.get(RATE_LIMIT_EXEMPT_HEADER) in RATE_LIMIT_EXEMPT_KEYS:
-        return True
-    return False
+    return request.headers.get(RATE_LIMIT_EXEMPT_HEADER) in RATE_LIMIT_EXEMPT_KEYS
 
 
 limiter = Limiter(

@@ -16,7 +16,7 @@ class Point(Controller):
             self.relationships["nearest_postcode"] = nearest_postcode
 
     def __repr__(self):
-        return "<Point {}, {}>".format(self.id[0], self.id[1])
+        return f"<Point {self.id[0]}, {self.id[1]}>"
 
     @staticmethod
     def get_nearest_postcodes_query(lat, lon):
@@ -53,9 +53,7 @@ class Point(Controller):
         )
 
     def get_by_id(self, lat, lon):
-        self.set_from_data(
-            {"_id": "{},{}".format(lat, lon), "_source": {"lat": lat, "lon": lon}}
-        )
+        self.set_from_data({"_id": f"{lat},{lon}", "_source": {"lat": lat, "lon": lon}})
         query = self.get_nearest_postcodes_query(lat, lon)
         result = self.es.search(
             index=self.config.get("es_index", "postcode"), body=query, size=1
@@ -120,7 +118,9 @@ class Point(Controller):
         json["included"] += postcode_json[1]
         return json
 
-    def url(self, filetype=None, query_vars={}):
+    def url(self, filetype=None, query_vars=None):
+        if query_vars is None:
+            query_vars = {}
         path = [
             self.url_slug,
             "{},{}".format(*self.id) + self.set_url_filetype(filetype),
@@ -137,8 +137,10 @@ class Point(Controller):
         )
 
     def relationship_url(
-        self, relationship, related=True, filetype=None, query_vars={}
+        self, relationship, related=True, filetype=None, query_vars=None
     ):
+        if query_vars is None:
+            query_vars = {}
         if related:
             path = [
                 self.url_slug,

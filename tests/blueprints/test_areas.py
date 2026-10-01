@@ -3,7 +3,7 @@ AREA_NAME = "Lower Bow & Larkfield, Fancy Farm, Mallard Bowl"
 
 
 def test_area_json(client):
-    rv = client.get("/areas/{}.json".format(AREA_CODE))
+    rv = client.get(f"/areas/{AREA_CODE}.json")
     data = rv.get_json()
 
     assert rv.mimetype == "application/json"
@@ -27,7 +27,7 @@ def test_missing_area_json(client):
 
 
 def test_area_html(client):
-    rv = client.get("/areas/{}.html".format(AREA_CODE))
+    rv = client.get(f"/areas/{AREA_CODE}.html")
     content = rv.data.decode("utf8")
     assert rv.mimetype == "text/html"
     assert AREA_NAME in content
@@ -42,7 +42,7 @@ def test_area_missing_html(client):
 
 
 def test_area_geojson(client):
-    rv = client.get("/areas/{}.geojson".format(AREA_CODE))
+    rv = client.get(f"/areas/{AREA_CODE}.geojson")
     data = rv.get_json()
 
     assert rv.mimetype == "application/json"

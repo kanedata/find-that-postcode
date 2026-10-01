@@ -32,11 +32,10 @@ def client():
     db = MockElasticsearch()
     s3_client = MockBoto3()
 
-    with db_set(app, db, s3_client):
-        with app.test_client() as client:
-            # with app.app_context():
-            #     app.init_db()
-            yield client
+    with db_set(app, db, s3_client), app.test_client() as client:
+        # with app.app_context():
+        #     app.init_db()
+        yield client
 
 
 class MockBoto3:
@@ -58,7 +57,9 @@ class MockElasticsearch:
         pass
 
     @staticmethod
-    def search_result_wrapper(hits=[], aggregates=None, scroll=None):
+    def search_result_wrapper(hits=None, aggregates=None, scroll=None):
+        if hits is None:
+            hits = []
         max_score = max([h.get("_score", 0) for h in hits]) if hits else 0
         result = {
             "took": 1,

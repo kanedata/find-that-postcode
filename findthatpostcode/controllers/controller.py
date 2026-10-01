@@ -65,7 +65,9 @@ class Controller:
         if isinstance(result["hits"]["total"], (float, int)):
             return result["hits"]["total"]
 
-    def url(self, filetype=None, query_vars={}):
+    def url(self, filetype=None, query_vars=None):
+        if query_vars is None:
+            query_vars = {}
         path = [
             self.url_slug,
             self.id.replace(" ", "+") + self.set_url_filetype(filetype),
@@ -82,8 +84,10 @@ class Controller:
         )
 
     def relationship_url(
-        self, relationship, related=True, filetype=None, query_vars={}
+        self, relationship, related=True, filetype=None, query_vars=None
     ):
+        if query_vars is None:
+            query_vars = {}
         if related:
             path = [
                 self.url_slug,
@@ -113,8 +117,10 @@ class Controller:
             return "." + filetype
         return ""
 
-    def get_query_string(self, query_vars={}):
+    def get_query_string(self, query_vars=None):
         # query_vars = self.page_query_vars(query_vars)
+        if query_vars is None:
+            query_vars = {}
         return urlencode(query_vars)
 
     def get_errors(self):
@@ -206,7 +212,9 @@ class Pagination:
         self.from_ = self.get_from()
         self.pagination = {"next": None, "prev": None, "first": None, "last": None}
 
-    def page_query_vars(self, query_vars={}):
+    def page_query_vars(self, query_vars=None):
+        if query_vars is None:
+            query_vars = {}
         if self.page and self.page > 1 and "p" not in query_vars:
             query_vars["p"] = self.page
         if (
@@ -225,7 +233,9 @@ class Pagination:
         self.page = page
         self.size = size
 
-    def set_pagination(self, total_results, url_args={}, range=5):
+    def set_pagination(self, total_results, url_args=None, range=5):
+        if url_args is None:
+            url_args = {}
         self.total = total_results
         self.min_page = 1
         self.max_page = math.ceil(float(total_results) / float(self.size))

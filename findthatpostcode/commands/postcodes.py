@@ -3,7 +3,7 @@ Import commands for the register of geographic codes and code history database
 """
 
 import csv
-import datetime
+import datetime as dt
 import hashlib
 import io
 import zipfile
@@ -45,7 +45,7 @@ def import_nspl(url=None, es_index=PC_INDEX):
         ):
             continue
 
-        print("[postcodes] Opening %s" % f.filename)
+        print(f"[postcodes] Opening {f.filename}")
 
         pcount = 0
         with z.open(f, "r") as pccsv:
@@ -73,7 +73,9 @@ def import_nspl(url=None, es_index=PC_INDEX):
                 # date fields
                 for j in ["dointr", "doterm"]:
                     if i[j]:
-                        i[j] = datetime.datetime.strptime(i[j], "%Y%m")
+                        i[j] = dt.datetime.strptime(i[j], "%Y%m").astimezone(
+                            dt.timezone.utc
+                        )
 
                 # latitude and longitude
                 for j in ["lat", "long"]:
@@ -139,12 +141,9 @@ def import_nspl(url=None, es_index=PC_INDEX):
                 postcodes.append(record)
                 pcount += 1
 
-            print("[postcodes] Processed %s postcodes" % pcount)
-            print("[elasticsearch] %s postcodes to save" % len(postcodes))
+            print(f"[postcodes] Processed {pcount} postcodes")
+            print(f"[elasticsearch] {len(postcodes)} postcodes to save")
             results = bulk(es, postcodes)
-            print(
-                "[elasticsearch] saved %s postcodes to %s index"
-                % (results[0], es_index)
-            )
-            print("[elasticsearch] %s errors reported" % len(results[1]))
+            print(f"[elasticsearch] saved {results[0]} postcodes to {es_index} index")
+            print(f"[elasticsearch] {len(results[1])} errors reported")
             postcodes = []

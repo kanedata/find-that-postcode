@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 import os
 import re
 
@@ -73,14 +73,14 @@ def create_app(test_config=None):
     # template helpers
     @app.context_processor
     def inject_now():
-        return dict(
-            now=datetime.datetime.now(),
-            key_area_types=KEY_AREA_TYPES,
-            other_codes=OTHER_CODES,
-            area_types=AREA_TYPES,
-            ethical_ads_publisher=app.config.get("ETHICAL_ADS_PUBLISHER"),
-            stats_fields=STATS_FIELDS,
-        )
+        return {
+            "now": dt.datetime.now(tz=dt.timezone.utc),
+            "key_area_types": KEY_AREA_TYPES,
+            "other_codes": OTHER_CODES,
+            "area_types": AREA_TYPES,
+            "ethical_ads_publisher": app.config.get("ETHICAL_ADS_PUBLISHER"),
+            "stats_fields": STATS_FIELDS,
+        }
 
     @app.template_filter()
     def expand_commas(s):

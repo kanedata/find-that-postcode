@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 
 import click
 from boto3 import session
@@ -36,29 +36,27 @@ def init_db(reset=False):
 
     for index, mapping in INDEXES.items():
         if es.indices.exists(index) and reset:
-            click.echo("[elasticsearch] deleting '%s' index..." % (index))
+            click.echo(f"[elasticsearch] deleting '{index}' index...")
             res = es.indices.delete(index=index)
-            click.echo("[elasticsearch] response: '%s'" % (res))
-        click.echo("[elasticsearch] creating '%s' index..." % (index))
+            click.echo(f"[elasticsearch] response: '{res}'")
+        click.echo(f"[elasticsearch] creating '{index}' index...")
         res = es.indices.create(index=index)
 
         res = es.indices.put_mapping(
             doc_type=doc_type, body=mapping, index=index, include_type_name=True
         )
-        click.echo(
-            "[elasticsearch] set mapping on %s index, %s type" % (index, doc_type)
-        )
+        click.echo(f"[elasticsearch] set mapping on {index} index, {doc_type} type")
 
 
 def get_log_db():
     if "log_db" not in g:
         if current_app.config.get("LOGGING_DB"):
-            datetime.datetime.now()
+            dt.datetime.now(dt.timezone.utc)
             g.log_db = Database(
                 current_app.config.get("LOGGING_DB").format(
-                    year=datetime.datetime.now().year,
-                    month=datetime.datetime.now().month,
-                    day=datetime.datetime.now().day,
+                    year=dt.datetime.now(dt.timezone.utc).year,
+                    month=dt.datetime.now(dt.timezone.utc).month,
+                    day=dt.datetime.now(dt.timezone.utc).day,
                 )
             )
         else:

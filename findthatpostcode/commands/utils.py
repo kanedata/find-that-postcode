@@ -13,7 +13,13 @@ def get_latest_geoportal_url(product_code: str) -> str:
         GEOPORTAL_API_URL, params={"q": product_code, "sortBy": "-properties.created"}
     )
     api_response.raise_for_status()
-    item = api_response.json()["features"][0]["id"]
-    url = GEOPORTAL_DATA_URL.format(item)
-    print(f"Latest URL for product code {product_code}: {url}")
-    return url
+    items = api_response.json()["features"]
+    for item in items:
+        if item["properties"]["type"] != "CSV Collection":
+            continue
+        item_id = item["id"]
+        url = GEOPORTAL_DATA_URL.format(item_id)
+        print(f"Latest URL for product code {product_code}: {url}")
+        return url
+
+    raise ValueError(f"No hosted table found for product code {product_code}")

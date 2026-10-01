@@ -7,6 +7,7 @@ from findthatpostcode.controllers.postcodes import Postcode
 from findthatpostcode.db import get_db
 from findthatpostcode.metadata import (
     OAC11_CODE,
+    OAC21_CODE,
     RU11IND_CODES,
     RUC21_CODES,
     STATS_FIELDS,
@@ -93,6 +94,10 @@ def get_postcode_by_hash(hashes: str | list[str], fields: list[str]):
             names[f"{i}_name"] = None
             if i == "oac11":
                 oac_name = OAC11_CODE.get(data.get(i))
+                if oac_name:
+                    names[f"{i}_name"] = " > ".join(oac_name)
+            elif i == "oac21":
+                oac_name = OAC21_CODE.get(data.get(i))
                 if oac_name:
                     names[f"{i}_name"] = " > ".join(oac_name)
             elif i == "ru11ind":

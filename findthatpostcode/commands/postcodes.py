@@ -113,6 +113,13 @@ def import_nspl(url=None, es_index=PC_INDEX):
                     "pfa23cd": "pfa",
                     "imd20ind": "imd",
                     "icb23cd": "icb",
+                    "ctry26cd": "ctry",
+                    "rgn26cd": "rgn",
+                    "cty26cd": "cty",
+                    "lad26cd": "lad",
+                    "wd26cd": "wd",
+                    "oac21ind": "oac21",
+                    "imd25ind": "imd",
                 }
                 for old, new in rename_fields.items():
                     if old in i:

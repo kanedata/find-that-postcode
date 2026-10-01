@@ -72,7 +72,7 @@ BASIC_UPLOAD_FIELDS = [
     Field(id="latlng", name="Latitude / Longitude", has_name=False),
     Field(id="estnrth", name="OS Easting / Northing", has_name=False),
     Field(id="pcds", name="Standardised postcode", has_name=False),
-    Field(id="oac11", name="2011 Output Area Classification (OAC)", has_name=True),
+    Field(id="oac21", name="2021 Output Area Classification (OAC)", has_name=True),
     Field(id="ru11ind", name="2011 Census rural-urban classification", has_name=True),
     Field(id="ruc21", name="2021 Census rural-urban classification", has_name=True),
 ]
@@ -336,6 +336,249 @@ OAC11_CODE = {
         "Hard-Pressed European Settlers",
     ],
     "9Z9": ["(pseudo) CI, IoM", "(pseudo) CI, IoM", "(pseudo) CI, IoM"],
+}
+
+OAC21_CODE = {
+    "1A1": [
+        "Retired Professionals",
+        "Spacious Rural Living",
+        "Pre-Retirement Spacious Living",
+    ],
+    "1A2": [
+        "Retired Professionals",
+        "Spacious Rural Living",
+        "Retirement Spacious Living",
+    ],
+    "1B1": [
+        "Retired Professionals",
+        "Small Town Suburbia",
+        "Younger Established Suburban Communities",
+    ],
+    "1B2": [
+        "Retired Professionals",
+        "Small Town Suburbia",
+        "Older Established Suburban Communities",
+    ],
+    "1C1": [
+        "Retired Professionals",
+        "Established Mature Families",
+        "Affluent Mature Families",
+    ],
+    "1C2": [
+        "Retired Professionals",
+        "Established Mature Families",
+        "Burgeoning Mature Families",
+    ],
+    "2A1": [
+        "Suburbanites and Peri-Urbanites",
+        "Inner Suburbs and Small Town Living",
+        "Younger Suburban Family Renters",
+    ],
+    "2A2": [
+        "Suburbanites and Peri-Urbanites",
+        "Inner Suburbs and Small Town Living",
+        "Settled Owner-Occupied Suburbs",
+    ],
+    "2A3": [
+        "Suburbanites and Peri-Urbanites",
+        "Inner Suburbs and Small Town Living",
+        "Terraced Communities",
+    ],
+    "2B1": [
+        "Suburbanites and Peri-Urbanites",
+        "Rural Amenity",
+        "Ageing Rural Communities",
+    ],
+    "2B2": ["Suburbanites and Peri-Urbanites", "Rural Amenity", "Rural Mix"],
+    "2C1": [
+        "Suburbanites and Peri-Urbanites",
+        "Ageing Communities",
+        "Communal Retirement Living",
+    ],
+    "2C2": [
+        "Suburbanites and Peri-Urbanites",
+        "Ageing Communities",
+        "Ageing Independent Living",
+    ],
+    "3A1": [
+        "Multicultural and Educated Urbanites",
+        "Student Living and Professional Footholds",
+        "University Centric",
+    ],
+    "3A2": [
+        "Multicultural and Educated Urbanites",
+        "Student Living and Professional Footholds",
+        "Professional Progression",
+    ],
+    "3A3": [
+        "Multicultural and Educated Urbanites",
+        "Student Living and Professional Footholds",
+        "Urbanite Mix",
+    ],
+    "3A4": [
+        "Multicultural and Educated Urbanites",
+        "Student Living and Professional Footholds",
+        "Affluent Graduate Living",
+    ],
+    "3B1": [
+        "Multicultural and Educated Urbanites",
+        "Ethnically Diverse Young Families",
+        "Private Rental Ethnic Minority Families",
+    ],
+    "3B2": [
+        "Multicultural and Educated Urbanites",
+        "Ethnically Diverse Young Families",
+        "Young Ethnic Minority Families",
+    ],
+    "3C1": [
+        "Multicultural and Educated Urbanites",
+        "Diverse Educated Urban Singles",
+        "Centrally Located Professionals",
+    ],
+    "3C2": [
+        "Multicultural and Educated Urbanites",
+        "Diverse Educated Urban Singles",
+        "Career Progression",
+    ],
+    "4A1": [
+        "Low-Skilled Migrant and Student Communities",
+        "Ethnically Diverse Families in Less Connected Locations",
+        "Semi-Detached, Service Workers and Students",
+    ],
+    "4A2": [
+        "Low-Skilled Migrant and Student Communities",
+        "Ethnically Diverse Families in Less Connected Locations",
+        "City Service Workers",
+    ],
+    "4A3": [
+        "Low-Skilled Migrant and Student Communities",
+        "Ethnically Diverse Families in Less Connected Locations",
+        "Multi-Child Young Families",
+    ],
+    "4B1": [
+        "Low-Skilled Migrant and Student Communities",
+        "Established Multi- Ethnic Communities",
+        "Migrant Families",
+    ],
+    "4B2": [
+        "Low-Skilled Migrant and Student Communities",
+        "Established Multi- Ethnic Communities",
+        "European Skilled Workforce",
+    ],
+    "4B3": [
+        "Low-Skilled Migrant and Student Communities",
+        "Established Multi- Ethnic Communities",
+        "Inner Suburb Ethnic Group Mix",
+    ],
+    "4B4": [
+        "Low-Skilled Migrant and Student Communities",
+        "Established Multi- Ethnic Communities",
+        "Ethnic Minority Routine Service Workers",
+    ],
+    "4C1": [
+        "Low-Skilled Migrant and Student Communities",
+        "Challenged Multicultural Communities and Students",
+        "African and Asian Influences",
+    ],
+    "4C2": [
+        "Low-Skilled Migrant and Student Communities",
+        "Challenged Multicultural Communities and Students",
+        "European and Asian Heritage",
+    ],
+    "5A1": [
+        "Ethnically Diverse Suburb-an Professionals",
+        "Outer Suburbs",
+        "Outer Suburb Asian Mix",
+    ],
+    "5A2": [
+        "Ethnically Diverse Suburb-an Professionals",
+        "Outer Suburbs",
+        "Suburban Empty Nesters",
+    ],
+    "5A3": [
+        "Ethnically Diverse Suburb-an Professionals",
+        "Outer Suburbs",
+        "Young Suburban Families",
+    ],
+    "5B1": [
+        "Ethnically Diverse Suburb-an Professionals",
+        "Suburban Professionals",
+        "Families in Multi-Ethnic Terraces",
+    ],
+    "5B2": [
+        "Ethnically Diverse Suburb-an Professionals",
+        "Suburban Professionals",
+        "Established Multi-Ethnic Suburbs",
+    ],
+    "6A1": ["Baseline UK", "Challenged Communities", "Suburban Housing Starters"],
+    "6A2": ["Baseline UK", "Challenged Communities", "Semi Detached Strivers"],
+    "6A3": [
+        "Baseline UK",
+        "Challenged Communities",
+        "Younger Ethnic Minority Families in Flats",
+    ],
+    "6B1": [
+        "Baseline UK",
+        "Legacy Industrial and Coastal Communities",
+        "Retired Seniors",
+    ],
+    "6B2": [
+        "Baseline UK",
+        "Legacy Industrial and Coastal Communities",
+        "Traditional Terraces",
+    ],
+    "6B3": ["Baseline UK", "Legacy Industrial and Coastal Communities", "EU Singles"],
+    "6C1": ["Baseline UK", "Multicultural Inner Suburbs", "Transient Communities"],
+    "6C2": [
+        "Baseline UK",
+        "Multicultural Inner Suburbs",
+        "Semi-Detached Family Renters",
+    ],
+    "7A1": [
+        "Semi- and Un-Skilled Workforce",
+        "Established but Challenged",
+        "Ageing Established Urban Communities",
+    ],
+    "7A2": [
+        "Semi- and Un-Skilled Workforce",
+        "Established but Challenged",
+        "Industry Associations",
+    ],
+    "7B1": [
+        "Semi- and Un-Skilled Workforce",
+        "Young Families in Industrial Towns",
+        "Terraces in Transitional Towns",
+    ],
+    "7B2": [
+        "Semi- and Un-Skilled Workforce",
+        "Young Families in Industrial Towns",
+        "Families and Later Life",
+    ],
+    "8A1": [
+        "Legacy Communities",
+        "Routine Occupations or Retirement",
+        "Retirement Residences",
+    ],
+    "8A2": [
+        "Legacy Communities",
+        "Routine Occupations or Retirement",
+        "Flats and Routine Occupations",
+    ],
+    "8B1": [
+        "Legacy Communities",
+        "Legacy and Demographically Mixed Communities",
+        "Challenged Families",
+    ],
+    "8B2": [
+        "Legacy Communities",
+        "Legacy and Demographically Mixed Communities",
+        "Retirement Pockets",
+    ],
+    "8B3": [
+        "Legacy Communities",
+        "Legacy and Demographically Mixed Communities",
+        "Young Family Flat Renters",
+    ],
 }
 
 RU11IND_CODES = {

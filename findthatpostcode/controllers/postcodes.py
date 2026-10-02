@@ -69,7 +69,9 @@ class Postcode(Controller):
                 except ValueError:
                     continue
 
-        oac11_code = postcode.get("oac11", "").upper()
+        oac11_code = postcode.get("oac11", "")
+        if isinstance(oac11_code, str):
+            oac11_code = oac11_code.upper()
         oac11 = OAC11_CODE.get(oac11_code)
         postcode["oac11"] = {
             "code": oac11_code,
@@ -85,7 +87,9 @@ class Postcode(Controller):
                 "subgroup": oac11[2],
             }
 
-        oac21_code = postcode.get("oac21", "").upper()
+        oac21_code = postcode.get("oac21", "")
+        if isinstance(oac21_code, str):
+            oac21_code = oac21_code.upper()
         oac21 = OAC21_CODE.get(oac21_code)
         postcode["oac21"] = {
             "code": oac21_code,

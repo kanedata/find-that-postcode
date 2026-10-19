@@ -31,6 +31,8 @@ def addtocsv():
 @bp.route("/", strict_slashes=False, methods=["POST"])
 def return_csv():
     upload = request.files.get("csvfile")
+    if not upload:
+        return "No file uploaded."
     column_name = request.form.get("column_name", "postcode")
     fields = request.form.getlist("fields")
     if not fields:

@@ -1,6 +1,7 @@
 import copy
 import json
 import os
+from typing import Generator
 
 import pytest
 from fastapi.testclient import TestClient
@@ -27,24 +28,24 @@ def mock_s3():
 
 
 @pytest.fixture
-def client(mocker):
+def client(mocker) -> Generator[TestClient, None, None]:
     mocker.patch("findthatpostcode.db.get_es", return_value=mock_es())
     mocker.patch("findthatpostcode.db.get_s3_client", return_value=mock_s3())
     app.dependency_overrides[get_es] = mock_es
     app.dependency_overrides[get_s3_client] = mock_s3
 
-    client = TestClient(app, follow_redirects=True)
+    client = TestClient(app, follow_redirects=True, base_url="https://testserver")
     yield client
 
 
 @pytest.fixture
-def client_redirect(mocker):
+def client_redirect(mocker) -> Generator[TestClient, None, None]:
     mocker.patch("findthatpostcode.db.get_es", return_value=mock_es())
     mocker.patch("findthatpostcode.db.get_s3_client", return_value=mock_s3())
     app.dependency_overrides[get_es] = mock_es
     app.dependency_overrides[get_s3_client] = mock_s3
 
-    client = TestClient(app, follow_redirects=False)
+    client = TestClient(app, follow_redirects=False, base_url="https://testserver")
     yield client
 
 

@@ -1,7 +1,9 @@
 from http import HTTPStatus
 
+from fastapi.testclient import TestClient
 
-def test_index(client):
+
+def test_index(client: TestClient):
     rv = client.get("/")
     content = rv.text
     assert rv.status_code == HTTPStatus.OK
@@ -16,7 +18,7 @@ def test_index(client):
     )
 
 
-def test_about(client):
+def test_about(client: TestClient):
     rv = client.get("/about")
     content = rv.text
     assert rv.status_code == HTTPStatus.OK
@@ -31,13 +33,13 @@ def test_about(client):
     )
 
 
-def test_tool_reduce_geojson(client):
+def test_tool_reduce_geojson(client: TestClient):
     rv = client.get("/tools/reduce-geojson")
     assert rv.status_code == HTTPStatus.OK
     assert "geojson" in rv.text
 
 
-def test_tool_merge_geojson(client):
+def test_tool_merge_geojson(client: TestClient):
     rv = client.get("/tools/merge-geojson")
     assert rv.status_code == HTTPStatus.OK
     assert "geojson" in rv.text

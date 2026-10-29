@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 import pytest
+from fastapi.testclient import TestClient
 
 AREA_CODE = "S02000783"
 AREA_NAME = "Lower Bow & Larkfield, Fancy Farm, Mallard Bowl"
@@ -10,7 +11,7 @@ AREA_CODE_2 = "E01020135"
 class TestAreaRouter:
     """Tests for the /api/v2/areas router endpoints"""
 
-    def test_read_area(self, client):
+    def test_read_area(self, client: TestClient):
         """Test GET /api/v2/areas/{areacode}"""
         rv = client.get(f"/api/v2/areas/{AREA_CODE}")
         assert rv.status_code == HTTPStatus.OK
@@ -20,12 +21,12 @@ class TestAreaRouter:
         assert data["name"] == AREA_NAME
         assert data["entity"] == "S02"
 
-    def test_read_area_not_found(self, client):
+    def test_read_area_not_found(self, client: TestClient):
         """Test GET /api/v2/areas/{areacode} with non-existent area"""
         rv = client.get("/api/v2/areas/NOTFOUND123")
         assert rv.status_code == HTTPStatus.NOT_FOUND
 
-    def test_read_area_geojson_single(self, client):
+    def test_read_area_geojson_single(self, client: TestClient):
         """Test GET /api/v2/areas/{areacodes}.geojson with single area"""
         rv = client.get(f"/api/v2/areas/{AREA_CODE}.geojson")
         assert rv.status_code == HTTPStatus.OK
@@ -45,7 +46,7 @@ class TestAreaRouter:
                 assert "properties" in data["features"][0]
                 assert "geometry" in data["features"][0]
 
-    def test_read_area_geojson_multiple(self, client):
+    def test_read_area_geojson_multiple(self, client: TestClient):
         """Test GET /api/v2/areas/{areacodes}.geojson with multiple areas"""
         areacodes = f"{AREA_CODE}+{AREA_CODE_2}"
         rv = client.get(f"/api/v2/areas/{areacodes}.geojson")
@@ -63,7 +64,7 @@ class TestAreaRouter:
                 assert "properties" in feature
                 assert "geometry" in feature
 
-    def test_read_example_postcodes(self, client):
+    def test_read_example_postcodes(self, client: TestClient):
         """Test GET /api/v2/areas/{areacode}/example_postcodes"""
         rv = client.get(f"/api/v2/areas/{AREA_CODE}/example_postcodes")
         assert rv.status_code == HTTPStatus.OK
@@ -72,12 +73,12 @@ class TestAreaRouter:
         assert isinstance(data, list)
         # Should return example postcodes from the area
 
-    def test_read_example_postcodes_not_found(self, client):
+    def test_read_example_postcodes_not_found(self, client: TestClient):
         """Test GET /api/v2/areas/{areacode}/example_postcodes with non-existent area"""
         rv = client.get("/api/v2/areas/NOTFOUND123/example_postcodes")
         assert rv.status_code == HTTPStatus.NOT_FOUND
 
-    def test_read_area_children(self, client):
+    def test_read_area_children(self, client: TestClient):
         """Test GET /api/v2/areas/{areacode}/children/{areatype}"""
         # Use an area that has children in mock data
         rv = client.get(f"/api/v2/areas/{AREA_CODE_2}/children/lsoa11")
@@ -87,7 +88,7 @@ class TestAreaRouter:
         data = rv.json()
         assert isinstance(data, list)
 
-    def test_read_area_children_geojson(self, client):
+    def test_read_area_children_geojson(self, client: TestClient):
         """Test GET /api/v2/areas/{areacode}/children/{areatype}.geojson"""
         rv = client.get(f"/api/v2/areas/{AREA_CODE_2}/children/lsoa11.geojson")
         assert rv.status_code == HTTPStatus.OK
@@ -105,13 +106,13 @@ class TestAreaRouter:
             # Features list may be empty if no children in mock data
             assert isinstance(data["features"], list)
 
-    def test_read_area_children_not_found(self, client):
+    def test_read_area_children_not_found(self, client: TestClient):
         """Test GET /api/v2/areas/{areacode}/children/{areatype} with non-existent area"""
         rv = client.get("/api/v2/areas/NOTFOUND123/children/lsoa11")
         assert rv.status_code == HTTPStatus.NOT_FOUND
 
     @pytest.mark.parametrize("origin", ["http://example.com", None])
-    def test_read_area_cors(self, client, origin):
+    def test_read_area_cors(self, client: TestClient, origin: str | None):
         """Test CORS headers on area endpoints"""
         headers = {}
         if origin:

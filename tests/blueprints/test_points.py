@@ -1,4 +1,5 @@
 import pytest
+from fastapi.testclient import TestClient
 
 
 @pytest.mark.parametrize(
@@ -10,7 +11,7 @@ import pytest
     ],
 )
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_point_json(client, origin, endpoint):
+def test_point_json(client: TestClient, origin: str | None, endpoint: str):
     headers = {}
     check_cors = False
     if origin:
@@ -35,11 +36,13 @@ def test_point_json(client, origin, endpoint):
         assert rv.headers["Access-Control-Allow-Origin"] == "*"
 
 
-def test_point_json_distance(client):
+@pytest.mark.skip("Not implemented yet")
+def test_point_json_distance(client: TestClient):
+    # @TODO: Implement test for distance calculation in JSON response
     pass
 
 
-def test_point_html(client):
+def test_point_html(client: TestClient):
     rv = client.get("/points/51.501,-0.2936.html")
     assert rv.headers["Content-Type"].split(";")[0].strip() == "text/html"
     content = rv.text
@@ -49,5 +52,7 @@ def test_point_html(client):
     assert "69.0" in content
 
 
-def test_point_html_distance(client):
+@pytest.mark.skip("Not implemented yet")
+def test_point_html_distance(client: TestClient):
+    # @TODO: Implement test for distance calculation in HTML response
     pass

@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 import pytest
+from fastapi.testclient import TestClient
 
 AREA_CODE = "S02000783"
 AREA_NAME = "Lower Bow & Larkfield, Fancy Farm, Mallard Bowl"
@@ -15,7 +16,7 @@ AREA_NAME = "Lower Bow & Larkfield, Fancy Farm, Mallard Bowl"
     ],
 )
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_area_json(client, endpoint, origin):
+def test_area_json(client: TestClient, endpoint: str, origin: str | None):
     headers = {}
     check_cors = False
     if origin:
@@ -51,19 +52,19 @@ def test_area_json(client, endpoint, origin):
         "/api/v1/areas/{}".format("123445676"),
     ],
 )
-def test_missing_area_json(client, endpoint):
+def test_missing_area_json(client: TestClient, endpoint: str):
     rv = client.get(endpoint)
     assert rv.status_code == HTTPStatus.NOT_FOUND
 
 
-def test_area_html(client):
+def test_area_html(client: TestClient):
     rv = client.get("/areas/{}.html".format(AREA_CODE))
     assert rv.headers["Content-Type"].split(";")[0].strip() == "text/html"
     assert AREA_NAME in rv.text
     assert AREA_CODE in rv.text
 
 
-def test_area_missing_html(client):
+def test_area_missing_html(client: TestClient):
     rv = client.get("/areas/123445676.html")
     assert rv.headers["Content-Type"].split(";")[0].strip() == "text/html"
     assert "not found" in rv.text.lower()
@@ -77,7 +78,7 @@ def test_area_missing_html(client):
     ],
 )
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_area_geojson(client, origin, endpoint):
+def test_area_geojson(client: TestClient, origin: str | None, endpoint: str):
     headers = {}
     check_cors = False
     if origin:
@@ -97,13 +98,13 @@ def test_area_geojson(client, origin, endpoint):
         assert rv.headers["Access-Control-Allow-Origin"] == "*"
 
 
-def test_area_search(client_redirect):
+def test_area_search(client_redirect: TestClient):
     rv = client_redirect.get("/areas/search")
-    assert rv.status_code == 301
-    assert rv.headers["Location"] == "http://testserver/search/"
+    assert rv.status_code == HTTPStatus.SEE_OTHER
+    assert rv.headers["Location"] == "https://testserver/search/"
 
 
-def test_area_names(client):
+def test_area_names(client: TestClient):
     rv = client.get("/areas/names.csv")
     assert rv.headers["Content-Type"].split(";")[0].strip() == "text/csv"
     assert "E01020135" in rv.text

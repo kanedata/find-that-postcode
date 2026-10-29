@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 import pytest
+from fastapi.testclient import TestClient
 
 
 @pytest.mark.parametrize(
@@ -12,7 +13,7 @@ import pytest
     ],
 )
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_postcode_json(client, origin, endpoint):
+def test_postcode_json(client: TestClient, origin: str | None, endpoint: str):
     headers = {}
     check_cors = False
     if origin:
@@ -49,13 +50,13 @@ def test_postcode_json(client, origin, endpoint):
         "/api/v1/postcodes/14214124",
     ],
 )
-def test_postcode_missing_json(client, endpoint):
+def test_postcode_missing_json(client: TestClient, endpoint: str):
     rv = client.get(endpoint)
     assert rv.headers["Content-Type"].split(";")[0].strip() == "application/json"
     assert rv.status_code == HTTPStatus.NOT_FOUND
 
 
-def test_postcode_html(client):
+def test_postcode_html(client: TestClient):
     rv = client.get("/postcodes/EX36 4AT.html")
     assert rv.headers["Content-Type"].split(";")[0].strip() == "text/html"
     assert "EX36 4AT" in rv.text
@@ -63,15 +64,15 @@ def test_postcode_html(client):
     assert "E01020122" not in rv.text
 
 
-def test_postcode_missing_html(client):
+def test_postcode_missing_html(client: TestClient):
     rv = client.get("/postcodes/14214124.html")
     assert rv.status_code == HTTPStatus.NOT_FOUND
     assert rv.headers["Content-Type"].split(";")[0].strip() == "text/html"
 
 
-def test_postcode_redirect(client_redirect):
+def test_postcode_redirect(client_redirect: TestClient):
     rv = client_redirect.get("/postcodes/redirect?postcode=EX36 4AT")
-    assert rv.status_code == 303
+    assert rv.status_code == HTTPStatus.SEE_OTHER
     assert rv.headers["Location"].endswith("/postcodes/EX36%204AT.html")
 
 
@@ -84,7 +85,7 @@ def test_postcode_redirect(client_redirect):
     ],
 )
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_postcode_hash(client, origin, endpoint):
+def test_postcode_hash(client: TestClient, origin: str | None, endpoint: str):
     headers = {}
     check_cors = False
     if origin:
@@ -107,7 +108,7 @@ def test_postcode_hash(client, origin, endpoint):
         "/api/v1/postcodes/hash/ab",
     ],
 )
-def test_postcode_hash_too_small(client, endpoint):
+def test_postcode_hash_too_small(client: TestClient, endpoint: str):
     rv = client.get(f"{endpoint}?properties=ward_code")
     assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
@@ -121,7 +122,7 @@ def test_postcode_hash_too_small(client, endpoint):
     ],
 )
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_postcode_hashes(client, origin, endpoint):
+def test_postcode_hashes(client: TestClient, origin: str | None, endpoint: str):
     headers = {}
     check_cors = False
     if origin:
@@ -152,7 +153,9 @@ def test_postcode_hashes(client, origin, endpoint):
     ],
 )
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_postcode_hashes_too_small(client, origin, endpoint):
+def test_postcode_hashes_too_small(
+    client: TestClient, origin: str | None, endpoint: str
+):
     headers = {}
     check_cors = False
     if origin:

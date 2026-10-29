@@ -1,12 +1,13 @@
 from http import HTTPStatus
 
 import pytest
+from fastapi.testclient import TestClient
 
 
 class TestPlaceRouter:
     """Tests for the /api/v2/places router endpoints"""
 
-    def test_read_place(self, client):
+    def test_read_place(self, client: TestClient):
         """Test GET /api/v2/places/{placecode}"""
         # Using a place code that should exist in mock data
         rv = client.get("/api/v2/places/IPN0000543")
@@ -17,12 +18,12 @@ class TestPlaceRouter:
             assert "code" in data
             assert "name" in data
 
-    def test_read_place_not_found(self, client):
+    def test_read_place_not_found(self, client: TestClient):
         """Test GET /api/v2/places/{placecode} with non-existent place"""
         rv = client.get("/api/v2/places/NOTFOUND123")
         assert rv.status_code == HTTPStatus.NOT_FOUND
 
-    def test_read_nearby_places(self, client):
+    def test_read_nearby_places(self, client: TestClient):
         """Test GET /api/v2/places/{placecode}/places"""
         rv = client.get("/api/v2/places/IPN0000543/places")
         assert rv.status_code == HTTPStatus.OK
@@ -31,12 +32,12 @@ class TestPlaceRouter:
             data = rv.json()
             assert isinstance(data, list)
 
-    def test_read_nearby_places_not_found(self, client):
+    def test_read_nearby_places_not_found(self, client: TestClient):
         """Test GET /api/v2/places/{placecode}/places with non-existent place"""
         rv = client.get("/api/v2/places/NOTFOUND123/places")
         assert rv.status_code == HTTPStatus.NOT_FOUND
 
-    def test_read_nearby_postcodes(self, client):
+    def test_read_nearby_postcodes(self, client: TestClient):
         """Test GET /api/v2/places/{placecode}/postcodes"""
         rv = client.get("/api/v2/places/IPN0000543/postcodes")
         assert rv.status_code == HTTPStatus.OK
@@ -45,7 +46,7 @@ class TestPlaceRouter:
             data = rv.json()
             assert isinstance(data, list)
 
-    def test_read_nearby_postcodes_with_within_param(self, client):
+    def test_read_nearby_postcodes_with_within_param(self, client: TestClient):
         """Test GET /api/v2/places/{placecode}/postcodes with within parameter"""
         rv = client.get("/api/v2/places/IPN0000543/postcodes?within=500")
         assert rv.status_code == HTTPStatus.OK
@@ -54,13 +55,13 @@ class TestPlaceRouter:
             data = rv.json()
             assert isinstance(data, list)
 
-    def test_read_nearby_postcodes_not_found(self, client):
+    def test_read_nearby_postcodes_not_found(self, client: TestClient):
         """Test GET /api/v2/places/{placecode}/postcodes with non-existent place"""
         rv = client.get("/api/v2/places/NOTFOUND123/postcodes")
         assert rv.status_code == HTTPStatus.NOT_FOUND
 
     @pytest.mark.parametrize("origin", ["http://example.com", None])
-    def test_read_place_cors(self, client, origin):
+    def test_read_place_cors(self, client: TestClient, origin: str | None):
         """Test CORS headers on place endpoints"""
         headers = {}
         if origin:
@@ -73,7 +74,9 @@ class TestPlaceRouter:
             assert rv.headers.get("Access-Control-Allow-Origin") == "*"
 
     @pytest.mark.parametrize("within", [100, 500, 1000, 5000])
-    def test_read_nearby_postcodes_various_distances(self, client, within):
+    def test_read_nearby_postcodes_various_distances(
+        self, client: TestClient, within: int
+    ):
         """Test GET /api/v2/places/{placecode}/postcodes with various within parameters"""
         rv = client.get(f"/api/v2/places/IPN0000543/postcodes?within={within}")
         assert rv.status_code == HTTPStatus.OK

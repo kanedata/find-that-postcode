@@ -3,6 +3,7 @@ from http import HTTPStatus
 from urllib.parse import urlencode
 
 import pytest
+from fastapi.testclient import TestClient
 
 reconcile_endpoints = [
     "/reconcile",
@@ -14,7 +15,7 @@ reconcile_endpoints = [
 
 @pytest.mark.parametrize("endpoint", reconcile_endpoints)
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_reconcile_spec(client, origin, endpoint):
+def test_reconcile_spec(client: TestClient, origin: str | None, endpoint: str):
     headers = {}
     check_cors = False
     if origin:
@@ -56,7 +57,7 @@ extend_q = {
 
 @pytest.mark.parametrize("endpoint", reconcile_endpoints)
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_reconcile_extend(client, origin, endpoint):
+def test_reconcile_extend(client: TestClient, origin: str | None, endpoint: str):
     headers = {}
     check_cors = False
     if origin:
@@ -74,7 +75,7 @@ def test_reconcile_extend(client, origin, endpoint):
 
 
 @pytest.mark.parametrize("endpoint", reconcile_endpoints)
-def test_reconcile_extend_jsonp(client, endpoint):
+def test_reconcile_extend_jsonp(client: TestClient, endpoint: str):
     extend_q["callback"] = "testCallback"
     rv = client.get("{}?{}".format(endpoint, urlencode(extend_q)))
     data = rv.text
@@ -90,7 +91,7 @@ def test_reconcile_extend_jsonp(client, endpoint):
 
 @pytest.mark.parametrize("endpoint", reconcile_endpoints)
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_reconcile_extend_post(client, origin, endpoint):
+def test_reconcile_extend_post(client: TestClient, origin: str | None, endpoint: str):
     headers = {}
     check_cors = False
     if origin:
@@ -108,7 +109,7 @@ def test_reconcile_extend_post(client, origin, endpoint):
 
 
 @pytest.mark.parametrize("endpoint", reconcile_endpoints)
-def test_reconcile_extend_post_jsonp(client, endpoint):
+def test_reconcile_extend_post_jsonp(client: TestClient, endpoint: str):
     rv = client.post("{}?callback=testCallback".format(endpoint), data=extend_q)
     data = rv.text
     assert rv.status_code == HTTPStatus.OK
@@ -139,7 +140,7 @@ recon_q = {
 
 @pytest.mark.parametrize("endpoint", reconcile_endpoints)
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_reconcile(client, origin, endpoint):
+def test_reconcile(client: TestClient, origin: str | None, endpoint: str):
     headers = {}
     check_cors = False
     if origin:
@@ -157,7 +158,7 @@ def test_reconcile(client, origin, endpoint):
 
 @pytest.mark.parametrize("endpoint", reconcile_endpoints)
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_reconcile_post(client, origin, endpoint):
+def test_reconcile_post(client: TestClient, origin: str | None, endpoint: str):
     headers = {}
     check_cors = False
     if origin:

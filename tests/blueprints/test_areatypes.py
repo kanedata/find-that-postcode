@@ -2,6 +2,7 @@ import html
 from http import HTTPStatus
 
 import pytest
+from fastapi.testclient import TestClient
 
 AREATYPE_CODE = "lsoa21"
 
@@ -15,7 +16,7 @@ AREATYPE_CODE = "lsoa21"
     ],
 )
 @pytest.mark.parametrize("origin", ["http://example.com", None])
-def test_areatype_json(client, origin, endpoint):
+def test_areatype_json(client: TestClient, origin: str | None, endpoint: str):
     headers = {}
     check_cors = False
     if origin:
@@ -41,12 +42,12 @@ def test_areatype_json(client, origin, endpoint):
         "/api/v1/areatypes/{}".format("kjhgdskgds"),
     ],
 )
-def test_areatype_json_missing(client, endpoint):
+def test_areatype_json_missing(client: TestClient, endpoint: str):
     rv = client.get(endpoint)
     assert rv.status_code == HTTPStatus.NOT_FOUND
 
 
-def test_areatype_html(client):
+def test_areatype_html(client: TestClient):
     rv = client.get("/areatypes/{}.html".format(AREATYPE_CODE))
     content = rv.text
     assert rv.headers["Content-Type"].split(";")[0].strip() == "text/html"
@@ -54,12 +55,12 @@ def test_areatype_html(client):
     assert AREATYPE_CODE in content
 
 
-def test_areatype_html_missing(client):
+def test_areatype_html_missing(client: TestClient):
     rv = client.get("/areatypes/{}.html".format("kjhgdskgds"))
     assert rv.status_code == HTTPStatus.NOT_FOUND
 
 
-def test_areatypes_html(client):
+def test_areatypes_html(client: TestClient):
     rv = client.get("/areatypes")
     content = rv.text
     print(rv.headers)
@@ -70,7 +71,7 @@ def test_areatypes_html(client):
     assert AREATYPE_CODE in content
 
 
-def test_areatype_csv(client):
+def test_areatype_csv(client: TestClient):
     rv = client.get("/areatypes/{}.csv".format(AREATYPE_CODE))
     content = rv.text
     assert rv.headers["Content-Type"].split(";")[0].strip() == "text/csv"

@@ -4,7 +4,7 @@ version = "2.0.0"
 description = "A database and search engine for UK postcodes."
 readme = "readme.md"
 authors = [{ name = "David Kane", email = "david@dkane.net" }]
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 dependencies = [
     "a2wsgi",
     "blinker",

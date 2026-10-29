@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime as dt
 
 import stripe
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -103,13 +103,15 @@ async def handle_subscription_created(subscription, db: Session):
             stripe_subscription_id=subscription.id,
             stripe_price_id=subscription.items.data[0].price.id,
             status=subscription.status,
-            current_period_start=datetime.fromtimestamp(
+            current_period_start=dt.datetime.fromtimestamp(
                 subscription.current_period_start
             ),
-            current_period_end=datetime.fromtimestamp(subscription.current_period_end),
+            current_period_end=dt.datetime.fromtimestamp(
+                subscription.current_period_end
+            ),
             cancel_at_period_end=subscription.cancel_at_period_end,
-            canceled_at=datetime.fromtimestamp(subscription.canceled_at)
-            if subscription.canceled_at
+            cancelled_at=dt.datetime.fromtimestamp(subscription.cancelled_at)
+            if subscription.cancelled_at
             else None,
         )
 
@@ -132,16 +134,16 @@ async def handle_subscription_updated(subscription, db: Session):
     if db_subscription:
         # Update subscription record
         db_subscription.status = subscription.status
-        db_subscription.current_period_start = datetime.fromtimestamp(
+        db_subscription.current_period_start = dt.datetime.fromtimestamp(
             subscription.current_period_start
         )
-        db_subscription.current_period_end = datetime.fromtimestamp(
+        db_subscription.current_period_end = dt.datetime.fromtimestamp(
             subscription.current_period_end
         )
         db_subscription.cancel_at_period_end = subscription.cancel_at_period_end
-        db_subscription.canceled_at = (
-            datetime.fromtimestamp(subscription.canceled_at)
-            if subscription.canceled_at
+        db_subscription.cancelled_at = (
+            dt.datetime.fromtimestamp(subscription.cancelled_at)
+            if subscription.cancelled_at
             else None
         )
 
@@ -161,12 +163,12 @@ async def handle_subscription_deleted(subscription, db: Session):
     )
 
     if db_subscription:
-        # Mark subscription as canceled
-        db_subscription.status = "canceled"
-        db_subscription.canceled_at = datetime.now()
+        # Mark subscription as cancelled
+        db_subscription.status = "cancelled"
+        db_subscription.cancelled_at = dt.datetime.now()
 
         db.commit()
-        print(f"Marked subscription {db_subscription.id} as canceled")
+        print(f"Marked subscription {db_subscription.id} as cancelled")
 
 
 async def handle_payment_succeeded(invoice, db: Session):
@@ -190,7 +192,7 @@ async def handle_payment_succeeded(invoice, db: Session):
             amount=invoice.amount_paid,
             currency=invoice.currency,
             status="succeeded",
-            created_at=datetime.fromtimestamp(invoice.created),
+            created_at=dt.datetime.fromtimestamp(invoice.created),
         )
 
         db.add(new_payment)
@@ -219,7 +221,7 @@ async def handle_payment_failed(invoice, db: Session):
             amount=invoice.amount_due,
             currency=invoice.currency,
             status="failed",
-            created_at=datetime.fromtimestamp(invoice.created),
+            created_at=dt.datetime.fromtimestamp(invoice.created),
         )
 
         db.add(new_payment)
@@ -324,11 +326,11 @@ async def cancel_subscription(subscription_id: str, db: Session = Depends(get_db
         )
 
         if db_subscription:
-            db_subscription.status = "canceled"
-            db_subscription.canceled_at = datetime.now()
+            db_subscription.status = "cancelled"
+            db_subscription.cancelled_at = dt.datetime.now()
             db.commit()
 
-        return {"status": "canceled", "subscription": subscription}
+        return {"status": "cancelled", "subscription": subscription}
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

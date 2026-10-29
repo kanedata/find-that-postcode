@@ -1,6 +1,6 @@
+import datetime as dt
 import enum
 from collections import defaultdict
-from datetime import date, datetime
 from typing import Any, Literal
 
 from pydantic import BaseModel, model_validator
@@ -65,8 +65,8 @@ class Area(AreaBase):
     areaehect: float | None = None
     areaihect: float | None = None
     arealhect: float | None = None
-    date_end: datetime | None = None
-    date_start: datetime | None = None
+    date_end: dt.datetime | None = None
+    date_start: dt.datetime | None = None
     entity: str | None = None
     equivalents: AreaEquivalents | None = None
     name_welsh: str | None = None
@@ -197,8 +197,8 @@ class PostcodeStats(BaseModel):
 
 
 class Postcode(BaseModel):
-    dointr: date | None = None
-    doterm: date | None = None
+    dointr: dt.date | None = None
+    doterm: dt.date | None = None
     location: Location | None = None
     pcd: str | None = None
     pcd2: str | None = None

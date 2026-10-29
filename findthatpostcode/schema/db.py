@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime as dt
 from typing import Optional
 
 from elasticsearch import Elasticsearch
@@ -32,8 +32,8 @@ class Postcode(Document):
     pcd: Optional[str] = Keyword()  # pyright: ignore[reportAssignmentType]
     pcd2: Optional[str] = Keyword()  # pyright: ignore[reportAssignmentType]
     pcds: Optional[str] = Keyword()  # pyright: ignore[reportAssignmentType]
-    dointr: Optional[datetime] = Date()  # pyright: ignore[reportAssignmentType]
-    doterm: Optional[datetime] = Date()  # pyright: ignore[reportAssignmentType]
+    dointr: Optional[dt.datetime] = Date()  # pyright: ignore[reportAssignmentType]
+    doterm: Optional[dt.datetime] = Date()  # pyright: ignore[reportAssignmentType]
     usertype: Optional[int] = Long()  # pyright: ignore[reportAssignmentType]
     oseast1m: Optional[int] = Long()  # pyright: ignore[reportAssignmentType]
     osnrth1m: Optional[int] = Long()  # pyright: ignore[reportAssignmentType]
@@ -150,8 +150,8 @@ class Area(Document):
     name_welsh: Optional[str] = Text()  # pyright: ignore[reportAssignmentType]
     statutory_instrument_id: Optional[str] = Keyword()  # pyright: ignore[reportAssignmentType]
     statutory_instrument_title: Optional[str] = Text()  # pyright: ignore[reportAssignmentType]
-    date_start: Optional[datetime] = Date()  # pyright: ignore[reportAssignmentType]
-    date_end: Optional[datetime] = Date()  # pyright: ignore[reportAssignmentType]
+    date_start: Optional[dt.datetime] = Date()  # pyright: ignore[reportAssignmentType]
+    date_end: Optional[dt.datetime] = Date()  # pyright: ignore[reportAssignmentType]
     parent: Optional[str] = Keyword()  # pyright: ignore[reportAssignmentType]
     entity: Optional[str] = Keyword()  # pyright: ignore[reportAssignmentType]
     owner: Optional[str] = Keyword()  # pyright: ignore[reportAssignmentType]

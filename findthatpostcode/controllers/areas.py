@@ -1,6 +1,6 @@
+import datetime as dt
 import io
 import json
-from datetime import datetime
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Generator
 
@@ -294,9 +294,9 @@ class Area(Controller):
 
         # turn dates into dates
         for i in self.date_fields:
-            if data.get(i) and not isinstance(data[i], datetime):
+            if data.get(i) and not isinstance(data[i], dt.datetime):
                 try:
-                    data[i] = datetime.strptime(data[i][0:10], "%Y-%m-%d")
+                    data[i] = dt.datetime.strptime(data[i][0:10], "%Y-%m-%d")
                 except ValueError:
                     continue
 

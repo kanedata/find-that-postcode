@@ -83,7 +83,7 @@
                 <th>Status</th>
                 <th>Price</th>
                 <th>Period</th>
-                <th>Canceled At</th>
+                <th>cancelled At</th>
               </tr>
             </thead>
             <tbody>
@@ -91,7 +91,7 @@
               <tr>
                 <td>{{ subscription.stripe_subscription_id }}</td>
                 <td>
-                  <span class="tag {% if subscription.status == 'active' %}is-success{% elif subscription.status == 'canceled' %}is-danger{% else %}is-warning{% endif %}">
+                  <span class="tag {% if subscription.status == 'active' %}is-success{% elif subscription.status == 'cancelled' %}is-danger{% else %}is-warning{% endif %}">
                     {{ subscription.status }}
                   </span>
                 </td>
@@ -101,8 +101,8 @@
                   {{ subscription.current_period_end|datetimeformat }}
                 </td>
                 <td>
-                  {% if subscription.canceled_at %}
-                    {{ subscription.canceled_at|datetimeformat }}
+                  {% if subscription.cancelled_at %}
+                    {{ subscription.cancelled_at|datetimeformat }}
                   {% else %}
                     -
                   {% endif %}
@@ -441,7 +441,7 @@ if (confirmActionBtn) {
       });
       
       if (response.ok) {
-        alert('Subscription canceled successfully');
+        alert('Subscription cancelled successfully');
         window.location.reload();
       } else {
         const error = await response.json();

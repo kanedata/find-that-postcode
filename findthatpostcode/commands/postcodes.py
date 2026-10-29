@@ -3,7 +3,7 @@ Import commands for the register of geographic codes and code history database
 """
 
 import csv
-import datetime
+import datetime as dt
 import hashlib
 import io
 import zipfile
@@ -69,7 +69,7 @@ def import_nspl(url=None, es_index=POSTCODE_INDEX):
                 # date fields
                 for j in ["dointr", "doterm"]:
                     if i[j]:
-                        i[j] = datetime.datetime.strptime(i[j], "%Y%m")
+                        i[j] = dt.datetime.strptime(i[j], "%Y%m")
 
                 # latitude and longitude
                 for j in ["lat", "long"]:

@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 from http import HTTPStatus
 from typing import Annotated, Any, AsyncGenerator, Optional
 
@@ -50,7 +50,7 @@ class DBSessionBackend(ISessionBackend):
                 or_(
                     UserSession.expire_date == None,  # noqa: E711
                     UserSession.expire_date  # pyright: ignore[reportOptionalOperand]
-                    > datetime.datetime.now(datetime.timezone.utc),
+                    > dt.datetime.now(dt.timezone.utc),
                 ),
             )
         ).first()
@@ -63,8 +63,7 @@ class DBSessionBackend(ISessionBackend):
 
         # convert exp to datetime from seconds
         expire_date = (
-            datetime.datetime.now(datetime.timezone.utc)
-            + datetime.timedelta(seconds=exp)
+            dt.datetime.now(dt.timezone.utc) + dt.timedelta(seconds=exp)
             if exp
             else None
         )

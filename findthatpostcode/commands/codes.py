@@ -4,7 +4,7 @@ Import commands for the register of geographic codes and code history database
 
 import codecs
 import csv
-import datetime
+import datetime as dt
 import io
 import zipfile
 from collections import defaultdict
@@ -34,9 +34,9 @@ DEFAULT_ENCODING = "utf-8-sig"
 def process_date(value, date_format="%d/%m/%Y"):
     if value in ["", "n/a"]:
         return None
-    if isinstance(value, datetime.datetime):
+    if isinstance(value, dt.datetime):
         return value
-    return datetime.datetime.strptime(value, date_format)
+    return dt.datetime.strptime(value, date_format)
 
 
 def process_str(value):

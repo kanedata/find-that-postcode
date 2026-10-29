@@ -1,6 +1,6 @@
 """Subscription management endpoints"""
 
-from datetime import datetime
+import datetime as dt
 
 import stripe
 from fastapi import APIRouter, Depends, HTTPException
@@ -165,8 +165,8 @@ async def cancel_subscription(subscription_id: int, db: Session = Depends(get_db
         )
 
         # Update subscription in database
-        subscription.status = "canceled"
-        subscription.canceled_at = datetime.now()
+        subscription.status = "cancelled"
+        subscription.cancelled_at = dt.datetime.now()
         db.commit()
 
         return {
@@ -181,7 +181,7 @@ async def cancel_subscription(subscription_id: int, db: Session = Depends(get_db
 
 @router.post("/reactivate/{subscription_id}")
 async def reactivate_subscription(subscription_id: int, db: Session = Depends(get_db)):
-    """Reactivate a canceled subscription"""
+    """Reactivate a cancelled subscription"""
     try:
         stripe.api_key = STRIPE_SECRET_KEY
 
@@ -193,32 +193,32 @@ async def reactivate_subscription(subscription_id: int, db: Session = Depends(ge
         if not subscription:
             raise HTTPException(status_code=404, detail="Subscription not found")
 
-        if subscription.status != "canceled":
-            raise HTTPException(status_code=400, detail="Subscription is not canceled")
+        if subscription.status != "cancelled":
+            raise HTTPException(status_code=400, detail="Subscription is not cancelled")
 
         # Reactivate subscription in Stripe
         stripe_subscription = stripe.Subscription.retrieve(
             subscription.stripe_subscription_id
         )
 
-        if stripe_subscription.status == "canceled":
+        if stripe_subscription.status == "cancelled":
             # Create a new subscription with the same price
             new_subscription = stripe.Subscription.create(
                 customer=stripe_subscription.customer,
                 items=[{"price": subscription.stripe_price_id}],
-                backdate_start_date=datetime.now().timestamp(),
+                backdate_start_date=dt.datetime.now().timestamp(),
             )
 
             # Update database record
             subscription.stripe_subscription_id = new_subscription.id
             subscription.status = new_subscription.status
-            subscription.current_period_start = datetime.fromtimestamp(
+            subscription.current_period_start = dt.datetime.fromtimestamp(
                 new_subscription.current_period_start
             )
-            subscription.current_period_end = datetime.fromtimestamp(
+            subscription.current_period_end = dt.datetime.fromtimestamp(
                 new_subscription.current_period_end
             )
-            subscription.canceled_at = None
+            subscription.cancelled_at = None
             subscription.cancel_at_period_end = new_subscription.cancel_at_period_end
             db.commit()
 
@@ -228,9 +228,9 @@ async def reactivate_subscription(subscription_id: int, db: Session = Depends(ge
                 "subscription": subscription,
             }
         else:
-            # Just update the status if it's not actually canceled in Stripe
+            # Just update the status if it's not actually cancelled in Stripe
             subscription.status = stripe_subscription.status
-            subscription.canceled_at = None
+            subscription.cancelled_at = None
             db.commit()
 
             return {"status": "success", "subscription": subscription}

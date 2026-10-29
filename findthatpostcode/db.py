@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 from typing import Annotated, Generator
 
 import click
@@ -74,12 +74,12 @@ def init_es(reset: bool = False):
 
 async def get_log_db():
     if LOGGING_DB:
-        datetime.datetime.now()
+        dt.datetime.now()
         db = Database(
             LOGGING_DB.format(
-                year=datetime.datetime.now().year,
-                month=datetime.datetime.now().month,
-                day=datetime.datetime.now().day,
+                year=dt.datetime.now().year,
+                month=dt.datetime.now().month,
+                day=dt.datetime.now().day,
             )
         )
     else:

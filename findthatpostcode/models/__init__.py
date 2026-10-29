@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime as dt
 from typing import Optional
 
 from sqlmodel import Field, Relationship, SQLModel
@@ -29,11 +29,11 @@ class Subscription(SQLModel, table=True):
     user_id: int = Field(foreign_key="user.id")
     stripe_subscription_id: str
     stripe_price_id: str
-    status: str  # active, canceled, past_due, etc.
-    current_period_start: datetime
-    current_period_end: datetime
+    status: str  # active, cancelled, past_due, etc.
+    current_period_start: dt.datetime
+    current_period_end: dt.datetime
     cancel_at_period_end: bool = Field(default=False)
-    canceled_at: Optional[datetime] = Field(default=None)
+    cancelled_at: Optional[dt.datetime] = Field(default=None)
 
     # Relationships
     user: User = Relationship(back_populates="subscriptions")
@@ -47,7 +47,7 @@ class Payment(SQLModel, table=True):
     amount: int  # in cents/pence
     currency: str
     status: str  # succeeded, failed, etc.
-    created_at: datetime
+    created_at: dt.datetime
 
     # Relationships
     subscription: Subscription = Relationship(back_populates="payments")
@@ -56,4 +56,4 @@ class Payment(SQLModel, table=True):
 class UserSession(SQLModel, table=True):
     session_key: str = Field(primary_key=True)
     session_data: bytes  # Serialized session data
-    expire_date: Optional[datetime] = Field(default=None)
+    expire_date: Optional[dt.datetime] = Field(default=None)

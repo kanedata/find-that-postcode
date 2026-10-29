@@ -1,6 +1,6 @@
 """Authentication endpoints for user management"""
 
-from datetime import timedelta
+import datetime as dt
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -49,7 +49,7 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 #             headers={"WWW-Authenticate": "Bearer"},
 #         )
 
-#     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+#     access_token_expires = dt.timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 #     access_token = create_access_token(
 #         data={"sub": user.email}, expires_delta=access_token_expires
 #     )

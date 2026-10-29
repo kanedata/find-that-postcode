@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass, field
@@ -48,7 +48,7 @@ def clean_postcode(postcode: str | None) -> str:
 
 def inject_context(request):
     return dict(
-        now=datetime.datetime.now(),
+        now=dt.datetime.now(),
         key_area_types=KEY_AREA_TYPES,
         other_codes=OTHER_CODES,
         area_types=AREA_TYPES,

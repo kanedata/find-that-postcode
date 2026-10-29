@@ -1,5 +1,5 @@
+import datetime as dt
 import re
-from datetime import datetime
 from http import HTTPStatus
 
 from dictlib import dig_get
@@ -75,9 +75,9 @@ class Postcode(Controller):
     def process_attributes(self, data: dict) -> dict:
         # turn dates into dates
         for i in self.date_fields:
-            if data.get(i) and not isinstance(data[i], datetime):
+            if data.get(i) and not isinstance(data[i], dt.datetime):
                 try:
-                    data[i] = datetime.strptime(data[i][0:10], "%Y-%m-%d")
+                    data[i] = dt.datetime.strptime(data[i][0:10], "%Y-%m-%d")
                 except ValueError:
                     continue
 
@@ -188,7 +188,7 @@ class Postcode(Controller):
         json, included = super().toJSON(role)
         for i in self.date_fields:
             if json.get("attributes", {}).get(i) and isinstance(
-                json["attributes"][i], datetime
+                json["attributes"][i], dt.datetime
             ):
                 json["attributes"][i] = json["attributes"][i].strftime("%Y-%m-%d")
 

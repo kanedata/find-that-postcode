@@ -94,8 +94,8 @@ the [Office for National Statistics](https://geoportal.statistics.gov.uk/) and
     #     "name": "TBD",
     #     # "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
     # },  # @todo License?
-    swagger_js_url="/static/swagger-ui/swagger-ui-bundle.js",
-    swagger_css_url="/static/swagger-ui/swagger-ui.css",
+    # swagger_js_url="/static/swagger-ui/swagger-ui-bundle.js",
+    # swagger_css_url="/static/swagger-ui/swagger-ui.css",
 )
 app.add_middleware(
     CORSMiddleware,

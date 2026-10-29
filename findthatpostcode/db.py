@@ -1,5 +1,5 @@
 import datetime as dt
-from typing import Annotated, Generator
+from typing import Annotated, AsyncGenerator, Generator
 
 import click
 from boto3 import session
@@ -34,11 +34,11 @@ INDEXES = {
 }
 
 
-def get_es():
+def get_es() -> Elasticsearch:
     return Elasticsearch(ES_URL)
 
 
-async def get_es_dep():
+async def get_es_dep() -> AsyncGenerator[Elasticsearch, None]:
     db = get_es()
     try:
         yield db
@@ -49,7 +49,7 @@ async def get_es_dep():
 ElasticsearchDep = Annotated[Elasticsearch, Depends(get_es_dep)]
 
 
-def init_es(reset: bool = False):
+def init_es(reset: bool = False) -> None:
     es = get_es()
     doc_type = "_doc"
 
@@ -72,7 +72,7 @@ def init_es(reset: bool = False):
         )
 
 
-async def get_log_db():
+async def get_log_db() -> AsyncGenerator[Database, None]:
     if LOGGING_DB:
         dt.datetime.now()
         db = Database(
@@ -104,7 +104,7 @@ def get_s3_client() -> S3Client:
     )
 
 
-async def get_s3_client_dep():
+async def get_s3_client_dep() -> AsyncGenerator[S3Client, None]:
     db = get_s3_client()
     try:
         yield db

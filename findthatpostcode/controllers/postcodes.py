@@ -10,6 +10,7 @@ from findthatpostcode.controllers.controller import Controller
 from findthatpostcode.controllers.places import Place
 from findthatpostcode.metadata import (
     OAC11_CODE,
+    OAC21_CODE,
     OTHER_CODES,
     RU11IND_CODES,
     RUC21_CODES,
@@ -81,16 +82,41 @@ class Postcode(Controller):
                 except ValueError:
                     continue
 
-        oac11 = data.get("oac11")
-        if isinstance(oac11, str):
-            oac11_data = OAC11_CODE.get(oac11)
-            if oac11_data:
-                data["oac11"] = {
-                    "code": oac11,
-                    "supergroup": oac11_data[0],
-                    "group": oac11_data[1],
-                    "subgroup": oac11_data[2],
-                }
+        oac11_code = data.get("oac11", "")
+        if isinstance(oac11_code, str):
+            oac11_code = oac11_code.upper()
+        oac11 = OAC11_CODE.get(oac11_code)
+        data["oac11"] = {
+            "code": oac11_code,
+            "supergroup": None,
+            "group": None,
+            "subgroup": None,
+        }
+        if oac11:
+            data["oac11"] = {
+                "code": oac11_code,
+                "supergroup": oac11[0],
+                "group": oac11[1],
+                "subgroup": oac11[2],
+            }
+
+        oac21_code = data.get("oac21", "")
+        if isinstance(oac21_code, str):
+            oac21_code = oac21_code.upper()
+        oac21 = OAC21_CODE.get(oac21_code)
+        data["oac21"] = {
+            "code": oac21_code,
+            "supergroup": None,
+            "group": None,
+            "subgroup": None,
+        }
+        if oac21:
+            data["oac21"] = {
+                "code": oac21_code,
+                "supergroup": oac21[0],
+                "group": oac21[1],
+                "subgroup": oac21[2],
+            }
 
         ru11ind = data.get("ru11ind")
         if isinstance(ru11ind, str) and RU11IND_CODES.get(ru11ind):

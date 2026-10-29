@@ -88,8 +88,8 @@ def import_nspl(url=None, es_index=POSTCODE_INDEX):
                     "oa21cd": "oa21",
                     "cty25cd": "cty",
                     "ced25cd": "ced",
-                    "lad25cd": "lad",
-                    "wd25cd": "wd",
+                    "lad25cd": "laua",
+                    "wd25cd": "ward",
                     "nhser24cd": "nhser",
                     "ctry25cd": "ctry",
                     "rgn25cd": "rgn",
@@ -109,6 +109,13 @@ def import_nspl(url=None, es_index=POSTCODE_INDEX):
                     "pfa23cd": "pfa",
                     "imd20ind": "imd",
                     "icb23cd": "icb",
+                    "ctry26cd": "ctry",
+                    "rgn26cd": "rgn",
+                    "cty26cd": "cty",
+                    "lad26cd": "laua",
+                    "wd26cd": "ward",
+                    "oac21ind": "oac21",
+                    "imd25ind": "imd",
                 }
                 for old, new in rename_fields.items():
                     if old in i:

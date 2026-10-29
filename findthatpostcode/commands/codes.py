@@ -9,6 +9,7 @@ import io
 import zipfile
 from collections import defaultdict
 
+import chardet
 import click
 import requests
 import requests_cache
@@ -175,63 +176,67 @@ def import_chd(url=None, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
     change_history = None
     changes = None
     equivalents = None
+    encodings = {}
     for f in z.namelist():
         if f.lower().startswith("changehistory") and f.lower().endswith(".csv"):
             change_history = f
+            encodings[f] = encoding
         elif f.lower().startswith("changes") and f.lower().endswith(".csv"):
             changes = f
+            encodings[f] = encoding
         elif f.lower().startswith("equivalents") and f.lower().endswith(".csv"):
             equivalents = f
+            encodings[f] = encoding
+
+    # detect encodings as they seem to change
+    detector = chardet.UniversalDetector(max_bytes=1024 * 1024 * 1024)
+    for f in encodings:
+        for line in z.open(f, "r"):
+            detector.feed(line)
+        detector.close()
+        encodings[f] = detector.result["encoding"]
+        detector.reset()
 
     if change_history is None or changes is None or equivalents is None:
         raise ValueError("Required CSV files not found in the ZIP archive")
 
-    encodings_to_try = ["utf-8-sig", "cp1252", "windows-1252"]
-    if encoding not in encodings_to_try:
-        encodings_to_try.insert(0, encoding)
-
-    for enc in encodings_to_try:
-        try:
-            with z.open(change_history, "r") as infile:
-                click.echo("Opening {} with {}".format(infile.name, enc))
-                reader = csv.DictReader(io.TextIOWrapper(infile, encoding=enc))
-                for k, area in tqdm.tqdm(enumerate(reader)):
-                    areas_cache[area["GEOGCD"]].append(
-                        {
-                            "code": area["GEOGCD"],
-                            "name": area["GEOGNM"],
-                            "name_welsh": area["GEOGNMW"] if area["GEOGNMW"] else None,
-                            "statutory_instrument_id": area["SI_ID"]
-                            if area["SI_ID"]
-                            else None,
-                            "statutory_instrument_title": area["SI_TITLE"]
-                            if area["SI_TITLE"]
-                            else None,
-                            "date_start": process_date(
-                                area["OPER_DATE"][0:10].split(" ")[0], "%d/%m/%Y"
-                            ),
-                            "date_end": process_date(
-                                area["TERM_DATE"][0:10].split(" ")[0], "%d/%m/%Y"
-                            ),
-                            "parent": area["PARENTCD"] if area["PARENTCD"] else None,
-                            "entity": process_str(area["ENTITYCD"]),
-                            "owner": area["OWNER"],
-                            "active": area["STATUS"] == "live",
-                            "areaehect": process_float(area["AREAEHECT"]),
-                            "areachect": process_float(area["AREACHECT"]),
-                            "areaihect": process_float(area["AREAIHECT"]),
-                            "arealhect": process_float(area["AREALHECT"]),
-                            "sort_order": area["GEOGCD"],
-                            "predecessor": [],
-                            "successor": [],
-                            "equivalents": {},
-                            "type": ENTITIES.get(process_str(area["ENTITYCD"])),
-                        }
-                    )
-            break
-        except UnicodeDecodeError:
-            click.echo(
-                f"Failed to read {change_history} with encoding {enc}, trying next..."
+    with z.open(change_history, "r") as infile:
+        click.echo(
+            "Opening {} with encoding {}".format(infile.name, encodings[change_history])
+        )
+        reader = csv.DictReader(
+            io.TextIOWrapper(infile, encoding=encodings[change_history])
+        )
+        for k, area in tqdm.tqdm(enumerate(reader)):
+            areas_cache[area["GEOGCD"]].append(
+                {
+                    "code": area["GEOGCD"],
+                    "name": area["GEOGNM"],
+                    "name_welsh": area["GEOGNMW"] if area["GEOGNMW"] else None,
+                    "statutory_instrument_id": area["SI_ID"] if area["SI_ID"] else None,
+                    "statutory_instrument_title": area["SI_TITLE"]
+                    if area["SI_TITLE"]
+                    else None,
+                    "date_start": process_date(
+                        area["OPER_DATE"][0:10].split(" ")[0], "%d/%m/%Y"
+                    ),
+                    "date_end": process_date(
+                        area["TERM_DATE"][0:10].split(" ")[0], "%d/%m/%Y"
+                    ),
+                    "parent": area["PARENTCD"] if area["PARENTCD"] else None,
+                    "entity": process_str(area["ENTITYCD"]),
+                    "owner": area["OWNER"],
+                    "active": area["STATUS"] == "live",
+                    "areaehect": process_float(area["AREAEHECT"]),
+                    "areachect": process_float(area["AREACHECT"]),
+                    "areaihect": process_float(area["AREAIHECT"]),
+                    "arealhect": process_float(area["AREALHECT"]),
+                    "sort_order": area["GEOGCD"],
+                    "predecessor": [],
+                    "successor": [],
+                    "equivalents": {},
+                    "type": ENTITIES.get(process_str(area["ENTITYCD"])),
+                }
             )
 
     for area_code, area_history in tqdm.tqdm(areas_cache.items()):
@@ -261,25 +266,18 @@ def import_chd(url=None, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
             "doc": area,
         }
 
-    for enc in encodings_to_try:
-        try:
-            with z.open(changes, "r") as infile:
-                click.echo("Opening {} with {}".format(infile.name, enc))
-                reader = csv.DictReader(io.TextIOWrapper(infile, encoding=enc))
-                for k, area in tqdm.tqdm(enumerate(reader)):
-                    if area["GEOGCD_P"] == "":
-                        continue
-                    if area["GEOGCD"] in areas:
-                        areas[area["GEOGCD"]]["doc"]["predecessor"].append(
-                            area["GEOGCD_P"]
-                        )
-                    if area["GEOGCD_P"] in areas:
-                        areas[area["GEOGCD_P"]]["doc"]["successor"].append(
-                            area["GEOGCD"]
-                        )
-            break
-        except UnicodeDecodeError:
-            click.echo(f"Failed to read {changes} with encoding {enc}, trying next...")
+    with z.open(changes, "r") as infile:
+        click.echo(
+            "Opening {} with encoding {}".format(infile.name, encodings[changes])
+        )
+        reader = csv.DictReader(io.TextIOWrapper(infile, encoding=encodings[changes]))
+        for k, area in tqdm.tqdm(enumerate(reader)):
+            if area["GEOGCD_P"] == "":
+                continue
+            if area["GEOGCD"] in areas:
+                areas[area["GEOGCD"]]["doc"]["predecessor"].append(area["GEOGCD_P"])
+            if area["GEOGCD_P"] in areas:
+                areas[area["GEOGCD_P"]]["doc"]["successor"].append(area["GEOGCD"])
 
     equiv = {
         "ons": ["GEOGCDO", "GEOGNMO"],
@@ -288,24 +286,21 @@ def import_chd(url=None, es_index=AREA_INDEX, encoding=DEFAULT_ENCODING):
         "scottish_government": ["GEOGCDS", "GEOGNMS"],
         "welsh_government": ["GEOGCDWG", "GEOGNMWG", "GEOGNMWWG"],
     }
-    for enc in encodings_to_try:
-        try:
-            with z.open(equivalents, "r") as infile:
-                click.echo("Opening {} with {}".format(infile.name, enc))
-                reader = csv.DictReader(io.TextIOWrapper(infile, encoding=enc))
-                for area in tqdm.tqdm(reader):
-                    if "GEOGCD" not in area:
-                        raise ValueError("No GEOGCD field in equivalents file")
-                    if area["GEOGCD"] not in areas:
-                        continue
-                    for k, v in equiv.items():
-                        if area[v[0]]:
-                            areas[area["GEOGCD"]]["doc"]["equivalents"][k] = area[v[0]]
-            break
-        except UnicodeDecodeError:
-            click.echo(
-                f"Failed to read {equivalents} with encoding {enc}, trying next..."
-            )
+    with z.open(equivalents, "r") as infile:
+        click.echo(
+            "Opening {} with encoding {}".format(infile.name, encodings[equivalents])
+        )
+        reader = csv.DictReader(
+            io.TextIOWrapper(infile, encoding=encodings[equivalents])
+        )
+        for area in tqdm.tqdm(reader):
+            if "GEOGCD" not in area:
+                raise ValueError("No GEOGCD field in equivalents file")
+            if area["GEOGCD"] not in areas:
+                continue
+            for k, v in equiv.items():
+                if area[v[0]]:
+                    areas[area["GEOGCD"]]["doc"]["equivalents"][k] = area[v[0]]
 
     bulk_upload(list(areas.values()), es, es_index, "areas")
 

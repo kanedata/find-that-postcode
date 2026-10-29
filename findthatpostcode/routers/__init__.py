@@ -17,4 +17,6 @@ router.include_router(postcodes_router, prefix="/postcodes")
 router.include_router(areas_router, prefix="/areas")
 router.include_router(areatype_router, prefix="/areatypes")
 router.include_router(place_router, prefix="/places")
-router.include_router(subscriptions_router, prefix="/subscriptions")
+router.include_router(
+    subscriptions_router, prefix="/subscriptions", include_in_schema=False
+)
